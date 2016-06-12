@@ -277,9 +277,9 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function getAIOrientation(charId, charStance)  
 // default behaviour
 { shuffle:
-  //  -   ~return ORIENTATION_DEFENSIVE
+    -   ~return ORIENTATION_DEFENSIVE
     -   ~return ORIENTATION_CAUTIOUS
-  //  -   ~return ORIENTATION_AGGRESSIVE
+    -   ~return ORIENTATION_AGGRESSIVE
 }
 
 === function getAIStance(charId)  
@@ -349,17 +349,17 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function setOrientationInitiative(ref fromInitiative, fromOrientation, toOrientation) 
 // todo consider: cautious from outside to here....???
 { 
-	-fromOrientation == ORIENTATION_CAUTIOUS: 
+	-fromOrientation == ORIENTATION_CAUTIOUS && toOrientation == ORIENTATION_CAUTIOUS: 
 	//THis shoudln't happen ORIETANTION cautious
 		~return
 }
 {
 - fromOrientation >= toOrientation && fromOrientation!=ORIENTATION_DEFENSIVE:
 	~fromInitiative = 1
-	setting intiaitive to 1
+	//setting intiaitive to 1
 - else:
 	~fromInitiative = 0
-	setting initaitive to 0
+	//setting initaitive to 0
 }
 
 
