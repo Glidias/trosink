@@ -1,12 +1,11 @@
 // Common globals
 VAR boutRounds=1	
 VAR boutExchange=1
+VAR boutStep=-1
 
 // Common Functions  (usually stateful, game-specific)
 === function showCombatStatus()
 ~ return "Round "+boutRounds+" - Exchange: "+boutExchange+"/2"
-
-//=== function showTargetInitiatives
 
 
 // Static Functions (stateless)
@@ -225,18 +224,62 @@ VAR charPersonName_lastAttacking = 0
 VAR shortRangeAdvantage = 0
 //VAR lastHadInitiative
 
+CONST RESOLVED_LOCKED = -1
+
 
 // Current combat functions
 
+=== function showPlayerInitiativeState()
+///* player
+{ charPersonName_fight_target==TARGET_NONE:{~return} }
+~temp mutual =  getTargetByCharId(charPersonName_fight_target) == charPersonName_id
+~temp mutualOrientation
+Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_fight_target)}{"   "}<>
+{
+	- charPersonName_fight_orientation == ORIENTATION_NONE || boutStep ==3:  // assumed initiative values are resolved by then...
+	 {
+	 	- mutual:
+	 		{ 
+	 			- charPersonName_fight_initiative:
+	 			{ getInitiativeByCharId(charPersonName_fight_target): Contesting for initiative.|You have initiative. }
+	 			- else:
+	 			{ getInitiativeByCharId(charPersonName_fight_target): Target has initiative.|Both without initiative. }
+	 		}
+	 	 - else:
+	 	 	{ charPersonName_fight_initiative: You have initiative.(target isn't aiming you) }
+	 }
+	- else:
+	 {
+	 	- mutual:
+	 		~mutualOrientation = getOrientationByCharId(charPersonName_fight_target)
+	 		{
+	 			-charPersonName_fight_orientation == ORIENTATION_AGGRESSIVE && mutualOrientation == ORIENTATION_AGGRESSIVE:  
+	 			  Contesting for initiative 
+	 			-else:
+	 			{
+	 			- charPersonName_fight_orientation != ORIENTATION_DEFENSIVE:
+	 				{ charPersonName_fight_orientation >  mutualOrientation: You have initiative.|Uncertain initiative }
+	 			- else:
+	 				{ mutualOrientation ==  ORIENTATION_DEFENSIVE: Both parties lack initiative.|Target has initiative. }
+	 				
+	 			}
+	 		}
+	 	
+	 	 - else:
+	 	 	{ charPersonName_fight_orientation != ORIENTATION_DEFENSIVE : You have initiative.(target isn't aiming you)|Without initiative and target isn't aiming you. }
+	 }
+}
+//*/
+
+
 
 // need to consider AI awareness of environment, situational aspects...
-
 === function getAIOrientation(charId, charStance)  
 // default behaviour
 { shuffle:
-    -   ~return ORIENTATION_DEFENSIVE
+  //  -   ~return ORIENTATION_DEFENSIVE
     -   ~return ORIENTATION_CAUTIOUS
-    -   ~return ORIENTATION_AGGRESSIVE
+  //  -   ~return ORIENTATION_AGGRESSIVE
 }
 
 === function getAIStance(charId)  
@@ -250,8 +293,6 @@ VAR shortRangeAdvantage = 0
     -   ~return STANCE_DEFENSIVE
 }
 
-=== function getTargets(fromId)
-~return
 
 
 === function getMobilityByCharId(charId)
@@ -284,14 +325,43 @@ VAR shortRangeAdvantage = 0
 	//*/
 }
 
-// note: doesn't take into account cautiousLocked case
-=== function getOrientationInitiative(fromOrientation, toOrientation) 
+=== function getInitiativeByCharId(charId)
 {
-	- fromOrientation >= toOrientation && fromOrientation!=ORIENTATION_DEFENSIVE:
-		~return 1
-	- else:
-		~return 0
+	///* utest all
+- charId == charPersonName_id: 
+	~return charPersonName_fight_initiative
+- charId == charPersonName2_id:
+	~return charPersonName2_fight_initiative
+	//*/
 }
+
+=== function getTargetByCharId(charId)
+{
+	///* utest all
+- charId == charPersonName_id: 
+	~return charPersonName_fight_target
+- charId == charPersonName2_id:
+	~return charPersonName2_fight_target
+	//*/
+}
+
+// note: doesn't take into account cautiousLocked case
+=== function setOrientationInitiative(ref fromInitiative, fromOrientation, toOrientation) 
+// todo consider: cautious from outside to here....???
+{ 
+	-fromOrientation == ORIENTATION_CAUTIOUS: 
+	//THis shoudln't happen ORIETANTION cautious
+		~return
+}
+{
+- fromOrientation >= toOrientation && fromOrientation!=ORIENTATION_DEFENSIVE:
+	~fromInitiative = 1
+	setting intiaitive to 1
+- else:
+	~fromInitiative = 0
+	setting initaitive to 0
+}
+
 
 
 === function fight_resolve_initiative(fromId, targetId, gainedInitiative )
@@ -304,7 +374,7 @@ VAR shortRangeAdvantage = 0
 		-else:
 			~charPersonName_fight_initiative = 0
 	}
-	~charPersonName_fight_cautiousLock = 0
+	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED	
 - fromId == charPersonName2_id:
 	{
 		-gainedInitiative>0: 
@@ -312,7 +382,7 @@ VAR shortRangeAdvantage = 0
 		-else:	
 			~charPersonName2_fight_initiative = 0
 	}
-	~charPersonName2_fight_cautiousLock = 0
+	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
 }
 {
@@ -325,7 +395,7 @@ VAR shortRangeAdvantage = 0
 			~charPersonName_fight_initiative = 0
 			
 	}
-	~charPersonName_fight_cautiousLock = 0
+	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED
 
 - targetId == charPersonName2_id:
 	{
@@ -334,10 +404,31 @@ VAR shortRangeAdvantage = 0
 		-else:	
 			~charPersonName2_fight_initiative = 0
 	}
-	~charPersonName2_fight_cautiousLock = 0
+	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
 }
-~return
+
+=== function fight_cancelBothInitiatives(fromId, targetId )
+{
+///* utest all
+- fromId == charPersonName_id: 
+	~charPersonName_fight_initiative = 0
+	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED	
+- fromId == charPersonName2_id:
+	~charPersonName2_fight_initiative = 0
+	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
+//*/
+}
+{
+///* utest all
+- targetId == charPersonName_id:
+	~charPersonName_fight_initiative = 0
+	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED
+- targetId == charPersonName2_id:
+	~charPersonName2_fight_initiative = 0
+	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
+//*/
+}
 
 === function fight_set_cautiousStates(fromId, targetId ) 
 {

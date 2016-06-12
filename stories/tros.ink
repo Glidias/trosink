@@ -20,11 +20,12 @@ Let's fight!
 -> Exchange
 
 === Exchange
-	Start of {boutExchange!=2:new|2nd} exchange. You are up against  (TODO: enemy roster)
+	Start of {boutExchange!=2:new|2nd} exchange. {boutExchange!=2:You are up against  (TODO: enemy roster)}
 	-> Combat_Step0 ->Combat_Step1 ->Combat_Step2 ->Combat_Step3 -> Combat_ResolveExchange -> Exchange
 
 
 === Combat_Step0
+	~boutStep = 0
 	~temp gotReveal = 0
 	///* player
 	{	charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused:
@@ -90,6 +91,7 @@ Let's fight!
 	
 
 === Combat_Step1
+	~boutStep = 1
 	~temp gotReveal = 0
 	///* player
 	{	charPersonName_FIGHT && charPersonName_fight_orientation==ORIENTATION_NONE && charPersonName_fight_paused:
@@ -138,7 +140,7 @@ Let's fight!
 	
 
 === Combat_Step2
-
+	~boutStep = 2
 	~temp gotReveal = 0
 
 	// Preinspect
@@ -257,12 +259,18 @@ Let's fight!
 
 
 === Combat_Step3
+	~boutStep = 3
 	{showCombatStatus()}
 	//STEP 3:
 	//kiv: If it's the 1st exchange, reveal any hidden L-mobility manuevers and resolve all L-mobility manuevers in order from highest to lowest mobility stat, using commit costs. If a mobility manuever fails to execute due to circumstance during the resolution, may consider some form of refund scheme, or no refunding.
 	
-	-> Combat_Step3.ResolveInitiatives
-
+	{	// limit resolving of new initiatives to only 1st exchange
+	-boutExchange == 1:
+		-> Combat_Step3.ResolveInitiatives
+	- else:
+		{showPlayerInitiativeState()}
+		-> DeclareCombatManuevers
+	}
 	= DeclareCombatManuevers
 	// Declare/reveal combat manuevers (their costs and details) in order of combatants that have initiative, then those without initiative, in order of lowest to highest adriotness stat.
 	//TODO: Declare moves...get lists of available moves, AI choose suitable move and CP, 
@@ -277,50 +285,63 @@ Let's fight!
 	~temp roll2
 	///* player
 	{  
-	   -charPersonName_FIGHT && charPersonName_fight_target!=TARGET_NONE: {
-		- charPersonName_fight_cautiousLock:
+	   -charPersonName_FIGHT && charPersonName_fight_target!=TARGET_NONE && charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED:
+	   {
+		- charPersonName_fight_orientation == ORIENTATION_CAUTIOUS && getOrientationByCharId(charPersonName_fight_target) == ORIENTATION_CAUTIOUS:
 			~roll = rollNumSuccesses(charPersonName_reflex,5,0)
 			~roll2 = rollNumSuccesses(getReflexByCharId(charPersonName_fight_target),5,0)
 			~whoWins = roll > roll2
 			{ 
 				-roll != roll2: 
-					{ fight_resolve_initiative(charPersonName_reflex, charPersonName_fight_target, whoWins) }
+					{ fight_resolve_initiative(charPersonName_id, charPersonName_fight_target, whoWins) }
 					{ 
-						- charPersonName_fight_initiative:
-						You took the initaitive over your cautious opponent.
+						- whoWins:
+						You took the initaitive over your cautious opponent. 
 						- else:
 						The enemy took the initiative over your cautious presence.
 					}
 				-else:
-					Both you and your opponent, being cautious, refuse to take the initiative this exchange.
+					Both parties remain cautiously uncertain.
+					{fight_cancelBothInitiatives(charPersonName_id, charPersonName_fight_target)}
 			}
 		- else:
-			~charPersonName_fight_initiative = getOrientationInitiative(charPersonName_fight_orientation, getOrientationByCharId(charPersonName_fight_target)) 
+			{ 
+				-  charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED: 
+					{setOrientationInitiative(charPersonName_fight_initiative, charPersonName_fight_orientation, getOrientationByCharId(charPersonName_fight_target)) }
+			}
 		}
-		- else:
-			~charPersonName_fight_initiative = 0
-			~charPersonName_fight_cautiousLock = 0
-			{charPersonName_FIGHT: You lost track of your moving target: {getNameOfChar(charPersonName_fight_target)}. }
+		//- else:
+			//~charPersonName_fight_initiative = 0
+		//	~charPersonName_fight_cautiousLock = 0
+			//{charPersonName_FIGHT: You lost track of your moving target: {getNameOfChar(charPersonName_fight_target)}. }
 	}	
 	//*/
 	///* utest
 	{  
-		-charPersonName2_FIGHT && charPersonName2_fight_target!=TARGET_NONE: {
-		-  charPersonName2_fight_cautiousLock:
+		-charPersonName2_FIGHT && charPersonName2_fight_target!=TARGET_NONE && charPersonName2_fight_cautiousLock !=  RESOLVED_LOCKED: 
+		{
+		- charPersonName2_fight_orientation == ORIENTATION_CAUTIOUS && getOrientationByCharId(charPersonName2_fight_target) == ORIENTATION_CAUTIOUS:
 			~roll = rollNumSuccesses(charPersonName2_reflex,5,0)
 			~roll2 = rollNumSuccesses(getReflexByCharId(charPersonName2_fight_target),5,0)
 			~whoWins = roll > roll2
-			{ -roll != roll2: {fight_resolve_initiative(charPersonName2_reflex, charPersonName2_fight_target, whoWins)} }
+			{ -roll != roll2: 
+				{fight_resolve_initiative(charPersonName2_id, charPersonName2_fight_target, whoWins)}
+				-else:
+					{fight_cancelBothInitiatives(charPersonName2_id, charPersonName2_fight_target)}
+			 }
 		- else:
-			~charPersonName2_fight_initiative = getOrientationInitiative(charPersonName2_fight_orientation, getOrientationByCharId(charPersonName2_fight_target))
+			{ 
+				-  charPersonName2_fight_cautiousLock !=  RESOLVED_LOCKED: 
+					{setOrientationInitiative(charPersonName2_fight_initiative, charPersonName2_fight_orientation, getOrientationByCharId(charPersonName2_fight_target)) }
+			}
 		} 
-		- else:
-			~charPersonName2_fight_initiative = 0
-			~charPersonName2_fight_cautiousLock = 0
-			{ charPersonName2_FIGHT: {getNameOfChar(charPersonName2_label)} lost track of {getDescribeLabelOfChar(charPersonName2_fight_target)} }
+		//- else:
+		//	~charPersonName2_fight_initiative = 0
+		//	~charPersonName2_fight_cautiousLock = 0
+			//{charPersonName2_FIGHT: You lost track of your moving target: {getNameOfChar(charPersonName2_fight_target)}. }
 	}
 	//*/
-	// TODO: reveal player's initiative relationship against 
+	{showPlayerInitiativeState()}
 	->Combat_Step3.DeclareCombatManuevers
 
 === Combat_ResolveExchange
@@ -334,10 +355,12 @@ Let's fight!
 	///* player
 	~charPersonName_fight_stance = STANCE_NEUTRAL
 	~charPersonName_fight_orientation = ORIENTATION_NONE
+	~charPersonName_fight_cautiousLock = 0
 	//*/
 	///* utest
 	~charPersonName2_fight_stance = STANCE_RESET
 	~charPersonName2_fight_orientation = ORIENTATION_NONE
+	~charPersonName2_fight_cautiousLock = 0
 	//*/
 
 	// proceed to next exchange
