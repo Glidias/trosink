@@ -6,7 +6,7 @@ INCLUDE manuevers.ink
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
 //->testing_fight_resolve_initiative
-//-> ChooseManueverListAtk("massweapons", 5, 14, ORIENTATION_AGGRESSIVE, 6,7,4,5, 1, 0,    -1,  GameStart)
+//-> ChooseManueverListAtk("massweapons", 5, 14, ORIENTATION_AGGRESSIVE,   6,7,4,5, 1, 0,    0,0, ->GameStart)
 //=== ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off ) 
 //-> ChooseManueverListDef("massweapons", 5, 14, ORIENTATION_CAUTIOUS,  0,1   ,5,5, 0,    7,7,6,7 ,    0  )
 

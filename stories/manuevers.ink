@@ -53,15 +53,70 @@ CONST MANUEVER_TYPE_RANGED = 1
 }
 
 
+=== ChooseManueverForChar( charId, ->_doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim )
+// 
+//, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off  ,  ATN, ATN2, ATN_off, ATN2_off, blunt  
+
+// Read-only Dependencies for manuever selection/consideration to request by reference
+~temp initiative
+
+Choosing manuever for character, inject required stats above
+~temp choiceCount = 0
+
+// all attack action availabilities
+~temp AVAIL_bash = 0
+~temp AVAIL_spike = 0
+~temp AVAIL_cut = 0
+~temp AVAIL_thrust = 0
+~temp AVAIL_beat = 0
+~temp AVAIL_bindstrike = 0
 
 
+->ChooseManueverMenu
 
-=== ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, _confirmSelection, ->_callbackThread )
+//Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
+
+= ChooseManueverMenu
+Choose the nature of your action
+{initiative} + Attack
+{initiative==0} + Defend
+//{initiative} + Double Attack   // allows cross attacking into another enemy that is targeting you
+//{initiative==0 && orientation==ORIENTATION_NONE && } + Quick Attack  // KIV
+{initiative} + Defend (with initiative)
+{initiative==0} + Attack (buy initiative)
+{initiative==0} + Attack (no initiative)
+//+ Change target
+//+ Change target (buy initiative)
+->DONE
+
+= ConfirmManuever
+To confirm manuever
+->_doneCallbackThread
+
+= CommitCombatPool
+Amount of CP to roll...
+-> DONE
+
+= AimTargetZone
+Which target zone do you wish to aim at?
+-> DONE
+
+
+// todo: factor this in once preparation outline is done
+=== ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, _confirmSelection, _altAction, ->_callbackThread )
 ~temp manueverAttackType = 0
 ~temp manueverDamageType = 0
 ~temp manueverCost = 0
 ~temp manueverTN = 0
 ~temp manueverNeedBodyAim = 1
+
+~temp choiceCount = 0
+~temp AVAIL_bash = 0
+~temp AVAIL_spike = 0
+~temp AVAIL_cut = 0
+~temp AVAIL_thrust = 0
+~temp AVAIL_beat = 0
+~temp AVAIL_bindstrike = 0
 
 ~temp stipulateCost
 ~temp stipulateTN
@@ -80,8 +135,10 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverTN = stipulateTN
 			-> ConfirmAtkManueverSelect
 		- else:
+			~choiceCount=choiceCount+1
+			~AVAIL_bash = 1
 			+ Bash....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "bash", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "bash", _altAction, _callbackThread )
 		}
 	}
 }
@@ -99,8 +156,10 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverTN = stipulateTN
 			-> ConfirmAtkManueverSelect
 		- else:
+			~choiceCount=choiceCount+1
+			~AVAIL_spike = 1
 			+ Spike....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "spike", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "spike", _altAction, _callbackThread )
 		}
 		
 	}
@@ -119,8 +178,10 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverTN = stipulateTN
 			-> ConfirmAtkManueverSelect
 		- else: 
+			~choiceCount=choiceCount+1
+			~AVAIL_cut = 1
 			+ Cut....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "cut", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "cut", _altAction, _callbackThread )
 		}
 		
 	}
@@ -139,8 +200,10 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverTN = stipulateTN
 			-> ConfirmAtkManueverSelect
 		-else :
+			~choiceCount=choiceCount+1
+			~AVAIL_thrust = 1
 			+ Thrust....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "thrust", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "thrust", _altAction, _callbackThread )
 		}
 
 		
@@ -160,8 +223,10 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverNeedBodyAim = 0
 			-> ConfirmAtkManueverSelect
 		- else:
+			~choiceCount=choiceCount+1
+			~AVAIL_beat = 1
 			+ Beat....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "beat", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "beat", _altAction, _callbackThread )
 		}	
 	}
 }
@@ -187,18 +252,21 @@ CONST MANUEVER_TYPE_RANGED = 1
 			~manueverNeedBodyAim = 0
 			-> ConfirmAtkManueverSelect
 		- else:
+			~choiceCount=choiceCount+1
+			~AVAIL_bindstrike = 1
 			+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "bindstrike", _callbackThread )
+			-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield, "bindstrike", _altAction, 	_callbackThread )
 		}
 
 	
 	}
 }
 { 
-- _confirmSelection == 0:
-+ [(Continue)]
-->_callbackThread
+	- _altAction == 0:
+		+ [(Continue)]
+		->_callbackThread
 }
+{CHOICE_COUNT() == 0: ->_callbackThread}
 
 
 /*

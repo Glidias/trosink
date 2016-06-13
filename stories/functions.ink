@@ -25,6 +25,7 @@ VAR boutStep=-1
 		~ return v2
 }
 
+
 === function rollD6() 
 { shuffle:
  	- ~return 1
@@ -190,13 +191,30 @@ VAR charPersonName_fight_target = TARGET_NONE
 VAR charPersonName_fight_target2 = TARGET_NONE
 VAR charPersonName_fight_cautiousLock = 0
 VAR charPersonName_manuever = 0
-VAR charPersonName_manuever2 = 0
-VAR charPersonName_manuever3 = 0
-VAR charPersonName_manuever_targetZone = 0
 VAR charPersonName_manuever_CP = 0
-VAR charPersonName_manuever2_targetZone = 0
+VAR charPersonName_manuever_targetZone = 0
+VAR charPersonName_manueverCost= 0
+VAR charPersonName_manueverTN= 0
+VAR charPersonName_manueverAttackType= 0
+VAR charPersonName_manueverDamageType= 0
+VAR charPersonName_manueverNeedBodyAim= 0
+VAR charPersonName_manuever2 = 0
 VAR charPersonName_manuever2_CP = 0
+VAR charPersonName_manuever2_targetZone = 0
+VAR charPersonName_manuever2Cost= 0
+VAR charPersonName_manuever2TN= 0
+VAR charPersonName_manuever2AttackType= 0
+VAR charPersonName_manuever2DamageType= 0
+VAR charPersonName_manuever2NeedBodyAim= 0
+VAR charPersonName_manuever3 = 0
 VAR charPersonName_manuever3_CP = 0
+VAR charPersonName_manuever3_targetZone = 0
+VAR charPersonName_manuever3Cost= 0
+VAR charPersonName_manuever3TN= 0
+VAR charPersonName_manuever3AttackType= 0
+VAR charPersonName_manuever3DamageType= 0
+VAR charPersonName_manuever3NeedBodyAim= 0
+
 VAR charPersonName_fight_paused = 1
 ///* utest 
 VAR charPersonName2_FIGHT = 1
@@ -209,13 +227,29 @@ VAR charPersonName2_fight_target = TARGET_NONE
 VAR charPersonName2_fight_target2 = TARGET_NONE
 VAR charPersonName2_fight_cautiousLock = 0
 VAR charPersonName2_manuever = 0
-VAR charPersonName2_manuever2 = 0
-VAR charPersonName2_manuever3 = 0
-VAR charPersonName2_manuever_targetZone = 0
 VAR charPersonName2_manuever_CP = 0
-VAR charPersonName2_manuever2_targetZone = 0
+VAR charPersonName2_manuever_targetZone = 0
+VAR charPersonName2_manueverCost= 0
+VAR charPersonName2_manueverTN= 0
+VAR charPersonName2_manueverAttackType= 0
+VAR charPersonName2_manueverDamageType= 0
+VAR charPersonName2_manueverNeedBodyAim= 0
+VAR charPersonName2_manuever2 = 0
 VAR charPersonName2_manuever2_CP = 0
+VAR charPersonName2_manuever2_targetZone = 0
+VAR charPersonName2_manuever2Cost= 0
+VAR charPersonName2_manuever2TN= 0
+VAR charPersonName2_manuever2AttackType= 0
+VAR charPersonName2_manuever2DamageType= 0
+VAR charPersonName2_manuever2NeedBodyAim= 0
+VAR charPersonName2_manuever3 = 0
 VAR charPersonName2_manuever3_CP = 0
+VAR charPersonName2_manuever3_targetZone = 0
+VAR charPersonName2_manuever3Cost= 0
+VAR charPersonName2_manuever3TN= 0
+VAR charPersonName2_manuever3AttackType= 0
+VAR charPersonName2_manuever3DamageType= 0
+VAR charPersonName2_manuever3NeedBodyAim= 0
 VAR charPersonName2_fight_paused = 1
 //*/
 
@@ -344,6 +378,52 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~return charPersonName2_fight_target
 	//*/
 }
+
+=== function getBeingTargettedCount(charId)
+~temp count=0
+{
+	///* utest all
+- charPersonName_fight_target == charId: 
+	~count= count + 1
+- charPersonName2_fight_target == charId: 
+	~count= count + 1
+	//*/
+}
+~return count
+
+=== function getBeingTargettedCountByAtLeast(charId, atLeast)
+~temp count=0
+{
+	///* utest all
+- charPersonName_fight_target == charId: 
+	~count= count + 1
+	{
+		- count >= atLeast: 
+			~return 1
+	}
+- charPersonName2_fight_target == charId: 
+	~count= count + 1
+	{
+		- count >= atLeast: 
+			~return 1
+	}
+	//*/
+}
+~return 0
+
+
+=== function charTargetedBy(charId, byId)
+{
+	///* utest all
+- byId == charPersonName_id: 
+	~return charPersonName_fight_target==charId
+- byId == charPersonName2_id:
+	~return charPersonName2_fight_target==charId
+	//*/
+}
+~return 0
+
+
 
 // note: doesn't take into account cautiousLocked case
 === function setOrientationInitiative(ref fromInitiative, fromOrientation, toOrientation) 
