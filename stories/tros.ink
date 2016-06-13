@@ -20,7 +20,7 @@ Let's fight!
 -> Exchange
 
 === Exchange
-	Start of {boutExchange!=2:new|2nd} exchange. {boutExchange!=2:You are up against  (TODO: enemy roster)}
+	Start of {boutExchange!=2:new|2nd} exchange. {boutExchange!=2:You are up against  (TODO: party/enemy roster)}
 	-> Combat_Step0 ->Combat_Step1 ->Combat_Step2 ->Combat_Step3 -> Combat_ResolveExchange -> Exchange
 
 
