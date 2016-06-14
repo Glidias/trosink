@@ -46,6 +46,10 @@ VAR boutStep=-1
 	-nSides==10:
 		~return rollD10()
 }
+// will return max nSideCapped available by default.
+~return rollD10   
+
+
 === function rollD2() 
 { shuffle:
  	- ~return 1
@@ -212,7 +216,7 @@ CONST charPersonName_isENEMY = 0
 CONST charPersonName_isYOU = 1
 //*/
 ///* utest
-CONST charPersonName2_AI = 1
+VAR charPersonName2_AI = 1
 CONST charPersonName2_isENEMY = 1
 CONST charPersonName2_isYOU = 0
 //*/
@@ -224,7 +228,7 @@ CONST charPersonName_id = 0
 CONST charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
 CONST charPersonName_mobility = 5
-VAR charPersonName_usingProfeciency =""
+VAR charPersonName_usingProfeciency ="swordandshield"
 VAR charPersonName_usingProfeciencyLevel = 15
 VAR charPersonName_carryOverShock = 0
 VAR charPersonName_cp = 0
@@ -239,8 +243,8 @@ CONST charPersonName2_id = 1
 CONST charPersonName2_label = "CharPersonName2"
 CONST charPersonName2_reflex = 3
 CONST charPersonName2_mobility = 4
-VAR charPersonName2_usingProfeciency = ""
-VAR charPersonName2_usingProfeciencyLevel = 0
+VAR charPersonName2_usingProfeciency = "massweapons"
+VAR charPersonName2_usingProfeciencyLevel = 8
 VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
@@ -445,6 +449,23 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
     -   ~return STANCE_NEUTRAL
     -   ~return STANCE_OFFENSIVE
     -   ~return STANCE_DEFENSIVE
+}
+
+
+=== function getCharMetaInfo(charId, ref label, ref isAI, ref isEnemy, ref isYou) 
+{
+///* utest all
+- charId == charPersonName_id: 
+	~label = charPersonName_label
+	~isAI = charPersonName_AI
+	~isEnemy = charPersonName_isENEMY
+	~isYou = charPersonName_isYOU
+- charId == charPersonName2_id:
+	~label = charPersonName2_label
+	~isAI = charPersonName2_AI
+	~isEnemy = charPersonName2_isENEMY
+	~isYou = charPersonName2_isYOU
+	//*/
 }
 
 

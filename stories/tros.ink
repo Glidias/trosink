@@ -6,7 +6,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-->testing_ChooseManueverForCharDef
+->testing_ChooseManueverForAIAtk
 
 -> GameStart
 

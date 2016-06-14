@@ -168,10 +168,19 @@ CONST MANUEVER_TYPE_RANGED = 1
 ~temp _ATN2_off
 ~temp _blunt  
 
+~temp _isAI
+ {getCharMetaInfo(charId, x, _isAI,x,x)}
+
+
 ~temp choiceCount = 0
+~temp stipulateCost
+~temp stipulateTN
+
 {getManueverSelectReadonlyDependencies(charId, _initiative, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt)}
 {getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
-initiative:{_initiative} {charPersonName_fight_initiative}
+
+// TODO: initiative should be based respective off to considered facing opponent, if it isn't primary target, then initiative is always considered to be false...
+initiative:{_initiative} 
 CP: {_diceAvailable} 
 ATNS: {_ATN} {_ATN2} 
 ATNS offhand: {_ATN_off} {_ATN2_off}
@@ -182,6 +191,7 @@ ProfLevel: {_profeciencyLevel}
 HasShield: {_hasShield}
 Last Attacked: {_lastAttacked}
 Blunt Weapon: {_blunt}
+isAI?:{_isAI}
 
 // all recorded attack action availabilities
 ~temp AVAIL_bash = 0
@@ -203,18 +213,240 @@ Blunt Weapon: {_blunt}
 ~temp AVAIL_expulsion = 1
 ~temp AVAIL_disarm = 1
 
-// todo..determine if NPC or PC is doing the selection
+~temp altAction
+~temp divertTo
+~temp aiFavCount
+
+~temp theConfirmedManuever
+
+
+{
+	- _isAI: 
+	~altAction = 1
+	~divertTo = ->AIManueverDecision
+	- else:
+	~altAction = 0
+	~divertTo = ->ChooseManueverMenu
+}
+
 {
 	- _initiative:
 		Attack
-		-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
+		-> ChooseManueverListAtk(0,altAction,divertTo )
 	- else:
 		Defend
-		-> ChooseManueverListDef(0,0,->ChooseManueverMenu)
+		-> ChooseManueverListDef(0,altAction,divertTo)
 }
 ->ChooseManueverMenu
-//Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
 
+
+= AIManueverConfirmFailedError
+AIManueverConfirmFailedError detected. This should not happen!
+->DONE
+
+= AILooseEndError
+AILooseEndError :: AI decision loose-end reached.
+->DONE
+
+
+
+= AIManueverDecision
+{
+	- _initiative:
+		-> AIManueverDecision_MakeRandomChoiceFavAtk(0, ->AIManueverMakeFavDecisionNow)
+	- else:
+		-> AIManueverDecision_MakeRandomChoiceFavDef(0, ->AIManueverMakeFavDecisionNow)
+}
+->AILooseEndError
+
+
+
+= AIManueverMakeFavDecisionNow
+~temp rollChoice
+{
+	- aiFavCount > 1:
+		~rollChoice = rollNSided(aiFavCount)
+	- aiFavCount == 1 :
+		~ rollChoice = 1
+	- aiFavCount ==0 :
+		->AICannotMakeFavDecision
+}
+{
+	- _initiative:
+		-> AIManueverDecision_MakeRandomChoiceFavAtk(rollChoice, ->AICannotMakeFavDecision)
+	- else:
+		-> AIManueverDecision_MakeRandomChoiceFavDef(rollChoice, ->AICannotMakeFavDecision)
+}
+->AILooseEndError
+
+
+
+= AICannotMakeFavDecision
+AI cannot make default decision from favourites. Handler todo:...
+Choice count..any choices? {choiceCount}
+For now, let's Do Nothing.
+->doneCallbackThread
+
+
+// How it works?
+// set parameter confirmDiceCHoice =0, if no finalised roll is made, but just need to consider numDice to roll based off aiFavCount
+// then re-call the same function with an N-sided dice roll to pick one of 'em'
+// Same trick applies to other AI menu selection routines
+
+= AIManueverDecision_MakeRandomChoiceFavAtk(confirmDiceChoice, ->noDecisionMadeYetCallback)
+~aiFavCount = 0
+// kiv:  ai can check more factors to determine if each move should be considered as a "favourite", such as how worth it is the expenditure for certain manuevers and such, etc. whether lower TN to gain intiative is more crucial then analysed reward, etc.
+{
+- _blunt:
+	{
+		-AVAIL_bash:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_bash:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_spike:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("spike", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_beat:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("beat", 1, ->AIManueverConfirmFailedError) }
+	}
+- else:
+	{
+		-AVAIL_cut:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("cut", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_thrust:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("thrust", 1, ->AIManueverConfirmFailedError) }
+	}
+}
+->noDecisionMadeYetCallback
+
+
+= AIManueverDecision_MakeRandomChoiceFavDef(confirmDiceChoice, ->noDecisionMadeYetCallback)
+~aiFavCount = 0
+// kiv:  ai can check more factors to determine if each move should be considered as a "favourite", such as how worth it is the expenditure for certain manuevers and such, etc. Example, if he is low on CP, he'll not bother risking life and limb with more expensives moves, etc.
+// . whether lower TN to gain intiative is more crucial then analysed reward, etc.
+// especially: whether to run or not, or go for some form of evasion
+{
+- _hasShield:
+	{
+		-AVAIL_block:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_block:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_block:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_block:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_blockopenstrike:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_blockopenstrike:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_blockopenstrike:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_expulsion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_fullevasion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_partialevasion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedError) }
+	}
+- else:
+	{
+		-AVAIL_parry:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_parry:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_parry:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_counter:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("counter", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_counter:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_rota:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("rota", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_expulsion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion",1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_disarm:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("disarm", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_fullevasion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedError) }
+	}
+	{
+		-AVAIL_partialevasion:
+		~aiFavCount = aiFavCount + 1
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedError) }
+	}
+}
+->noDecisionMadeYetCallback
+
+
+
+//Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
 // todo kiv other action types
 = ChooseManueverMenu
 Choose the nature of your action
@@ -233,10 +465,9 @@ Choose the nature of your action
 //+ Change target
 //+ Change target (buy initiative)
 + [(Do Nothing)]
-->DONE
+->doneCallbackThread
 
 = ConfirmManuever
-To confirm manuever
 ->doneCallbackThread
 
 = CommitCombatPool
@@ -249,11 +480,11 @@ Which target zone do you wish to aim at?
 
 
 = ChooseManueverListAtk(_confirmSelection, _altAction, ->_callbackThread )
-
-~temp stipulateCost
-~temp stipulateTN
 ~choiceCount=0
-
+{	
+	-_confirmSelection:
+		~theConfirmedManuever = _confirmSelection
+}
 { 	// Bash
 	- (_confirmSelection==0||_confirmSelection=="bash") && _blunt!=0 && _ATN: 
 	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "bash", _hasShield)
@@ -270,8 +501,13 @@ Which target zone do you wish to aim at?
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_bash = 1
-			+ Bash....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("bash", _altAction, _callbackThread )
+			{
+				- _altAction <= 0:
+					+ Bash....[({stipulateCost})tn:{stipulateTN}]
+					-> ChooseManueverListAtk("bash", _altAction, ->_callbackThread )
+				//-else:
+				//	->_callbackThread
+			}
 		}
 	}
 }
@@ -291,8 +527,13 @@ Which target zone do you wish to aim at?
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_spike = 1
-			+ Spike....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("spike", _altAction, _callbackThread )
+			{
+				- _altAction <= 0:
+					+ Spike....[({stipulateCost})tn:{stipulateTN}]
+					-> ChooseManueverListAtk("spike", _altAction, ->_callbackThread )
+				//-else:
+				//	->_callbackThread
+			}
 		}
 		
 	}
@@ -313,8 +554,13 @@ Which target zone do you wish to aim at?
 		- else: 
 			~choiceCount=choiceCount+1
 			~AVAIL_cut = 1
-			+ Cut....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("cut", _altAction, _callbackThread )
+			{
+				- _altAction <= 0:
+					+ Cut....[({stipulateCost})tn:{stipulateTN}]
+					-> ChooseManueverListAtk("cut", _altAction, ->_callbackThread )
+				//-else:
+				//	->_callbackThread
+			}
 		}
 		
 	}
@@ -335,8 +581,13 @@ Which target zone do you wish to aim at?
 		-else :
 			~choiceCount=choiceCount+1
 			~AVAIL_thrust = 1
-			+ Thrust....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("thrust", _altAction, _callbackThread )
+			{
+				- _altAction <= 0:
+					+ Thrust....[({stipulateCost})tn:{stipulateTN}]
+					-> ChooseManueverListAtk("thrust", _altAction, ->_callbackThread )
+				//-else:
+				//	->_callbackThread
+			}
 		}
 
 		
@@ -358,8 +609,13 @@ Which target zone do you wish to aim at?
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_beat = 1
-			+ Beat....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("beat", _altAction, _callbackThread )
+			{
+				- _altAction <= 0:
+					+ Beat....[({stipulateCost})tn:{stipulateTN}]
+					-> ChooseManueverListAtk("beat", _altAction, ->_callbackThread )
+				//-else:
+				//	->_callbackThread
+			}
 		}	
 	}
 }
@@ -387,8 +643,13 @@ Which target zone do you wish to aim at?
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_bindstrike = 1
-			+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}]
-			-> ChooseManueverListAtk("bindstrike", _altAction, 	_callbackThread )
+			{
+			- _altAction <= 0:
+				+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}]
+				-> ChooseManueverListAtk("bindstrike", _altAction, 	->_callbackThread )
+			//- else:
+			//	->_callbackThread
+			}
 		}
 
 	
@@ -427,6 +688,9 @@ Which target zone do you wish to aim at?
 
 
 = ConfirmAtkManueverSelect 
+.........
+~manuever = theConfirmedManuever
+ManueverID: {manuever}
 AttackType: {getAttackTypeLabel(manueverAttackType)}
 DamageType: {getDamageTypeLabel(manueverDamageType)}
 Need to Aim body zone: {manueverNeedBodyAim:Yes|No }
@@ -435,11 +699,11 @@ TN: {manueverTN}
 ->DONE
 
 = ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
-
-~temp stipulateCost
-~temp stipulateTN
 ~choiceCount=0
-
+{	
+	-_confirmSelection:
+		~theConfirmedManuever = _confirmSelection
+}
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
 	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) 
@@ -454,8 +718,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_block = 1
-				+ Block....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("block", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Block....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("block", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -473,8 +742,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_parry  = 1
-				+ Parry....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("parry", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Parry....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("parry", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -492,8 +766,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_duckweave = 1
-				+ Duck and Weave....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("duckweave", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Duck and Weave....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("duckweave", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -511,8 +790,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_partialevasion = 1
-				+ Partial Evasion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("partialevade", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Partial Evasion....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("partialevasion", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -530,8 +814,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_fullevasion = 1
-				+ Full Evasion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("fullevasion", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Full Evasion....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("fullevasion", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -549,8 +838,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_blockopenstrike = 1
-				+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("blockopenstrike", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("blockopenstrike", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -568,8 +862,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_counter = 1
-				+ Counter....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("counter", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Counter....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("counter", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -587,8 +886,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_rota = 1
-				+ Rota....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("rota", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Rota....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("rota", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -606,8 +910,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_expulsion = 1
-				+ Expulsion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("expulsion", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Expulsion....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("expulsion", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -625,8 +934,13 @@ TN: {manueverTN}
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_disarm = 1
-				+ Disarm....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef("disarm", _altAction, ->_callbackThread)
+				{
+					- _altAction <= 0:
+						+ Disarm....[({stipulateCost})tn:{stipulateTN}]
+						-> ChooseManueverListDef("disarm", _altAction, ->_callbackThread )
+					//-else:
+					//	->_callbackThread
+				}
 		}
 	}
 }
@@ -648,7 +962,10 @@ Grapple (Defensive) - Entering a clinch with an opponent before he hits.
 Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand while re-gripping like a spear.
 */
 
-= ConfirmDefManueverSelect 
+= ConfirmDefManueverSelect()
+.........
+~manuever = theConfirmedManuever
+ManueverID: {manuever}
 Cost: {manueverCost}
 TN: {manueverTN}
 ->DONE
