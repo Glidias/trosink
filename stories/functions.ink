@@ -230,7 +230,7 @@ VAR charPersonName_carryOverShock = 0
 VAR charPersonName_cp = 0
 VAR charPersonName_totalPain = 0
 VAR charPersonName_health = 5
-VAR charPersonName_equipOffhand = ""
+VAR charPersonName_equipOffhand = "shield"
 VAR charPersonName_equipMasterhand = "gladius"
 
 //*/

@@ -67,9 +67,11 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~lastAttacked = charPersonName_fight_lastAttacked
 	{getWeaponStatsForManueverFilter(charPersonName_equipMasterhand, x, DTN, DTNt, ATN, ATN2, blunt )}
 	{getWeaponStatsForManueverFilter(charPersonName_equipOffhand, hasShield, DTN_off, DTNt_off, ATN_off, ATN2_off, x )}
+
 //*/
 ///* utest
 - charId == charPersonName2_id:
+
 	~initiative = charPersonName2_fight_initiative
 	~profeciencyType = charPersonName2_usingProfeciency
 	~profeciencyLevel = charPersonName2_usingProfeciencyLevel
@@ -135,50 +137,51 @@ CONST MANUEVER_TYPE_RANGED = 1
 }
 
 
-=== ChooseManueverForChar( charId, enemyId, ->_doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim)
+=== ChooseManueverForChar( charId, enemyId, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim)
 // 
 //, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off  ,  ATN, ATN2, ATN_off, ATN2_off, blunt  
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
 ~temp x
 // common to both attack/defense
-~temp initiative
-~temp profeciencyType
-~temp profeciencyLevel
-~temp diceAvailable
-~temp orientation
-~temp hasShield     
+~temp _initiative
+~temp _profeciencyType
+~temp _profeciencyLevel
+~temp _diceAvailable
+~temp _orientation
+~temp _hasShield     
 // for defending only
-~temp lastAttacked
+~temp _lastAttacked
 // enemy specific
-~temp enemyDiceRolled
-~temp enemyTargetZone
-~temp enemyManueverType
+~temp _enemyDiceRolled
+~temp _enemyTargetZone
+~temp _enemyManueverType
 // -----
-~temp DTN
-~temp DTNt
-~temp DTN_off
-~temp DTNt_off
+~temp _DTN
+~temp _DTNt
+~temp _DTN_off
+~temp _DTNt_off
 // for attacking only
-~temp ATN 
-~temp ATN2
-~temp ATN_off
-~temp ATN2_off
-~temp blunt  
+~temp _ATN 
+~temp _ATN2
+~temp _ATN_off
+~temp _ATN2_off
+~temp _blunt  
 
 ~temp choiceCount = 0
-{getManueverSelectReadonlyDependencies(charId, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked,    DTN, DTNt, DTN_off, DTNt_off   ,    ATN, ATN2,  ATN_off, ATN2_off, blunt)}
-Orienting:{orientation} {charPersonName_fight_orientation}
-{getManueverSelectReadonlyEnemyDependencies(charId, enemyId, enemyDiceRolled, enemyTargetZone, enemyManueverType)}
-Orienting:{orientation} {charPersonName_fight_orientation}
-initiative:{initiative} {charPersonName_fight_initiative}
-CP: {diceAvailable} 
-ATNS: {ATN} {ATN2} 
-ATNS offhand: {ATN_off} {ATN2_off}
-Prof: {profeciencyType}
-ProfLevel: {profeciencyLevel}
-HasShield: {hasShield}
-Last Attacked: {lastAttacked}
+{getManueverSelectReadonlyDependencies(charId, _initiative, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt)}
+{getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
+initiative:{_initiative} {charPersonName_fight_initiative}
+CP: {_diceAvailable} 
+ATNS: {_ATN} {_ATN2} 
+ATNS offhand: {_ATN_off} {_ATN2_off}
+DTNs: {_DTN} {_DTNt}
+DTNS offhand: {_DTN_off} {_DTNt_off}
+Prof: {_profeciencyType}
+ProfLevel: {_profeciencyLevel}
+HasShield: {_hasShield}
+Last Attacked: {_lastAttacked}
+Blunt Weapon: {_blunt}
 
 // all recorded attack action availabilities
 ~temp AVAIL_bash = 0
@@ -188,36 +191,53 @@ Last Attacked: {lastAttacked}
 ~temp AVAIL_beat = 0
 ~temp AVAIL_bindstrike = 0
 
-// all recorded defend actoin availabilities todo
+// all recorded defend actoin availabilities
+~temp AVAIL_block = 1
+~temp AVAIL_parry = 1
+~temp AVAIL_duckweave =1
+~temp AVAIL_partialevasion = 1
+~temp AVAIL_fullevasion = 1
+~temp AVAIL_blockopenstrike = 1
+~temp AVAIL_counter = 1
+~temp AVAIL_rota = 1
+~temp AVAIL_expulsion = 1
+~temp AVAIL_disarm = 1
 
 // todo..determine if NPC or PC is doing the selection
 {
-	- initiative:
+	- _initiative:
+		Attack
 		-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 	- else:
-		todo:
-		Defending manuever menu
+		Defend
+		-> ChooseManueverListDef(0,0,->ChooseManueverMenu)
 }
 ->ChooseManueverMenu
 //Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
 
-
+// todo kiv other action types
 = ChooseManueverMenu
 Choose the nature of your action
-{initiative} + Attack
-{initiative==0} + Defend
-//{initiative} + Double Attack   // allows cross attacking into another enemy that is targeting you
-//{initiative==0 && orientation==ORIENTATION_NONE && } + Quick Attack  // KIV
-{initiative} + Defend (with initiative)
-{initiative==0} + Attack (buy initiative)
-{initiative==0} + Attack (no initiative)
++  {_initiative}  Attack
+	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
++ {_initiative==0}  Defend 
+	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
+//+ {_initiative} Double Attack   // allows cross attacking into another enemy that is targeting you
+//+ {_initiative==0 && orientation==ORIENTATION_NONE && } Quick Attack  // KIV
++ {_initiative}  Defend (with initiative)
+	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
++ {_initiative==0} Attack (buy initiative)
+	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
++ {_initiative==0} Attack (no initiative) 
+	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 //+ Change target
 //+ Change target (buy initiative)
++ [(Do Nothing)]
 ->DONE
 
 = ConfirmManuever
 To confirm manuever
-->_doneCallbackThread
+->doneCallbackThread
 
 = CommitCombatPool
 Amount of CP to roll...
@@ -232,14 +252,14 @@ Which target zone do you wish to aim at?
 
 ~temp stipulateCost
 ~temp stipulateTN
+~choiceCount=0
 
-Attack:
 { 	// Bash
-	- (_confirmSelection==0||_confirmSelection=="bash") && blunt!=0 && ATN: 
-	~stipulateCost= getManueverCostWithProfeciency(profeciencyType, "bash", hasShield)
-	~stipulateTN = ATN
+	- (_confirmSelection==0||_confirmSelection=="bash") && _blunt!=0 && _ATN: 
+	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "bash", _hasShield)
+	~stipulateTN = _ATN
 	{ 
-		- diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{
 		- _confirmSelection:
 			~manueverAttackType = ATTACK_TYPE_STRIKE
@@ -256,11 +276,11 @@ Attack:
 	}
 }
 {	// Spike
-	- (_confirmSelection==0||_confirmSelection=="spike") && blunt!=0 && ATN2: 
-	~stipulateCost= getManueverCostWithProfeciency(profeciencyType, "spike", hasShield)
-	~stipulateTN = ATN2
+	- (_confirmSelection==0||_confirmSelection=="spike") && _blunt!=0 && _ATN2: 
+	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "spike", _hasShield)
+	~stipulateTN = _ATN2
 	{
-		- diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{
 		- _confirmSelection:
 			~manueverAttackType = ATTACK_TYPE_THRUST
@@ -278,11 +298,11 @@ Attack:
 	}
 }
 { 	// Cut
-	- (_confirmSelection==0||_confirmSelection=="cut") && blunt==0 && ATN:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "cut", hasShield) 
-	~stipulateTN = ATN
+	- (_confirmSelection==0||_confirmSelection=="cut") && _blunt==0 && _ATN:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "cut", _hasShield) 
+	~stipulateTN = _ATN
 	{
-		-diceAvailable > stipulateCost: 
+		-_diceAvailable > stipulateCost: 
 		{
 		- _confirmSelection:
 			~manueverAttackType = ATTACK_TYPE_STRIKE
@@ -300,11 +320,11 @@ Attack:
 	}
 }
 { 	// Thrust
-	- (_confirmSelection==0||_confirmSelection=="thrust") && blunt==0 && ATN2:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "thrust", hasShield) 
-	~stipulateTN = ATN2
+	- (_confirmSelection==0||_confirmSelection=="thrust") && _blunt==0 && _ATN2:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "thrust", _hasShield) 
+	~stipulateTN = _ATN2
 	{
-		-diceAvailable > stipulateCost: 
+		-_diceAvailable > stipulateCost: 
 		{
 		- _confirmSelection:
 			~manueverAttackType = ATTACK_TYPE_THRUST
@@ -323,11 +343,11 @@ Attack:
 	}
 }
 { 	// Beat - Striking with the weapon at hand to knock an opponent's weapon or shield to the side
-	- (_confirmSelection==0||_confirmSelection=="beat") && orientation == ORIENTATION_AGGRESSIVE && ATN && profeciencyLevel >=4:
-	~stipulateCost =  getManueverCostWithProfeciency(profeciencyType, "beat", hasShield)
-	~stipulateTN = ATN
+	- (_confirmSelection==0||_confirmSelection=="beat") && _orientation == ORIENTATION_AGGRESSIVE && _ATN && _profeciencyLevel >=4:
+	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "beat", _hasShield)
+	~stipulateTN = _ATN
 	{
-	- diceAvailable > stipulateCost:
+	- _diceAvailable > stipulateCost:
 		{
 		- _confirmSelection:
 			~manueverAttackType = ATTACK_TYPE_STRIKE
@@ -344,20 +364,20 @@ Attack:
 	}
 }
 {	// Bind and Strike - Attacking with the offhand weapon to tie up an opponent's weapon.
-	- (_confirmSelection==0||_confirmSelection=="bindstrike") && (ATN_off!=0 || ATN2_off!=0):
-	~stipulateCost =  getManueverCostWithProfeciency(profeciencyType, "bindstrike", hasShield)
+	- (_confirmSelection==0||_confirmSelection=="bindstrike") && (_ATN_off!=0 || _ATN2_off!=0):
+	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "bindstrike", _hasShield)
 	{
-		-ATN_off !=0 && ATN2_off !=0:
-			~stipulateTN =  MathMin(ATN_off, ATN2_off)
+		-_ATN_off !=0 && _ATN2_off !=0:
+			~stipulateTN =  MathMin(_ATN_off, _ATN2_off)
 		-else: { 
-			- ATN_off!=0:
-			~stipulateTN = ATN_off
+			- _ATN_off!=0:
+			~stipulateTN = _ATN_off
 			-else:
-			~stipulateTN = ATN2_off
+			~stipulateTN = _ATN2_off
 		}
 	}
 	{
-	- diceAvailable > stipulateCost:
+	- _diceAvailable > stipulateCost:
 		{
 		- _confirmSelection:
 			~manueverCost = stipulateCost
@@ -375,8 +395,8 @@ Attack:
 	}
 }
 { 
-	- _altAction == 0:
-		+ [(Continue)]
+	- _altAction <= 0:
+		+ [(Try Something Else)]
 		->_callbackThread
 }
 {CHOICE_COUNT() == 0: ->_callbackThread}
@@ -414,46 +434,47 @@ Cost: {manueverCost}
 TN: {manueverTN}
 ->DONE
 
-=== ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, _confirmSelection ) 
-// TODO: refactor under parent
-
-~temp manueverCost = 0
-~temp manueverTN = 0
+= ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
 
 ~temp stipulateCost
 ~temp stipulateTN
+~choiceCount=0
 
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
-	- (_confirmSelection==0||_confirmSelection=="block") && hasShield && DTN_off!=0:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "block", hasShield) 
-	~stipulateTN = DTN_off
+	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) 
+	~stipulateTN = _DTN_off
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_block = 1
 				+ Block....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "block")
+				->ChooseManueverListDef("block", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Parry (Defensive) - Deflect an incoming attack with the weapon at hand.
-	- (_confirmSelection==0||_confirmSelection=="parry") && DTN:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "parry", hasShield) 
-	~stipulateTN = DTN
+	- (_confirmSelection==0||_confirmSelection=="parry") && _DTN:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) 
+	~stipulateTN = _DTN
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_parry  = 1
 				+ Parry....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "parry")
+				->ChooseManueverListDef("parry", _altAction, ->_callbackThread)
 		}
 	}
 }
@@ -462,15 +483,17 @@ TN: {manueverTN}
 	~stipulateCost = 0
 	~stipulateTN = 9
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_duckweave = 1
 				+ Duck and Weave....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "duckweave")
+				->ChooseManueverListDef("duckweave", _altAction, ->_callbackThread)
 		}
 	}
 }
@@ -479,127 +502,143 @@ TN: {manueverTN}
 	~stipulateCost = 0
 	~stipulateTN = 7
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_partialevasion = 1
 				+ Partial Evasion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "partialevade")
+				->ChooseManueverListDef("partialevade", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Full Evasion (Defensive) - Avoiding an incoming attack and exit the fight.
-	- (_confirmSelection==0||_confirmSelection=="fullevasion") && (orientation == ORIENTATION_DEFENSIVE) || lastAttacked==0:
+	- (_confirmSelection==0||_confirmSelection=="fullevasion") && (_orientation == ORIENTATION_DEFENSIVE) || _lastAttacked==0:
 	~stipulateCost = 0
 	~stipulateTN = 5
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_fullevasion = 1
 				+ Full Evasion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "fullevasion")
+				->ChooseManueverListDef("fullevasion", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Block Open and Strike - Deflecting an incoming attack with the offhand weapon to leave an opponent open for the next strike.
-	- (_confirmSelection==0||_confirmSelection=="blockopenstrike") && DTN_off != 0 && profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "blockopenstrike", hasShield) 
-	~stipulateTN = DTN_off
+	- (_confirmSelection==0||_confirmSelection=="blockopenstrike") && _DTN_off != 0 && _profeciencyLevel>=6:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield) 
+	~stipulateTN = _DTN_off
 	{
-		-diceAvailable > stipulateCost: 
-		+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_blockopenstrike = 1
 				+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "blockopenstrike")
+				->ChooseManueverListDef("blockopenstrike", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Counter - Deflecting an incoming attack with the weapon at hand while using an opponent's attack against them.
-	- (_confirmSelection==0||_confirmSelection=="counter") && DTN != 0 && profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "counter", hasShield) 
-	~stipulateTN = DTN
+	- (_confirmSelection==0||_confirmSelection=="counter") && _DTN != 0 && _profeciencyLevel>=6:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateTN = _DTN
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_counter = 1
 				+ Counter....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "counter")
+				->ChooseManueverListDef("counter", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Rota - Deflect an incoming attack with the back of weapon at hand and countering with the front.
-	- (_confirmSelection==0||_confirmSelection=="rota") && DTN && profeciencyLevel>=3 && enemyManueverType!=ATTACK_TYPE_THRUST && isThrustingMotion(enemyTargetZone)==0:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "rota", hasShield) 
-	~stipulateTN = DTN
+	- (_confirmSelection==0||_confirmSelection=="rota") && _DTN && _profeciencyLevel>=3 && _enemyManueverType!=ATTACK_TYPE_THRUST && isThrustingMotion(_enemyTargetZone)==0:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "rota", _hasShield) 
+	~stipulateTN = _DTN
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_rota = 1
 				+ Rota....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "rota")
+				->ChooseManueverListDef("rota", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Expulsion
-	- (_confirmSelection==0||_confirmSelection=="expulsion") && DTN && profeciencyLevel>=5 && ( (enemyDiceRolled<=4) || (enemyManueverType == ATTACK_TYPE_THRUST || isThrustingMotion(enemyTargetZone)) ):
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "expulsion", hasShield) 
+	- (_confirmSelection==0||_confirmSelection=="expulsion") && _DTN && _profeciencyLevel>=5 && ( (_enemyDiceRolled<=4) || (_enemyManueverType == ATTACK_TYPE_THRUST || isThrustingMotion(_enemyTargetZone)) ):
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "expulsion", _hasShield) 
 	~stipulateTN = 9
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_expulsion = 1
 				+ Expulsion....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "expulsion")
+				->ChooseManueverListDef("expulsion", _altAction, ->_callbackThread)
 		}
 	}
 }
 {	//Disarm (Defensive) - Striking with the weapon at hand to remove an opponent's weapon from his control before he hits.
-	- (_confirmSelection==0||_confirmSelection=="disarm") && DTN != 0 && profeciencyLevel>=4:
-	~stipulateCost = getManueverCostWithProfeciency(profeciencyType, "counter", hasShield) 
-	~stipulateTN = DTN
+	- (_confirmSelection==0||_confirmSelection=="disarm") && _DTN != 0 && _profeciencyLevel>=4:
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateTN = _DTN
 	{
-		-diceAvailable > stipulateCost: 
+		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
 			- else: 
+				~choiceCount=choiceCount+1
+				~AVAIL_disarm = 1
 				+ Disarm....[({stipulateCost})tn:{stipulateTN}]
-				->ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off, "disarm")
+				->ChooseManueverListDef("disarm", _altAction, ->_callbackThread)
 		}
 	}
 }
-+ [(Continue)]
-->DONE
+{ 
+	- _altAction <= 0:
+		+ [(Try Something Else)]
+		->_callbackThread
+}
+{CHOICE_COUNT() == 0: ->_callbackThread}
 
 
 /*
-
 
 SIMULATENOUS/special moves?
 Overrun - Avoiding an incoming attack and striking with the weapon at hand simultaneously.
@@ -608,8 +647,6 @@ Master Strike (Defensive) - Parrying and striking with the weapon at hand simult
 Grapple (Defensive) - Entering a clinch with an opponent before he hits.
 Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand while re-gripping like a spear.
 */
-
-
 
 = ConfirmDefManueverSelect 
 Cost: {manueverCost}

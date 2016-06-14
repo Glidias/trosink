@@ -28,9 +28,12 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
 -> ChooseManueverForChar( charPersonName_id, charPersonName2_id, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim)
 
-//=== testing_ChooseManueverListDef
-//=== ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off ) 
-//-> ChooseManueverListDef("massweapons", 5, 14, ORIENTATION_CAUTIOUS,  0,1   ,5,5, 0,    7,7,6,7 ,    0  )
+=== testing_ChooseManueverForCharDef
+~charPersonName_fight_orientation = ORIENTATION_CAUTIOUS
+~charPersonName_fight_initiative = 0
+{refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
+{refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
+-> ChooseManueverForChar( charPersonName_id, charPersonName2_id, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim)
 
 
 // --------------------------------

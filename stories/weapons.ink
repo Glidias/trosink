@@ -35,6 +35,19 @@ CONST ATTR_BASE_STRENGTH = 0
 	~atn2 = 6
 	~blunt = 1
 ~return
+- weaponId == "shield":
+	~name = "Shield"
+	~isShield = 1
+	~damage = 0
+	~damage2 = 0
+	~damage3 = 0
+	~attrBaseIndex = ATTR_BASE_STRENGTH
+	~dtn = 4
+	~dtnT = 0
+	~atn = 0
+	~atn2 = 0
+	~blunt = 1
+~return
 }
 // default empty NOTHING weapon below (remember to '~return' switch cases above to early-exit!!)
 ~name =""
