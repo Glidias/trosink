@@ -225,7 +225,7 @@ CONST charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
 CONST charPersonName_mobility = 5
 VAR charPersonName_usingProfeciency =""
-VAR charPersonName_usingProfeciencyLevel = 0
+VAR charPersonName_usingProfeciencyLevel = 15
 VAR charPersonName_carryOverShock = 0
 VAR charPersonName_cp = 0
 VAR charPersonName_totalPain = 0
@@ -491,21 +491,22 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	//*/
 }
 
-=== function getTargetInitiativeStatesByCharId(charId, ref initiative, ref orientation, ref paused, ref lastAttacked, ref target, ref target2)
+// temporary fix with to prevent naming conflicts with knot 't_' prefix...
+=== function getTargetInitiativeStatesByCharId(charId, ref t_initiative, ref t_orientation, ref t_paused, ref t_lastAttacked, ref t_target, ref t_target2)
 {
-	///* utest all
+	///* utest 	all
 - charId == charPersonName_id: 
-	~initiative = charPersonName_id
-	~orientation = charPersonName_fight_orientation
-	~target = charPersonName_fight_target
-	~target2 = charPersonName_fight_target2
-	~lastAttacked = charPersonName_fight_lastAttacked
+	~t_initiative = charPersonName_fight_initiative
+	~t_orientation = charPersonName_fight_orientation
+	~t_target = charPersonName_fight_target
+	~t_target2 = charPersonName_fight_target2
+	~t_lastAttacked = charPersonName_fight_lastAttacked
 - charId == charPersonName2_id:
-	~initiative = charPersonName2_id
-	~orientation = charPersonName2_fight_orientation
-	~target = charPersonName2_fight_target
-	~target2 = charPersonName2_fight_target2
-	~lastAttacked = charPersonName2_fight_lastAttacked
+	~t_initiative = charPersonName2_fight_initiative
+	~t_orientation = charPersonName2_fight_orientation
+	~t_target = charPersonName2_fight_target
+	~t_target2 = charPersonName2_fight_target2
+	~t_lastAttacked = charPersonName2_fight_lastAttacked
 	//*/
 }
 

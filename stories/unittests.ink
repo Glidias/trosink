@@ -23,19 +23,63 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 -> DONE
 
 === testing_ChooseManueverForChar
-{charPersonName_id}
+~charPersonName_fight_orientation = ORIENTATION_AGGRESSIVE
 {refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
 -> ChooseManueverForChar( charPersonName_id, charPersonName2_id, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim)
-
-=== testing_ChooseManueverListAtk
--> ChooseManueverListAtk("massweapons", 5, 14, ORIENTATION_AGGRESSIVE,   6,7,4,5, 1, 0,    0,0, ->TestDone)
-
 
 //=== testing_ChooseManueverListDef
 //=== ChooseManueverListDef(profeciencyType, profeciencyLevel, diceAvailable, orientation, lastAttacked, hasShield, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off ) 
 //-> ChooseManueverListDef("massweapons", 5, 14, ORIENTATION_CAUTIOUS,  0,1   ,5,5, 0,    7,7,6,7 ,    0  )
 
+
+// --------------------------------
+
+// This test is ok..
+
+=== test_funcParamScope
+~temp withinScopeOfKnot = 0
+{testFuncParamScope()}
+assert (withinScopeOfKnot == 0 ) (still remains as zero?)
+withinScopeOfKnot =  {withinScopeOfKnot}
+-> TestDone
+
+=== function testFuncParamScope()
+~temp withinThisFunc = 1
+{testFuncParamScope2(withinThisFunc)}
+new value within testFuncParamScope() == 3 assert: {withinThisFunc}
+
+=== function testFuncParamScope2(ref withinScopeOfKnot)
+~withinScopeOfKnot = 3
+
+
+// --------------------------------
+
+// This test fails..
+
+=== adv_test_funcParamScope
+~temp withinScopeOfKnot = 0
+
+Value is {withinScopeOfKnot} at the moment.
+
+{adv_testFuncParamScope(withinScopeOfKnot)}
+Is Value 1? Value = {withinScopeOfKnot}
+
+-> TestDone
+
+=== function adv_testFuncParamScope(ref withinScopeOfKnot)
+~temp x
+~withinScopeOfKnot=1
+{adv_testFuncParamScope2(x)}
+assert pointer changed: x == 3: x = {x}
+
+
+=== function adv_testFuncParamScope2(ref withinScopeOfKnot)
+~withinScopeOfKnot = 3
+// the above should not affect the main Knot despite having similar name, since the `~temp x` pointer was passed in!
+
+
+// --------------------------------------------------------------------
 
 === TestDone
 Test Completed!
