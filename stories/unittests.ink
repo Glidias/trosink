@@ -55,6 +55,7 @@ new value within testFuncParamScope() == 3 assert: {withinThisFunc}
 
 // --------------------------------
 
+// Test that passed pointer is correct and doesn't conflict with Knot scope
 // This test fails..
 
 === adv_test_funcParamScope
@@ -77,6 +78,31 @@ assert pointer changed: x == 3: x = {x}
 === function adv_testFuncParamScope2(ref withinScopeOfKnot)
 ~withinScopeOfKnot = 3
 // the above should not affect the main Knot despite having similar name, since the `~temp x` pointer was passed in!
+
+
+// --------------------------------------------------------------------
+
+// Test passed (if ref x isn't accessed set)
+=== adv_test_funcParamScope2
+~temp x = 0
+
+Value is {x} at the moment.
+
+{adv_testFuncParamScopeXXX(x)}
+knot x remains the same as zero?: = {x}
+
+->TestDone
+
+=== function adv_testFuncParamScopeXXX(ref x)
+~temp y
+// It seems, any pointer value set operation below at ~x=0 on the parameter will trigger the issue !
+// Would need to set ~x only after recursive function calls are made!
+~x = 0  
+{adv_testFuncParamScopeXXX2(y)}
+assert pointer changed:  == 3:  = {y}
+
+=== function adv_testFuncParamScopeXXX2(ref x)
+~x = 3
 
 
 // --------------------------------------------------------------------
