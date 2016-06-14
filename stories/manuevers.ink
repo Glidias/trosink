@@ -41,7 +41,8 @@ CONST MANUEVER_TYPE_RANGED = 1
 
 // return 9999999 cost if invalid against profeciency, to filter away
 === function getManueverCostWithProfeciency(profeciencyType, manueverType, hasShield)
-~ return 1
+// TODO
+~ return 0
 
 
 === function isThrustingMotion(targetZone)
@@ -52,18 +53,124 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~return 0
 }
 
+=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt  )
+~temp x
+{
+///* player
+- charId == charPersonName_id:
+	// common to both attack/defense
+	~initiative = charPersonName_fight_initiative
+	~profeciencyType = charPersonName_usingProfeciency
+	~profeciencyLevel = charPersonName_usingProfeciencyLevel
+	~diceAvailable = charPersonName_cp
+	~orientation = charPersonName_fight_orientation
+	~lastAttacked = charPersonName_fight_lastAttacked
+	{getWeaponStatsForManueverFilter(charPersonName_equipMasterhand, x, DTN, DTNt, ATN, ATN2, blunt )}
+	{getWeaponStatsForManueverFilter(charPersonName_equipOffhand, hasShield, DTN_off, DTNt_off, ATN_off, ATN2_off, x )}
+//*/
+///* utest
+- charId == charPersonName2_id:
+	~initiative = charPersonName2_fight_initiative
+	~profeciencyType = charPersonName2_usingProfeciency
+	~profeciencyLevel = charPersonName2_usingProfeciencyLevel
+	~diceAvailable = charPersonName2_cp
+	~orientation = charPersonName2_fight_orientation
+	~lastAttacked = charPersonName2_fight_lastAttacked
+	{getWeaponStatsForManueverFilter(charPersonName2_equipMasterhand, x, DTN, DTNt, ATN, ATN2, blunt )}
+	{getWeaponStatsForManueverFilter(charPersonName2_equipOffhand, hasShield, DTN_off, DTNt_off, ATN_off, ATN2_off, x )}
+//*/
+}
 
-=== ChooseManueverForChar( charId, ->_doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim )
+
+=== function getManueverSelectReadonlyEnemyDependencies(charId, enemyId, ref enemyDiceRolled, ref enemyTargetZone, ref enemyManueverType)
+~temp x
+~temp target
+~temp target2
+{
+///* player
+- enemyId == charPersonName_id:
+	{getTargetInitiativeStatesByCharId(enemyId, x, x, x, x, target, target2)}
+	{
+ 	- target == charId: 
+ 		//  enemy targeting character
+ 		~enemyDiceRolled = charPersonName_manuever_rollAmount
+ 		~enemyTargetZone = charPersonName_manuever_targetZone
+ 		~enemyManueverType = charPersonName_manueverAttackType
+ 	- target2 == charId: 
+ 		//  enemy targeting character
+ 		~enemyDiceRolled = charPersonName_manuever2_rollAmount
+ 		~enemyTargetZone = charPersonName_manuever2_targetZone
+ 		~enemyManueverType = charPersonName_manuever2AttackType
+ 	- else: 
+ 		// enemy not targeting character but someone else
+ 		~enemyDiceRolled = 0
+ 		~enemyTargetZone = 0
+ 		~enemyManueverType = 0
+ 	}
+//*/
+///* utest
+- enemyId == charPersonName2_id:
+	{getTargetInitiativeStatesByCharId(enemyId, x, x, x, x, target, target2)}
+	{	
+	- target == charId: 
+ 		//  enemy targeting character
+ 		~enemyDiceRolled = charPersonName2_manuever_rollAmount
+ 		~enemyTargetZone = charPersonName2_manuever_targetZone
+ 		~enemyManueverType = charPersonName2_manueverAttackType
+ 	- target2 == charId: 
+ 		//  enemy targeting character
+ 		~enemyDiceRolled = charPersonName2_manuever2_rollAmount
+ 		~enemyTargetZone = charPersonName2_manuever2_targetZone
+ 		~enemyManueverType = charPersonName2_manuever2AttackType
+ 	- else:
+ 		~enemyDiceRolled = 0
+ 		~enemyTargetZone = 0
+ 		~enemyManueverType = 0
+ 	}
+//*/
+}
+
+
+=== ChooseManueverForChar( charId, enemyId, ->_doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim)
 // 
 //, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off  ,  ATN, ATN2, ATN_off, ATN2_off, blunt  
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
+~temp x
+// common to both attack/defense
 ~temp initiative
+~temp profeciencyType
+~temp profeciencyLevel
+~temp diceAvailable
+~temp orientation
+~temp hasShield     
+// for defending only
+~temp lastAttacked
+// enemy specific
+~temp enemyDiceRolled
+~temp enemyTargetZone
+~temp enemyManueverType
+// -----
+~temp DTN
+~temp DTNt
+~temp DTN_off
+~temp DTNt_off
+// for attacking only
+~temp ATN 
+~temp ATN2
+~temp ATN_off
+~temp ATN2_off
+~temp blunt  
 
-Choosing manuever for character, inject required stats above
+{getManueverSelectReadonlyDependencies(charId, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked,    DTN, DTNt, DTN_off, DTNt_off   ,    ATN, ATN2,  ATN_off, ATN2_off, blunt)}
 ~temp choiceCount = 0
+{getManueverSelectReadonlyEnemyDependencies(charId, enemyId, enemyDiceRolled, enemyTargetZone, enemyManueverType)}
 
-// all attack action availabilities
+CP: {diceAvailable} 
+ATNS: {ATN} {ATN2} 
+ATNS offhand: {ATN_off} {ATN2_off}
+
+// all recorded attack action availabilities
 ~temp AVAIL_bash = 0
 ~temp AVAIL_spike = 0
 ~temp AVAIL_cut = 0
@@ -71,10 +178,18 @@ Choosing manuever for character, inject required stats above
 ~temp AVAIL_beat = 0
 ~temp AVAIL_bindstrike = 0
 
-
+// todo..determine if NPC or PC is doing the selection
+{
+	- initiative:
+		-> ChooseManueverListAtk(profeciencyType, profeciencyLevel, diceAvailable, orientation,  ATN, ATN2, ATN_off, ATN2_off, blunt, hasShield,   0,0,   ->ChooseManueverMenu )
+	- else:
+		todo:
+		Defending manuever menu
+}
 ->ChooseManueverMenu
 
 //Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
+
 
 = ChooseManueverMenu
 Choose the nature of your action
@@ -121,6 +236,7 @@ Which target zone do you wish to aim at?
 ~temp stipulateCost
 ~temp stipulateTN
 
+Attack:
 { 	// Bash
 	- (_confirmSelection==0||_confirmSelection=="bash") && blunt!=0 && ATN: 
 	~stipulateCost= getManueverCostWithProfeciency(profeciencyType, "bash", hasShield)

@@ -25,7 +25,53 @@ VAR boutStep=-1
 		~ return v2
 }
 
-
+=== function rollNSided(nSides)
+{
+	-nSides==2:
+		~return rollD2()
+	-nSides==3:
+		~return rollD3()
+	-nSides==4:
+		~return rollD4()
+	-nSides==5:
+		~return rollD5()
+	-nSides==6:
+		~return rollD6()
+	-nSides==7:
+		~return rollD7()
+	-nSides==8:
+		~return rollD8()
+	-nSides==9:
+		~return rollD9()
+	-nSides==10:
+		~return rollD10()
+}
+=== function rollD2() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+}
+=== function rollD3() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+}
+=== function rollD4() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+ 	- ~return 4
+}
+=== function rollD5() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+ 	- ~return 4
+ 	- ~return 5
+}
 === function rollD6() 
 { shuffle:
  	- ~return 1
@@ -34,6 +80,39 @@ VAR boutStep=-1
  	- ~return 4
  	- ~return 5
  	- ~return 6
+}
+=== function rollD7() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+ 	- ~return 4
+ 	- ~return 5
+ 	- ~return 6
+ 	- ~return 7
+}
+=== function rollD8() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+ 	- ~return 4
+ 	- ~return 5
+ 	- ~return 6
+ 	- ~return 7
+ 	- ~return 8
+}
+=== function rollD9() 
+{ shuffle:
+ 	- ~return 1
+ 	- ~return 2
+ 	- ~return 3
+ 	- ~return 4
+ 	- ~return 5
+ 	- ~return 6
+ 	- ~return 7
+ 	- ~return 8
+ 	- ~return 9
 }
 === function rollD10() 
 { shuffle:
@@ -104,6 +183,21 @@ VAR boutStep=-1
 		~return curSuccesses
 }
 
+=== function inCriticalCondition(health) 
+{
+	- health == 1:
+		~return 1
+}
+~return 0
+
+=== function refreshCombatPool(ref cp, profeciencyLevel, reflex, totalPain, carryOverShock, health)
+~temp inCritical =  inCriticalCondition(health)
+~temp useReflex = reflex
+{inCritical: useReflex = 1}
+~temp result = profeciencyLevel + useReflex -MathMax(carryOverShock, totalPain)
+{inCritical: result = result/2}
+{result < 0: result = 0}
+~cp = result
 
 
 // FOR COMBAT... (scenerio specific)
@@ -130,12 +224,30 @@ CONST charPersonName_id = 0
 CONST charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
 CONST charPersonName_mobility = 5
+VAR charPersonName_usingProfeciency =""
+VAR charPersonName_usingProfeciencyLevel = 0
+VAR charPersonName_carryOverShock = 0
+VAR charPersonName_cp = 0
+VAR charPersonName_totalPain = 0
+VAR charPersonName_health = 5
+VAR charPersonName_equipOffhand = ""
+VAR charPersonName_equipMasterhand = "gladius"
+
 //*/
 ///* utest
 CONST charPersonName2_id = 1
 CONST charPersonName2_label = "CharPersonName2"
 CONST charPersonName2_reflex = 3
 CONST charPersonName2_mobility = 4
+VAR charPersonName2_usingProfeciency = ""
+VAR charPersonName2_usingProfeciencyLevel = 0
+VAR charPersonName2_carryOverShock = 0
+VAR charPersonName2_cp = 0
+VAR charPersonName2_totalPain = 0
+VAR charPersonName2_health = 5
+VAR charPersonName2_equipOffhand = ""
+VAR charPersonName2_equipMasterhand = "mace"
+
 //*/
 // for each char.body... parts... (tag bodyPartName)
 VAR charPersonName_wound_bodyPartName = 0
@@ -143,6 +255,7 @@ VAR charPersonName_wound_bodyPartName = 0
 VAR charPersonName_wound_bodyPartName2 = 0
 VAR charPersonName2_wound_bodyPartName = 0
 VAR charPersonName2_wound_bodyPartName2 = 0
+
 //*/
 
 // Fight
@@ -190,6 +303,7 @@ VAR charPersonName_fight_shock = 0
 VAR charPersonName_fight_target = TARGET_NONE
 VAR charPersonName_fight_target2 = TARGET_NONE
 VAR charPersonName_fight_cautiousLock = 0
+VAR charPersonName_fight_lastAttacked = 0
 VAR charPersonName_manuever = 0
 VAR charPersonName_manuever_CP = 0
 VAR charPersonName_manuever_targetZone = 0
@@ -198,6 +312,7 @@ VAR charPersonName_manueverTN= 0
 VAR charPersonName_manueverAttackType= 0
 VAR charPersonName_manueverDamageType= 0
 VAR charPersonName_manueverNeedBodyAim= 0
+VAR charPersonName_manuever_rollAmount = 0
 VAR charPersonName_manuever2 = 0
 VAR charPersonName_manuever2_CP = 0
 VAR charPersonName_manuever2_targetZone = 0
@@ -206,6 +321,7 @@ VAR charPersonName_manuever2TN= 0
 VAR charPersonName_manuever2AttackType= 0
 VAR charPersonName_manuever2DamageType= 0
 VAR charPersonName_manuever2NeedBodyAim= 0
+VAR charPersonName_manuever2_rollAmount = 0
 VAR charPersonName_manuever3 = 0
 VAR charPersonName_manuever3_CP = 0
 VAR charPersonName_manuever3_targetZone = 0
@@ -214,6 +330,7 @@ VAR charPersonName_manuever3TN= 0
 VAR charPersonName_manuever3AttackType= 0
 VAR charPersonName_manuever3DamageType= 0
 VAR charPersonName_manuever3NeedBodyAim= 0
+VAR charPersonName_manuever3_rollAmount = 0
 
 VAR charPersonName_fight_paused = 1
 ///* utest 
@@ -226,6 +343,7 @@ VAR charPersonName2_fight_shock = 0
 VAR charPersonName2_fight_target = TARGET_NONE
 VAR charPersonName2_fight_target2 = TARGET_NONE
 VAR charPersonName2_fight_cautiousLock = 0
+VAR charPersonName2_fight_lastAttacked = 0
 VAR charPersonName2_manuever = 0
 VAR charPersonName2_manuever_CP = 0
 VAR charPersonName2_manuever_targetZone = 0
@@ -234,6 +352,7 @@ VAR charPersonName2_manueverTN= 0
 VAR charPersonName2_manueverAttackType= 0
 VAR charPersonName2_manueverDamageType= 0
 VAR charPersonName2_manueverNeedBodyAim= 0
+VAR charPersonName2_manuever_rollAmount = 0
 VAR charPersonName2_manuever2 = 0
 VAR charPersonName2_manuever2_CP = 0
 VAR charPersonName2_manuever2_targetZone = 0
@@ -242,6 +361,7 @@ VAR charPersonName2_manuever2TN= 0
 VAR charPersonName2_manuever2AttackType= 0
 VAR charPersonName2_manuever2DamageType= 0
 VAR charPersonName2_manuever2NeedBodyAim= 0
+VAR charPersonName2_manuever2_rollAmount = 0
 VAR charPersonName2_manuever3 = 0
 VAR charPersonName2_manuever3_CP = 0
 VAR charPersonName2_manuever3_targetZone = 0
@@ -250,11 +370,11 @@ VAR charPersonName2_manuever3TN= 0
 VAR charPersonName2_manuever3AttackType= 0
 VAR charPersonName2_manuever3DamageType= 0
 VAR charPersonName2_manuever3NeedBodyAim= 0
+VAR charPersonName2_manuever3_rollAmount = 0
 VAR charPersonName2_fight_paused = 1
 //*/
 
 // for each char (advanced) TBC
-VAR charPersonName_lastAttacking = 0
 VAR shortRangeAdvantage = 0
 //VAR lastHadInitiative
 
@@ -349,6 +469,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	//*/
 }
 
+// note: this method might depciiate
 === function getOrientationByCharId(charId)
 {
 	///* utest all
@@ -359,6 +480,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	//*/
 }
 
+// note: this method might depciiate
 === function getInitiativeByCharId(charId)
 {
 	///* utest all
@@ -369,6 +491,27 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	//*/
 }
 
+=== function getTargetInitiativeStatesByCharId(charId, ref initiative, ref orientation, ref paused, ref lastAttacked, ref target, ref target2)
+{
+	///* utest all
+- charId == charPersonName_id: 
+	~initiative = charPersonName_id
+	~orientation = charPersonName_fight_orientation
+	~target = charPersonName_fight_target
+	~target2 = charPersonName_fight_target2
+	~lastAttacked = charPersonName_fight_lastAttacked
+- charId == charPersonName2_id:
+	~initiative = charPersonName2_id
+	~orientation = charPersonName2_fight_orientation
+	~target = charPersonName2_fight_target
+	~target2 = charPersonName2_fight_target2
+	~lastAttacked = charPersonName2_fight_lastAttacked
+	//*/
+}
+
+
+
+// NOTE, this method might depreciate
 === function getTargetByCharId(charId)
 {
 	///* utest all
@@ -378,6 +521,19 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~return charPersonName2_fight_target
 	//*/
 }
+
+// NOTE, this method might depreciate
+=== function getTarget2ByCharId(charId)
+{
+	///* utest all
+- charId == charPersonName_id: 
+	~return charPersonName_fight_target2
+- charId == charPersonName2_id:
+	~return charPersonName2_fight_target2
+	//*/
+}
+
+
 
 === function getBeingTargettedCount(charId)
 ~temp count=0
