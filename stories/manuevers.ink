@@ -1,5 +1,10 @@
 CONST ZONE_VIII = 7
 
+CONST CONFIRM_HAND_NONE = 0
+CONST CONFIRM_HAND_MASTER = 1
+CONST CONFIRM_HAND_SECONDARY = 2
+CONST CONFIRM_HAND_BOTH = 3
+
 CONST DAMAGE_TYPE_CUTTING =1
 CONST DAMAGE_TYPE_PUNCTURING = 2 
 CONST DAMAGE_TYPE_BLUDGEONING = 3
@@ -168,12 +173,15 @@ For last opponent.... always display a tagline above for third opponent case abo
 ->DONE
 
 
-=== ChooseManueverForChar(charId, enemyId, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking)
+
+=== ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking)
 // 
 //, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off  ,  ATN, ATN2, ATN_off, ATN2_off, blunt  
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
+// dummy variable to hold as unused referenced
 ~temp x
+
 // common to both attack/defense
 ~temp _profeciencyType
 ~temp _profeciencyLevel
@@ -211,6 +219,8 @@ For last opponent.... always display a tagline above for third opponent case abo
 ~temp _charTarget
 ~temp _charTarget2
 
+~temp preferOffhand = 0
+
 
 // initaitive, orientation, ref t_paused, ref t_lastAttacked, ref t_target, ref t_target2
 {getTargetInitiativeStatesByCharId(charId, _initiative, x, x, x,  _charTarget , _charTarget2 )}
@@ -234,9 +244,24 @@ For last opponent.... always display a tagline above for third opponent case abo
 	- _initiative && _charTarget != enemyId:
 		~_initiative = 0
 		{	
-			- currentlyBeingAttackedBy(charId, enemyId, 1): 
+			- slotIndex == 2 && currentlyBeingAttackedBy(charId, enemyId, 1) && (charNoMasterHand==0 || charNoOffHand==0): 
 				~_initiative = 1
 		}
+}
+
+{
+- charNoMasterHand:
+	_DTN = 0
+	_DTNt = 0
+	_ATN = 0
+	_ATN2 = 0
+}
+{
+- charNoOffHand:
+	_DTN_off = 0
+	_DTNt_off = 0
+	_ATN_off = 0
+	_ATN2_off = 0
 }
 
 initiative:{_initiative} 
@@ -276,7 +301,9 @@ isAI?:{_isAI}
 ~temp divertTo
 ~temp aiFavCount
 
+~temp theConfirmHanded
 ~temp theConfirmedManuever
+
 {
 	- _isAI: 
 	~altAction = 1
@@ -343,7 +370,7 @@ AILooseEndError :: AI decision loose-end reached.
 = AICannotMakeFavDecision
 AI cannot make default decision from favourites. Handler todo:...
 Choice count..any choices? {choiceCount}
-For now, let's Do Nothing.
+For now, he will Do Nothing.
 ->doneCallbackThread
 
 
@@ -540,14 +567,21 @@ Which target zone do you wish to aim at? TODO
 
 = ChooseManueverListAtk(_confirmSelection, _altAction, ->_callbackThread )
 ~choiceCount=0
+~theConfirmHanded = CONFIRM_HAND_NONE
+~temp usingOffhand = 0
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
 }
 { 	// Bash
-	- (_confirmSelection==0||_confirmSelection=="bash") && _blunt!=0 && _ATN: 
+	- (_confirmSelection==0||_confirmSelection=="bash") && _blunt!=0 && (_ATN || _ATN_off): 
 	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "bash", _hasShield)
 	~stipulateTN = _ATN
+	{ 
+		-stipulateTN == 0: 
+			~stipulateTN=_ATN_off
+			~usingOffhand = 1
+	}
 	{ 
 		- _diceAvailable > stipulateCost: 
 		{
@@ -555,14 +589,17 @@ Which target zone do you wish to aim at? TODO
 			~manueverAttackType = ATTACK_TYPE_STRIKE
 			~manueverDamageType = DAMAGE_TYPE_BLUDGEONING
 			~manueverCost = stipulateCost
-			~manueverTN = stipulateTN
+			~theConfirmHanded = CONFIRM_HAND_MASTER
+			{ _ATN==0:
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY
+			}
 			-> ConfirmAtkManueverSelect
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_bash = 1
 			{
 				- _altAction <= 0:
-					+ Bash....[({stipulateCost})tn:{stipulateTN}]
+					+ Bash....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("bash", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -571,9 +608,14 @@ Which target zone do you wish to aim at? TODO
 	}
 }
 {	// Spike
-	- (_confirmSelection==0||_confirmSelection=="spike") && _blunt!=0 && _ATN2: 
+	- (_confirmSelection==0||_confirmSelection=="spike") && _blunt!=0 && (_ATN2 || _ATN2_off): 
 	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "spike", _hasShield)
 	~stipulateTN = _ATN2
+	{ 
+		-stipulateTN == 0: 
+			~stipulateTN=_ATN2_off
+			~usingOffhand = 1
+	}
 	{
 		- _diceAvailable > stipulateCost: 
 		{
@@ -582,13 +624,17 @@ Which target zone do you wish to aim at? TODO
 			~manueverDamageType = DAMAGE_TYPE_BLUDGEONING
 			~manueverCost = stipulateCost
 			~manueverTN = stipulateTN
+			~theConfirmHanded = CONFIRM_HAND_MASTER
+			{ _ATN2==0:
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY
+			}
 			-> ConfirmAtkManueverSelect
 		- else:
 			~choiceCount=choiceCount+1
 			~AVAIL_spike = 1
 			{
 				- _altAction <= 0:
-					+ Spike....[({stipulateCost})tn:{stipulateTN}]
+					+ Spike....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("spike", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -598,9 +644,14 @@ Which target zone do you wish to aim at? TODO
 	}
 }
 { 	// Cut
-	- (_confirmSelection==0||_confirmSelection=="cut") && _blunt==0 && _ATN:
+	- (_confirmSelection==0||_confirmSelection=="cut") && _blunt==0 && (_ATN || _ATN_off):
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "cut", _hasShield) 
 	~stipulateTN = _ATN
+	{ 
+		-stipulateTN == 0: 
+			~stipulateTN=_ATN_off
+			~usingOffhand = 1
+	}
 	{
 		-_diceAvailable > stipulateCost: 
 		{
@@ -609,13 +660,17 @@ Which target zone do you wish to aim at? TODO
 			~manueverDamageType = DAMAGE_TYPE_CUTTING
 			~manueverCost = stipulateCost
 			~manueverTN = stipulateTN
+			~theConfirmHanded = CONFIRM_HAND_MASTER
+			{ _ATN==0:
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY
+			}
 			-> ConfirmAtkManueverSelect
 		- else: 
 			~choiceCount=choiceCount+1
 			~AVAIL_cut = 1
 			{
 				- _altAction <= 0:
-					+ Cut....[({stipulateCost})tn:{stipulateTN}]
+					+ Cut....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("cut", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -625,9 +680,14 @@ Which target zone do you wish to aim at? TODO
 	}
 }
 { 	// Thrust
-	- (_confirmSelection==0||_confirmSelection=="thrust") && _blunt==0 && _ATN2:
+	- (_confirmSelection==0||_confirmSelection=="thrust") && _blunt==0 && (_ATN2||_ATN2_off):
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "thrust", _hasShield) 
 	~stipulateTN = _ATN2
+	{
+		-stipulateTN == 0: 
+			~stipulateTN=_ATN2_off
+			~usingOffhand = 1
+	}
 	{
 		-_diceAvailable > stipulateCost: 
 		{
@@ -636,13 +696,17 @@ Which target zone do you wish to aim at? TODO
 			~manueverDamageType = DAMAGE_TYPE_PUNCTURING
 			~manueverCost = stipulateCost
 			~manueverTN = stipulateTN
+			~theConfirmHanded = CONFIRM_HAND_MASTER
+			{ _ATN2==0:
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY
+			}
 			-> ConfirmAtkManueverSelect
 		-else :
 			~choiceCount=choiceCount+1
 			~AVAIL_thrust = 1
 			{
 				- _altAction <= 0:
-					+ Thrust....[({stipulateCost})tn:{stipulateTN}]
+					+ Thrust....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("thrust", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -664,6 +728,7 @@ Which target zone do you wish to aim at? TODO
 			~manueverCost = stipulateCost
 			~manueverTN = stipulateTN
 			~manueverNeedBodyAim = 0
+			~theConfirmHanded = CONFIRM_HAND_MASTER
 			-> ConfirmAtkManueverSelect
 		- else:
 			~choiceCount=choiceCount+1
@@ -698,6 +763,7 @@ Which target zone do you wish to aim at? TODO
 			~manueverCost = stipulateCost
 			~manueverTN = stipulateTN
 			~manueverNeedBodyAim = 0
+			~theConfirmHanded = CONFIRM_HAND_SECONDARY
 			-> ConfirmAtkManueverSelect
 		- else:
 			~choiceCount=choiceCount+1
@@ -750,6 +816,17 @@ Which target zone do you wish to aim at? TODO
 .........
 ~manuever = theConfirmedManuever
 ~manueverIsAttacking = 0
+{
+	-theConfirmHanded == CONFIRM_HAND_MASTER:
+		~charNoMasterHand = 1
+	-theConfirmHanded == CONFIRM_HAND_SECONDARY:
+		~charNoOffHand = 1
+	-theConfirmHanded == CONFIRM_HAND_BOTH:
+		~charNoMasterHand = 1
+		~charNoOffHand = 1
+	-else:
+		~elseResulted = 1
+}
 ManueverID: {manuever}
 AttackType: {getAttackTypeLabel(manueverAttackType)}
 DamageType: {getDamageTypeLabel(manueverDamageType)}
@@ -760,6 +837,8 @@ TN: {manueverTN}
 
 = ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
 ~choiceCount=0
+~theConfirmHanded = CONFIRM_HAND_NONE
+~temp usingOffhand = 0
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
@@ -772,6 +851,7 @@ TN: {manueverTN}
 		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
@@ -789,13 +869,22 @@ TN: {manueverTN}
 	}
 }
 {	//Parry (Defensive) - Deflect an incoming attack with the weapon at hand.
-	- (_confirmSelection==0||_confirmSelection=="parry") && _DTN:
+	- (_confirmSelection==0||_confirmSelection=="parry") && (_DTN||_DTN_off):
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) 
 	~stipulateTN = _DTN
 	{
+		-stipulateTN==0: 
+		~stipulateTN=_DTN_off
+		~usingOffhand = 1
+	}
+	{
 		- _diceAvailable > stipulateCost: 
-		{ 
+		{
 			- _confirmSelection:
+				~theConfirmHanded = CONFIRM_HAND_MASTER
+				{ _DTN==0: 
+					~theConfirmHanded = CONFIRM_HAND_SECONDARY
+				}
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
 				->ConfirmDefManueverSelect
@@ -804,7 +893,7 @@ TN: {manueverTN}
 				~AVAIL_parry  = 1
 				{
 					- _altAction <= 0:
-						+ Parry....[({stipulateCost})tn:{stipulateTN}]
+						+ Parry....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("parry", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -893,7 +982,8 @@ TN: {manueverTN}
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
-				~manueverTN = stipulateTN	 
+				~manueverTN = stipulateTN
+				~theConfirmHanded = CONFIRM_HAND_SECONDARY	 
 				->ConfirmDefManueverSelect
 			- else: 
 				~choiceCount=choiceCount+1
@@ -909,22 +999,31 @@ TN: {manueverTN}
 	}
 }
 {	//Counter - Deflecting an incoming attack with the weapon at hand while using an opponent's attack against them.
-	- (_confirmSelection==0||_confirmSelection=="counter") && _DTN != 0 && _profeciencyLevel>=6:
+	- (_confirmSelection==0||_confirmSelection=="counter") && (_DTN || _DTN_off) && _profeciencyLevel>=6:
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
 	~stipulateTN = _DTN
+	{
+		-stipulateTN==0: 
+		~stipulateTN=_DTN_off
+		~usingOffhand = 1
+	}
 	{
 		- _diceAvailable > stipulateCost: 
 		{ 
 			- _confirmSelection:
 				~manueverCost = stipulateCost
-				~manueverTN = stipulateTN	 
+				~manueverTN = stipulateTN	
+				~theConfirmHanded = CONFIRM_HAND_MASTER
+				{ _DTN:
+					~theConfirmHanded = CONFIRM_HAND_SECONDARY
+				}
 				->ConfirmDefManueverSelect
 			- else: 
 				~choiceCount=choiceCount+1
 				~AVAIL_counter = 1
 				{
 					- _altAction <= 0:
-						+ Counter....[({stipulateCost})tn:{stipulateTN}]
+						+ Counter....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -942,6 +1041,7 @@ TN: {manueverTN}
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
+				~theConfirmHanded = CONFIRM_HAND_MASTER
 				->ConfirmDefManueverSelect
 			- else: 
 				~choiceCount=choiceCount+1
@@ -966,6 +1066,7 @@ TN: {manueverTN}
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
+				~theConfirmHanded = CONFIRM_HAND_MASTER
 				->ConfirmDefManueverSelect
 			- else: 
 				~choiceCount=choiceCount+1
@@ -990,6 +1091,7 @@ TN: {manueverTN}
 			- _confirmSelection:
 				~manueverCost = stipulateCost
 				~manueverTN = stipulateTN	 
+				~theConfirmHanded = CONFIRM_HAND_MASTER
 				->ConfirmDefManueverSelect
 			- else: 
 				~choiceCount=choiceCount+1
@@ -1026,6 +1128,18 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 .........
 ~manuever = theConfirmedManuever
 ~manueverIsAttacking = 1
+{
+	-theConfirmHanded == CONFIRM_HAND_MASTER:
+		~charNoMasterHand = 1
+	-theConfirmHanded == CONFIRM_HAND_SECONDARY:
+		~charNoOffHand = 1
+	-theConfirmHanded == CONFIRM_HAND_BOTH:
+		~charNoMasterHand = 1
+		~charNoOffHand = 1
+	-else:
+		~elseResulted = 1
+}
+
 ManueverID: {manuever}
 Cost: {manueverCost}
 TN: {manueverTN}
