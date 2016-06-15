@@ -3,15 +3,13 @@
 CONST ATTR_BASE_NONE = -1
 CONST ATTR_BASE_STRENGTH = 0
 
-=== function getWeaponStatsForManueverFilter(weaponId, ref isShield, ref dtn, ref dtnT, ref atn, ref atn2, ref blunt) 
-~temp x
-{ getAllWeaponStats(weaponId,x,isShield,x,x,x,x,  dtn, dtnT, atn, atn2, blunt) }
 
-=== function getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt   )
+=== function getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,  ref shieldLimit  )
 {
 - weaponId == "gladius":
 	~name = "Gladius"
 	~isShield = 0
+	~shieldLimit = 0
 	~damage = 2
 	~damage2 = 2
 	~damage3 = 0
@@ -25,6 +23,7 @@ CONST ATTR_BASE_STRENGTH = 0
 - weaponId == "mace":
 	~name = "Mace"
 	~isShield = 0
+	~shieldLimit = 0
 	~damage = 2
 	~damage2 = 2
 	~damage3 = 4
@@ -38,6 +37,7 @@ CONST ATTR_BASE_STRENGTH = 0
 - weaponId == "shield":
 	~name = "Shield"
 	~isShield = 1
+	~shieldLimit = 0
 	~damage = 0
 	~damage2 = 0
 	~damage3 = 0
@@ -48,6 +48,8 @@ CONST ATTR_BASE_STRENGTH = 0
 	~atn2 = 0
 	~blunt = 1
 ~return
+-else:
+	~elseResulted = 1
 }
 // default empty NOTHING weapon below (remember to '~return' switch cases above to early-exit!!)
 ~name =""

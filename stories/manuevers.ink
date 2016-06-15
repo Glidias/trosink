@@ -8,6 +8,8 @@ CONST DAMAGE_TYPE_BLUDGEONING = 3
 	- damageType == DAMAGE_TYPE_CUTTING: ~return "cutting"
 	- damageType == DAMAGE_TYPE_PUNCTURING: ~return "puncturing"
 	- damageType == DAMAGE_TYPE_BLUDGEONING: ~return "bludgeoning"
+	-else:
+	~elseResulted = 1
 }
 ~return "none"
 
@@ -17,6 +19,8 @@ CONST ATTACK_TYPE_THRUST = 2
 { 
 	- attackType == ATTACK_TYPE_STRIKE: ~return "striking"
 	- attackType == ATTACK_TYPE_THRUST: ~return "thrusting"
+	-else:
+	~elseResulted = 1
 }
 ~return "none"
 
@@ -26,6 +30,8 @@ CONST DEFEND_TYPE_MASTERHAND = 2
 { 
 	- defendType == DEFEND_TYPE_OFFHAND: ~return "off-hand"
 	- defendType == DEFEND_TYPE_MASTERHAND: ~return "main-hand"
+	-else:
+	~elseResulted = 1
 }
 ~return "none"
 
@@ -35,6 +41,8 @@ CONST MANUEVER_TYPE_RANGED = 1
 { 
 	- manueverType == MANUEVER_TYPE_MELEE: ~return "melee"
 	- manueverType == MANUEVER_TYPE_RANGED: ~return "ranged"
+	-else:
+	~elseResulted = 1
 }
 ~return "none"
 
@@ -53,7 +61,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~return 0
 }
 
-=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt  )
+=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel  )
 ~temp x
 {
 ///* player
@@ -65,8 +73,9 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~diceAvailable = charPersonName_cp
 	~orientation = charPersonName_fight_orientation
 	~lastAttacked = charPersonName_fight_lastAttacked
-	{getWeaponStatsForManueverFilter(charPersonName_equipMasterhand, x, DTN, DTNt, ATN, ATN2, blunt )}
-	{getWeaponStatsForManueverFilter(charPersonName_equipOffhand, hasShield, DTN_off, DTNt_off, ATN_off, ATN2_off, x )}
+//getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,   ~ref shieldLimit  )
+	{getAllWeaponStats(charPersonName_equipMasterhand, weaponMainLabel, hasShield,  damage, damage2, damage3,x,DTN, DTNt, ATN, ATN2, blunt, shieldLimit )}
+	{getAllWeaponStats(charPersonName_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt, shieldLimit )}
 
 //*/
 ///* utest
@@ -78,12 +87,13 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~diceAvailable = charPersonName2_cp
 	~orientation = charPersonName2_fight_orientation
 	~lastAttacked = charPersonName2_fight_lastAttacked
-	{getWeaponStatsForManueverFilter(charPersonName2_equipMasterhand, x, DTN, DTNt, ATN, ATN2, blunt )}
-	{getWeaponStatsForManueverFilter(charPersonName2_equipOffhand, hasShield, DTN_off, DTNt_off, ATN_off, ATN2_off, x )}
+	{getAllWeaponStats(charPersonName2_equipMasterhand, weaponMainLabel, hasShield,  damage, damage2, damage3,x,DTN, DTNt, ATN, ATN2, blunt, shieldLimit )}
+	{getAllWeaponStats(charPersonName2_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt, shieldLimit )}
 //*/
+-else:
+	~elseResulted = 1
 }
-=== function dummyTest( ref orientation) 
-~orientation = 99999999
+
 
 
 
@@ -134,17 +144,37 @@ CONST MANUEVER_TYPE_RANGED = 1
  		~enemyManueverType = 0
  	}
 //*/
+-else:
+	~elseResulted = 1
 }
 
+=== PrepareManueversForChar(charId)
+Check how many opponents are targeting you.
 
-=== ChooseManueverForChar( charId, enemyId, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim)
+Always
+Display opponents' list , of up to 3,  and their manuevers that are used against you. (if attacking someone else, can state manuever but need to explcitly state which other prson the other target is attacking)
+(Ensure engine limits targeting to not more than 3 targettings on a char).
+
+Immediately have to ChooseManueverForChar for primary first...Manual [Continue] to proceed required if got more than 1 opponent, or could be a user-option to skip entirely or always show regardless.
+Once done,
+if got more >1 opponent, will jump back to menu to pick your secondary and third opponent accordingly, revising on the list and what you actually did in response.
+"Against other opponent..." (1 opponent left)  manual enter to continue or run through
+"Choose your second opponent..." (2 opponents left)  have to choose second opponent regardless
+"Your last opponent..." (1 opponent left among the 3)  manual enter to continue or run through
+"Your third opponent..." This alternative label appears if there is a 4th opponent... (in rarer but possible cases of you are targeting someone that is targeting soemeone else, while 3 others are targeting you)
+For last opponent.... always display a tagline above for third opponent case above
+"Your last opponent, [Name inserted here], cannot be dealt with as you're too busy with 3 other opponents"
+
+->DONE
+
+
+=== ChooseManueverForChar(charId, enemyId, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking)
 // 
 //, initiative, profeciencyType, profeciencyLevel, diceAvailable, orientation, hasShield  ,   lastAttacked, enemyDiceRolled, enemyTargetZone, enemyManueverType, DTN, DTNt, DTN_off, DTNt_off  ,  ATN, ATN2, ATN_off, ATN2_off, blunt  
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
 ~temp x
 // common to both attack/defense
-~temp _initiative
 ~temp _profeciencyType
 ~temp _profeciencyLevel
 ~temp _diceAvailable
@@ -152,6 +182,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 ~temp _hasShield     
 // for defending only
 ~temp _lastAttacked
+~temp _shieldLimit
 // enemy specific
 ~temp _enemyDiceRolled
 ~temp _enemyTargetZone
@@ -166,7 +197,24 @@ CONST MANUEVER_TYPE_RANGED = 1
 ~temp _ATN2
 ~temp _ATN_off
 ~temp _ATN2_off
+~temp _equipMainHand
 ~temp _blunt  
+~temp _damage
+~temp _damage2
+~temp _damage3
+~temp _damage_off
+~temp _damage2_off
+~temp _damage3_off
+~temp _equipOffhand
+// target iniaitive states
+~temp _initiative
+~temp _charTarget
+~temp _charTarget2
+
+
+// initaitive, orientation, ref t_paused, ref t_lastAttacked, ref t_target, ref t_target2
+{getTargetInitiativeStatesByCharId(charId, _initiative, x, x, x,  _charTarget , _charTarget2 )}
+
 
 ~temp _isAI
  {getCharMetaInfo(charId, x, _isAI,x,x)}
@@ -176,10 +224,21 @@ CONST MANUEVER_TYPE_RANGED = 1
 ~temp stipulateCost
 ~temp stipulateTN
 
-{getManueverSelectReadonlyDependencies(charId, _initiative, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt)}
+// kiv: some overlap below with getTargetInitiativeStatesByCharId() by above, can consider re-factoring later? bah nvm..
+{getManueverSelectReadonlyDependencies(charId, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt,   _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand)}
 {getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
 
-// TODO: initiative should be based respective off to considered facing opponent, if it isn't primary target, then initiative is always considered to be false...
+
+// TOCHECK when dealing against multiple enemies
+{
+	- _initiative && _charTarget != enemyId:
+		~_initiative = 0
+		{	
+			- currentlyBeingAttackedBy(charId, enemyId, 1): 
+				~_initiative = 1
+		}
+}
+
 initiative:{_initiative} 
 CP: {_diceAvailable} 
 ATNS: {_ATN} {_ATN2} 
@@ -218,8 +277,6 @@ isAI?:{_isAI}
 ~temp aiFavCount
 
 ~temp theConfirmedManuever
-
-
 {
 	- _isAI: 
 	~altAction = 1
@@ -267,9 +324,11 @@ AILooseEndError :: AI decision loose-end reached.
 	- aiFavCount > 1:
 		~rollChoice = rollNSided(aiFavCount)
 	- aiFavCount == 1 :
-		~ rollChoice = 1
+		~rollChoice = 1
 	- aiFavCount ==0 :
 		->AICannotMakeFavDecision
+	-else:
+		~elseResulted = 1
 }
 {
 	- _initiative:
@@ -470,12 +529,12 @@ Choose the nature of your action
 = ConfirmManuever
 ->doneCallbackThread
 
-= CommitCombatPool
-Amount of CP to roll...
+= AssignCombatPool
+Assign dice from combat pool to make to roll... TODO
 -> DONE
 
 = AimTargetZone
-Which target zone do you wish to aim at?
+Which target zone do you wish to aim at? TODO
 -> DONE
 
 
@@ -504,7 +563,7 @@ Which target zone do you wish to aim at?
 			{
 				- _altAction <= 0:
 					+ Bash....[({stipulateCost})tn:{stipulateTN}]
-					-> ChooseManueverListAtk("bash", _altAction, ->_callbackThread )
+					-> ChooseManueverListAtk("bash", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
 			}
@@ -530,7 +589,7 @@ Which target zone do you wish to aim at?
 			{
 				- _altAction <= 0:
 					+ Spike....[({stipulateCost})tn:{stipulateTN}]
-					-> ChooseManueverListAtk("spike", _altAction, ->_callbackThread )
+					-> ChooseManueverListAtk("spike", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
 			}
@@ -557,7 +616,7 @@ Which target zone do you wish to aim at?
 			{
 				- _altAction <= 0:
 					+ Cut....[({stipulateCost})tn:{stipulateTN}]
-					-> ChooseManueverListAtk("cut", _altAction, ->_callbackThread )
+					-> ChooseManueverListAtk("cut", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
 			}
@@ -584,7 +643,7 @@ Which target zone do you wish to aim at?
 			{
 				- _altAction <= 0:
 					+ Thrust....[({stipulateCost})tn:{stipulateTN}]
-					-> ChooseManueverListAtk("thrust", _altAction, ->_callbackThread )
+					-> ChooseManueverListAtk("thrust", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
 			}
@@ -612,7 +671,7 @@ Which target zone do you wish to aim at?
 			{
 				- _altAction <= 0:
 					+ Beat....[({stipulateCost})tn:{stipulateTN}]
-					-> ChooseManueverListAtk("beat", _altAction, ->_callbackThread )
+					-> ChooseManueverListAtk("beat", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
 			}
@@ -646,7 +705,7 @@ Which target zone do you wish to aim at?
 			{
 			- _altAction <= 0:
 				+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}]
-				-> ChooseManueverListAtk("bindstrike", _altAction, 	->_callbackThread )
+				-> ChooseManueverListAtk("bindstrike", _altAction, 	_callbackThread )
 			//- else:
 			//	->_callbackThread
 			}
@@ -690,6 +749,7 @@ Which target zone do you wish to aim at?
 = ConfirmAtkManueverSelect 
 .........
 ~manuever = theConfirmedManuever
+~manueverIsAttacking = 0
 ManueverID: {manuever}
 AttackType: {getAttackTypeLabel(manueverAttackType)}
 DamageType: {getDamageTypeLabel(manueverDamageType)}
@@ -721,7 +781,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Block....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("block", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("block", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -745,7 +805,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Parry....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("parry", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("parry", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -769,7 +829,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Duck and Weave....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("duckweave", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("duckweave", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -793,7 +853,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Partial Evasion....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("partialevasion", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("partialevasion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -817,7 +877,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Full Evasion....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("fullevasion", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("fullevasion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -841,7 +901,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("blockopenstrike", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("blockopenstrike", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -865,7 +925,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Counter....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("counter", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -889,7 +949,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Rota....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("rota", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("rota", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -913,7 +973,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Expulsion....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("expulsion", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("expulsion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -937,7 +997,7 @@ TN: {manueverTN}
 				{
 					- _altAction <= 0:
 						+ Disarm....[({stipulateCost})tn:{stipulateTN}]
-						-> ChooseManueverListDef("disarm", _altAction, ->_callbackThread )
+						-> ChooseManueverListDef("disarm", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
 				}
@@ -965,6 +1025,7 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 = ConfirmDefManueverSelect()
 .........
 ~manuever = theConfirmedManuever
+~manueverIsAttacking = 1
 ManueverID: {manuever}
 Cost: {manueverCost}
 TN: {manueverTN}

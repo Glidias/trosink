@@ -2,6 +2,7 @@
 VAR boutRounds=1	
 VAR boutExchange=1
 VAR boutStep=-1
+VAR elseResulted = 0
 
 // Common Functions  (usually stateful, game-specific)
 === function showCombatStatus()
@@ -45,6 +46,8 @@ VAR boutStep=-1
 		~return rollD9()
 	-nSides==10:
 		~return rollD10()
+	-else:
+		~elseResulted = 1
 }
 // will return max nSideCapped available by default.
 ~return rollD10   
@@ -191,6 +194,8 @@ VAR boutStep=-1
 {
 	- health == 1:
 		~return 1
+	-else:
+		~elseResulted = 1
 }
 ~return 0
 
@@ -221,11 +226,11 @@ CONST charPersonName2_isENEMY = 1
 CONST charPersonName2_isYOU = 0
 //*/
 
-// CharacterSheet (id==0 implicit Main Character "You")
+// CharacterSheet 
 // for each char (tag charPersonName)
 ///* player
-CONST charPersonName_id = 0
-CONST charPersonName_label = "CharPersonName"
+CONST charPersonName_id = 1
+VAR charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
 CONST charPersonName_mobility = 5
 VAR charPersonName_usingProfeciency ="swordandshield"
@@ -239,8 +244,8 @@ VAR charPersonName_equipMasterhand = "gladius"
 
 //*/
 ///* utest
-CONST charPersonName2_id = 1
-CONST charPersonName2_label = "CharPersonName2"
+CONST charPersonName2_id = 2
+VAR charPersonName2_label = "CharPersonName2"
 CONST charPersonName2_reflex = 3
 CONST charPersonName2_mobility = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
@@ -249,7 +254,7 @@ VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
 VAR charPersonName2_health = 5
-VAR charPersonName2_equipOffhand = ""
+VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
 
 //*/
@@ -276,6 +281,8 @@ CONST STANCE_OFFENSIVE = 2
     - stance==STANCE_DEFENSIVE:  ~return "Defensive"
     - stance==STANCE_OFFENSIVE:  ~return "Offensive"
     - stance==STANCE_RESET: ~return "Resetted"
+    -else:
+		~elseResulted = 1
 }
 // combat orientation intent
 CONST ORIENTATION_NONE = 0
@@ -288,6 +295,8 @@ CONST ORIENTATION_AGGRESSIVE = 3
     - orientation==ORIENTATION_DEFENSIVE:  ~return "Defensive"
     - orientation==ORIENTATION_CAUTIOUS:  ~return "Cautious"
     - orientation==ORIENTATION_NONE: ~return "In the Midst of Fighting"
+    -else:
+		~elseResulted = 1
 }
 
 // initiative state reflection
@@ -317,6 +326,7 @@ VAR charPersonName_manueverAttackType= 0
 VAR charPersonName_manueverDamageType= 0
 VAR charPersonName_manueverNeedBodyAim= 0
 VAR charPersonName_manuever_rollAmount = 0
+VAR charPersonName_manuever_attacking = 0
 VAR charPersonName_manuever2 = 0
 VAR charPersonName_manuever2_CP = 0
 VAR charPersonName_manuever2_targetZone = 0
@@ -326,6 +336,7 @@ VAR charPersonName_manuever2AttackType= 0
 VAR charPersonName_manuever2DamageType= 0
 VAR charPersonName_manuever2NeedBodyAim= 0
 VAR charPersonName_manuever2_rollAmount = 0
+VAR charPersonName_manuever2_attacking = 0
 VAR charPersonName_manuever3 = 0
 VAR charPersonName_manuever3_CP = 0
 VAR charPersonName_manuever3_targetZone = 0
@@ -357,6 +368,7 @@ VAR charPersonName2_manueverAttackType= 0
 VAR charPersonName2_manueverDamageType= 0
 VAR charPersonName2_manueverNeedBodyAim= 0
 VAR charPersonName2_manuever_rollAmount = 0
+VAR charPersonName2_manuever_attacking = 0
 VAR charPersonName2_manuever2 = 0
 VAR charPersonName2_manuever2_CP = 0
 VAR charPersonName2_manuever2_targetZone = 0
@@ -366,6 +378,7 @@ VAR charPersonName2_manuever2AttackType= 0
 VAR charPersonName2_manuever2DamageType= 0
 VAR charPersonName2_manuever2NeedBodyAim= 0
 VAR charPersonName2_manuever2_rollAmount = 0
+VAR charPersonName2_manuever2_attacking = 0
 VAR charPersonName2_manuever3 = 0
 VAR charPersonName2_manuever3_CP = 0
 VAR charPersonName2_manuever3_targetZone = 0
@@ -386,7 +399,6 @@ CONST RESOLVED_LOCKED = -1
 
 
 // Current combat functions
-
 === function showPlayerInitiativeState()
 ///* player
 { charPersonName_fight_target==TARGET_NONE:{~return} }
@@ -451,6 +463,30 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
     -   ~return STANCE_DEFENSIVE
 }
 
+=== function currentlyBeingAttackedBy(attacker, charIdToCheck, mustBePrimaryTarget)
+~temp considerSecondaryManuever = (mustBePrimaryTarget==0)
+{ 
+	///* utest all
+- attacker == charPersonName_id: 
+	{
+		- (charPersonName_fight_target == charIdToCheck && charPersonName_manuever_attacking) || (considerSecondaryManuever && charPersonName_fight_target2 == charIdToCheck && charPersonName_manuever2_attacking):
+			~return 1
+	}
+- attacker == charPersonName2_id:
+	{
+		- (charPersonName2_fight_target == charIdToCheck && charPersonName2_manuever_attacking) || (considerSecondaryManuever && charPersonName2_fight_target2 == charIdToCheck && charPersonName2_manuever2_attacking):
+			~return 1
+	}
+	//*/
+-else:
+	~elseResulted = 1
+}
+~return 0
+
+
+
+
+
 
 === function getCharMetaInfo(charId, ref label, ref isAI, ref isEnemy, ref isYou) 
 {
@@ -466,6 +502,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~isEnemy = charPersonName2_isENEMY
 	~isYou = charPersonName2_isYOU
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 
@@ -478,6 +516,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_mobility
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 === function getReflexByCharId(charId)
@@ -488,6 +528,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_reflex
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 // note: this method might depciiate
@@ -499,6 +541,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_orientation
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 // note: this method might depciiate
@@ -510,6 +554,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_initiative
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 // temporary fix with to prevent naming conflicts with knot 't_' prefix...
@@ -529,6 +575,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~t_target2 = charPersonName2_fight_target2
 	~t_lastAttacked = charPersonName2_fight_lastAttacked
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 
@@ -542,6 +590,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_target
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 // NOTE, this method might depreciate
@@ -553,6 +603,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_target2
 	//*/
+-else:
+	~elseResulted = 1
 }
 
 
@@ -566,6 +618,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - charPersonName2_fight_target == charId: 
 	~count= count + 1
 	//*/
+-else:
+	~elseResulted = 1
 }
 ~return count
 
@@ -586,6 +640,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 			~return 1
 	}
 	//*/
+-else:
+	~elseResulted = 1
 }
 ~return 0
 
@@ -598,6 +654,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - byId == charPersonName2_id:
 	~return charPersonName2_fight_target==charId
 	//*/
+-else:
+	~elseResulted = 1
 }
 ~return 0
 
@@ -642,6 +700,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	}
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
+-else:
+	~elseResulted = 1
 }
 {
 ///* utest all
@@ -664,6 +724,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	}
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
+-else:
+	~elseResulted = 1
 }
 
 === function fight_cancelBothInitiatives(fromId, targetId )
@@ -676,6 +738,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~charPersonName2_fight_initiative = 0
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
+-else:
+	~elseResulted = 1
 }
 {
 ///* utest all
@@ -686,6 +750,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~charPersonName2_fight_initiative = 0
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
 //*/
+-else:
+	~elseResulted = 1
 }
 
 === function fight_set_cautiousStates(fromId, targetId ) 
@@ -696,6 +762,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 - fromId == charPersonName2_id:
 	~charPersonName2_fight_cautiousLock = 1
 //*/
+-else:
+	~elseResulted = 1
 }
 {
 ///* utest all
@@ -706,6 +774,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~charPersonName2_fight_cautiousLock = 1
 	~charPersonName2_fight_target = fromId
 //*/
+-else:
+	~elseResulted = 1
 }
 
 === function getNameOfChar(charId)
@@ -718,6 +788,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	- charId == charPersonName2_id:
 		~return charPersonName2_label
 	//*/
+	-else:
+	~elseResulted = 1
 }
 
 === function getDescribeLabelOfCharCapital(charId)
@@ -730,6 +802,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	- charId == charPersonName2_id:
 		~return charPersonName2_label
 	//*/
+	-else:
+	~elseResulted = 1
 }
 
 === function getDescribeLabelOfChar(charId)
@@ -742,6 +816,9 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	- charId == charPersonName2_id:
 		~return charPersonName2_label
 	//*/
+	-else:
+	~elseResulted = 1
+
 }
 
 
@@ -757,6 +834,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	- fromId == charPersonName2_id:
 		~charPersonName2_fight_target = targetId
 	//*/
+	-else:
+	~elseResulted = 1
 }
 //{getOrientationLabel(targetOrientation)} :: {targetOrientation} :: {targetTarget} :: {targetOrientation == ORIENTATION_CAUTIOUS : Yes}  {targetTarget==TARGET_NONE: Yes}
 { 
@@ -791,6 +870,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 		 ~charPersonName2_wound_bodyPartName2=MathMax(woundLevel,charPersonName2_wound_bodyPartName2)
 	}
 //*/
+-else:
+	~elseResulted = 1
 }
 
 === function setManuever(srcId, diceToRoll, targetId, targetZone)

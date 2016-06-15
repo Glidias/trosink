@@ -6,7 +6,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-->testing_ChooseManueverForAIAtk
+//->testing_ChooseManueverForAIAtk
 
 -> GameStart
 
@@ -36,6 +36,7 @@ Let's fight!
 	}
 	//*/
 	{ gotReveal==0: 
+		...
 		->->
 	}
 
@@ -258,7 +259,7 @@ Let's fight!
 
 === Combat_Step3
 	~boutStep = 3
-	{showCombatStatus()}
+	
 	//STEP 3:
 	//kiv: If it's the 1st exchange, reveal any hidden L-mobility manuevers and resolve all L-mobility manuevers in order from highest to lowest mobility stat, using commit costs. If a mobility manuever fails to execute due to circumstance during the resolution, may consider some form of refund scheme, or no refunding.
 	
@@ -270,6 +271,7 @@ Let's fight!
 		-> DeclareCombatManuevers
 	}
 	= DeclareCombatManuevers
+	{showCombatStatus()}
 	// Declare/reveal combat manuevers (their costs and details) in order of combatants that have initiative, then those without initiative, in order of lowest to highest adriotness stat.
 	//TODO: Declare moves...get lists of available moves, AI choose suitable move and CP, 
 	Declaring moves...
@@ -340,7 +342,7 @@ Let's fight!
 	}
 	//*/
 	{showPlayerInitiativeState()}
-	->Combat_Step3.DeclareCombatManuevers
+	->DeclareCombatManuevers
 
 === Combat_ResolveExchange
 	{showCombatStatus()}
@@ -356,7 +358,7 @@ Let's fight!
 	~charPersonName_fight_cautiousLock = 0
 	//*/
 	///* utest
-	~charPersonName2_fight_stance = STANCE_RESET
+	~charPersonName2_fight_stance = STANCE_NEUTRAL
 	~charPersonName2_fight_orientation = ORIENTATION_NONE
 	~charPersonName2_fight_cautiousLock = 0
 	//*/
