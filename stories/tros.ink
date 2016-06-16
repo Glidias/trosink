@@ -6,7 +6,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-//->testing_ChooseManueverForAIAtk
+//->testing_ChooseManueverForChar
 
 -> GameStart
 
@@ -23,8 +23,24 @@ Let's fight!
 
 
 === Combat_Step0
+
 	~boutStep = 0
 	~temp gotReveal = 0
+
+	///* utest all
+	{
+		- boutExchange == 1:
+		{
+			-charPersonName_FIGHT:
+				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
+		}
+		{
+			-charPersonName2_FIGHT:
+				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
+		}
+	}
+	//*/
+
 	///* player
 	{	charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused:
 		~gotReveal = 1
@@ -275,6 +291,31 @@ Let's fight!
 	// Declare/reveal combat manuevers (their costs and details) in order of combatants that have initiative, then those without initiative, in order of lowest to highest adriotness stat.
 	//TODO: Declare moves...get lists of available moves, AI choose suitable move and CP, 
 	Declaring moves...
+	-> DeclarationLoop
+
+
+	= DeclarationLoop
+	///* utest all declaration
+		{
+			-charPersonName_FIGHT && charPersonName_fight_initiative:
+				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+		}
+		{
+			-charPersonName2_FIGHT && charPersonName2_fight_initiative:
+				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+		}
+	//*/
+
+	///* utest all declaration
+		{
+			-charPersonName_FIGHT && charPersonName_fight_initiative==0:
+				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+		}
+		{
+			-charPersonName2_FIGHT && charPersonName2_fight_initiative==0:
+				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+		}
+	//*/
 
 	+ [Continue]
 	->->

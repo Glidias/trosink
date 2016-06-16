@@ -17,7 +17,6 @@ VAR elseResulted = 0
 	- else:
 		~ return v2
 }
-
 === function MathMin(v,v2)
 {  
 	- v < v2: 
@@ -25,6 +24,38 @@ VAR elseResulted = 0
 	- else:
 		~ return v2
 }
+=== function MathExp(base, power)
+~return _MathExp(base,power, 1)
+
+=== function _MathExp(base, power, v)
+{
+	-power == 0:
+		~return v
+}
+~v = v*base
+~power = power - 1
+{
+	-power: 
+		~return _MathExp(base, power, v)
+}
+~return v
+
+=== function XOR_2Bits(A, B) 
+~temp evalue = (A + B*MathExp(-1,A)) % 4
+// handle negative int results by swapping A/B and re-evaulating
+{ evalue < 0:
+	~evalue = (B + A*MathExp(-1,B)) % 4
+}
+~return evalue
+
+=== function OR_2Bits(A, B) 
+~return XOR_2Bits(A,B) + B
+
+=== function flag_OR_2Bits(ref val, bits) 
+~val = XOR_2Bits(val,bits) + bits
+
+=== function check_2BitFlag(A,B)
+~return XOR_2Bits(A,3) == B
 
 === function rollNSided(nSides)
 {
@@ -327,6 +358,7 @@ VAR charPersonName_manueverDamageType= 0
 VAR charPersonName_manueverNeedBodyAim= 0
 VAR charPersonName_manuever_rollAmount = 0
 VAR charPersonName_manuever_attacking = 0
+VAR charPersonName_manueverUsingHands = 0
 VAR charPersonName_manuever2 = 0
 VAR charPersonName_manuever2_CP = 0
 VAR charPersonName_manuever2_targetZone = 0
@@ -337,6 +369,7 @@ VAR charPersonName_manuever2DamageType= 0
 VAR charPersonName_manuever2NeedBodyAim= 0
 VAR charPersonName_manuever2_rollAmount = 0
 VAR charPersonName_manuever2_attacking = 0
+VAR charPersonName_manuever2UsingHands = 0
 VAR charPersonName_manuever3 = 0
 VAR charPersonName_manuever3_CP = 0
 VAR charPersonName_manuever3_targetZone = 0
@@ -346,7 +379,8 @@ VAR charPersonName_manuever3AttackType= 0
 VAR charPersonName_manuever3DamageType= 0
 VAR charPersonName_manuever3NeedBodyAim= 0
 VAR charPersonName_manuever3_rollAmount = 0
-
+VAR charPersonName_manuever3_attacking = 0
+VAR charPersonName_manuever3UsingHands = 0
 VAR charPersonName_fight_paused = 1
 ///* utest 
 VAR charPersonName2_FIGHT = 1
@@ -369,6 +403,7 @@ VAR charPersonName2_manueverDamageType= 0
 VAR charPersonName2_manueverNeedBodyAim= 0
 VAR charPersonName2_manuever_rollAmount = 0
 VAR charPersonName2_manuever_attacking = 0
+VAR charPersonName2_manueverUsingHands = 0
 VAR charPersonName2_manuever2 = 0
 VAR charPersonName2_manuever2_CP = 0
 VAR charPersonName2_manuever2_targetZone = 0
@@ -379,6 +414,7 @@ VAR charPersonName2_manuever2DamageType= 0
 VAR charPersonName2_manuever2NeedBodyAim= 0
 VAR charPersonName2_manuever2_rollAmount = 0
 VAR charPersonName2_manuever2_attacking = 0
+VAR charPersonName2_manuever2UsingHands = 0
 VAR charPersonName2_manuever3 = 0
 VAR charPersonName2_manuever3_CP = 0
 VAR charPersonName2_manuever3_targetZone = 0
@@ -388,6 +424,8 @@ VAR charPersonName2_manuever3AttackType= 0
 VAR charPersonName2_manuever3DamageType= 0
 VAR charPersonName2_manuever3NeedBodyAim= 0
 VAR charPersonName2_manuever3_rollAmount = 0
+VAR charPersonName2_manuever3_attacking = 0
+VAR charPersonName2_manuever3UsingHands = 0
 VAR charPersonName2_fight_paused = 1
 //*/
 

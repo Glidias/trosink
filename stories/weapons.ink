@@ -4,7 +4,7 @@ CONST ATTR_BASE_NONE = -1
 CONST ATTR_BASE_STRENGTH = 0
 
 
-=== function getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,  ref shieldLimit  )
+=== function getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,  ref shieldLimit, ref twoHanded  )
 {
 - weaponId == "gladius":
 	~name = "Gladius"
@@ -19,6 +19,7 @@ CONST ATTR_BASE_STRENGTH = 0
 	~atn = 6
 	~atn2 = 6
 	~blunt =0
+	~twoHanded = 0
 ~return
 - weaponId == "mace":
 	~name = "Mace"
@@ -33,6 +34,7 @@ CONST ATTR_BASE_STRENGTH = 0
 	~atn = 6
 	~atn2 = 6
 	~blunt = 1
+	~twoHanded = 0
 ~return
 - weaponId == "shield":
 	~name = "Shield"
@@ -47,6 +49,7 @@ CONST ATTR_BASE_STRENGTH = 0
 	~atn = 0
 	~atn2 = 0
 	~blunt = 1
+	~twoHanded = 0
 ~return
 -else:
 	~elseResulted = 1
