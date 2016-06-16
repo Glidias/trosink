@@ -988,6 +988,7 @@ Which target zone do you wish to aim at? TODO
 { 
 	- _altAction <= 0:
 		+ [(Try Something Else)]
+		// TODO: point this to the correct location
 		->_callbackThread
 }
 {CHOICE_COUNT() == 0: ->_callbackThread}
