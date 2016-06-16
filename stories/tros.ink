@@ -275,6 +275,10 @@ Let's fight!
 
 === Combat_Step3
 	~boutStep = 3
+
+	// phase 0 for those with initiative, 1 for those without initiative
+	~temp phase = 0
+	~temp fromId = 0
 	
 	//STEP 3:
 	//kiv: If it's the 1st exchange, reveal any hidden L-mobility manuevers and resolve all L-mobility manuevers in order from highest to lowest mobility stat, using commit costs. If a mobility manuever fails to execute due to circumstance during the resolution, may consider some form of refund scheme, or no refunding.
@@ -295,25 +299,49 @@ Let's fight!
 
 
 	= DeclarationLoop
+	//Start of declaration loop:{fromId} {phase}
+	{
+	-phase == 0:
 	///* utest all declaration
 		{
-			-charPersonName_FIGHT && charPersonName_fight_initiative:
+			- fromId ==0 && charPersonName_FIGHT && charPersonName_fight_initiative:
+				~fromId = charPersonName_id
 				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+			- else:
+				{ fromId == charPersonName_id:
+					~fromId = 0
+				}
 		}
 		{
-			-charPersonName2_FIGHT && charPersonName2_fight_initiative:
+			-fromId ==0 &&  charPersonName2_FIGHT && charPersonName2_fight_initiative:
+				~fromId = charPersonName2_id
 				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+			- else:
+				{ fromId == charPersonName2_id:
+					~fromId = 0
+				}
 		}
 	//*/
-
+	}
+	~phase = 1
 	///* utest all declaration
 		{
-			-charPersonName_FIGHT && charPersonName_fight_initiative==0:
+			-fromId == 0 && charPersonName_FIGHT && charPersonName_fight_initiative==0:
+				~fromId = charPersonName_id
 				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+			- else:
+				{ fromId == charPersonName_id:
+					~fromId = 0
+				}	
 		}
 		{
-			-charPersonName2_FIGHT && charPersonName2_fight_initiative==0:
+			-fromId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative==0:
+				~fromId = charPersonName2_id
 				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+			- else:
+				{ fromId == charPersonName2_id:
+					~fromId =0
+				}
 		}
 	//*/
 

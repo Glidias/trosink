@@ -203,18 +203,20 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 ~temp useSlotIndex
 ~temp secondarySlotIndex
 ~temp asPrimaryTarget
+~temp charNoMasterHand
+~temp charNoOffHand
 
-// todo: for dealing with multiple opponents find a way and multiple attacks, find a way to determine secondarySlotIndex and persitant handmask 0 0 , 
+~inspectHandsFree(charId, secondarySlotIndex, charNoMasterHand, charNoOffHand)
 
 {opponentCount > 1 && charIsPlayer && _confirming == 0: Pick an opponent to deal against:}
-///* utest all resolution
+///* utest all declaration
 {
 	- (_confirming==0 || _confirming == charPersonName_id) && charPersonName_FIGHT && (charPersonName_id == charTarget || charPersonName_fight_target == charId):
 		
 		{
 			- charHasPrimaryTarget && charPersonName_id == charTarget: 
 				~useSlotIndex = 1
-				asPrimaryTarget = 1
+				~asPrimaryTarget = 1
 			- else:
 				~useSlotIndex = secondarySlotIndex
 		}
@@ -223,7 +225,7 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 				+  [{charPersonName_label} {asPrimaryTarget:(Your target)}]
 				-> ConsiderOpponents(charPersonName_id)
 			- else:
-				-> ProceedToActionAgainst(useSlotIndex, charId, charPersonName_id, 0, 0, redirectBack)
+				-> ProceedToActionAgainst(useSlotIndex, charId, charPersonName_id, charNoMasterHand, charNoOffHand, redirectBack)
 		}
 }
 {
@@ -232,7 +234,7 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 		{
 			- charHasPrimaryTarget && charPersonName2_id == charTarget: 
 				~useSlotIndex = 1
-				asPrimaryTarget = 1
+				~asPrimaryTarget = 1
 			- else:
 				~useSlotIndex = secondarySlotIndex
 		}
@@ -241,7 +243,7 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 				+  [{charPersonName2_label} {asPrimaryTarget:(Your target)}]
 				-> ConsiderOpponents(charPersonName2_id)
 			- else:
-				-> ProceedToActionAgainst(useSlotIndex, charId, charPersonName2_id, 0, 0, redirectBack)
+				-> ProceedToActionAgainst(useSlotIndex, charId, charPersonName2_id, charNoMasterHand, charNoOffHand, redirectBack)
 		}
 }
 //*/
@@ -441,6 +443,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	_ATN2 = 0
 }
 
+/*
 initiative:{_initiative} 
 CP: {_diceAvailable} 
 Hands available: Rt:{charNoMasterHand:0|1} lt:{charNoOffHand:0|1} 
@@ -454,6 +457,7 @@ HasShield: {_hasShield}
 Last Attacked: {_lastAttacked}
 Blunt Weapon: {_blunt}
 isAI?:{_isAI}
+*/
 
 // all recorded attack action availabilities
 ~temp AVAIL_bash = 0
@@ -492,10 +496,10 @@ isAI?:{_isAI}
 
 {
 	- _initiative:
-		Attack
+		{_isAI==0:Attack}
 		-> ChooseManueverListAtk(0,altAction,divertTo )
 	- else:
-		Defend
+		{_isAI==0:Defend}
 		-> ChooseManueverListDef(0,altAction,divertTo)
 }
 ->ChooseManueverMenu
@@ -711,26 +715,26 @@ For now, he will Do Nothing.
 = ToggleOffHandOnly
 {
 	- preferOffhand:
-		preferOffhand  = 0
+		~preferOffhand  = 0
 	-else:
-		preferOffhand = 1
+		~preferOffhand = 1
 }
 {
 	-preferOffhand:
-		You switched to your off-hand. 
+		//You switched to your off-hand weapon. 
 		.....
 		{
 		- preferOffhand:
-			_DTN = 0
-			_DTNt = 0
-			_ATN = 0
-			_ATN2 = 0
+			~_DTN = 0
+			~_DTNt = 0
+			~_ATN = 0
+			~_ATN2 = 0
 		}
 	-else:
-		You switched back to your main hand(s).
+		//You switched back to your main hand weapon.
 		{
 		- charNoMasterHand == 0:
-			getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x,   x,   x, x, x, x, x, x, x, x, x, x)
+			~getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x,   x,   x, x, x, x, x, x, x, x, x, x)
 		}
 }
 -> ChooseManueverMenu
@@ -744,16 +748,16 @@ Choose the nature of your action {preferOffhand: (off-hand)}
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 + {_initiative==0}  Defend 
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
-//+ {_initiative} Double Attack   // kiv, allows for double attack on same target...
-//+ {_initiative==0 && orientation==ORIENTATION_NONE && } Quick Attack  // KIV
-+ {_initiative}  Defend (with initiative)
++ {_initiative && _orientation!=ORIENTATION_AGGRESSIVE}  Defend (with initiative)   // Quick Defense falls under here
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
-+ {_initiative==0 && _charTarget == enemyId} Attack (buy initiative)
++ {_initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE} Attack (buy initiative)
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
-+ {_initiative==0 && _charTarget==enemyId} Attack (no initiative) 
++ {_initiative==0 && _charTarget==enemyId && _orientation!= ORIENTATION_DEFENSIVE} Attack (no initiative) 
+//+ {_initiative==0 && _orientation!= ORIENTATION_DEFENSIVE } Quick Attack  // kiv, but just a naming convention
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
-//+ Change target  // kiv, allows for switching target, but will lose current initiative (if any)
-+ { charNoOffHand == 0 && _twoHanded==0 && (_equipOffhand=="")==0 && _hasShield==0 } Switch Hands
+//+ Change target  (no initiative)// kiv, allows for switching target, but will lose current initiative (if any)
+//+ Change target  (buy initiative)// kiv, allows for switching target, and will buy  initiative 
++ { charNoOffHand == 0 && _twoHanded==0 && (_equipOffhand=="")==0 && _hasShield==0 && (_equipMainHand=="")==0 && charNoMasterHand==0  } [{preferOffhand == 0:Switch to off-hand|Switch back to main-hand}]
 	-> ToggleOffHandOnly
 + [(Do Nothing)]
 ->doneCallbackThread
@@ -804,7 +808,7 @@ Which target zone do you wish to aim at? TODO
 			~AVAIL_bash = 1
 			{
 				- _altAction <= 0:
-					+ Bash....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+					+ Bash....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("bash", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -839,7 +843,7 @@ Which target zone do you wish to aim at? TODO
 			~AVAIL_spike = 1
 			{
 				- _altAction <= 0:
-					+ Spike....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+					+ Spike....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("spike", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -875,7 +879,7 @@ Which target zone do you wish to aim at? TODO
 			~AVAIL_cut = 1
 			{
 				- _altAction <= 0:
-					+ Cut....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+					+ Cut....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("cut", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -911,7 +915,7 @@ Which target zone do you wish to aim at? TODO
 			~AVAIL_thrust = 1
 			{
 				- _altAction <= 0:
-					+ Thrust....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+					+ Thrust....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("thrust", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -988,7 +992,6 @@ Which target zone do you wish to aim at? TODO
 { 
 	- _altAction <= 0:
 		+ [(Try Something Else)]
-		// TODO: point this to the correct location
 		->_callbackThread
 }
 {CHOICE_COUNT() == 0: ->_callbackThread}
@@ -1036,13 +1039,15 @@ Which target zone do you wish to aim at? TODO
 	-else:
 		~elseResulted = 1
 }
+...
+CharacterID: {charId}
 ManueverID: {manuever}
 AttackType: {getAttackTypeLabel(manueverAttackType)}
 DamageType: {getDamageTypeLabel(manueverDamageType)}
 Need to Aim body zone: {manueverNeedBodyAim:Yes|No }
 Cost: {manueverCost}
 TN: {manueverTN}
-->DONE
+->doneCallbackThread
 
 = ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
 ~choiceCount=0
@@ -1102,7 +1107,7 @@ TN: {manueverTN}
 				~AVAIL_parry  = 1
 				{
 					- _altAction <= 0:
-						+ Parry....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+						+ Parry....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("parry", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1232,7 +1237,7 @@ TN: {manueverTN}
 				~AVAIL_counter = 1
 				{
 					- _altAction <= 0:
-						+ Counter....[({stipulateCost})tn:{stipulateTN}{usingOffhand:(off-hand)}]
+						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1334,7 +1339,6 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 */
 
 = ConfirmDefManueverSelect()
-.........
 ~manuever = theConfirmedManuever
 ~manueverIsAttacking = 1
 {
@@ -1351,10 +1355,11 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 	-else:
 		~elseResulted = 1
 }
-
+...
+CharacterID: {charId}
 ManueverID: {manuever}
 Cost: {manueverCost}
 TN: {manueverTN}
-->DONE
+->doneCallbackThread
 
 
