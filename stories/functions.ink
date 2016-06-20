@@ -1,4 +1,5 @@
 // Common globals
+CONST GOT_CONSOLE_NUMBERS = 0
 VAR boutRounds=1	
 VAR boutExchange=1
 VAR boutStep=-1
@@ -300,7 +301,7 @@ VAR charPersonName2_wound_bodyPartName2 = 0
 
 // Fight
 // targeting
-CONST TARGET_NONE = -1
+CONST TARGET_NONE = 0
 // stance
 CONST STANCE_RESET = -1
 CONST STANCE_NEUTRAL = 0
@@ -346,9 +347,10 @@ VAR charPersonName_fight_orientation = ORIENTATION_NONE
 VAR charPersonName_fight_shock = 0
 VAR charPersonName_fight_target = TARGET_NONE
 VAR charPersonName_fight_target2 = TARGET_NONE
+VAR charPersonName_fight_target3 = TARGET_NONE
 VAR charPersonName_fight_cautiousLock = 0
 VAR charPersonName_fight_lastAttacked = 0
-VAR charPersonName_manuever = 0
+VAR charPersonName_manuever = ""
 VAR charPersonName_manuever_CP = 0
 VAR charPersonName_manuever_targetZone = 0
 VAR charPersonName_manueverCost= 0
@@ -359,7 +361,7 @@ VAR charPersonName_manueverNeedBodyAim= 0
 VAR charPersonName_manuever_rollAmount = 0
 VAR charPersonName_manuever_attacking = 0
 VAR charPersonName_manueverUsingHands = 0
-VAR charPersonName_manuever2 = 0
+VAR charPersonName_manuever2 = ""
 VAR charPersonName_manuever2_CP = 0
 VAR charPersonName_manuever2_targetZone = 0
 VAR charPersonName_manuever2Cost= 0
@@ -370,16 +372,14 @@ VAR charPersonName_manuever2NeedBodyAim= 0
 VAR charPersonName_manuever2_rollAmount = 0
 VAR charPersonName_manuever2_attacking = 0
 VAR charPersonName_manuever2UsingHands = 0
-VAR charPersonName_manuever3 = 0
+VAR charPersonName_manuever3 = ""
 VAR charPersonName_manuever3_CP = 0
-VAR charPersonName_manuever3_targetZone = 0
 VAR charPersonName_manuever3Cost= 0
 VAR charPersonName_manuever3TN= 0
 VAR charPersonName_manuever3AttackType= 0
 VAR charPersonName_manuever3DamageType= 0
 VAR charPersonName_manuever3NeedBodyAim= 0
 VAR charPersonName_manuever3_rollAmount = 0
-VAR charPersonName_manuever3_attacking = 0
 VAR charPersonName_manuever3UsingHands = 0
 VAR charPersonName_fight_paused = 1
 ///* utest 
@@ -391,9 +391,10 @@ VAR charPersonName2_fight_orientation = ORIENTATION_NONE
 VAR charPersonName2_fight_shock = 0
 VAR charPersonName2_fight_target = TARGET_NONE
 VAR charPersonName2_fight_target2 = TARGET_NONE
+VAR charPersonName2_fight_target3 = TARGET_NONE
 VAR charPersonName2_fight_cautiousLock = 0
 VAR charPersonName2_fight_lastAttacked = 0
-VAR charPersonName2_manuever = 0
+VAR charPersonName2_manuever = ""
 VAR charPersonName2_manuever_CP = 0
 VAR charPersonName2_manuever_targetZone = 0
 VAR charPersonName2_manueverCost= 0
@@ -404,7 +405,7 @@ VAR charPersonName2_manueverNeedBodyAim= 0
 VAR charPersonName2_manuever_rollAmount = 0
 VAR charPersonName2_manuever_attacking = 0
 VAR charPersonName2_manueverUsingHands = 0
-VAR charPersonName2_manuever2 = 0
+VAR charPersonName2_manuever2 = ""
 VAR charPersonName2_manuever2_CP = 0
 VAR charPersonName2_manuever2_targetZone = 0
 VAR charPersonName2_manuever2Cost= 0
@@ -415,16 +416,14 @@ VAR charPersonName2_manuever2NeedBodyAim= 0
 VAR charPersonName2_manuever2_rollAmount = 0
 VAR charPersonName2_manuever2_attacking = 0
 VAR charPersonName2_manuever2UsingHands = 0
-VAR charPersonName2_manuever3 = 0
+VAR charPersonName2_manuever3 = ""
 VAR charPersonName2_manuever3_CP = 0
-VAR charPersonName2_manuever3_targetZone = 0
 VAR charPersonName2_manuever3Cost= 0
 VAR charPersonName2_manuever3TN= 0
 VAR charPersonName2_manuever3AttackType= 0
 VAR charPersonName2_manuever3DamageType= 0
 VAR charPersonName2_manuever3NeedBodyAim= 0
 VAR charPersonName2_manuever3_rollAmount = 0
-VAR charPersonName2_manuever3_attacking = 0
 VAR charPersonName2_manuever3UsingHands = 0
 VAR charPersonName2_fight_paused = 1
 //*/
@@ -485,7 +484,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function getAIOrientation(charId, charStance)  
 // default behaviour
 { shuffle:
-    -   ~return ORIENTATION_DEFENSIVE
+ 	-   ~return ORIENTATION_DEFENSIVE
     -   ~return ORIENTATION_CAUTIOUS
     -   ~return ORIENTATION_AGGRESSIVE
 }

@@ -201,7 +201,7 @@ Let's fight!
 	//For all combatants that need to, establish their primary target, in order of those that can  (and wish to) freely gain initiative over specific targets from their previous exchange of combat, and if it's the first exchange, also those from aggressive, cautious, and defensive orientations respectively. Initiatives fighting states are determined from here
 	// GainedInitiative
 	/* TODO: kiv when up against multiple opponents. Figure out a way to determine this
-	{ charPersonName2_FIGHT && charPersonName2_fight_target == -1 && charPersonName2_fight_orientation==ORIENTATION_NONE: 
+	{ charPersonName2_FIGHT && charPersonName2_fight_target == TARGET_NONE && charPersonName2_fight_orientation==ORIENTATION_NONE: 
 		{charPersonName2_label} chose a target.
 	}
 	*/
@@ -210,7 +210,7 @@ Let's fight!
 	{ charPersonName_FIGHT && charPersonName_fight_target == TARGET_NONE && charPersonName_fight_orientation==ORIENTATION_AGGRESSIVE: 
 		->ChooseTargetForPlayer(charPersonName_id, charPersonName_fight_orientation, charPersonName_label, charPersonName_fight_side, charPersonName_isYOU)
 	}
-	{ charPersonName2_FIGHT && charPersonName2_fight_target == -1 && charPersonName2_fight_orientation==ORIENTATION_AGGRESSIVE: 
+	{ charPersonName2_FIGHT && charPersonName2_fight_target == TARGET_NONE && charPersonName2_fight_orientation==ORIENTATION_AGGRESSIVE: 
 		->ChooseTargetForAI(charPersonName2_id, charPersonName2_fight_orientation, charPersonName2_label, charPersonName2_fight_side)
 	}
 	//*/
@@ -219,7 +219,7 @@ Let's fight!
 	{ charPersonName_FIGHT && charPersonName_fight_target == TARGET_NONE && charPersonName_fight_orientation==ORIENTATION_CAUTIOUS: 
 		->ChooseTargetForPlayer(charPersonName_id, charPersonName_fight_orientation, charPersonName_label, charPersonName_fight_side, charPersonName_isYOU)
 	}
-	{ charPersonName2_FIGHT && charPersonName2_fight_target == -1 && charPersonName2_fight_orientation==ORIENTATION_CAUTIOUS: 
+	{ charPersonName2_FIGHT && charPersonName2_fight_target == TARGET_NONE && charPersonName2_fight_orientation==ORIENTATION_CAUTIOUS: 
 		->ChooseTargetForAI(charPersonName2_id, charPersonName2_fight_orientation, charPersonName2_label, charPersonName2_fight_side)
 	}
 	//*/
@@ -228,7 +228,7 @@ Let's fight!
 	{ charPersonName_FIGHT && charPersonName_fight_target == TARGET_NONE && charPersonName_fight_orientation==ORIENTATION_DEFENSIVE: 
 		->ChooseTargetForPlayer(charPersonName_id, charPersonName_fight_orientation, charPersonName_label, charPersonName_fight_side, charPersonName_isYOU)
 	}
-	{ charPersonName2_FIGHT && charPersonName2_fight_target == -1 && charPersonName2_fight_orientation==ORIENTATION_DEFENSIVE: 
+	{ charPersonName2_FIGHT && charPersonName2_fight_target == TARGET_NONE && charPersonName2_fight_orientation==ORIENTATION_DEFENSIVE: 
 		->ChooseTargetForAI(charPersonName2_id, charPersonName2_fight_orientation, charPersonName2_label, charPersonName2_fight_side)
 	}
 	//*/
@@ -295,6 +295,7 @@ Let's fight!
 	// Declare/reveal combat manuevers (their costs and details) in order of combatants that have initiative, then those without initiative, in order of lowest to highest adriotness stat.
 	//TODO: Declare moves...get lists of available moves, AI choose suitable move and CP, 
 	Declaring moves...
+	{" "}
 	-> DeclarationLoop
 
 
@@ -306,7 +307,7 @@ Let's fight!
 		{
 			- fromId ==0 && charPersonName_FIGHT && charPersonName_fight_initiative:
 				~fromId = charPersonName_id
-				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0,    1, ->DeclarationLoop)
 			- else:
 				{ fromId == charPersonName_id:
 					~fromId = 0
@@ -315,7 +316,7 @@ Let's fight!
 		{
 			-fromId ==0 &&  charPersonName2_FIGHT && charPersonName2_fight_initiative:
 				~fromId = charPersonName2_id
-				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target,  charPersonName2_AI==0,   1, ->DeclarationLoop)
 			- else:
 				{ fromId == charPersonName2_id:
 					~fromId = 0
@@ -328,7 +329,7 @@ Let's fight!
 		{
 			-fromId == 0 && charPersonName_FIGHT && charPersonName_fight_initiative==0:
 				~fromId = charPersonName_id
-				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0, ->DeclarationLoop)
+				->PrepareManueversForChar(charPersonName_id, charPersonName_fight_target, charPersonName_AI==0,   0, ->DeclarationLoop)
 			- else:
 				{ fromId == charPersonName_id:
 					~fromId = 0
@@ -337,7 +338,7 @@ Let's fight!
 		{
 			-fromId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative==0:
 				~fromId = charPersonName2_id
-				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target, charPersonName2_AI==0, ->DeclarationLoop)
+				->PrepareManueversForChar(charPersonName2_id, charPersonName2_fight_target,charPersonName2_AI==0,   0,->DeclarationLoop)
 			- else:
 				{ fromId == charPersonName2_id:
 					~fromId =0
@@ -345,7 +346,8 @@ Let's fight!
 		}
 	//*/
 
-	+ [Continue]
+	//+ [Continue]
+	...
 	->->
 
 	= ResolveInitiatives
@@ -415,11 +417,127 @@ Let's fight!
 
 === Combat_ResolveExchange
 	{showCombatStatus()}
+	/*
 	Resolution:
 	Now, resolve all offensive combat maneuvers in order of those with initiative, then those without initiative, in order of highest to lowest adriotness stat.
-	Establish new initiatives as a result of each exchange of combat manuevers
-	Establish any new possible targets that a person can choose (later in the next exchange) to freely gain initiative over
-	+ [{boutExchange==1: Proceed to 2nd Exchange|Proceed to Next Round}]
+	Establish new initiatives as a result of each exchange of combat manuevers (likely to be done within menuver resolution itself)
+	Establish any new possible targets that a person can choose (later in the next exchange) to freely gain initiative over (likely to be done within manuever resolution itself)
+	*/
+
+	// phase 0 for those with initiative, 1 for those without initiative
+	~temp phase = 0
+	~temp fromId = 0
+	~temp gotResolve = 0
+
+	// Resolve all offensive manuevers
+	-> ResolveLoop
+
+	= ResolveLoop
+	{
+		-phase == 0: 
+		///* utest all resolution
+		{
+			- fromId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking:
+				~fromId = charPersonName2_id
+				~gotResolve = 1
+				->ResolveAtkManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP,charPersonName2_manueverCost, charPersonName2_fight_target, charPersonName2_manuever_targetZone, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, charPersonName2_manuever2_targetZone, ->ResolveLoop )
+			- else:
+				{ fromId == charPersonName2_id:
+					~fromId = 0
+				}	
+		
+		}
+		{
+			- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==1 &&  (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
+				~fromId = charPersonName_id
+				~gotResolve = 1
+				->ResolveAtkManuever(charPersonName_id, charPersonName_cp,  charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost,  charPersonName_fight_target, charPersonName_manuever_targetZone, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_manuever2_targetZone, ->ResolveLoop)
+			- else:
+				{ fromId == charPersonName_id:
+					~fromId = 0
+				}	
+		}
+		//*/
+	}
+	~phase = 1
+
+	///* utest all resolution
+	{
+		- fromId == 0 &&  charPersonName2_FIGHT && charPersonName2_fight_initiative==0 &&  (charPersonName2_manuever=="")==0 &&  charPersonName2_manuever_attacking:
+			~fromId = charPersonName2_id
+			~gotResolve = 1
+			->ResolveAtkManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_manueverCost, charPersonName2_fight_target, charPersonName2_manuever_targetZone, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, charPersonName2_manuever2_targetZone, ->ResolveLoop )
+		- else:
+				{ fromId == charPersonName2_id:
+					~fromId = 0
+				}	
+	}
+	{
+		- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==0 && (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
+			~fromId = charPersonName_id
+			~gotResolve = 1
+			->ResolveAtkManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost, charPersonName_fight_target, charPersonName_manuever_targetZone, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_manuever2_targetZone, ->ResolveLoop)
+		- else:
+			{ fromId == charPersonName_id:
+				~fromId = 0
+			}	
+	}
+	//*/
+
+
+
+	-> RefundLoop
+
+	= RefundLoop
+
+	// Refund/resolve any un-expended defense manuevers
+	///* utest all
+	{
+		-charPersonName2_FIGHT && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking == 0:
+			charPersonName2 defense refunding resolution slot1
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_manueverCost)
+	}
+	{
+		-charPersonName_FIGHT && (charPersonName_manuever=="")==0 && charPersonName_manuever_attacking == 0:
+			charPersonName defense refunding resolution slot1
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost)
+			
+	}
+	//*/
+		///* utest all
+	{
+		-charPersonName2_FIGHT && (charPersonName2_manuever2=="")==0 && charPersonName2_manuever2_attacking == 0:
+			charPersonName2 defense refunding resolution slot2
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_manueverCost)
+	}
+	{
+		-charPersonName_FIGHT && (charPersonName_manuever2=="")==0 && charPersonName_manuever2_attacking == 0:
+			charPersonName defense refunding resolution slot2
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_manuever2Cost)
+	}
+	//*/
+	///* utest all
+	{
+		-charPersonName2_FIGHT && (charPersonName2_manuever3=="")==0:
+			charPersonName2 defense refunding resolution slot3
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever3, charPersonName2_manuever3_CP, charPersonName2_manuever3Cost)
+	}
+	{
+		-charPersonName_FIGHT && (charPersonName_manuever3=="")==0:
+			charPersonName defense refunding resolution slot3
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever3, charPersonName_manuever3_CP, charPersonName_manuever3Cost)
+	}
+	//*/
+	-> ProceedOn
+
+
+
+	= ProceedOn
+	{
+		- gotResolve==0:
+			Nothing happened as combatants circle about uncertainly.
+	}
+	+ [{boutExchange==1 && gotResolve!=0: Proceed to 2nd Exchange|Proceed to Next Round}]
 	// reset combat flags
 	///* player
 	~charPersonName_fight_stance = STANCE_NEUTRAL
@@ -434,10 +552,17 @@ Let's fight!
 
 	// proceed to next exchange
 	~boutExchange++
-	{ boutExchange >= 3:
-		// proceed to next round
-		~boutExchange=1
-		~boutRounds++
+	{ 
+		-boutExchange >= 3:
+			// proceed to next round
+			~boutExchange=1
+			~boutRounds++
+		- gotResolve ==0:
+			//A battle lull has occured between combatants.
+			~boutExchange=1
+			~boutRounds++
+		- else:
+			~elseResulted = 1
 	}
 	->->
 

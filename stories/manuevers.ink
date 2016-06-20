@@ -147,7 +147,12 @@ CONST MANUEVER_TYPE_RANGED = 1
 }
 
 
-=== PrepareManueversForChar(charId, charTarget, charIsPlayer, ->callbackToMainLoop)
+=== function isAThreat(initiative, orientation, target)
+// a "threat" must always have a target aquired, and a resolved initiative due to orientation (ie. if due to orientation resolution, it lacks initiative, often due to defensive vs defensive engagements  or some cautious vs cautious engagements, then it's deemed not a threat..). 
+~return target && (initiative || orientation==ORIENTATION_NONE ) 
+
+
+=== PrepareManueversForChar(charId, charTarget, charIsPlayer, charHasInitiative, ->callbackToMainLoop)
 ~temp opponentCount = 0
 ~temp charHasPrimaryTarget = 0
 ~temp redirectBack
@@ -155,18 +160,22 @@ CONST MANUEVER_TYPE_RANGED = 1
 
 ///* utest all
 {
-	- charPersonName_FIGHT && (charPersonName_id == charTarget || charPersonName_fight_target == charId):
+	- (charPersonName_id == charTarget || charPersonName_fight_target == charId) && ( charHasInitiative || isAThreat(charPersonName_fight_initiative, charPersonName_fight_orientation, charPersonName_fight_target) ):
 		~opponentCount = opponentCount+1
-		{	charPersonName_id == charTarget:
-			~charHasPrimaryTarget = 1
+		{	
+			-charPersonName_id == charTarget:
+				~charHasPrimaryTarget = 1
+
 		}
 }
 {
-	- charPersonName2_FIGHT && (charPersonName2_id == charTarget || charPersonName2_fight_target == charId):
+	- (charPersonName2_id == charTarget || charPersonName2_fight_target == charId) && ( charHasInitiative || isAThreat(charPersonName2_fight_initiative, charPersonName2_fight_orientation, charPersonName2_fight_target) ):
 		~opponentCount = opponentCount+1
-		{	charPersonName_id == charTarget:
-			~charHasPrimaryTarget = 1
+		{	
+			-charPersonName2_id == charTarget:
+				~charHasPrimaryTarget = 1
 		}
+
 }
 //*/
 {
@@ -219,6 +228,7 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 				~asPrimaryTarget = 1
 			- else:
 				~useSlotIndex = secondarySlotIndex
+				Using secondary slot index! ID:{charId} Char has primary target:{charHasPrimaryTarget}
 		}
 		{
 			- _confirming == 0 && charIsPlayer && opponentCount>1:
@@ -237,6 +247,7 @@ PrepareManueversForCharLooseEndError detected. This should not happen!
 				~asPrimaryTarget = 1
 			- else:
 				~useSlotIndex = secondarySlotIndex
+				Using secondary slot index! ID:{charId} Char has primary target:{charHasPrimaryTarget}
 		}
 		{
 			- _confirming == 0 && charIsPlayer && opponentCount>1:
@@ -311,14 +322,17 @@ slotIndex will either be "2" or "3", depending which is already used up.
 
 
 === ProceedToActionAgainst(slotIndex, charId, enemyId,  charNoMasterHand, charNoOffHand, ->doneCallbackThread) 
+~temp x = 0
+~temp y = 0
+~temp z = 0
 {
 - slotIndex == 1:
 	{	
 	///* utest all 
 	- charId == charPersonName_id: 
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever,  charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever,  charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone )
 	- charId == charPersonName2_id:
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever,  charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName2_manuever,  charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone )
 	-else:
 		~elseResulted = 1
 	//*/
@@ -327,9 +341,11 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	{	
 	///* utest all 
 	- charId == charPersonName_id: 
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever2,  charPersonName_manuever2Cost, charPersonName_manuever2TN, charPersonName_manuever2AttackType, charPersonName_manuever2DamageType, charPersonName_manuever2NeedBodyAim, charPersonName_manuever2_attacking, charPersonName_manuever2UsingHands )
+		~charPersonName_fight_target2 = enemyId
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever2,  charPersonName_manuever2Cost, charPersonName_manuever2TN, charPersonName_manuever2AttackType, charPersonName_manuever2DamageType, charPersonName_manuever2NeedBodyAim, charPersonName_manuever2_attacking, charPersonName_manuever2UsingHands, charPersonName_manuever2_CP, charPersonName_manuever2_targetZone)
 	- charId == charPersonName2_id:
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName2_manuever2,  charPersonName2_manuever2Cost, charPersonName2_manuever2TN, charPersonName2_manuever2AttackType, charPersonName2_manuever2DamageType, charPersonName2_manuever2NeedBodyAim, charPersonName2_manuever2_attacking, charPersonName2_manuever2UsingHands )
+		~charPersonName2_fight_target2 = enemyId
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName2_manuever2,  charPersonName2_manuever2Cost, charPersonName2_manuever2TN, charPersonName2_manuever2AttackType, charPersonName2_manuever2DamageType, charPersonName2_manuever2NeedBodyAim, charPersonName2_manuever2_attacking, charPersonName2_manuever2UsingHands, charPersonName2_manuever2_CP, charPersonName2_manuever2_targetZone )
 	-else:
 		~elseResulted = 1
 	//*/
@@ -338,16 +354,18 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	{
 	///* utest all 
 	- charId == charPersonName_id: 
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever3,  charPersonName_manuever3Cost, charPersonName_manuever3TN, charPersonName_manuever3AttackType, charPersonName_manuever3DamageType, charPersonName_manuever3NeedBodyAim, charPersonName_manuever3_attacking, charPersonName_manuever3UsingHands )
+		~charPersonName_fight_target3 = enemyId
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever3,  charPersonName_manuever3Cost, charPersonName_manuever3TN, charPersonName_manuever3AttackType, charPersonName_manuever3DamageType, x, y, charPersonName_manuever3UsingHands, charPersonName_manuever3_CP, z )
 	- charId == charPersonName2_id:
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread, charPersonName2_manuever3,  charPersonName2_manuever2Cost, charPersonName2_manuever3TN, charPersonName2_manuever3AttackType, charPersonName2_manuever3DamageType, charPersonName2_manuever3NeedBodyAim, charPersonName2_manuever3_attacking, charPersonName2_manuever3UsingHands )
+		~charPersonName2_fight_target3 = enemyId
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread, charPersonName2_manuever3,  charPersonName2_manuever2Cost, charPersonName2_manuever3TN, charPersonName2_manuever3AttackType, charPersonName2_manuever3DamageType, x, y, charPersonName2_manuever3UsingHands, charPersonName2_manuever3_CP, z )
 	-else:
 		~elseResulted = 1
 	//*/
 	}
 }
 
-=== ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking, ref manueverUseHands)
+=== ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking, ref manueverUseHands, ref manuever_CP, ref manuever_targetZone)
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
 // dummy variable to hold as unused referenced
@@ -410,6 +428,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 {getManueverSelectReadonlyDependencies(charId, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt,   _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand, _twoHanded)}
 {getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
 
+~temp charCanAttack = _charTarget == enemyId && slotIndex != 3
 
 // TOCHECK when dealing against multiple enemies
 {
@@ -418,29 +437,30 @@ slotIndex will either be "2" or "3", depending which is already used up.
 		{	
 			- slotIndex == 2 && currentlyBeingAttackedBy(charId, enemyId, 1) && (charNoMasterHand==0 || charNoOffHand==0): 
 				~_initiative = 1
+				~charCanAttack = 1
 		}
 }
 
 {
 - charNoMasterHand:
-	_DTN = 0
-	_DTNt = 0
-	_ATN = 0
-	_ATN2 = 0
+	~_DTN = 0
+	~_DTNt = 0
+	~_ATN = 0
+	~_ATN2 = 0
 }
 {
 - charNoOffHand:
-	_DTN_off = 0
-	_DTNt_off = 0
-	_ATN_off = 0
-	_ATN2_off = 0
+	~_DTN_off = 0
+	~_DTNt_off = 0
+	~_ATN_off = 0
+	~_ATN2_off = 0
 }
 {
 	-preferOffhand:
-	_DTN = 0
-	_DTNt = 0
-	_ATN = 0
-	_ATN2 = 0
+	~_DTN = 0
+	~_DTNt = 0
+	~_ATN = 0
+	~_ATN2 = 0
 }
 
 /*
@@ -495,12 +515,17 @@ isAI?:{_isAI}
 }
 
 {
-	- _initiative:
+	- _diceAvailable > 0:
+	{
+	- _initiative && charCanAttack:
+		{_isAI==0:{" "}}
 		{_isAI==0:Attack}
 		-> ChooseManueverListAtk(0,altAction,divertTo )
 	- else:
+		{_isAI==0:{" "}}
 		{_isAI==0:Defend}
 		-> ChooseManueverListDef(0,altAction,divertTo)
+	}
 }
 ->ChooseManueverMenu
 
@@ -743,41 +768,178 @@ For now, he will Do Nothing.
 //Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
 // todo kiv other action types
 = ChooseManueverMenu
-Choose the nature of your action {preferOffhand: (off-hand)}
-+  {_initiative}  Attack
+{
+	- _diceAvailable > 0:
+		Choose the nature of your action {preferOffhand: (off-hand)}
+	-else:
+		You have no more dice left in your combat pool.
+}
++  {_diceAvailable>0 && _initiative && charCanAttack}  Attack
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
-+ {_initiative==0}  Defend 
++ {_diceAvailable>0 && _initiative==0}  Defend 
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
-+ {_initiative && _orientation!=ORIENTATION_AGGRESSIVE}  Defend (with initiative)   // Quick Defense falls under here
++ {_diceAvailable>0 && _initiative && _orientation!=ORIENTATION_AGGRESSIVE}  Defend (with initiative)   // Quick Defense falls under here
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
-+ {_initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE} Attack (buy initiative)
++ {_diceAvailable>0 && _initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (buy initiative)
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
-+ {_initiative==0 && _charTarget==enemyId && _orientation!= ORIENTATION_DEFENSIVE} Attack (no initiative) 
++ {_diceAvailable>0 && _initiative==0 && _charTarget==enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (no initiative) 
 //+ {_initiative==0 && _orientation!= ORIENTATION_DEFENSIVE } Quick Attack  // kiv, but just a naming convention
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 //+ Change target  (no initiative)// kiv, allows for switching target, but will lose current initiative (if any)
 //+ Change target  (buy initiative)// kiv, allows for switching target, and will buy  initiative 
-+ { charNoOffHand == 0 && _twoHanded==0 && (_equipOffhand=="")==0 && _hasShield==0 && (_equipMainHand=="")==0 && charNoMasterHand==0  } [{preferOffhand == 0:Switch to off-hand|Switch back to main-hand}]
++ { _diceAvailable > 0 &&  charNoOffHand == 0 && _twoHanded==0 && (_equipOffhand=="")==0 && _hasShield==0 && (_equipMainHand=="")==0 && charNoMasterHand==0  } [{preferOffhand == 0:Switch to off-hand|Switch back to main-hand}]
 	-> ToggleOffHandOnly
-+ [(Do Nothing)]
-->doneCallbackThread
-
-= ConfirmManuever
++ {_orientation!=ORIENTATION_AGGRESSIVE || choiceCount==0} [(Do Nothing)]
 ->doneCallbackThread
 
 = AssignCombatPool
-Assign dice from combat pool to make to roll... TODO
--> DONE
+{
+-_isAI ==0:
+	// kiv todo: change copy to suit multiple PC characters in party
+	How much dice in your combat pool do you wish to roll for this manuever?
+	+ { boutExchange == 2 } [All remaining {_diceAvailable} dice]
+		->ConfirmCombatPool(_diceAvailable)
+	+ {_diceAvailable >= 1  } [1 dice]
+		->ConfirmCombatPool(1)
+	+ {_diceAvailable >= 2  } [2 dice]
+		->ConfirmCombatPool(2)
+	+ {_diceAvailable >= 3  } [3 dice]
+		->ConfirmCombatPool(3)
+	+ {_diceAvailable >= 4  }[4 dice]
+		->ConfirmCombatPool(4)
+	+ {_diceAvailable >= 5  } [5 dice]
+		->ConfirmCombatPool(5)
+	+ {_diceAvailable >= 5  } [6 dice]
+		->ConfirmCombatPool(6)
+	+ {_diceAvailable >= 7  } [7 dice] 
+		->ConfirmCombatPool(7)
+	+ {_diceAvailable >= 8  } [8 dice]
+		->ConfirmCombatPool(8)
+	+ {_diceAvailable >= 9  } [9 dice]
+		->ConfirmCombatPool(9)
+	+ {_diceAvailable >= 10  } [10 dice]
+		->ConfirmCombatPool(10)
+	+ {_diceAvailable >= 11  } [11 dice]
+		->ConfirmCombatPool(11)
+	+ {_diceAvailable >= 12  } [12 dice]
+		->ConfirmCombatPool(12)
+	+ {_diceAvailable >= 13  } [13 dice]
+		->ConfirmCombatPool(13)
+	+ {_diceAvailable >= 14  } [14 dice]
+		->ConfirmCombatPool(14)
+	+ {_diceAvailable >= 15  } [15 dice]
+		->ConfirmCombatPool(15)
+	+ {_diceAvailable >= 16  } [16 dice]
+		->ConfirmCombatPool(16)
+	+ {_diceAvailable >= 17 } [17 dice]
+		->ConfirmCombatPool(17)
+	+ {_diceAvailable >= 18  } [18 dice]
+		->ConfirmCombatPool(18)
+	+ {_diceAvailable >= 19  } [19 dice]
+		->ConfirmCombatPool(19)
+	+ {_diceAvailable >= 20  } [20 dice]
+		->ConfirmCombatPool(20)
+	+ {_diceAvailable >= 21  } [21 dice]
+		->ConfirmCombatPool(21)
+	+ {_diceAvailable >= 22  } [22 dice]
+		->ConfirmCombatPool(22)
+	+ {_diceAvailable >= 23  } [23 dice]
+		->ConfirmCombatPool(23)
+	+ {_diceAvailable >= 24  } [24 dice]
+		->ConfirmCombatPool(24)
+	+ {_diceAvailable >= 25  } [25 dice]
+		->ConfirmCombatPool(25)
+	+ {_diceAvailable >= 26  } [26 dice]
+		->ConfirmCombatPool(26)
+	+ {_diceAvailable >= 27  } [27 dice]
+		->ConfirmCombatPool(27)
+	+ {_diceAvailable >= 28  } [28 dice]
+		->ConfirmCombatPool(28)
+	+ {_diceAvailable >= 29  } [29 dice]
+		->ConfirmCombatPool(29)
+	+ {_diceAvailable >= 30  } [30 dice]
+		->ConfirmCombatPool(30)
+-else:
+	// todo: ai needs to determine how to divide his combat pool when up against multiple opponents, and other variations
+	~temp aiDecidePool = _diceAvailable/2
+	{
+		-aiDecidePool == 0:
+			~aiDecidePool = 1
+	}
+	->ConfirmCombatPool(aiDecidePool)
+}
+//-> AssignCombatPoolLooseEndError
+
+= AssignCombatPoolLooseEndError
+AssignCombatPoolLooseEndError detected. This should not happen!
+->DONE
+
+= ChoosingManuversLooseEndError
+ChoosingManuversLooseEndError detected. This should not happen!
+->DONE
+
+= ConfirmManuever
+{
+	-_isAI:
+	{ 
+	-manueverIsAttacking:
+		Enemy acts with...
+		CharacterID: {charId}
+		ManueverID: {manuever}
+		TN: {manueverTN}
+		AttackType: {getAttackTypeLabel(manueverAttackType)}
+		DamageType: {getDamageTypeLabel(manueverDamageType)}
+		//Need to Aim body zone: {manueverNeedBodyAim:Yes|No }
+		Cost: {manueverCost}
+		Rolling CP: {manuever_CP}
+	-else:
+		Enemy acts with...
+		CharacterID: {charId}
+		ManueverID: {manuever}
+		TN: {manueverTN}
+		Cost: {manueverCost}
+		Rolling CP: {manuever_CP}
+	}
+}
+//....
+{" "}
+->doneCallbackThread
+
+= ConfirmCombatPool(amount)
+// kiv todo: change copy to suit multiple PC characters in party
+/*
+{	
+	-_isAI == 0:
+	Spending {amount}(+{manueverCost}) dice to roll on your [{manuever}] manuever...
+	~_diceAvailable = _diceAvailable - amount
+	You have {_diceAvailable} remaining dice left.
+	-else:
+		{""}
+}
+*/
+{""}
+~manuever_CP = amount
+{ 
+	-manueverNeedBodyAim:
+		->AimTargetZone
+	-else:
+		->ConfirmManuever
+}
 
 = AimTargetZone
-Which target zone do you wish to aim at? TODO
--> DONE
+//Which target zone do you wish to aim at? TODO
+-> ConfirmManuever
+-> AimTargetZoneLooseEndError
 
+= AimTargetZoneLooseEndError
+AimTargetZoneLooseEndError detected. This should not happen!
+->DONE
 
 = ChooseManueverListAtk(_confirmSelection, _altAction, ->_callbackThread )
 ~choiceCount=0
 ~manueverUseHands = MANUEVER_HAND_NONE
 ~temp usingOffhand = 0
+~manueverNeedBodyAim = 1
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
@@ -1024,7 +1186,8 @@ Which target zone do you wish to aim at? TODO
 = ConfirmAtkManueverSelect 
 .........
 ~manuever = theConfirmedManuever
-~manueverIsAttacking = 0
+~manueverIsAttacking = 1
+~_diceAvailable = _diceAvailable -  manueverCost
 {
 	-manueverUseHands == MANUEVER_HAND_MASTER:
 		~charNoMasterHand = 1
@@ -1039,20 +1202,13 @@ Which target zone do you wish to aim at? TODO
 	-else:
 		~elseResulted = 1
 }
-...
-CharacterID: {charId}
-ManueverID: {manuever}
-AttackType: {getAttackTypeLabel(manueverAttackType)}
-DamageType: {getDamageTypeLabel(manueverDamageType)}
-Need to Aim body zone: {manueverNeedBodyAim:Yes|No }
-Cost: {manueverCost}
-TN: {manueverTN}
-->doneCallbackThread
+->AssignCombatPool
 
 = ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
 ~choiceCount=0
 ~manueverUseHands = MANUEVER_HAND_NONE
 ~temp usingOffhand = 0
+~manueverNeedBodyAim = 0
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
@@ -1340,7 +1496,9 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 
 = ConfirmDefManueverSelect()
 ~manuever = theConfirmedManuever
-~manueverIsAttacking = 1
+~manueverIsAttacking = 0
+
+~_diceAvailable = _diceAvailable -  manueverCost
 {
 	-manueverUseHands == MANUEVER_HAND_MASTER:
 		~charNoMasterHand = 1
@@ -1355,11 +1513,66 @@ Half Sword (Defensive) - Deflect an incoming attack with the weapon at hand whil
 	-else:
 		~elseResulted = 1
 }
+/*
 ...
 CharacterID: {charId}
 ManueverID: {manuever}
 Cost: {manueverCost}
 TN: {manueverTN}
-->doneCallbackThread
+*/
+->AssignCombatPool
 
 
+
+=== ResolveAtkManuever(attackerId, ref attackerCP, ref atkManuever, ref atkManueverCP, ref atkManueverCost, ref atkManueverTarget, ref atkManueverTargetZone, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ref atkManuever2TargetZone, ->mainCallbackThread)
+// kiv todo: resolve all overwatching targeters on character
+///* utest all 
+{
+	-atkManueverTarget == charPersonName_id:
+		->AttemptDefense(charPersonName_id, charPersonName_fight_target, charPersonName_fight_target2, charPersonName_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName_manuever_attacking, charPersonName_manuever2_attacking)
+	-atkManueverTarget == charPersonName2_id:
+		->AttemptDefense(charPersonName2_id, charPersonName2_fight_target, charPersonName2_fight_target2, charPersonName2_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName2_manuever_attacking, charPersonName2_manuever2_attacking)
+	-else:
+		~elseResulted = 1
+}
+//*/
+ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTarget}
+-> ResolveComplete
+
+
+= ResolveComplete
+~atkManuever = ""
+~attackerCP = attackerCP - atkManueverCP - atkManueverCost
+-> mainCallbackThread
+
+
+= AttemptDefense(defenderId, ref defenderTarget, ref defenderTarget2, ref defenderTarget3, ref defManuever, ref defManuever2, ref defManuever3, ref defenderAttacking, ref defenderAttacking2 )
+///* utest all 
+{
+	- (defenderTarget == attackerId && (defManuever=="")==0) || (defenderTarget2 == attackerId && (defManuever2=="")==0) || (defenderTarget3 == attackerId && (defManuever3=="")==0):
+		{
+			-(defenderTarget == attackerId && (defManuever=="")==0):
+				->AttemptDefendersManuever(defenderId, defManuever, defenderAttacking)
+			-(defenderTarget2 == attackerId && (defManuever2=="")==0):
+				->AttemptDefendersManuever(defenderId, defManuever2, defenderAttacking2)
+			-(defenderTarget3 == attackerId && (defManuever3=="")==0):
+				->AttemptDefendersManuever(defenderId, defManuever3, 0)
+			-else:
+				AttemptDefense else exception found :: Should NOT HAPPEN!!
+		}
+	-else:
+		resolve undefended attack manuever: {attackerId} on {defenderId}
+}
+-> ResolveComplete
+//*/
+
+
+= AttemptDefendersManuever(defenderId, ref defManuever, defenderCounterAttacking)  
+//, ref defManueverCP, ref defManueverCost,
+todo: resolve attacker's manueever against defender's manuever: {attackerId} on {defenderId} {defenderCounterAttacking: (counter-attacking)}
+-> ResolveComplete
+
+
+=== function resolveUnusedDefManuever(defenderId, ref defenderCP, ref defManuever, ref defManueverCP, ref defManueverCost)
+~defManuever = ""
+~defenderCP = defenderCP - defManueverCP - defManueverCost
