@@ -6,8 +6,15 @@ VAR boutStep=-1
 VAR elseResulted = 0
 
 // Common Functions  (usually stateful, game-specific)
+VAR combatStatusStringCache = ""
 === function showCombatStatus()
-~ return "Round "+boutRounds+" - Exchange: "+boutExchange+"/2"
+~temp statusToShow = "Round "+boutRounds+" - Exchange: "+boutExchange+"/2"
+{
+	- (combatStatusStringCache == statusToShow)==0:
+		~combatStatusStringCache = statusToShow
+		~return statusToShow
+}
+~ return ""
 
 
 // Static Functions (stateless)
@@ -278,7 +285,7 @@ VAR charPersonName_equipMasterhand = "gladius"
 ///* utest
 CONST charPersonName2_id = 2
 VAR charPersonName2_label = "CharPersonName2"
-CONST charPersonName2_reflex = 3
+CONST charPersonName2_reflex = 5
 CONST charPersonName2_mobility = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
 VAR charPersonName2_usingProfeciencyLevel = 8
@@ -358,7 +365,6 @@ VAR charPersonName_manueverTN= 0
 VAR charPersonName_manueverAttackType= 0
 VAR charPersonName_manueverDamageType= 0
 VAR charPersonName_manueverNeedBodyAim= 0
-VAR charPersonName_manuever_rollAmount = 0
 VAR charPersonName_manuever_attacking = 0
 VAR charPersonName_manueverUsingHands = 0
 VAR charPersonName_manuever2 = ""
@@ -369,7 +375,6 @@ VAR charPersonName_manuever2TN= 0
 VAR charPersonName_manuever2AttackType= 0
 VAR charPersonName_manuever2DamageType= 0
 VAR charPersonName_manuever2NeedBodyAim= 0
-VAR charPersonName_manuever2_rollAmount = 0
 VAR charPersonName_manuever2_attacking = 0
 VAR charPersonName_manuever2UsingHands = 0
 VAR charPersonName_manuever3 = ""
@@ -379,7 +384,6 @@ VAR charPersonName_manuever3TN= 0
 VAR charPersonName_manuever3AttackType= 0
 VAR charPersonName_manuever3DamageType= 0
 VAR charPersonName_manuever3NeedBodyAim= 0
-VAR charPersonName_manuever3_rollAmount = 0
 VAR charPersonName_manuever3UsingHands = 0
 VAR charPersonName_fight_paused = 1
 ///* utest 
@@ -402,7 +406,6 @@ VAR charPersonName2_manueverTN= 0
 VAR charPersonName2_manueverAttackType= 0
 VAR charPersonName2_manueverDamageType= 0
 VAR charPersonName2_manueverNeedBodyAim= 0
-VAR charPersonName2_manuever_rollAmount = 0
 VAR charPersonName2_manuever_attacking = 0
 VAR charPersonName2_manueverUsingHands = 0
 VAR charPersonName2_manuever2 = ""
@@ -413,7 +416,6 @@ VAR charPersonName2_manuever2TN= 0
 VAR charPersonName2_manuever2AttackType= 0
 VAR charPersonName2_manuever2DamageType= 0
 VAR charPersonName2_manuever2NeedBodyAim= 0
-VAR charPersonName2_manuever2_rollAmount = 0
 VAR charPersonName2_manuever2_attacking = 0
 VAR charPersonName2_manuever2UsingHands = 0
 VAR charPersonName2_manuever3 = ""
@@ -423,7 +425,6 @@ VAR charPersonName2_manuever3TN= 0
 VAR charPersonName2_manuever3AttackType= 0
 VAR charPersonName2_manuever3DamageType= 0
 VAR charPersonName2_manuever3NeedBodyAim= 0
-VAR charPersonName2_manuever3_rollAmount = 0
 VAR charPersonName2_manuever3UsingHands = 0
 VAR charPersonName2_fight_paused = 1
 //*/
@@ -436,6 +437,85 @@ CONST RESOLVED_LOCKED = -1
 
 
 // Current combat functions
+=== function getAllManueverDetailsForCharacter(charId, manueverSlot, ref manuever, ref manuever_CP, ref manuever_targetZone, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manuever_attacking, ref manueverUsingHands)
+{
+///* utest all
+- charId == charPersonName_id: 
+	{
+	-manueverSlot==1:
+		~manuever= charPersonName_manuever
+		~manuever_CP = charPersonName_manuever_CP
+		~manuever_targetZone = charPersonName_manuever_targetZone
+		~manueverCost = charPersonName_manueverCost
+		~manueverTN = charPersonName_manueverTN
+		~manueverAttackType = charPersonName_manueverAttackType
+		~manueverDamageType = charPersonName_manueverDamageType
+		~manueverNeedBodyAim = charPersonName_manueverNeedBodyAim
+		~manuever_attacking = charPersonName_manuever_attacking
+		~manueverUsingHands= charPersonName_manueverUsingHands
+	-manueverSlot==2:
+		~manuever= charPersonName_manuever2
+		~manuever_CP = charPersonName_manuever2_CP
+		~manuever_targetZone = charPersonName_manuever2_targetZone
+		~manueverCost = charPersonName_manuever2Cost
+		~manueverTN = charPersonName_manuever2TN
+		~manueverAttackType = charPersonName_manuever2AttackType
+		~manueverDamageType = charPersonName_manuever2DamageType
+		~manueverNeedBodyAim = charPersonName_manuever2NeedBodyAim
+		~manuever_attacking = charPersonName_manuever2_attacking
+		~manueverUsingHands= charPersonName_manuever2UsingHands
+	-else:
+		~manuever= charPersonName_manuever3
+		~manuever_CP = charPersonName_manuever3_CP
+		~manuever_targetZone = 0
+		~manueverCost = charPersonName_manuever3Cost
+		~manueverTN = charPersonName_manuever3TN
+		~manueverAttackType = charPersonName_manuever3AttackType
+		~manueverDamageType = charPersonName_manuever3DamageType
+		~manueverNeedBodyAim = charPersonName_manuever3NeedBodyAim
+		~manuever_attacking = 0
+		~manueverUsingHands= charPersonName_manuever3UsingHands
+	}
+- charId == charPersonName2_id:
+	{
+	-manueverSlot==1:
+		~manuever= charPersonName2_manuever
+		~manuever_CP = charPersonName2_manuever_CP
+		~manuever_targetZone = charPersonName2_manuever_targetZone
+		~manueverCost = charPersonName2_manueverCost
+		~manueverTN = charPersonName2_manueverTN
+		~manueverAttackType = charPersonName2_manueverAttackType
+		~manueverDamageType = charPersonName2_manueverDamageType
+		~manueverNeedBodyAim = charPersonName2_manueverNeedBodyAim
+		~manuever_attacking = charPersonName2_manuever_attacking
+		~manueverUsingHands= charPersonName2_manueverUsingHands
+	-manueverSlot==2:
+		~manuever= charPersonName2_manuever2
+		~manuever_CP = charPersonName2_manuever2_CP
+		~manuever_targetZone = charPersonName2_manuever2_targetZone
+		~manueverCost = charPersonName2_manuever2Cost
+		~manueverTN = charPersonName2_manuever2TN
+		~manueverAttackType = charPersonName2_manuever2AttackType
+		~manueverDamageType = charPersonName2_manuever2DamageType
+		~manueverNeedBodyAim = charPersonName2_manuever2NeedBodyAim
+		~manuever_attacking = charPersonName2_manuever2_attacking
+		~manueverUsingHands= charPersonName2_manuever2UsingHands
+	-else:
+		~manuever= charPersonName2_manuever3
+		~manuever_CP = charPersonName2_manuever3_CP
+		~manuever_targetZone = 0
+		~manueverCost = charPersonName2_manuever3Cost
+		~manueverTN = charPersonName2_manuever3TN
+		~manueverAttackType = charPersonName2_manuever3AttackType
+		~manueverDamageType = charPersonName2_manuever3DamageType
+		~manueverNeedBodyAim = charPersonName2_manuever3NeedBodyAim
+		~manuever_attacking = 0
+		~manueverUsingHands= charPersonName2_manuever3UsingHands
+	}
+//*/
+}
+
+
 === function showPlayerInitiativeState()
 ///* player
 { charPersonName_fight_target==TARGET_NONE:{~return} }
@@ -628,7 +708,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~return charPersonName2_fight_target
 	//*/
 -else:
-	~elseResulted = 1
+	~return TARGET_NONE
 }
 
 // NOTE, this method might depreciate
@@ -641,7 +721,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~return charPersonName2_fight_target2
 	//*/
 -else:
-	~elseResulted = 1
+	~return TARGET_NONE
 }
 
 

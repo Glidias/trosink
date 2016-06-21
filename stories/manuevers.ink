@@ -105,12 +105,12 @@ CONST MANUEVER_TYPE_RANGED = 1
 	{
  	- target == charId: 
  		//  enemy targeting character
- 		~enemyDiceRolled = charPersonName_manuever_rollAmount
+ 		~enemyDiceRolled = charPersonName_manuever_CP
  		~enemyTargetZone = charPersonName_manuever_targetZone
  		~enemyManueverType = charPersonName_manueverAttackType
  	- target2 == charId: 
  		//  enemy targeting character
- 		~enemyDiceRolled = charPersonName_manuever2_rollAmount
+ 		~enemyDiceRolled = charPersonName_manuever2_CP
  		~enemyTargetZone = charPersonName_manuever2_targetZone
  		~enemyManueverType = charPersonName_manuever2AttackType
  	- else: 
@@ -126,12 +126,12 @@ CONST MANUEVER_TYPE_RANGED = 1
 	{	
 	- target == charId: 
  		//  enemy targeting character
- 		~enemyDiceRolled = charPersonName2_manuever_rollAmount
+ 		~enemyDiceRolled = charPersonName2_manuever_CP
  		~enemyTargetZone = charPersonName2_manuever_targetZone
  		~enemyManueverType = charPersonName2_manueverAttackType
  	- target2 == charId: 
  		//  enemy targeting character
- 		~enemyDiceRolled = charPersonName2_manuever2_rollAmount
+ 		~enemyDiceRolled = charPersonName2_manuever2_CP
  		~enemyTargetZone = charPersonName2_manuever2_targetZone
  		~enemyManueverType = charPersonName2_manuever2AttackType
  	- else:
@@ -145,6 +145,8 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~enemyTargetZone = 0
 	~enemyManueverType = 0
 }
+
+
 
 
 === function isAThreat(initiative, orientation, target)
@@ -530,8 +532,12 @@ isAI?:{_isAI}
 ->ChooseManueverMenu
 
 
-= AIManueverConfirmFailedError
-AIManueverConfirmFailedError detected. This should not happen!
+= AIManueverConfirmFailedErrorDef
+AIManueverConfirmFailedErrorDef detected. This should not happen!
+->DONE
+
+= AIManueverConfirmFailedErrorAtk
+AIManueverConfirmFailedErrorAtk detected. This should not happen!
 ->DONE
 
 = AILooseEndError
@@ -593,33 +599,33 @@ For now, he will Do Nothing.
 	{
 		-AVAIL_bash:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 	{
 		-AVAIL_bash:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("bash", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 	{
 		-AVAIL_spike:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("spike", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("spike", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 	{
 		-AVAIL_beat:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("beat", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("beat", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 - else:
 	{
 		-AVAIL_cut:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("cut", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("cut", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 	{
 		-AVAIL_thrust:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("thrust", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListAtk("thrust", 1, ->AIManueverConfirmFailedErrorAtk) }
 	}
 }
 ->noDecisionMadeYetCallback
@@ -635,103 +641,103 @@ For now, he will Do Nothing.
 	{
 		-AVAIL_block:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_block:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_block:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_block:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("block", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_blockopenstrike:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_blockopenstrike:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_blockopenstrike:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("blockopenstrike", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_expulsion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_fullevasion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_partialevasion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 - else:
 	{
 		-AVAIL_parry:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_parry:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_parry:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_counter:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("counter", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("counter", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_counter:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("parry", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_rota:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("rota", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("rota", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_expulsion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion",1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("expulsion",1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_disarm:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("disarm", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("disarm", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_fullevasion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("fullevasion", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 	{
 		-AVAIL_partialevasion:
 		~aiFavCount = aiFavCount + 1
-		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedError) }
+		{ confirmDiceChoice == aiFavCount: ->ChooseManueverListDef("partialevasion", 1, ->AIManueverConfirmFailedErrorDef) }
 	}
 }
 ->noDecisionMadeYetCallback
@@ -766,7 +772,7 @@ For now, he will Do Nothing.
 
 
 //Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
-// todo kiv other action types
+// todo kiv other action types, buy initiative espe
 = ChooseManueverMenu
 {
 	- _diceAvailable > 0:
@@ -783,7 +789,7 @@ For now, he will Do Nothing.
 + {_diceAvailable>0 && _initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (buy initiative)
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 + {_diceAvailable>0 && _initiative==0 && _charTarget==enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (no initiative) 
-//+ {_initiative==0 && _orientation!= ORIENTATION_DEFENSIVE } Quick Attack  // kiv, but just a naming convention
+//+ {_initiative==0 && _orientation!= ORIENTATION_DEFENSIVE } Attack (seize initiative)  // TODO, if not being engaged by offenseive manuever from target
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
 //+ Change target  (no initiative)// kiv, allows for switching target, but will lose current initiative (if any)
 //+ Change target  (buy initiative)// kiv, allows for switching target, and will buy  initiative 
@@ -1296,7 +1302,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 	}
 }
 {	//Partial Evasion (Defensive) - Avoiding an incoming attack.
-	- (_confirmSelection==0||_confirmSelection=="partialevade") :
+	- (_confirmSelection==0||_confirmSelection=="partialevasion") :
 	~stipulateCost = 0
 	~stipulateTN = 7
 	{
@@ -1524,14 +1530,49 @@ TN: {manueverTN}
 
 
 
-=== ResolveAtkManuever(attackerId, ref attackerCP, ref atkManuever, ref atkManueverCP, ref atkManueverCost, ref atkManueverTarget, ref atkManueverTargetZone, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ref atkManuever2TargetZone, ->mainCallbackThread)
+=== ResolveAtkManuevers(attackerId, ref attackerInitiative, ref attackerPaused, ref attackerCP, ref atkManuever1, ref atkManuever1CP, ref atkManuever1Target, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ->mainCallbackThread)
+~temp requiredSuccesses
+~temp x
+~temp zeroDefPool = 0
+~temp _atk_targetZone
+~temp _atk_tn
+~temp _atk_cp
+~temp _atk_attackType
+~temp _atk_damageType
+~temp _atk_needBodyAim
+~temp _atk_usingHands
+~temp _def_cp
+~temp _def_usingHands
+~temp _def_tn
+~temp _def_cost
+~temp noDefense = ""
+~temp defenderCharId
+~temp slotIndexBeingResolved
+
+// todo: handle double attack and mixed cases
 // kiv todo: resolve all overwatching targeters on character
+{	
+	- (atkManuever1 == "")==0: 
+	{ 
+		- atkManuever1CP <= 0 || (attackerCP  - atkManuever1CP) < 0:
+			{getDescribeLabelOfCharCapital(attackerId)} failed to attack due to shock.
+			->ResolveComplete
+		-else: 
+			->ResolveAtkManuever(atkManuever1, atkManuever1CP, atkManuever1Target, 1)
+	}
+}
+
+= ResolveAtkManuever(ref atkManuever, ref atkManueverCP, ref atkManueverTarget, slotIndex)
+~requiredSuccesses = 0
+~_atk_cp = atkManueverCP
+~slotIndexBeingResolved = slotIndex
+~getAllManueverDetailsForCharacter(attackerId, slotIndex, x, x,  _atk_targetZone, x, _atk_tn, _atk_attackType, _atk_damageType, _atk_needBodyAim, x, _atk_usingHands )
 ///* utest all 
 {
 	-atkManueverTarget == charPersonName_id:
-		->AttemptDefense(charPersonName_id, charPersonName_fight_target, charPersonName_fight_target2, charPersonName_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName_manuever_attacking, charPersonName_manuever2_attacking)
+		->AttemptDefense(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused,  charPersonName_cp, charPersonName_fight_target, charPersonName_fight_target2, charPersonName_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName_manuever_attacking, charPersonName_manuever2_attacking, charPersonName_manuever_CP, charPersonName_manuever2_CP, charPersonName_manuever3_CP)
 	-atkManueverTarget == charPersonName2_id:
-		->AttemptDefense(charPersonName2_id, charPersonName2_fight_target, charPersonName2_fight_target2, charPersonName2_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName2_manuever_attacking, charPersonName2_manuever2_attacking)
+		->AttemptDefense(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_fight_target, charPersonName2_fight_target2, charPersonName2_fight_target3, charPersonName2_manuever, charPersonName2_manuever2, charPersonName2_manuever3, charPersonName2_manuever_attacking, charPersonName2_manuever2_attacking, charPersonName2_manuever_CP, charPersonName2_manuever2_CP, charPersonName2_manuever3_CP)
 	-else:
 		~elseResulted = 1
 }
@@ -1541,38 +1582,160 @@ ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTa
 
 
 = ResolveComplete
-~atkManuever = ""
-~attackerCP = attackerCP - atkManueverCP - atkManueverCost
+{	
+	- (atkManuever1 == "")==0: 
+		~attackerCP = attackerCP - atkManuever1CP
+		~atkManuever1 = ""
+}
+{	
+	- (atkManuever2 == "")==0: 
+		~atkManuever2= ""
+}
 -> mainCallbackThread
 
 
-= AttemptDefense(defenderId, ref defenderTarget, ref defenderTarget2, ref defenderTarget3, ref defManuever, ref defManuever2, ref defManuever3, ref defenderAttacking, ref defenderAttacking2 )
+= AttemptDefense(defenderId, ref defenderInitiative, ref defenderPaused, ref defenderCP, ref defenderTarget, ref defenderTarget2, ref defenderTarget3, ref defManuever, ref defManuever2, ref defManuever3, ref defenderAttacking,  ref defenderAttacking2, ref defManueverCP, ref defManuever2CP, ref defManuever3CP  )
+~zeroDefPool = 0
+~defenderCharId = defenderId
+
+~defenderPaused = 0
 ///* utest all 
 {
 	- (defenderTarget == attackerId && (defManuever=="")==0) || (defenderTarget2 == attackerId && (defManuever2=="")==0) || (defenderTarget3 == attackerId && (defManuever3=="")==0):
 		{
 			-(defenderTarget == attackerId && (defManuever=="")==0):
-				->AttemptDefendersManuever(defenderId, defManuever, defenderAttacking)
+				->AttemptDefendersManuever(defenderId, defenderInitiative, defenderTarget, defenderPaused, defenderCP, defManuever, defenderAttacking, defManueverCP, 1)
 			-(defenderTarget2 == attackerId && (defManuever2=="")==0):
-				->AttemptDefendersManuever(defenderId, defManuever2, defenderAttacking2)
+				->AttemptDefendersManuever(defenderId, defenderInitiative, defenderTarget, defenderPaused, defenderCP, defManuever2, defenderAttacking2, defManuever2CP, 2)
 			-(defenderTarget3 == attackerId && (defManuever3=="")==0):
-				->AttemptDefendersManuever(defenderId, defManuever3, 0)
+				->AttemptDefendersManuever(defenderId, defenderInitiative, defenderTarget,  defenderPaused, defenderCP, defManuever3, 0, defManuever3CP, 3)
 			-else:
 				AttemptDefense else exception found :: Should NOT HAPPEN!!
 		}
 	-else:
-		resolve undefended attack manuever: {attackerId} on {defenderId}
+		->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
 }
+AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 -> ResolveComplete
 //*/
 
 
-= AttemptDefendersManuever(defenderId, ref defManuever, defenderCounterAttacking)  
-//, ref defManueverCP, ref defManueverCost,
-todo: resolve attacker's manueever against defender's manuever: {attackerId} on {defenderId} {defenderCounterAttacking: (counter-attacking)}
+= AttemptDefendersManuever(defenderId, ref defenderInitiative, ref defenderTarget, ref defenderPaused, ref defenderCP, ref defManuever, defManueverAttacking, ref defManueverCP, slotIndex)  
+~temp c1
+~temp c2
+
+~getAllManueverDetailsForCharacter(defenderId, slotIndex, x, _def_cp,  x, _def_cost, _def_tn, x, x, x, x, _def_usingHands )
+{
+	-defManueverAttacking: 
+	{
+		-defenderInitiative:
+			 ~temp atkReflex = getReflexByCharId(attackerId)
+			 ~temp defReflex = getReflexByCharId(defenderId)
+
+			 ~c1 = rollNumSuccesses(atkReflex,5,0)
+			 ~c2 = rollNumSuccesses(defReflex,5,0)
+			// reflex contest role results: D{atkReflex}:{c1} D{defReflex}:{c2}
+			 {
+			 	-c1 > c2:
+			 		~defenderInitiative = 0
+			 		todo: successive resolution of atk manuevers from target AFTER targeter
+			 		 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
+			 	-c2 > c1:
+			 		~attackerInitiative  = 0
+			 		todo:   successive resolution of atk manuevers from target before targeter
+			 		-> mainCallbackThread
+			 	-else:
+			 		todo: simultatenous resolution of atk manuevers between parties
+			 		-> mainCallbackThread
+			 }
+			 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative,defenderTarget,  defenderPaused, noDefense)
+		-else:
+			->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+	}
+	-else:
+		~requiredSuccesses = rollNumSuccesses(_def_cp, _def_tn, 0)
+		~defenderCP = defenderCP - _def_cp
+		->AttemptAttackersManuever(zeroDefPool, defenderCP, 1, defenderInitiative, defenderTarget,  defenderPaused, defManuever)
+
+}
+AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 -> ResolveComplete
 
 
-=== function resolveUnusedDefManuever(defenderId, ref defenderCP, ref defManuever, ref defManueverCP, ref defManueverCost)
+= AttemptAttackersManuever(ref defenderManueverPool, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,   ref defenderPaused, ref defManuever)
+~temp totalAtkSuccess = rollNumSuccesses(_atk_cp, _atk_tn, 0)
+~temp bonusSuccess = totalAtkSuccess - requiredSuccesses
+~temp shockToInflict
+{
+	- bonusSuccess >= 0:
+		// todo: calculate shockToInflict based off damage table 
+		~shockToInflict = bonusSuccess
+		~defenderManueverPool = defenderManueverPool - shockToInflict
+		{
+			- defenderManueverPool < 0:
+				~defenderCP =  defenderCP + defenderManueverPool
+				~defenderManueverPool = 0
+		}
+		-> ResolveAttackManueverResultsWin(totalAtkSuccess, bonusSuccess, defenderCP, gotDefense, defenderInitiative, defenderTarget, defenderPaused, defManuever)
+	- else:
+		-> ResolveAttackManueverResultsFail(totalAtkSuccess, bonusSuccess, defenderCP, gotDefense, defenderInitiative, defenderTarget,  defenderPaused, defManuever)
+}
+AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
+-> ResolveComplete
+
+= ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
+...
+{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}
+
+// do specific atkManuever resolution here
+{
+-gotDefense:
+	~defManuever = ""
+}
+-> ResolveComplete
+
+= ResolveAttackManueverResultsFail(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,  ref defenderPaused, ref defManuever)
+...
+~temp giveInitiativeToDefender = 1
+
+{getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}
+
+// do specific case defManuever resolution here..
+{
+	-defManuever == "fullevasion":
+		~giveInitiativeToDefender = 0
+		~defenderInitiative = 0
+		{
+			- slotIndexBeingResolved == 1:
+				~defenderTarget = TARGET_NONE
+				~atkManuever1Target = TARGET_NONE
+				~attackerInitiative = 0
+		}
+	//- defManuever == "partialevasion":
+	//	~giveInitiativeToDefender = 0
+	//-
+	- else:
+		~elseResulted = 1 
+}
+-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+
+
+= ResolveAttackManueverFailedDefault(giveInitiativeToDefender, ref defenderInitiative, gotDefense, ref defManuever)
+{
+- giveInitiativeToDefender:
+	~defenderInitiative = 1
+	~attackerInitiative = 0
+}
+{
+-gotDefense:
+	~defManuever = ""
+}
+-> ResolveComplete
+
+=== function resolveUnusedDefManuever(defenderId, ref defenderStance, ref defenderCP, ref defManuever, ref defManueverCP, ref defManueverCost)
+{
+	-(defManuever == "fullevasion") == 0:
+		~defenderStance = STANCE_NEUTRAL
+}
 ~defManuever = ""
-~defenderCP = defenderCP - defManueverCP - defManueverCost
+~defenderCP = defenderCP - defManueverCP

@@ -70,7 +70,7 @@ Let's fight!
 	///* utest perceptionCheck<playerPerceptionCheck
 	{  -charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
 		~charPersonName2_fight_stance = getAIStance(charPersonName2_id)
-		You noticed {charPersonName2_label} adopting a {getStanceLabel(charPersonName2_fight_stance)} martial stance.
+		{charPersonName2_fight_stance!=STANCE_NEUTRAL: You noticed {charPersonName2_label} adopting a {getStanceLabel(charPersonName2_fight_stance)} martial stance. }
 	}
 	//*/
 	///* pc
@@ -285,7 +285,7 @@ Let's fight!
 	
 	{	// limit resolving of new initiatives to only 1st exchange
 	-boutExchange == 1:
-		-> Combat_Step3.ResolveInitiatives
+		-> ResolveInitiatives
 	- else:
 		{showPlayerInitiativeState()}
 		-> DeclareCombatManuevers
@@ -377,14 +377,14 @@ Let's fight!
 			}
 		- else:
 			{ 
-				-  charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED: 
+				-  charPersonName_fight_orientation!= ORIENTATION_NONE && charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED: 
 					{setOrientationInitiative(charPersonName_fight_initiative, charPersonName_fight_orientation, getOrientationByCharId(charPersonName_fight_target)) }
 			}
 		}
-		//- else:
-			//~charPersonName_fight_initiative = 0
-		//	~charPersonName_fight_cautiousLock = 0
-			//{charPersonName_FIGHT: You lost track of your moving target: {getNameOfChar(charPersonName_fight_target)}. }
+		- else:
+			~charPersonName_fight_initiative = 0
+			~charPersonName_fight_cautiousLock = 0
+			{charPersonName_FIGHT: {getDescribeLabelOfCharCapital(charPersonName_id)} lost track of your moving target: {getDescribeLabelOfCharCapital(charPersonName_fight_target)}. }
 	}	
 	//*/
 	///* utest
@@ -402,14 +402,14 @@ Let's fight!
 			 }
 		- else:
 			{ 
-				-  charPersonName2_fight_cautiousLock !=  RESOLVED_LOCKED: 
+				-  charPersonName2_fight_orientation!=ORIENTATION_NONE &&  charPersonName2_fight_cautiousLock !=  RESOLVED_LOCKED: 
 					{setOrientationInitiative(charPersonName2_fight_initiative, charPersonName2_fight_orientation, getOrientationByCharId(charPersonName2_fight_target)) }
 			}
 		} 
-		//- else:
-		//	~charPersonName2_fight_initiative = 0
-		//	~charPersonName2_fight_cautiousLock = 0
-			//{charPersonName2_FIGHT: You lost track of your moving target: {getNameOfChar(charPersonName2_fight_target)}. }
+		- else:
+			~charPersonName2_fight_initiative = 0
+			~charPersonName2_fight_cautiousLock = 0
+			{charPersonName2_FIGHT: {getDescribeLabelOfCharCapital(charPersonName2_id)} lost track of your moving target: {getDescribeLabelOfCharCapital(charPersonName2_fight_target)}. }
 	}
 	//*/
 	{showPlayerInitiativeState()}
@@ -429,6 +429,21 @@ Let's fight!
 	~temp fromId = 0
 	~temp gotResolve = 0
 
+	///* utest all
+	{
+		-charPersonName_FIGHT: 
+			~charPersonName_fight_lastAttacked = 0
+			~charPersonName_fight_paused = 1
+			~charPersonName_fight_stance = STANCE_RESET
+	}
+	{
+		-charPersonName2_FIGHT: 
+			~charPersonName2_fight_lastAttacked = 0
+			~charPersonName2_fight_paused = 1
+			~charPersonName2_fight_stance = STANCE_RESET
+	}
+	//*/
+
 	// Resolve all offensive manuevers
 	-> ResolveLoop
 
@@ -440,7 +455,10 @@ Let's fight!
 			- fromId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking:
 				~fromId = charPersonName2_id
 				~gotResolve = 1
-				->ResolveAtkManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP,charPersonName2_manueverCost, charPersonName2_fight_target, charPersonName2_manuever_targetZone, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, charPersonName2_manuever2_targetZone, ->ResolveLoop )
+				~charPersonName2_fight_lastAttacked = 1
+				~charPersonName2_fight_paused = 0
+				~charPersonName2_fight_stance = STANCE_NEUTRAL
+				->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop )
 			- else:
 				{ fromId == charPersonName2_id:
 					~fromId = 0
@@ -451,7 +469,10 @@ Let's fight!
 			- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==1 &&  (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
 				~fromId = charPersonName_id
 				~gotResolve = 1
-				->ResolveAtkManuever(charPersonName_id, charPersonName_cp,  charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost,  charPersonName_fight_target, charPersonName_manuever_targetZone, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_manuever2_targetZone, ->ResolveLoop)
+				~charPersonName_fight_lastAttacked = 1
+				~charPersonName_fight_paused = 0
+				~charPersonName_fight_stance = STANCE_NEUTRAL
+				->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP,  charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop)
 			- else:
 				{ fromId == charPersonName_id:
 					~fromId = 0
@@ -466,7 +487,10 @@ Let's fight!
 		- fromId == 0 &&  charPersonName2_FIGHT && charPersonName2_fight_initiative==0 &&  (charPersonName2_manuever=="")==0 &&  charPersonName2_manuever_attacking:
 			~fromId = charPersonName2_id
 			~gotResolve = 1
-			->ResolveAtkManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_manueverCost, charPersonName2_fight_target, charPersonName2_manuever_targetZone, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, charPersonName2_manuever2_targetZone, ->ResolveLoop )
+			~charPersonName2_fight_lastAttacked = 1
+			~charPersonName2_fight_paused = 0
+			~charPersonName2_fight_stance = STANCE_NEUTRAL
+			->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop )
 		- else:
 				{ fromId == charPersonName2_id:
 					~fromId = 0
@@ -476,7 +500,10 @@ Let's fight!
 		- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==0 && (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
 			~fromId = charPersonName_id
 			~gotResolve = 1
-			->ResolveAtkManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost, charPersonName_fight_target, charPersonName_manuever_targetZone, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_manuever2_targetZone, ->ResolveLoop)
+			~charPersonName_fight_lastAttacked = 1
+			~charPersonName_fight_paused = 0
+			~charPersonName_fight_stance = STANCE_NEUTRAL
+			->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop)
 		- else:
 			{ fromId == charPersonName_id:
 				~fromId = 0
@@ -494,38 +521,32 @@ Let's fight!
 	///* utest all
 	{
 		-charPersonName2_FIGHT && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking == 0:
-			charPersonName2 defense refunding resolution slot1
-			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_manueverCost)
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_fight_stance, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_manueverCost)
 	}
 	{
 		-charPersonName_FIGHT && (charPersonName_manuever=="")==0 && charPersonName_manuever_attacking == 0:
-			charPersonName defense refunding resolution slot1
-			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost)
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_fight_stance, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_manueverCost)
 			
 	}
 	//*/
 		///* utest all
 	{
 		-charPersonName2_FIGHT && (charPersonName2_manuever2=="")==0 && charPersonName2_manuever2_attacking == 0:
-			charPersonName2 defense refunding resolution slot2
-			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_manueverCost)
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_fight_stance, charPersonName2_cp, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_manueverCost)
 	}
 	{
 		-charPersonName_FIGHT && (charPersonName_manuever2=="")==0 && charPersonName_manuever2_attacking == 0:
-			charPersonName defense refunding resolution slot2
-			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_manuever2Cost)
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_fight_stance, charPersonName_cp, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_manuever2Cost)
 	}
 	//*/
 	///* utest all
 	{
 		-charPersonName2_FIGHT && (charPersonName2_manuever3=="")==0:
-			charPersonName2 defense refunding resolution slot3
-			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_cp, charPersonName2_manuever3, charPersonName2_manuever3_CP, charPersonName2_manuever3Cost)
+			~resolveUnusedDefManuever(charPersonName2_id, charPersonName2_fight_stance, charPersonName2_cp, charPersonName2_manuever3, charPersonName2_manuever3_CP, charPersonName2_manuever3Cost)
 	}
 	{
 		-charPersonName_FIGHT && (charPersonName_manuever3=="")==0:
-			charPersonName defense refunding resolution slot3
-			~resolveUnusedDefManuever(charPersonName_id, charPersonName_cp, charPersonName_manuever3, charPersonName_manuever3_CP, charPersonName_manuever3Cost)
+			~resolveUnusedDefManuever(charPersonName_id, charPersonName_fight_stance, charPersonName_cp, charPersonName_manuever3, charPersonName_manuever3_CP, charPersonName_manuever3Cost)
 	}
 	//*/
 	-> ProceedOn
@@ -535,17 +556,41 @@ Let's fight!
 	= ProceedOn
 	{
 		- gotResolve==0:
-			Nothing happened as combatants circle about uncertainly.
+			~temp targetingCount = 0
+			///* utest all
+			{
+				-charPersonName2_FIGHT && charPersonName2_fight_target != TARGET_NONE:
+					~targetingCount = targetingCount+1
+			}
+			{
+				-charPersonName_FIGHT && charPersonName_fight_target != TARGET_NONE:
+					~targetingCount = targetingCount+1		
+			}
+			...
+			//*/
+			{targetingCount:Nothing happened as combatants circle about uncertainly.|Battle lull occurs as combatants spread apart.}
+		-else:
+			// to update any new stances based off any newly emptied target states (if any)
+			///* utest all
+			{
+				-charPersonName2_FIGHT && charPersonName2_fight_target == TARGET_NONE && getBeingTargettedCountByAtLeast(charPersonName2_id,1)==0:
+					~charPersonName2_fight_stance = STANCE_RESET
+			}
+			{
+				-charPersonName_FIGHT && charPersonName_fight_target == TARGET_NONE && getBeingTargettedCountByAtLeast(charPersonName_id,1)==0:
+					~charPersonName_fight_stance = STANCE_RESET
+			}
+			//*/
 	}
 	+ [{boutExchange==1 && gotResolve!=0: Proceed to 2nd Exchange|Proceed to Next Round}]
 	// reset combat flags
 	///* player
-	~charPersonName_fight_stance = STANCE_NEUTRAL
+	//~charPersonName_fight_stance = STANCE_NEUTRAL
 	~charPersonName_fight_orientation = ORIENTATION_NONE
 	~charPersonName_fight_cautiousLock = 0
 	//*/
 	///* utest
-	~charPersonName2_fight_stance = STANCE_NEUTRAL
+	//~charPersonName2_fight_stance = STANCE_NEUTRAL
 	~charPersonName2_fight_orientation = ORIENTATION_NONE
 	~charPersonName2_fight_cautiousLock = 0
 	//*/
