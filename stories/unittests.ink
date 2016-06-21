@@ -27,7 +27,7 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 ~charPersonName_fight_target = charPersonName2_id
 {refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
--> ChooseManueverForChar(1, charPersonName_id, charPersonName2_id, 0,0, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone)
+-> ChooseManueverForChar(1, charPersonName_id, charPersonName2_id, 0,0, charPersonName_cp, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone)
 
 === testing_ChooseManueverForCharDef
 ~charPersonName_fight_orientation = ORIENTATION_CAUTIOUS
@@ -35,7 +35,7 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 ~charPersonName_fight_initiative = 0
 {refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
--> ChooseManueverForChar(1, charPersonName_id, charPersonName2_id, 0,0,->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone)
+-> ChooseManueverForChar(1, charPersonName_id, charPersonName2_id, 0,0, charPersonName_cp, ->TestDone, charPersonName_manuever, charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone)
 
 
 === testing_ChooseManueverForAIDef
@@ -44,7 +44,7 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 ~charPersonName2_fight_initiative = 0
 {refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
--> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0,->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
+-> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0, charPersonName2_cp, ->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
 
 === testing_ChooseManueverForAIAtk
 ~charPersonName2_fight_orientation = ORIENTATION_AGGRESSIVE
@@ -54,7 +54,7 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 ~charPersonName_fight_initiative =  0
 {refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )}
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
--> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0,->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
+-> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0, charPersonName2_cp, ->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
 
 
 === test_func_MathExp

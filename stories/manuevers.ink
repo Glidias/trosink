@@ -332,9 +332,9 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	{	
 	///* utest all 
 	- charId == charPersonName_id: 
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever,  charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever,  charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone )
 	- charId == charPersonName2_id:
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName2_manuever,  charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread,  charPersonName2_manuever,  charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone )
 	-else:
 		~elseResulted = 1
 	//*/
@@ -344,10 +344,10 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	///* utest all 
 	- charId == charPersonName_id: 
 		~charPersonName_fight_target2 = enemyId
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever2,  charPersonName_manuever2Cost, charPersonName_manuever2TN, charPersonName_manuever2AttackType, charPersonName_manuever2DamageType, charPersonName_manuever2NeedBodyAim, charPersonName_manuever2_attacking, charPersonName_manuever2UsingHands, charPersonName_manuever2_CP, charPersonName_manuever2_targetZone)
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever2,  charPersonName_manuever2Cost, charPersonName_manuever2TN, charPersonName_manuever2AttackType, charPersonName_manuever2DamageType, charPersonName_manuever2NeedBodyAim, charPersonName_manuever2_attacking, charPersonName_manuever2UsingHands, charPersonName_manuever2_CP, charPersonName_manuever2_targetZone)
 	- charId == charPersonName2_id:
 		~charPersonName2_fight_target2 = enemyId
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName2_manuever2,  charPersonName2_manuever2Cost, charPersonName2_manuever2TN, charPersonName2_manuever2AttackType, charPersonName2_manuever2DamageType, charPersonName2_manuever2NeedBodyAim, charPersonName2_manuever2_attacking, charPersonName2_manuever2UsingHands, charPersonName2_manuever2_CP, charPersonName2_manuever2_targetZone )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread,  charPersonName2_manuever2,  charPersonName2_manuever2Cost, charPersonName2_manuever2TN, charPersonName2_manuever2AttackType, charPersonName2_manuever2DamageType, charPersonName2_manuever2NeedBodyAim, charPersonName2_manuever2_attacking, charPersonName2_manuever2UsingHands, charPersonName2_manuever2_CP, charPersonName2_manuever2_targetZone )
 	-else:
 		~elseResulted = 1
 	//*/
@@ -357,17 +357,17 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	///* utest all 
 	- charId == charPersonName_id: 
 		~charPersonName_fight_target3 = enemyId
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread,  charPersonName_manuever3,  charPersonName_manuever3Cost, charPersonName_manuever3TN, charPersonName_manuever3AttackType, charPersonName_manuever3DamageType, x, y, charPersonName_manuever3UsingHands, charPersonName_manuever3_CP, z )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever3,  charPersonName_manuever3Cost, charPersonName_manuever3TN, charPersonName_manuever3AttackType, charPersonName_manuever3DamageType, x, y, charPersonName_manuever3UsingHands, charPersonName_manuever3_CP, z )
 	- charId == charPersonName2_id:
 		~charPersonName2_fight_target3 = enemyId
-		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, doneCallbackThread, charPersonName2_manuever3,  charPersonName2_manuever2Cost, charPersonName2_manuever3TN, charPersonName2_manuever3AttackType, charPersonName2_manuever3DamageType, x, y, charPersonName2_manuever3UsingHands, charPersonName2_manuever3_CP, z )
+		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread, charPersonName2_manuever3,  charPersonName2_manuever2Cost, charPersonName2_manuever3TN, charPersonName2_manuever3AttackType, charPersonName2_manuever3DamageType, x, y, charPersonName2_manuever3UsingHands, charPersonName2_manuever3_CP, z )
 	-else:
 		~elseResulted = 1
 	//*/
 	}
 }
 
-=== ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking, ref manueverUseHands, ref manuever_CP, ref manuever_targetZone)
+=== ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ref charCombatPool, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking, ref manueverUseHands, ref manuever_CP, ref manuever_targetZone)
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
 // dummy variable to hold as unused referenced
@@ -867,10 +867,14 @@ For now, he will Do Nothing.
 		->ConfirmCombatPool(30)
 -else:
 	// todo: ai needs to determine how to divide his combat pool when up against multiple opponents, and other variations
-	~temp aiDecidePool = _diceAvailable/2
+	~temp aiDecidePool = _diceAvailable
 	{
+	- boutExchange == 1:
+		~aiDecidePool = _diceAvailable/2
+		{
 		-aiDecidePool == 0:
 			~aiDecidePool = 1
+		}
 	}
 	->ConfirmCombatPool(aiDecidePool)
 }
@@ -907,6 +911,7 @@ ChoosingManuversLooseEndError detected. This should not happen!
 		Rolling CP: {manuever_CP}
 	}
 }
+~charCombatPool = charCombatPool - manueverCost - manuever_CP
 //....
 {" "}
 ->doneCallbackThread
@@ -1554,7 +1559,7 @@ TN: {manueverTN}
 {	
 	- (atkManuever1 == "")==0: 
 	{ 
-		- atkManuever1CP <= 0 || (attackerCP  - atkManuever1CP) < 0:
+		- atkManuever1CP <= 0:
 			{getDescribeLabelOfCharCapital(attackerId)} failed to attack due to shock.
 			->ResolveComplete
 		-else: 
@@ -1584,7 +1589,6 @@ ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTa
 = ResolveComplete
 {	
 	- (atkManuever1 == "")==0: 
-		~attackerCP = attackerCP - atkManuever1CP
 		~atkManuever1 = ""
 }
 {	
@@ -1654,7 +1658,6 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 	}
 	-else:
 		~requiredSuccesses = rollNumSuccesses(_def_cp, _def_tn, 0)
-		~defenderCP = defenderCP - _def_cp
 		->AttemptAttackersManuever(zeroDefPool, defenderCP, 1, defenderInitiative, defenderTarget,  defenderPaused, defManuever)
 
 }
@@ -1738,4 +1741,3 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 		~defenderStance = STANCE_NEUTRAL
 }
 ~defManuever = ""
-~defenderCP = defenderCP - defManueverCP
