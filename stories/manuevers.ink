@@ -1688,7 +1688,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}
+{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}.
 
 // do specific atkManuever resolution here
 {
@@ -1700,8 +1700,9 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 = ResolveAttackManueverResultsFail(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
 ~temp giveInitiativeToDefender = 1
+~temp userPrompted = 0
 
-{getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}
+{getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}.
 
 // do specific case defManuever resolution here..
 {
@@ -1714,14 +1715,42 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 				~atkManuever1Target = TARGET_NONE
 				~attackerInitiative = 0
 		}
-	//- defManuever == "partialevasion":
-	//	~giveInitiativeToDefender = 0
-	//-
+	- defManuever == "partialevasion":
+		~giveInitiativeToDefender = 0
+		{
+			-defenderCP >= 2 && defenderInitiative == 0:
+				~temp isAI = 1
+				~temp isYou = 0
+				~getCharMetaInfo(defenderCharId, x, isAI, x, isYou)
+				{
+					- isAI==0:
+						~userPrompted = 1
+						{
+							-isYou: 
+								..
+								Do you wish to seize initiative for 2 CP? (Will have {defenderCP-2} CP left.)
+							-else:
+								..
+								Does {getDescribeLabelOfChar(defenderCharId)} wish to seize initiative for 2 CP? (Will have {defenderCP-2} CP left.)
+						}
+						+ [Yes]
+							~defenderCP = defenderCP - 2
+							~giveInitiativeToDefender = 1
+							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+						+ [No]
+							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+					-else:
+						// kiv: better AI to decide if wish to take initiative or not
+						~defenderCP = defenderCP - 2
+						~giveInitiativeToDefender = 1
+				}
+		}
 	- else:
 		~elseResulted = 1 
 }
--> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
-
+{	userPrompted == 0:
+	-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+}
 
 = ResolveAttackManueverFailedDefault(giveInitiativeToDefender, ref defenderInitiative, gotDefense, ref defManuever)
 {

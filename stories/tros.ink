@@ -510,10 +510,8 @@ Let's fight!
 			}	
 	}
 	//*/
-
-
-
-	-> RefundLoop
+	
+	->RefundLoop
 
 	= RefundLoop
 
@@ -549,8 +547,8 @@ Let's fight!
 			~resolveUnusedDefManuever(charPersonName_id, charPersonName_fight_stance, charPersonName_cp, charPersonName_manuever3, charPersonName_manuever3_CP, charPersonName_manuever3Cost)
 	}
 	//*/
-	-> ProceedOn
 
+	->ProceedOn
 
 
 	= ProceedOn
