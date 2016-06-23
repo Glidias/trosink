@@ -426,8 +426,10 @@ Let's fight!
 
 	// phase 0 for those with initiative, 1 for those without initiative
 	~temp phase = 0
-	~temp fromId = 0
+	~temp selectId = 0
+	~temp selectNextId = 0
 	~temp gotResolve = 0
+	~temp x
 
 	///* utest all
 	{
@@ -449,65 +451,64 @@ Let's fight!
 
 	= ResolveLoop
 	{
-		-phase == 0: 
+		-selectId==0 && selectNextId:
+			~selectId = selectNextId
+			~selectNextId = 0
+	}
+
+	// handle any attack manuevers among characters with initiative or from specically selected characters
+	{
+		-phase == 0 || selectId: 
 		///* utest all resolution
 		{
-			- fromId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking:
-				~fromId = charPersonName2_id
+			-  (selectId == charPersonName2_id && charPersonName2_FIGHT && (charPersonName2_manuever=="")==0) || (selectId == 0 && charPersonName2_FIGHT && charPersonName2_fight_initiative && (charPersonName2_manuever=="")==0 && charPersonName2_manuever_attacking):
 				~gotResolve = 1
+				~selectId = 0
 				~charPersonName2_fight_lastAttacked = 1
 				~charPersonName2_fight_paused = 0
 				~charPersonName2_fight_stance = STANCE_NEUTRAL
-				->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop )
-			- else:
-				{ fromId == charPersonName2_id:
-					~fromId = 0
-				}	
-		
+				->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop, selectId, selectNextId )
 		}
 		{
-			- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==1 &&  (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
-				~fromId = charPersonName_id
+			-   (selectId == charPersonName_id && charPersonName_FIGHT && (charPersonName_manuever=="")==0) || (selectId == 0 && charPersonName_FIGHT && charPersonName_fight_initiative==1 &&  (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking):
 				~gotResolve = 1
+				~selectId = 0
 				~charPersonName_fight_lastAttacked = 1
 				~charPersonName_fight_paused = 0
 				~charPersonName_fight_stance = STANCE_NEUTRAL
-				->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP,  charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop)
-			- else:
-				{ fromId == charPersonName_id:
-					~fromId = 0
-				}	
+				->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP,  charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop, selectId, selectNextId)	
 		}
 		//*/
 	}
+
+	// catch situation if selectId didn't occured for whatever reason, such as charPerson no longer fighting
+	{
+		- selectId:
+			~selectId = 0
+			-> ResolveLoop
+	}
+
+	// handle any unresolved attack manuevers from characters without initiative
+	~selectNextId = 0
+	~selectId = 0
 	~phase = 1
 
 	///* utest all resolution
 	{
-		- fromId == 0 &&  charPersonName2_FIGHT && charPersonName2_fight_initiative==0 &&  (charPersonName2_manuever=="")==0 &&  charPersonName2_manuever_attacking:
-			~fromId = charPersonName2_id
+		-   charPersonName2_FIGHT && charPersonName2_fight_initiative==0 &&  (charPersonName2_manuever=="")==0 &&  charPersonName2_manuever_attacking:
 			~gotResolve = 1
 			~charPersonName2_fight_lastAttacked = 1
 			~charPersonName2_fight_paused = 0
 			~charPersonName2_fight_stance = STANCE_NEUTRAL
-			->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop )
-		- else:
-				{ fromId == charPersonName2_id:
-					~fromId = 0
-				}	
+			->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop, x,x )
 	}
 	{
-		- fromId == 0 &&  charPersonName_FIGHT && charPersonName_fight_initiative==0 && (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
-			~fromId = charPersonName_id
+		-  charPersonName_FIGHT && charPersonName_fight_initiative==0 && (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
 			~gotResolve = 1
 			~charPersonName_fight_lastAttacked = 1
 			~charPersonName_fight_paused = 0
 			~charPersonName_fight_stance = STANCE_NEUTRAL
-			->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop)
-		- else:
-			{ fromId == charPersonName_id:
-				~fromId = 0
-			}	
+			->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop, x,x)
 	}
 	//*/
 	

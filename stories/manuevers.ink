@@ -490,16 +490,16 @@ isAI?:{_isAI}
 ~temp AVAIL_bindstrike = 0
 
 // all recorded defend actoin availabilities
-~temp AVAIL_block = 1
-~temp AVAIL_parry = 1
-~temp AVAIL_duckweave =1
-~temp AVAIL_partialevasion = 1
-~temp AVAIL_fullevasion = 1
-~temp AVAIL_blockopenstrike = 1
-~temp AVAIL_counter = 1
-~temp AVAIL_rota = 1
-~temp AVAIL_expulsion = 1
-~temp AVAIL_disarm = 1
+~temp AVAIL_block = 0
+~temp AVAIL_parry = 0
+~temp AVAIL_duckweave = 0
+~temp AVAIL_partialevasion = 0
+~temp AVAIL_fullevasion = 0
+~temp AVAIL_blockopenstrike = 0
+~temp AVAIL_counter = 0
+~temp AVAIL_rota = 0
+~temp AVAIL_expulsion = 0
+~temp AVAIL_disarm = 0
 
 ~temp altAction
 ~temp divertTo
@@ -1223,6 +1223,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
+		Confiming def manuever: {_confirmSelection}
 }
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
 	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:
@@ -1535,7 +1536,7 @@ TN: {manueverTN}
 
 
 
-=== ResolveAtkManuevers(attackerId, ref attackerInitiative, ref attackerPaused, ref attackerCP, ref atkManuever1, ref atkManuever1CP, ref atkManuever1Target, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ->mainCallbackThread)
+=== ResolveAtkManuevers(attackerId, ref attackerInitiative, ref attackerPaused, ref attackerCP, ref atkManuever1, ref atkManuever1CP, ref atkManuever1Target, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ->mainCallbackThread, ref reselectCharId, ref reselectCharIdNext)
 ~temp requiredSuccesses
 ~temp x
 ~temp zeroDefPool = 0
@@ -1553,6 +1554,7 @@ TN: {manueverTN}
 ~temp noDefense = ""
 ~temp defenderCharId
 ~temp slotIndexBeingResolved
+~temp simultaneousHitResulted = 0
 
 // todo: handle double attack and mixed cases
 // kiv todo: resolve all overwatching targeters on character
@@ -1631,30 +1633,53 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 ~getAllManueverDetailsForCharacter(defenderId, slotIndex, x, _def_cp,  x, _def_cost, _def_tn, x, x, x, x, _def_usingHands )
 {
 	-defManueverAttacking: 
+	// todo kiv: for simultatneous block/strike cases during red/red, MAY have defensive manuever on slot2!
 	{
-		-defenderInitiative:
+		-defenderInitiative && attackerInitiative:
+			// will attempt contest due to both parties having initiative with attack manuever
 			 ~temp atkReflex = getReflexByCharId(attackerId)
 			 ~temp defReflex = getReflexByCharId(defenderId)
 
 			 ~c1 = rollNumSuccesses(atkReflex,5,0)
 			 ~c2 = rollNumSuccesses(defReflex,5,0)
+			// ~c1 = c2
 			// reflex contest role results: D{atkReflex}:{c1} D{defReflex}:{c2}
 			 {
 			 	-c1 > c2:
+			 		{getDescribeLabelOfCharCapital(attackerId)} won the initaitive contest
 			 		~defenderInitiative = 0
-			 		todo: successive resolution of atk manuevers from target AFTER targeter
+			 		//testing: successive resolution of atk manuevers from target AFTER targeter
+			 		~reselectCharId = defenderId
+			 		~reselectCharIdNext = 0
 			 		 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
 			 	-c2 > c1:
+				 	{getDescribeLabelOfCharCapital(defenderId)} won the initaitive contest
 			 		~attackerInitiative  = 0
-			 		todo:   successive resolution of atk manuevers from target before targeter
+			 		//testing:   successive resolution of atk manuevers from target before targeter
+			 		~reselectCharId = defenderId
+			 		~reselectCharIdNext = attackerId
 			 		-> mainCallbackThread
 			 	-else:
-			 		todo: simultatenous resolution of atk manuevers between parties
-			 		-> mainCallbackThread
+				 	Neither party won the initaitive contest.
+			 		~defenderInitiative = 0
+			 		~attackerInitiative = 0
+			 		//testing: simultatenous resolution hit of atk manuevers between parties
+			 		~simultaneousHitResulted = 1
+			 		~reselectCharId = defenderId
+			 		~reselectCharIdNext = 0
+			 		//simult
+			 		 ->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
 			 }
 			 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative,defenderTarget,  defenderPaused, noDefense)
 		-else:
-			->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+			{
+				- attackerInitiative:
+					->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+				- else:
+					// assumption made due to both defender and attacker not having initaitive, assumed simultatenous hit situation!
+					->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+			}
+			
 	}
 	-else:
 		~requiredSuccesses = rollNumSuccesses(_def_cp, _def_tn, 0)
@@ -1688,7 +1713,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}.
+{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {simultaneousHitResulted: while...}.
 
 // do specific atkManuever resolution here
 {
@@ -1702,7 +1727,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 ~temp giveInitiativeToDefender = 1
 ~temp userPrompted = 0
 
-{getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess}.
+{getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {simultaneousHitResulted: while...}.
 
 // do specific case defManuever resolution here..
 {
