@@ -27,9 +27,9 @@ Let's fight!
 	~boutStep = 0
 	~temp gotReveal = 0
 
-	///* utest all
 	{
 		- boutExchange == 1:
+		///* utest all
 		{
 			-charPersonName_FIGHT:
 				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
@@ -38,10 +38,11 @@ Let's fight!
 			-charPersonName2_FIGHT:
 				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
 		}
+		//*/
 	}
-	//*/
+	
 
-	///* player
+	///* utest player
 	{	charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused:
 		~gotReveal = 1
 	}
@@ -108,12 +109,10 @@ Let's fight!
 === Combat_Step1
 	~boutStep = 1
 	~temp gotReveal = 0
-	///* player
+	///* utest all
 	{	charPersonName_FIGHT && charPersonName_fight_orientation==ORIENTATION_NONE && charPersonName_fight_paused:
 		~gotReveal = 1
 	}
-	//*/
-	///* utest
 	{ charPersonName2_FIGHT && charPersonName2_fight_orientation==ORIENTATION_NONE && charPersonName2_fight_paused: 
 		~gotReveal = 1
 	}
@@ -160,7 +159,7 @@ Let's fight!
 
 	// Preinspect
 	//STEP 2:
-	///* player
+	///* utest player
 	{	charPersonName_FIGHT && charPersonName_fight_orientation!=ORIENTATION_NONE:
 		~gotReveal = 1
 	}
@@ -184,9 +183,11 @@ Let's fight!
 
 	{showCombatStatus()}
 	//If it's the 1st exchange,  For all combatants that secretly chose orientation, reveal their orientations at the same time.
+	///* utest player
 	{	charPersonName_FIGHT && charPersonName_fight_orientation!=ORIENTATION_NONE:
 			You revealed your {getOrientationLabel( charPersonName_fight_orientation )} orientation.
 	}
+	//*/
 	///* utest
 	{ charPersonName2_FIGHT && charPersonName2_fight_orientation!=ORIENTATION_NONE: 
 		{charPersonName2_label} revealed an orientation intent of: {getOrientationLabel( charPersonName2_fight_orientation )}.
@@ -237,15 +238,13 @@ Let's fight!
 	= ChooseTargetForPlayer(charId, charOrientation, charLabel, charSide, isYou)
 	~ temp lockingEngagement=0
 	Choosing target for player character: {isYou: You|{charLabel}}
-	///* player
+	///* utest all
 	{ charPersonName_FIGHT && charPersonName_fight_side != charSide && charPersonName_isYOU!=1 : 
 		+ [{charPersonName_label}]
 		 ~lockingEngagement= pickTarget(charId, charOrientation, charPersonName_id, charPersonName_fight_target, charPersonName_fight_orientation)
 			You {lockingEngagement:engaged|targetted} {charPersonName_label}{charOrientation==ORIENTATION_DEFENSIVE:{" defensively."}|.}
 			->Combat_Step2.ChooseTargetForAll
 	}
-	//*/
-	///* utest
 	{ charPersonName2_FIGHT && charPersonName2_fight_side != charSide && charPersonName2_isYOU!=1 : 
 		+ [{charPersonName2_label}] 
 			 ~lockingEngagement= pickTarget(charId, charOrientation, charPersonName2_id, charPersonName2_fight_target, charPersonName2_fight_orientation)
@@ -256,14 +255,12 @@ Let's fight!
 
 	= ChooseTargetForAI(charId, charOrientation, charLabel, charSide)
 	~ temp lockingEngagement=0
-	///* player
+	///* utest all
 	{ charPersonName_FIGHT && charPersonName_fight_side != charSide: 
 		 ~lockingEngagement= pickTarget(charId, charOrientation, charPersonName_id, charPersonName_fight_target, charPersonName_fight_orientation)
 			{charLabel} {lockingEngagement:engaged|targetted} {getDescribeLabelOfChar(charPersonName_id)}{charOrientation==ORIENTATION_DEFENSIVE:{" defensively."}|.}
 			->Combat_Step2.ChooseTargetForAll
 	}
-	//*/
-	///* utest
 	{ charPersonName2_FIGHT && charPersonName2_fight_side != charSide: 
 			 ~lockingEngagement= pickTarget(charId, charOrientation, charPersonName2_id, charPersonName2_fight_target, charPersonName2_fight_orientation)
 			{charLabel} {lockingEngagement:engaged|targetted} {getDescribeLabelOfChar(charPersonName_id)}{charOrientation==ORIENTATION_DEFENSIVE:{" defensively."}|.}
@@ -354,7 +351,7 @@ Let's fight!
 	~temp whoWins =0
 	~temp roll
 	~temp roll2
-	///* player
+	///* utest player
 	{  
 	   -charPersonName_FIGHT && charPersonName_fight_target!=TARGET_NONE && charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED:
 	   {
@@ -583,13 +580,11 @@ Let's fight!
 	}
 	+ [{boutExchange==1 && gotResolve!=0: Proceed to 2nd Exchange|Proceed to Next Round}]
 	// reset combat flags
-	///* player
-	//~charPersonName_fight_stance = STANCE_NEUTRAL
+	///* utest player
 	~charPersonName_fight_orientation = ORIENTATION_NONE
 	~charPersonName_fight_cautiousLock = 0
 	//*/
 	///* utest
-	//~charPersonName2_fight_stance = STANCE_NEUTRAL
 	~charPersonName2_fight_orientation = ORIENTATION_NONE
 	~charPersonName2_fight_cautiousLock = 0
 	//*/

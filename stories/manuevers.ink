@@ -60,7 +60,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 === function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel, ref twoHanded )
 ~temp x
 {
-///* player
+///* utest player
 - charId == charPersonName_id:
 	// common to both attack/defense
 	~initiative = charPersonName_fight_initiative
@@ -99,7 +99,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 ~temp target
 ~temp target2
 {
-///* player
+///* utest player
 - enemyId == charPersonName_id:
 	{getTargetInitiativeStatesByCharId(enemyId, x, x, x, x, target, target2)}
 	{
@@ -311,16 +311,18 @@ slotIndex will either be "2" or "3", depending which is already used up.
 
 
 === function inspectHandsFree(charId, ref secSlotIndex, ref charNoMasterHand, ref charNoOffHand) 
-///* utest all 
 {
+	///* utest player 
 	-charId == charPersonName_id:
 		~determineHandsFree(secSlotIndex, charNoMasterHand, charNoOffHand, charPersonName_manuever, charPersonName_manueverUsingHands, charPersonName_manuever2, charPersonName_manuever2UsingHands, charPersonName_manuever3, charPersonName_manuever3UsingHands)
+	//*/
+	///* utest  
 	-charId == charPersonName2_id:
 		~determineHandsFree(secSlotIndex, charNoMasterHand, charNoOffHand, charPersonName2_manuever, charPersonName2_manueverUsingHands, charPersonName2_manuever2, charPersonName_manuever2UsingHands, charPersonName2_manuever3, charPersonName2_manuever3UsingHands)
+	//*/
 	-else:
 		~elseResulted = 1
 }
-//*/
 
 
 === ProceedToActionAgainst(slotIndex, charId, enemyId,  charNoMasterHand, charNoOffHand, ->doneCallbackThread) 
@@ -330,14 +332,17 @@ slotIndex will either be "2" or "3", depending which is already used up.
 {
 - slotIndex == 1:
 	{	
-	///* utest all 
+	///* utest player 
 	- charId == charPersonName_id: 
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever,  charPersonName_manueverCost, charPersonName_manueverTN, charPersonName_manueverAttackType, charPersonName_manueverDamageType, charPersonName_manueverNeedBodyAim, charPersonName_manuever_attacking, charPersonName_manueverUsingHands, charPersonName_manuever_CP, charPersonName_manuever_targetZone )
+	//*/
+	///* utest  
 	- charId == charPersonName2_id:
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread,  charPersonName2_manuever,  charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone )
+	//*/
 	-else:
 		~elseResulted = 1
-	//*/
+	
 	}
 - slotIndex == 2:
 	{	
@@ -1223,7 +1228,6 @@ AimTargetZoneLooseEndError detected. This should not happen!
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
-		Confiming def manuever: {_confirmSelection}
 }
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
 	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:

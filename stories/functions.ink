@@ -254,7 +254,7 @@ VAR numCombatants = 2
 
 // CharacterMetaData
 // relative client metaData
-///* player
+///* utest player
 CONST charPersonName_AI = 0
 CONST charPersonName_isENEMY = 0
 CONST charPersonName_isYOU = 1
@@ -267,7 +267,7 @@ CONST charPersonName2_isYOU = 0
 
 // CharacterSheet 
 // for each char (tag charPersonName)
-///* player
+///* utest player
 CONST charPersonName_id = 1
 VAR charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
@@ -280,7 +280,6 @@ VAR charPersonName_totalPain = 0
 VAR charPersonName_health = 5
 VAR charPersonName_equipOffhand = "gladius"
 VAR charPersonName_equipMasterhand = "gladius"
-
 //*/
 ///* utest
 CONST charPersonName2_id = 2
@@ -295,15 +294,16 @@ VAR charPersonName2_totalPain = 0
 VAR charPersonName2_health = 5
 VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
-
 //*/
+
 // for each char.body... parts... (tag bodyPartName)
+///* utest player 
 VAR charPersonName_wound_bodyPartName = 0
-///* utest 
 VAR charPersonName_wound_bodyPartName2 = 0
+//*/
+///* utest 
 VAR charPersonName2_wound_bodyPartName = 0
 VAR charPersonName2_wound_bodyPartName2 = 0
-
 //*/
 
 // Fight
@@ -439,7 +439,7 @@ CONST RESOLVED_LOCKED = -1
 // Current combat functions
 === function getAllManueverDetailsForCharacter(charId, manueverSlot, ref manuever, ref manuever_CP, ref manuever_targetZone, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manuever_attacking, ref manueverUsingHands)
 {
-///* utest all
+///* utest player
 - charId == charPersonName_id: 
 	{
 	-manueverSlot==1:
@@ -476,6 +476,8 @@ CONST RESOLVED_LOCKED = -1
 		~manuever_attacking = 0
 		~manueverUsingHands= charPersonName_manuever3UsingHands
 	}
+//*/
+///* utest
 - charId == charPersonName2_id:
 	{
 	-manueverSlot==1:
@@ -517,7 +519,7 @@ CONST RESOLVED_LOCKED = -1
 
 
 === function showPlayerInitiativeState()
-///* player
+///* utest player
 { charPersonName_fight_target==TARGET_NONE:{~return} }
 ~temp mutual =  getTargetByCharId(charPersonName_fight_target) == charPersonName_id
 ~temp mutualOrientation
@@ -583,12 +585,14 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function currentlyBeingAttackedBy(attacker, charIdToCheck, mustBePrimaryTarget)
 ~temp considerSecondaryManuever = (mustBePrimaryTarget==0)
 { 
-	///* utest all
+	///* utest player
 - attacker == charPersonName_id: 
 	{
 		- (charPersonName_fight_target == charIdToCheck && charPersonName_manuever_attacking) || (considerSecondaryManuever && charPersonName_fight_target2 == charIdToCheck && charPersonName_manuever2_attacking):
 			~return 1
 	}
+	//*/
+	///* utest
 - attacker == charPersonName2_id:
 	{
 		- (charPersonName2_fight_target == charIdToCheck && charPersonName2_manuever_attacking) || (considerSecondaryManuever && charPersonName2_fight_target2 == charIdToCheck && charPersonName2_manuever2_attacking):
@@ -607,12 +611,14 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getCharMetaInfo(charId, ref label, ref isAI, ref isEnemy, ref isYou) 
 {
-///* utest all
+///* utest player
 - charId == charPersonName_id: 
 	~label = charPersonName_label
 	~isAI = charPersonName_AI
 	~isEnemy = charPersonName_isENEMY
 	~isYou = charPersonName_isYOU
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~label = charPersonName2_label
 	~isAI = charPersonName2_AI
@@ -627,9 +633,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getMobilityByCharId(charId)
 {
-	///* utest all
+	///* utest player
 - charId == charPersonName_id: 
 	~return charPersonName_mobility
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~return charPersonName2_mobility
 	//*/
@@ -639,9 +647,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getReflexByCharId(charId)
 {
-	///* utest all
+	///* utest player
 - charId == charPersonName_id: 
 	~return charPersonName_reflex
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~return charPersonName2_reflex
 	//*/
@@ -652,9 +662,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 // note: this method might depciiate
 === function getOrientationByCharId(charId)
 {
-	///* utest all
+	///* utest player
 - charId == charPersonName_id: 
 	~return charPersonName_fight_orientation
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_orientation
 	//*/
@@ -665,9 +677,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 // note: this method might depciiate
 === function getInitiativeByCharId(charId)
 {
-	///* utest all
+	///* utest player
 - charId == charPersonName_id: 
 	~return charPersonName_fight_initiative
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_initiative
 	//*/
@@ -678,13 +692,15 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 // temporary fix with to prevent naming conflicts with knot 't_' prefix...
 === function getTargetInitiativeStatesByCharId(charId, ref t_initiative, ref t_orientation, ref t_paused, ref t_lastAttacked, ref t_target, ref t_target2)
 {
-	///* utest 	all
+	///* utest player	
 - charId == charPersonName_id: 
 	~t_initiative = charPersonName_fight_initiative
 	~t_orientation = charPersonName_fight_orientation
 	~t_target = charPersonName_fight_target
 	~t_target2 = charPersonName_fight_target2
 	~t_lastAttacked = charPersonName_fight_lastAttacked
+	//*/
+	///* utest
 - charId == charPersonName2_id:
 	~t_initiative = charPersonName2_fight_initiative
 	~t_orientation = charPersonName2_fight_orientation
@@ -701,9 +717,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 // NOTE, this method might depreciate
 === function getTargetByCharId(charId)
 {
-	///* utest all
+	///* utest player	
 - charId == charPersonName_id: 
 	~return charPersonName_fight_target
+	//*/
+	///* utest	
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_target
 	//*/
@@ -714,9 +732,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 // NOTE, this method might depreciate
 === function getTarget2ByCharId(charId)
 {
-	///* utest all
+	///* utest player	
 - charId == charPersonName_id: 
 	~return charPersonName_fight_target2
+	//*/
+	///* utest	
 - charId == charPersonName2_id:
 	~return charPersonName2_fight_target2
 	//*/
@@ -729,9 +749,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function getBeingTargettedCount(charId)
 ~temp count=0
 {
-	///* utest all
+	///* utest player
 - charPersonName_fight_target == charId: 
 	~count= count + 1
+	//*/
+	///* utest
 - charPersonName2_fight_target == charId: 
 	~count= count + 1
 	//*/
@@ -743,13 +765,15 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 === function getBeingTargettedCountByAtLeast(charId, atLeast)
 ~temp count=0
 {
-	///* utest all
+	///* utest player
 - charPersonName_fight_target == charId: 
 	~count= count + 1
 	{
 		- count >= atLeast: 
 			~return 1
 	}
+	//*/
+	///* utest
 - charPersonName2_fight_target == charId: 
 	~count= count + 1
 	{
@@ -765,9 +789,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function charTargetedBy(charId, byId)
 {
-	///* utest all
+	///* utest player
 - byId == charPersonName_id: 
 	~return charPersonName_fight_target==charId
+//*/
+	///* utest
 - byId == charPersonName2_id:
 	~return charPersonName2_fight_target==charId
 	//*/
@@ -799,7 +825,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function fight_resolve_initiative(fromId, targetId, gainedInitiative )
 {
-///* utest all
+///* utest player
 - fromId == charPersonName_id: 
 	{
 		-gainedInitiative>0: 
@@ -808,6 +834,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 			~charPersonName_fight_initiative = 0
 	}
 	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED	
+	//*/
+	///* utest
 - fromId == charPersonName2_id:
 	{
 		-gainedInitiative>0: 
@@ -821,7 +849,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~elseResulted = 1
 }
 {
-///* utest all
+///* utest player
 - targetId == charPersonName_id:
 	{
 		-gainedInitiative<=0: 
@@ -831,7 +859,8 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 			
 	}
 	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED
-
+//*/
+///* utest
 - targetId == charPersonName2_id:
 	{
 		-gainedInitiative<=0: 
@@ -847,10 +876,12 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function fight_cancelBothInitiatives(fromId, targetId )
 {
-///* utest all
+///* utest player
 - fromId == charPersonName_id: 
 	~charPersonName_fight_initiative = 0
 	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED	
+//*/	
+///* utest
 - fromId == charPersonName2_id:
 	~charPersonName2_fight_initiative = 0
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
@@ -859,10 +890,12 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~elseResulted = 1
 }
 {
-///* utest all
+///* utest player
 - targetId == charPersonName_id:
 	~charPersonName_fight_initiative = 0
 	~charPersonName_fight_cautiousLock = RESOLVED_LOCKED
+//*/	
+///* utest
 - targetId == charPersonName2_id:
 	~charPersonName2_fight_initiative = 0
 	~charPersonName2_fight_cautiousLock = RESOLVED_LOCKED
@@ -873,9 +906,11 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function fight_set_cautiousStates(fromId, targetId ) 
 {
-///* utest all
+///* utest player
 - fromId == charPersonName_id:
 	~charPersonName_fight_cautiousLock = 1 
+//*/
+///* utest
 - fromId == charPersonName2_id:
 	~charPersonName2_fight_cautiousLock = 1
 //*/
@@ -883,10 +918,12 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	~elseResulted = 1
 }
 {
-///* utest all
+///* utest player
 - targetId == charPersonName_id:
 	~charPersonName_fight_cautiousLock = 1
 	~charPersonName_fight_target = fromId
+//*/
+///* utest
 - targetId == charPersonName2_id:
 	~charPersonName2_fight_cautiousLock = 1
 	~charPersonName2_fight_target = fromId
@@ -911,7 +948,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getDescribeLabelOfCharCapital(charId)
 {
-	///* player
+	///* utest player
 	- charId == charPersonName_id:
 		~return "You"
 	//*/
@@ -925,7 +962,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getDescribeLabelOfChar(charId)
 {
-	///* player
+	///* utest player
 	- charId == charPersonName_id:
 		~return "you"
 	//*/
@@ -943,7 +980,7 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function pickTarget(fromId, fromOrientation, targetId, ref targetTarget, targetOrientation)
 {
-	///* player
+	///* utest player
 	- fromId == charPersonName_id:
 		~charPersonName_fight_target = targetId
 	//*/
@@ -969,9 +1006,9 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function inflictWoundOn(targetId, targetPart, woundLevel)
 { 
+///* utest player
 - targetId == charPersonName_id: 
  	{
-///* player
 	- targetPart == "bodyPartName": 
 		~charPersonName_wound_bodyPartName=MathMax(woundLevel,charPersonName_wound_bodyPartName)
 	- targetPart == "bodyPartName2":
