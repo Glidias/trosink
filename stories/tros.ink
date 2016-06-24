@@ -6,9 +6,14 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
+//->test_ConsiderCharacters
 //->testing_ChooseManueverForChar
 
 -> GameStart
+
+
+//*/
+
 
 === GameStart
 // ACTUAL game flow starts here
@@ -67,7 +72,6 @@ Let's fight!
 	= DeclareStancesForAll(repeated)
 	//If it's the 1st exchange at the start of a round,  for all combatants that require, declare stance, in order from lowest to highest adriotness stat.
 
-	// TODO: figure out a way to roll off ties (tiebreaking)
 	///* utest perceptionCheck<playerPerceptionCheck
 	{  -charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
 		~charPersonName2_fight_stance = getAIStance(charPersonName2_id)

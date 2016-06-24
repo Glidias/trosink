@@ -253,16 +253,22 @@ VAR numEnemies = 1
 VAR numCombatants = 2
 
 // CharacterMetaData
-// relative client metaData
+// relative client metaData and flag states
 ///* utest player
-CONST charPersonName_AI = 0
+VAR charPersonName_AI = 0
 CONST charPersonName_isENEMY = 0
 CONST charPersonName_isYOU = 1
+VAR charPersonName_visited = 0
+VAR charPersonName_avail = 0
+VAR charPersonName_picked = 0
 //*/
 ///* utest
 VAR charPersonName2_AI = 1
 CONST charPersonName2_isENEMY = 1
 CONST charPersonName2_isYOU = 0
+VAR charPersonName2_visited = 0
+VAR charPersonName2_avail = 0
+VAR charPersonName2_picked = 0
 //*/
 
 // CharacterSheet 
@@ -270,8 +276,9 @@ CONST charPersonName2_isYOU = 0
 ///* utest player
 CONST charPersonName_id = 1
 VAR charPersonName_label = "CharPersonName"
-CONST charPersonName_reflex = 5
-CONST charPersonName_mobility = 5
+VAR charPersonName_reflex = 5
+VAR charPersonName_mobility = 5
+VAR charPersonName_perception = 5
 VAR charPersonName_usingProfeciency ="swordandshield"
 VAR charPersonName_usingProfeciencyLevel = 15
 VAR charPersonName_carryOverShock = 0
@@ -284,8 +291,9 @@ VAR charPersonName_equipMasterhand = "gladius"
 ///* utest
 CONST charPersonName2_id = 2
 VAR charPersonName2_label = "CharPersonName2"
-CONST charPersonName2_reflex = 5
-CONST charPersonName2_mobility = 4
+VAR charPersonName2_reflex = 5
+VAR charPersonName2_mobility = 4
+VAR charPersonName2_perception = 5
 VAR charPersonName2_usingProfeciency = "massweapons"
 VAR charPersonName2_usingProfeciencyLevel = 8
 VAR charPersonName2_carryOverShock = 0
@@ -437,6 +445,321 @@ CONST RESOLVED_LOCKED = -1
 
 
 // Current combat functions
+=== function pickResetCharactersAll()
+///* utest player
+~charPersonName_picked = 0
+~charPersonName_visited = 0
+~charPersonName_avail = 0
+//*/
+///* utest 
+~charPersonName2_picked = 0
+~charPersonName2_visited = 0
+~charPersonName2_avail = 0
+//*/
+
+=== function repickingCharacters()
+///* utest player
+~charPersonName_picked = 0
+~charPersonName_avail = 0
+//*/
+///* utest 
+~charPersonName2_picked = 0
+~charPersonName2_avail = 0
+//*/
+
+
+VAR juncture = 0
+
+=== PickCharactersWithAttributeVal(attr, isDescending, ->callback)
+~pickResetCharactersAll()
+~juncture = 0
+~temp curAvailability = 0
+
+-> GotoLoop
+
+= GotoLoop
+~repickingCharacters()
+{
+	- curAvailability > 1:
+	 ~curAvailability = 0
+	 ~juncture = juncture -1
+}
+{
+	- isDescending:
+		-> LoopDescend
+	- else:
+		-> LoopAscend
+}
+
+
+= LoopAscend
+{
+	-juncture < 1:
+		~juncture = 1
+		->PickCharWithAttrVal(0,  1, ->GotoLoop)
+}
+{
+	-juncture < 2:
+		~juncture = 2
+		->PickCharWithAttrVal(0,  2, ->GotoLoop)
+}
+{
+	-juncture < 3:
+		~juncture = 3
+		->PickCharWithAttrVal(0,  3, ->GotoLoop)
+}
+{
+	-juncture < 4:
+		~juncture = 4
+		->PickCharWithAttrVal(0,  4,  ->GotoLoop)
+}
+{
+	-juncture < 5:
+		~juncture = 5
+		->PickCharWithAttrVal(0,  5,  ->GotoLoop)
+}
+{
+	-juncture < 6:
+		~juncture = 6
+		->PickCharWithAttrVal(0,  6,  ->GotoLoop)
+}
+{
+	-juncture < 7:
+		~juncture = 7
+		->PickCharWithAttrVal(0,  7,  ->GotoLoop)
+}
+{
+	-juncture < 8:
+		~juncture = 8
+		->PickCharWithAttrVal(0,  8,  ->GotoLoop)
+}
+{
+	-juncture < 9:
+		~juncture = 9
+		->PickCharWithAttrVal(0,  9,  ->GotoLoop)
+}
+{
+	-juncture < 10:
+		~juncture = 10
+		->PickCharWithAttrVal(0,  10,  ->GotoLoop)
+}
+->callback
+
+
+= LoopDescend
+{
+	-juncture < 1:
+		~juncture = 1
+		->PickCharWithAttrVal(0,  10,  ->GotoLoop)
+}
+{
+	-juncture < 2:
+		~juncture = 2
+		->PickCharWithAttrVal(0,  9,  ->GotoLoop)
+}
+{
+	-juncture < 3:
+		~juncture = 3
+		->PickCharWithAttrVal(0,  8,  ->GotoLoop)
+}
+{
+	-juncture < 4:
+		~juncture = 4
+		->PickCharWithAttrVal(0,  7,  ->GotoLoop)
+}
+{
+	-juncture < 5:
+		~juncture = 5
+		->PickCharWithAttrVal(0,  6,  ->GotoLoop)
+}
+{
+	-juncture < 6:
+		~juncture = 6
+		->PickCharWithAttrVal(0,  5,  ->GotoLoop)
+}
+{
+	-juncture < 7:
+		~juncture = 7
+		->PickCharWithAttrVal(0,  4,  ->GotoLoop)
+}
+{
+	-juncture < 8:
+		~juncture = 8
+		->PickCharWithAttrVal(0,  3,  ->GotoLoop)
+}
+{
+	-juncture < 9:
+		~juncture = 9
+		->PickCharWithAttrVal(0,  2,  ->GotoLoop)
+}
+{
+	-juncture < 10:
+		~juncture = 10
+		->PickCharWithAttrVal(0,  1,  ->GotoLoop)
+}
+-> callback
+
+
+= PickCharWithAttrVal(pickResult, val,  ->noCandidateCallback )
+~temp pickAvailabilityCount = 0
+//Attempting pick at {attr}={val} ..Confirming? {pickResult}
+{
+
+- attr == "reflex":
+	///* utest all
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName_visited==0 && charPersonName_reflex == val:
+				~charPersonName_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName_picked = 1
+						~charPersonName_visited = 1
+						->callback
+				}
+			}
+	}
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName2_visited== 0 && charPersonName2_reflex == val:
+				~charPersonName2_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName2_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName2_picked = 1
+						~charPersonName2_visited = 1
+						->callback
+				}
+			}
+	}
+	//*/
+- attr == "perception":
+	///* utest all
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName_visited==0 && charPersonName_perception == val:
+				charPersonName_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName_picked = 1
+						~charPersonName_visited = 1
+						->callback
+				}
+			}
+	}
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName2_visited== 0 && charPersonName2_perception == val:
+				charPersonName2_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName2_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName2_picked = 1
+						~charPersonName2_visited = 1
+						->callback
+				}
+			}
+	}
+	//*/
+- attr == "mobility":
+	///* utest all
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName_visited==0 && charPersonName_mobility == val:
+				charPersonName_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName_picked = 1
+						~charPersonName_visited = 1
+						->callback
+				}
+			}
+	}
+	{
+		- pickResult == 0:	
+			{
+			- charPersonName2_visited== 0 && charPersonName2_reflex == val:
+				charPersonName2_avail = 1
+				~pickAvailabilityCount = pickAvailabilityCount +1
+			}
+		-else:
+			{
+			-charPersonName2_avail:
+				~pickAvailabilityCount = pickAvailabilityCount +1
+				{
+					- pickAvailabilityCount >= pickResult:
+						~charPersonName2_picked = 1
+						~charPersonName2_visited = 1
+						->callback
+				}
+			}
+	}
+	//*/
+- else:
+	 Exception::: Sorry, pick attribute: {attr} not supported! No one will be picked!
+}
+{
+	-pickResult:
+		->PickCharWithAttrValLooseEndException
+}
+~curAvailability = pickAvailabilityCount
+{
+	- pickResult == 0:
+		{
+			- pickAvailabilityCount > 1:
+				->PickCharWithAttrVal( rollNSided(pickAvailabilityCount),  val,  noCandidateCallback )
+			- pickAvailabilityCount:
+				->PickCharWithAttrVal(1,  val,  noCandidateCallback )
+			-else: 
+				->noCandidateCallback
+		}
+	-else:
+		->noCandidateCallback
+}
+->noCandidateCallback
+
+= PickCharWithAttrValLooseEndException
+Exception found PickCharWithAttrValLooseEndException!
+->DONE
+
+
+
+
+
+
 === function getAllManueverDetailsForCharacter(charId, manueverSlot, ref manuever, ref manuever_CP, ref manuever_targetZone, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manuever_attacking, ref manueverUsingHands)
 {
 ///* utest player
