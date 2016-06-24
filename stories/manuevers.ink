@@ -346,29 +346,33 @@ slotIndex will either be "2" or "3", depending which is already used up.
 	}
 - slotIndex == 2:
 	{	
-	///* utest all 
+	///* utest player 
 	- charId == charPersonName_id: 
 		~charPersonName_fight_target2 = enemyId
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever2,  charPersonName_manuever2Cost, charPersonName_manuever2TN, charPersonName_manuever2AttackType, charPersonName_manuever2DamageType, charPersonName_manuever2NeedBodyAim, charPersonName_manuever2_attacking, charPersonName_manuever2UsingHands, charPersonName_manuever2_CP, charPersonName_manuever2_targetZone)
+	//*/
+	///* utest 
 	- charId == charPersonName2_id:
 		~charPersonName2_fight_target2 = enemyId
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread,  charPersonName2_manuever2,  charPersonName2_manuever2Cost, charPersonName2_manuever2TN, charPersonName2_manuever2AttackType, charPersonName2_manuever2DamageType, charPersonName2_manuever2NeedBodyAim, charPersonName2_manuever2_attacking, charPersonName2_manuever2UsingHands, charPersonName2_manuever2_CP, charPersonName2_manuever2_targetZone )
+	//*/
 	-else:
 		~elseResulted = 1
-	//*/
 	}
 - else:
 	{
-	///* utest all 
+	///* utest player 
 	- charId == charPersonName_id: 
 		~charPersonName_fight_target3 = enemyId
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName_cp, doneCallbackThread,  charPersonName_manuever3,  charPersonName_manuever3Cost, charPersonName_manuever3TN, charPersonName_manuever3AttackType, charPersonName_manuever3DamageType, x, y, charPersonName_manuever3UsingHands, charPersonName_manuever3_CP, z )
+	//*/
+	///* utest 
 	- charId == charPersonName2_id:
 		~charPersonName2_fight_target3 = enemyId
 		->ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, charPersonName2_cp, doneCallbackThread, charPersonName2_manuever3,  charPersonName2_manuever2Cost, charPersonName2_manuever3TN, charPersonName2_manuever3AttackType, charPersonName2_manuever3DamageType, x, y, charPersonName2_manuever3UsingHands, charPersonName2_manuever3_CP, z )
+	//*/
 	-else:
 		~elseResulted = 1
-	//*/
 	}
 }
 
@@ -1578,16 +1582,19 @@ TN: {manueverTN}
 ~_atk_cp = atkManueverCP
 ~slotIndexBeingResolved = slotIndex
 ~getAllManueverDetailsForCharacter(attackerId, slotIndex, x, x,  _atk_targetZone, x, _atk_tn, _atk_attackType, _atk_damageType, _atk_needBodyAim, x, _atk_usingHands )
-///* utest all 
 {
+	///* utest player 
 	-atkManueverTarget == charPersonName_id:
 		->AttemptDefense(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused,  charPersonName_cp, charPersonName_fight_target, charPersonName_fight_target2, charPersonName_fight_target3, charPersonName_manuever, charPersonName_manuever2, charPersonName_manuever3, charPersonName_manuever_attacking, charPersonName_manuever2_attacking, charPersonName_manuever_CP, charPersonName_manuever2_CP, charPersonName_manuever3_CP)
+	//*/
+	///* utest 
 	-atkManueverTarget == charPersonName2_id:
 		->AttemptDefense(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_fight_target, charPersonName2_fight_target2, charPersonName2_fight_target3, charPersonName2_manuever, charPersonName2_manuever2, charPersonName2_manuever3, charPersonName2_manuever_attacking, charPersonName2_manuever2_attacking, charPersonName2_manuever_CP, charPersonName2_manuever2_CP, charPersonName2_manuever3_CP)
+	//*/
 	-else:
 		~elseResulted = 1
 }
-//*/
+
 ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTarget}
 -> ResolveComplete
 
@@ -1608,8 +1615,7 @@ ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTa
 ~zeroDefPool = 0
 ~defenderCharId = defenderId
 
-~defenderPaused = 0
-///* utest all 
+~defenderPaused = 0 
 {
 	- (defenderTarget == attackerId && (defManuever=="")==0) || (defenderTarget2 == attackerId && (defManuever2=="")==0) || (defenderTarget3 == attackerId && (defManuever3=="")==0):
 		{
@@ -1625,9 +1631,10 @@ ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTa
 	-else:
 		->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
 }
+
 AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 -> ResolveComplete
-//*/
+
 
 
 = AttemptDefendersManuever(defenderId, ref defenderInitiative, ref defenderTarget, ref defenderPaused, ref defenderCP, ref defManuever, defManueverAttacking, ref defManueverCP, slotIndex)  
