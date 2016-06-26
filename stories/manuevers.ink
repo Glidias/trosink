@@ -948,53 +948,102 @@ ChoosingManuversLooseEndError detected. This should not happen!
 }
 
 = AimTargetZone
-// TODO: filtering
 {
 -_isAI ==0:
-How do you wish to aim your strike?
-///* #if TROS
-+ Swing to the Lower Legs
-	~manuever_targetZone = 1
-	->ConfirmManuever 
-+ Swing to the Upper Legs 
-	~manuever_targetZone = 2
-	->ConfirmManuever 
-+ Horizontal Swing
-	~manuever_targetZone = 3
-	->ConfirmManuever 
-+ Overhand Swing
-	~manuever_targetZone = 4
-	->ConfirmManuever 
-+ Downward Swing from Above
-	~manuever_targetZone = 5
-	->ConfirmManuever 
-+ Upward Swing from Below
-	~manuever_targetZone = 6
-	->ConfirmManuever 
-+ Swing to the Arms
-	~manuever_targetZone = 7
-	->ConfirmManuever 
-+ Thrust to the Lower Legs
-	~manuever_targetZone = 8
-	->ConfirmManuever 
-+ Thrust to the Upper Legs
-	~manuever_targetZone = 9
-	->ConfirmManuever 
-+ Thrust to the Pelvis
-	~manuever_targetZone = 10
-	->ConfirmManuever
-+ Thrust to the Belly
-	~manuever_targetZone = 11
- 	->ConfirmManuever
-+ Thrust to the Chest
-	~manuever_targetZone = 12
-	->ConfirmManuever 
-+ Thrust to the Head
-	~manuever_targetZone = 13
-	->ConfirmManuever 	
-+ Thrust to the Arm
-	~manuever_targetZone = 14
-	->ConfirmManuever 
+	{
+	-manueverAttackType == ATTACK_TYPE_STRIKE:
+	How do you wish to aim your swing?
+	+ to the Lower Legs
+		~manuever_targetZone = 1
+		->ConfirmManuever 
+	+ to the Upper Legs 
+		~manuever_targetZone = 2
+		->ConfirmManuever 
+	+ Horizontal Swing
+		~manuever_targetZone = 3
+		->ConfirmManuever 
+	+ Overhand Swing
+		~manuever_targetZone = 4
+		->ConfirmManuever 
+	+ Downward Swing from Above
+		~manuever_targetZone = 5
+		->ConfirmManuever 
+	+ Upward Swing from Below
+		~manuever_targetZone = 6
+		->ConfirmManuever 
+	+ to the Arms
+		~manuever_targetZone = 7
+		->ConfirmManuever 
+	-manueverAttackType == ATTACK_TYPE_THRUST:
+	Where on your opponent do you wish to aim your thrust?
+	+ to the Lower Legs
+		~manuever_targetZone = 8
+		->ConfirmManuever 
+	+ to the Upper Legs
+		~manuever_targetZone = 9
+		->ConfirmManuever 
+	+ to the Pelvis
+		~manuever_targetZone = 10
+		->ConfirmManuever
+	+ to the Belly
+		~manuever_targetZone = 11
+	 	->ConfirmManuever
+	+ to the Chest
+		~manuever_targetZone = 12
+		->ConfirmManuever 
+	+ to the Head
+		~manuever_targetZone = 13
+		->ConfirmManuever 	
+	+ to the Arm
+		~manuever_targetZone = 14
+		->ConfirmManuever 
+	-else:
+	How do you wish to aim your strike?
+	///* #if TROS
+	+ Swing to the Lower Legs
+		~manuever_targetZone = 1
+		->ConfirmManuever 
+	+ Swing to the Upper Legs 
+		~manuever_targetZone = 2
+		->ConfirmManuever 
+	+ Horizontal Swing
+		~manuever_targetZone = 3
+		->ConfirmManuever 
+	+ Overhand Swing
+		~manuever_targetZone = 4
+		->ConfirmManuever 
+	+ Downward Swing from Above
+		~manuever_targetZone = 5
+		->ConfirmManuever 
+	+ Upward Swing from Below
+		~manuever_targetZone = 6
+		->ConfirmManuever 
+	+ Swing to the Arms
+		~manuever_targetZone = 7
+		->ConfirmManuever 
+	+ Thrust to the Lower Legs
+		~manuever_targetZone = 8
+		->ConfirmManuever 
+	+ Thrust to the Upper Legs
+		~manuever_targetZone = 9
+		->ConfirmManuever 
+	+ Thrust to the Pelvis
+		~manuever_targetZone = 10
+		->ConfirmManuever
+	+ Thrust to the Belly
+		~manuever_targetZone = 11
+	 	->ConfirmManuever
+	+ Thrust to the Chest
+		~manuever_targetZone = 12
+		->ConfirmManuever 
+	+ Thrust to the Head
+		~manuever_targetZone = 13
+		->ConfirmManuever 	
+	+ Thrust to the Arm
+		~manuever_targetZone = 14
+		->ConfirmManuever 
+	}
+
 //*/
 -else:
 // TODO: ai
@@ -1759,6 +1808,15 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 {
 	- bonusSuccess >= 0:
 		// todo: calculate shockToInflict based off damage table 
+		/*
+				Determine damage type:
+		- Does manuever prescribe damage type? If so, Use damage type of manuever.
+		- else if both NO target zone is required for manuever, assumed no damage appleid for manuever (because no damage type was found to 
+
+		be true in the previosu check)
+		- else, since there's target zone...if Weapon is blunt, use Bludgeoning always, else, 
+		- else use target zone to determine if cutting/puncturing damage is used
+		*/
 		~shockToInflict = bonusSuccess
 		~defenderManueverPool = defenderManueverPool - shockToInflict
 		{
