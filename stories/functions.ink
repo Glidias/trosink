@@ -1,5 +1,6 @@
 // Common globals
 CONST GOT_CONSOLE_NUMBERS = 0
+
 VAR boutRounds=1	
 VAR boutExchange=1
 VAR boutStep=-1
@@ -64,6 +65,17 @@ VAR combatStatusStringCache = ""
 
 === function check_2BitFlag(A,B)
 ~return XOR_2Bits(A,3) == B
+
+
+=== function hasBit(mask, bit)
+~return (mask mod (bit*2)) >= bit
+
+=== function addBit(ref mask, bit)
+{
+	- hasBit(mask, bit) == 0:
+		~mask = mask + bit
+}
+
 
 === function rollNSided(nSides)
 {
@@ -254,7 +266,7 @@ VAR numCombatants = 2
 
 // CharacterMetaData
 // relative client metaData
-///* utest player
+///* utest player var
 CONST charPersonName_AI = 0
 CONST charPersonName_isENEMY = 0
 CONST charPersonName_isYOU = 1
@@ -267,7 +279,7 @@ CONST charPersonName2_isYOU = 0
 
 // CharacterSheet 
 // for each char (tag charPersonName)
-///* utest player
+///* utest player var
 CONST charPersonName_id = 1
 VAR charPersonName_label = "CharPersonName"
 CONST charPersonName_reflex = 5
@@ -281,7 +293,7 @@ VAR charPersonName_health = 5
 VAR charPersonName_equipOffhand = "gladius"
 VAR charPersonName_equipMasterhand = "gladius"
 //*/
-///* utest
+///* utest var
 CONST charPersonName2_id = 2
 VAR charPersonName2_label = "CharPersonName2"
 CONST charPersonName2_reflex = 5
@@ -296,14 +308,38 @@ VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
 //*/
 
+CONST WOUND_BIT_LEVEL_1 = 1
+CONST WOUND_BIT_LEVEL_2 = 2
+CONST WOUND_BIT_LEVEL_3 = 4
+CONST WOUND_BIT_LEVEL_4 = 8
+CONST WOUND_BIT_LEVEL_5 = 16
+
+CONST DAMAGE_TYPE_CUTTING =1
+CONST DAMAGE_TYPE_PUNCTURING = 2 
+CONST DAMAGE_TYPE_BLUDGEONING = 3
+
 // for each char.body... parts... (tag bodyPartName)
-///* utest player 
-VAR charPersonName_wound_bodyPartName = 0
-VAR charPersonName_wound_bodyPartName2 = 0
+///* utest player bodyparts
+///* bodyparts var
+VAR charPersonName_wound_bodyPartName = "bodyPartName"
+VAR charPersonName_wound_bodyPartName_BL = 0
+VAR charPersonName_wound_bodyPartName_shock = 0
+VAR charPersonName_wound_bodyPartName_pain = 0
+VAR charPersonName_wound_bodyPartName_punctureFreshLevelMask = 0
+VAR charPersonName_wound_bodyPartName_bludgeonFreshLevelMask = 0
+VAR charPersonName_wound_bodyPartName_cutLevelFreshMask = 0
 //*/
-///* utest 
-VAR charPersonName2_wound_bodyPartName = 0
-VAR charPersonName2_wound_bodyPartName2 = 0
+//*/
+///* utest bodyparts
+///* bodyparts var
+VAR charPersonName2_wound_bodyPartName = "bodyPartName"
+VAR charPersonName2_wound_bodyPartName_BL = 0
+VAR charPersonName2_wound_bodyPartName_shock = 0
+VAR charPersonName2_wound_bodyPartName_pain = 0
+VAR charPersonName2_wound_bodyPartName_punctureFreshLevelMask = 0
+VAR charPersonName2_wound_bodyPartName_bludgeonFreshLevelMask = 0
+VAR charPersonName2_wound_bodyPartName_cutLevelFreshMask = 0
+//*/
 //*/
 
 // Fight
@@ -1003,30 +1039,6 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 }
 ~return 0
 
-
-=== function inflictWoundOn(targetId, targetPart, woundLevel)
-{ 
-///* utest player
-- targetId == charPersonName_id: 
- 	{
-	- targetPart == "bodyPartName": 
-		~charPersonName_wound_bodyPartName=MathMax(woundLevel,charPersonName_wound_bodyPartName)
-	- targetPart == "bodyPartName2":
-		 ~charPersonName_wound_bodyPartName2=MathMax(woundLevel,charPersonName_wound_bodyPartName2)
-	}
-	//*/
-///* utest
-- targetId == charPersonName2_id: 
- 	{
-	- targetPart == "bodyPartName": 
-		~charPersonName2_wound_bodyPartName=MathMax(woundLevel,charPersonName2_wound_bodyPartName)
-	- targetPart == "bodyPartName2":
-		 ~charPersonName2_wound_bodyPartName2=MathMax(woundLevel,charPersonName2_wound_bodyPartName2)
-	}
-//*/
--else:
-	~elseResulted = 1
-}
 
 === function setManuever(srcId, diceToRoll, targetId, targetZone)
 ~return

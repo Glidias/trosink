@@ -1,5 +1,6 @@
 // Unit tests
 
+/*
 === testing_inflictWoundOn
 {inflictWoundOn(charPersonName_id, "bodyPartName2", 3)}
 {inflictWoundOn(charPersonName_id, "bodyPartName2", 2)}
@@ -7,6 +8,7 @@
 testing_inflictWoundOn person1 {charPersonName_wound_bodyPartName}  {charPersonName_wound_bodyPartName2}
 testing_inflictWoundOn person2 {charPersonName2_wound_bodyPartName}  {charPersonName2_wound_bodyPartName2}
 -> DONE
+*/
 
 === testing_rollNumSuccesses
 {rollNumSuccesses(7,5,0)}

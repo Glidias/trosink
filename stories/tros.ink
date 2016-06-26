@@ -1,6 +1,7 @@
 ﻿//https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md
 
 INCLUDE functions.ink
+INCLUDE damagetables.ink
 INCLUDE weapons.ink
 INCLUDE manuevers.ink
 
