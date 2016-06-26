@@ -103,10 +103,16 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 3 OR 3= {OR_2Bits(3,3)} == 3
 ->TestDone
 
+=== test_null_string_int_compare
+~temp numStrTest = "2"
+~temp numTest = 2
+~temp nullFakeStrTest = "null"
+~temp zeroVal = 0
+"2"==2: {numStrTest==numTest:Yes|No}
+"null"==0: {nullFakeStrTest==zeroVal:Yes|No}
+->TestDone
 
-
-
-// -- Inkle engine specific tests below
+// -- Inkle engine specific tests bel_comparew
 // --------------------------------
 
 // This test is ok..

@@ -7,7 +7,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-//->testing_ChooseManueverForChar
+//->test_null_string_int_compare
 
 -> GameStart
 
@@ -27,16 +27,21 @@ Let's fight!
 
 	~boutStep = 0
 	~temp gotReveal = 0
-
+	~temp x = 0
 	{
 		- boutExchange == 1:
 		///* utest all
 		{
 			-charPersonName_FIGHT:
+				~charPersonName2_totalPain= 0
+				~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
+				 
 				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
 		}
 		{
 			-charPersonName2_FIGHT:
+				~charPersonName2_totalPain= 0
+				~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
 				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
 		}
 		//*/

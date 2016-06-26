@@ -308,39 +308,6 @@ VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
 //*/
 
-CONST WOUND_BIT_LEVEL_1 = 1
-CONST WOUND_BIT_LEVEL_2 = 2
-CONST WOUND_BIT_LEVEL_3 = 4
-CONST WOUND_BIT_LEVEL_4 = 8
-CONST WOUND_BIT_LEVEL_5 = 16
-
-CONST DAMAGE_TYPE_CUTTING =1
-CONST DAMAGE_TYPE_PUNCTURING = 2 
-CONST DAMAGE_TYPE_BLUDGEONING = 3
-
-// for each char.body... parts... (tag bodyPartName)
-///* utest player bodyparts
-///* bodyparts var
-VAR charPersonName_wound_bodyPartName = "bodyPartName"
-VAR charPersonName_wound_bodyPartName_BL = 0
-VAR charPersonName_wound_bodyPartName_shock = 0
-VAR charPersonName_wound_bodyPartName_pain = 0
-VAR charPersonName_wound_bodyPartName_punctureFreshLevelMask = 0
-VAR charPersonName_wound_bodyPartName_bludgeonFreshLevelMask = 0
-VAR charPersonName_wound_bodyPartName_cutLevelFreshMask = 0
-//*/
-//*/
-///* utest bodyparts
-///* bodyparts var
-VAR charPersonName2_wound_bodyPartName = "bodyPartName"
-VAR charPersonName2_wound_bodyPartName_BL = 0
-VAR charPersonName2_wound_bodyPartName_shock = 0
-VAR charPersonName2_wound_bodyPartName_pain = 0
-VAR charPersonName2_wound_bodyPartName_punctureFreshLevelMask = 0
-VAR charPersonName2_wound_bodyPartName_bludgeonFreshLevelMask = 0
-VAR charPersonName2_wound_bodyPartName_cutLevelFreshMask = 0
-//*/
-//*/
 
 // Fight
 // targeting

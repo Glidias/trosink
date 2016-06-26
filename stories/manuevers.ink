@@ -1,4 +1,4 @@
-CONST ZONE_VIII = 7
+CONST THRUST_INDEX = 8
 
 CONST MANUEVER_HAND_NONE = 0
 CONST MANUEVER_HAND_MASTER = 1
@@ -49,7 +49,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 
 === function isThrustingMotion(targetZone)
 {
-	- targetZone >= ZONE_VIII:
+	- targetZone >= THRUST_INDEX:
 	~return 1
 	- else:
 	~return 0
@@ -375,6 +375,8 @@ slotIndex will either be "2" or "3", depending which is already used up.
 }
 
 === ChooseManueverForChar(slotIndex, charId, enemyId, charNoMasterHand, charNoOffHand, ref charCombatPool, ->doneCallbackThread, ref manuever, ref manueverCost, ref manueverTN, ref manueverAttackType, ref manueverDamageType, ref manueverNeedBodyAim, ref manueverIsAttacking, ref manueverUseHands, ref manuever_CP, ref manuever_targetZone)
+
+~manuever_targetZone = 0
 
 // Read-only Dependencies for manuever selection/consideration to request by reference
 // dummy variable to hold as unused referenced
@@ -906,6 +908,7 @@ ChoosingManuversLooseEndError detected. This should not happen!
 		TN: {manueverTN}
 		AttackType: {getAttackTypeLabel(manueverAttackType)}
 		DamageType: {getDamageTypeLabel(manueverDamageType)}
+		TargetZone: {manuever_targetZone >= THRUST_INDEX: (thrust)|(swing)} {getTargetZoneLabelDir(manuever_targetZone)}
 		//Need to Aim body zone: {manueverNeedBodyAim:Yes|No }
 		Cost: {manueverCost}
 		Rolling CP: {manuever_CP}
@@ -945,9 +948,59 @@ ChoosingManuversLooseEndError detected. This should not happen!
 }
 
 = AimTargetZone
-//Which target zone do you wish to aim at? TODO
--> ConfirmManuever
--> AimTargetZoneLooseEndError
+// TODO: filtering
+{
+-_isAI ==0:
+How do you wish to aim your strike?
+///* #if TROS
++ Swing to the Lower Legs
+	~manuever_targetZone = 1
+	->ConfirmManuever 
++ Swing to the Upper Legs 
+	~manuever_targetZone = 2
+	->ConfirmManuever 
++ Horizontal Swing
+	~manuever_targetZone = 3
+	->ConfirmManuever 
++ Overhand Swing
+	~manuever_targetZone = 4
+	->ConfirmManuever 
++ Downward Swing from Above
+	~manuever_targetZone = 5
+	->ConfirmManuever 
++ Upward Swing from Below
+	~manuever_targetZone = 6
+	->ConfirmManuever 
++ Swing to the Arms
+	~manuever_targetZone = 7
+	->ConfirmManuever 
++ Thrust to the Lower Legs
+	~manuever_targetZone = 8
+	->ConfirmManuever 
++ Thrust to the Upper Legs
+	~manuever_targetZone = 9
+	->ConfirmManuever 
++ Thrust to the Pelvis
+	~manuever_targetZone = 10
+	->ConfirmManuever
++ Thrust to the Belly
+	~manuever_targetZone = 11
+ 	->ConfirmManuever
++ Thrust to the Chest
+	~manuever_targetZone = 12
+	->ConfirmManuever 
++ Thrust to the Head
+	~manuever_targetZone = 13
+	->ConfirmManuever 	
++ Thrust to the Arm
+	~manuever_targetZone = 14
+	->ConfirmManuever 
+//*/
+-else:
+// TODO: ai
+	~manuever_targetZone = 4
+	-> ConfirmManuever
+}
 
 = AimTargetZoneLooseEndError
 AimTargetZoneLooseEndError detected. This should not happen!
@@ -1804,3 +1857,255 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 		~defenderStance = STANCE_NEUTRAL
 }
 ~defManuever = ""
+
+=== function getTargetZoneLabelDir(targetZone)
+///* #if TROS
+{
+-targetZone == 1:
+~return "to the Lower Legs"
+-targetZone == 2:
+~return "to the Upper Legs"
+-targetZone == 3:
+~return "for Horizontal Swing"
+-targetZone == 4:
+~return "for Overhand Swing"
+-targetZone == 5:
+~return "for Downward Swing from Above"
+-targetZone == 6:
+~return "for Upward Swing from Below"
+-targetZone == 7:
+~return "to the Arms"
+
+-targetZone == 8:
+~return "to the Lower Legs"
+-targetZone == 9:
+~return "to the Upper Legs"
+-targetZone == 10:
+~return "to the Pelvis"
+-targetZone == 11:
+~return "to the Belly"
+-targetZone == 12:
+~return "to the Chest"
+-targetZone == 13:
+~return "to the Head"
+-targetZone == 14:
+~return "to the Arm"
+-else:
+	~return ""
+}
+//*/
+
+
+=== function getTargetZoneBodyPart(targetZone, damageType)
+///* #if TROS
+{
+-targetZone == 1:
+	{ shuffle:
+		- ~return "foot"
+		- ~return "shin_and_lower_leg"
+		- ~return "shin_and_lower_leg"
+		- ~return "shin_and_lower_leg"
+		- ~return "knee_and_nearby_areas"
+		- ~return "knee_and_nearby_areas"
+	}
+-targetZone == 2:
+	{ shuffle:
+		- ~return "knee_and_nearby_areas"
+		- ~return "knee_and_nearby_areas"
+		- ~return "thigh"
+		- ~return "thigh"
+		- ~return "thigh"
+		- ~return "hip"
+	}
+-targetZone == 3:
+	{ shuffle:
+		- ~return "hip"
+		- ~return "upper_abdomen"
+		- ~return "lower_abdomen"
+		- ~return "ribcage"
+		- ~return "ribcage"
+		- ~return "arms"
+	}
+-targetZone==4:
+	{ shuffle:
+		- ~return "upper_arm_and_shoulder"
+		- ~return "upper_arm_and_shoulder"
+		- ~return "chest"
+		- ~return "neck"
+		- ~return "lower_head"
+		- ~return "upper_head"
+	}	
+-targetZone==5:
+	{ shuffle:
+		- ~return "upper_head"
+		- ~return "upper_head"
+		- ~return "upper_head"
+		- ~return "lower_head"
+		- ~return "shoulder"
+		- ~return "shoulder"
+	}	
+-targetZone==6:
+	{ shuffle:
+		- ~return "inner_thigh"
+		- ~return "inner_thigh"
+		- ~return "inner_thigh"
+		- ~return "groin"
+		- ~return "abdomen"
+		- ~return "chest"
+	}	
+-targetZone==7:
+	{ shuffle:
+		- ~return "hand"
+		- ~return "forearm"
+		- ~return "forearm"
+		- ~return "elbow"
+		- ~return "upper_arm_and_shoulder"
+		- ~return "upper_arm_and_shoulder"
+	}
+-targetZone==8:
+	{ shuffle:
+		- ~return "foot"
+		- ~return "shin_and_lower_leg"
+		- ~return "shin_and_lower_leg"
+		- ~return "shin_and_lower_leg"
+		- ~return "knee_and_nearby_areas"
+		- ~return ""
+	}
+-targetZone==9:
+	{ shuffle:
+		- ~return "knee_and_nearby_areas"
+		- ~return "knee_and_nearby_areas"
+		- ~return "thigh"
+		- ~return "thigh"
+		- ~return "thigh"
+		- ~return "hip"
+	}
+-targetZone==10:
+	{ shuffle:
+		// note missing rules for male/female cases
+		- ~return "hip"
+		- ~return "hip"
+		- ~return "groin"
+		- ~return "groin"
+		- ~return "lower_abdomen"
+		- ~return "lower_abdomen"
+	}	
+-targetZone==11:
+	{ 
+	-damageType != DAMAGE_TYPE_BLUDGEONING:
+		{ shuffle:
+			- ~return "lower_abdomen"
+			- ~return "lower_abdomen"
+			- ~return "lower_abdomen"
+			- ~return "lower_abdomen"
+			- ~return "lower_abdomen"
+			- ~return "flesh_to_the_side"
+		}
+	- else:
+		~return "lower_abdomen"
+	}
+-targetZone==12:
+	{ shuffle:
+		- ~return "upper_abdomen"
+		- ~return "upper_abdomen"
+		- ~return "chest"
+		- ~return "chest"
+		- ~return "chest"
+		- ~return "chest"
+	}			
+-targetZone==13:
+	{ 
+	-damageType != DAMAGE_TYPE_BLUDGEONING:
+		{ shuffle:
+			- ~return "collar_and_throat"
+			- ~return "collar_and_throat"
+			- ~return "face_or_head"
+			- ~return "face_or_head"
+			- ~return "face_or_head"
+			- ~return "face_or_head"
+		}
+	- else:
+		{ shuffle:
+			- ~return "neck"
+			- ~return "face_or_lower_head"
+			- ~return "face_or_lower_head"
+			- ~return "face_or_lower_head"
+			- ~return "upper_head"
+			- ~return "upper_head"
+		}	
+	}	
+-targetZone==14:
+	{ 
+	-damageType != DAMAGE_TYPE_BLUDGEONING:
+		{ shuffle:
+			- ~return "hand"
+			- ~return "forearm"
+			- ~return "forearm"
+			- ~return "elbow"
+			- ~return "upper_arm"
+			- ~return "upper_arm"
+		}
+	- else:
+		{ shuffle:
+			- ~return "hand"
+			- ~return "forearm"
+			- ~return "forearm"
+			- ~return "elbow"
+			- ~return "upper_arm_and_shoulder"
+			- ~return "upper_arm_and_shoulder"
+		}	
+	}	
+
+-else:
+	~return ""
+}
+//*/
+
+// handling of special cases for targeted body part
+=== function resolveTargetBodyPart(ref targetBodyPart, woundLevel, targetZone, damageType)
+///* #if TROS
+{
+-damageType == DAMAGE_TYPE_BLUDGEONING:
+	{
+		-targetZone==13 && targetBodyPart == "face_or_lower_head":
+			{
+
+				-woundLevel <= 1:
+					targetBodyPart = "face"
+				-woundLevel == 2:
+					targetBodyPart = "face"
+				-woundLevel == 3:
+					targetBodyPart = "face"
+				-woundLevel == 4:
+					targetBodyPart = "lower_head"
+				-woundLevel >=5:
+					targetBodyPart = "lower_head"
+				-else:
+					~elseResulted = 1
+			}
+		-else:
+			~elseResulted = 1
+	}
+-else:
+	{
+	-targetZone==13 && targetBodyPart == "face_or_head":
+			{
+
+				-woundLevel <= 1:
+					targetBodyPart = "face"
+				-woundLevel == 2:
+					targetBodyPart = "face"
+				-woundLevel == 3:
+					targetBodyPart = "face"
+				-woundLevel == 4:
+					targetBodyPart = "head"
+				-woundLevel >=5:
+					targetBodyPart = "head"
+				-else:
+					~elseResulted = 1
+			}
+		-else:
+			~elseResulted = 1
+	}
+}
+//*/
