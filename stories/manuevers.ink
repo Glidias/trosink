@@ -1046,8 +1046,68 @@ ChoosingManuversLooseEndError detected. This should not happen!
 
 //*/
 -else:
-// TODO: ai
-	~manuever_targetZone = 4
+	{
+	-manueverAttackType == ATTACK_TYPE_STRIKE:
+		{ shuffle:
+		- ~manuever_targetZone = 1
+		- ~manuever_targetZone = 2
+		- ~manuever_targetZone = 2
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 4
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 6
+		- ~manuever_targetZone = 7
+		}
+	-manueverAttackType == ATTACK_TYPE_THRUST:
+		{ shuffle:
+		- ~manuever_targetZone = 8
+		- ~manuever_targetZone = 9
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 13
+		- ~manuever_targetZone = 14
+		}
+	-else:
+		{ shuffle:
+		- ~manuever_targetZone = 1
+		- ~manuever_targetZone = 2
+		- ~manuever_targetZone = 2
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 3
+		- ~manuever_targetZone = 4
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 5
+		- ~manuever_targetZone = 6
+		- ~manuever_targetZone = 7
+		- ~manuever_targetZone = 8
+		- ~manuever_targetZone = 9
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 10
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 11
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 12
+		- ~manuever_targetZone = 13
+		- ~manuever_targetZone = 14
+
+		}
+	}
 	-> ConfirmManuever
 }
 
