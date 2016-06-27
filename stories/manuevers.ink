@@ -1823,7 +1823,10 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 
 			 ~c1 = rollNumSuccesses(atkReflex,5,0)
 			 ~c2 = rollNumSuccesses(defReflex,5,0)
+
+			 // to test simulatneous
 			// ~c1 = c2
+
 			// reflex contest role results: D{atkReflex}:{c1} D{defReflex}:{c2}
 			 {
 			 	-c1 > c2:
@@ -1840,15 +1843,15 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 			 		~reselectCharId = defenderId
 			 		~reselectCharIdNext = attackerId
 			 		-> mainCallbackThread
-			 	-else:
+			 	- else:
 				 	Neither party won the initaitive contest.
 			 		~defenderInitiative = 0
 			 		~attackerInitiative = 0
-			 		//testing: simultatenous resolution hit of atk manuevers between parties
+			 		
 			 		~simultaneousHitResulted = 1
 			 		~reselectCharId = defenderId
 			 		~reselectCharIdNext = 0
-			 		//simult
+			 		
 			 		 ->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
 			 }
 			 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative,defenderTarget,  defenderPaused, noDefense)
@@ -1907,8 +1910,9 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 			{
 				- _atk_damageType:
 					~useDamageType = _atk_damageType
-				- _atk_needBodyAim == 0:
+				- _atk_targetZone == 0:
 					// assumption made by convention... with manuever without neither damage Type or attack zone
+					~useDamageType = 0
 					~shockToInflict = 0
 				- usingWeapon && usingWeaponBlunt:
 					~useDamageType = DAMAGE_TYPE_BLUDGEONING

@@ -253,10 +253,16 @@ VAR combatStatusStringCache = ""
 === function refreshCombatPool(ref cp, profeciencyLevel, reflex, totalPain, carryOverShock, health)
 ~temp inCritical =  inCriticalCondition(health)
 ~temp useReflex = reflex
-{inCritical: useReflex = 1}
+{inCritical: 
+	~useReflex = 1
+}
 ~temp result = profeciencyLevel + useReflex -MathMax(carryOverShock, totalPain)
-{inCritical: result = result/2}
-{result < 0: result = 0}
+{inCritical: 
+	~result = result/2
+}
+{result < 0: 
+	~result = 0
+}
 
 ~cp = result
 
@@ -1271,7 +1277,7 @@ VAR juncture = 0
 		- pickResult == 0:	
 			{
 			- charPersonName_visited==0 && charPersonName_perception == val:
-				charPersonName_avail = 1
+				~charPersonName_avail = 1
 				~pickAvailabilityCount = pickAvailabilityCount +1
 			}
 		-else:
@@ -1290,7 +1296,7 @@ VAR juncture = 0
 		- pickResult == 0:	
 			{
 			- charPersonName2_visited== 0 && charPersonName2_perception == val:
-				charPersonName2_avail = 1
+				~charPersonName2_avail = 1
 				~pickAvailabilityCount = pickAvailabilityCount +1
 			}
 		-else:
@@ -1312,7 +1318,7 @@ VAR juncture = 0
 		- pickResult == 0:	
 			{
 			- charPersonName_visited==0 && charPersonName_mobility == val:
-				charPersonName_avail = 1
+				~charPersonName_avail = 1
 				~pickAvailabilityCount = pickAvailabilityCount +1
 			}
 		-else:
@@ -1331,7 +1337,7 @@ VAR juncture = 0
 		- pickResult == 0:	
 			{
 			- charPersonName2_visited== 0 && charPersonName2_reflex == val:
-				charPersonName2_avail = 1
+				~charPersonName2_avail = 1
 				~pickAvailabilityCount = pickAvailabilityCount +1
 			}
 		-else:

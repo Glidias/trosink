@@ -608,7 +608,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -746,7 +746,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -884,7 +884,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1022,7 +1022,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1117,7 +1117,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1255,7 +1255,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1393,7 +1393,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1488,7 +1488,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1583,7 +1583,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1721,7 +1721,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1816,7 +1816,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -1911,7 +1911,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2006,7 +2006,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2144,7 +2144,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2239,7 +2239,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2334,7 +2334,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2472,7 +2472,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2610,7 +2610,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2748,7 +2748,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -2886,7 +2886,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3024,7 +3024,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3119,7 +3119,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3171,7 +3171,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			}
 		
 
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3224,7 +3224,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		
 
 		
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3277,7 +3277,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		
 
 		
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3330,7 +3330,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		
 
 		
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
@@ -3383,11 +3383,15 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		
 
 		
-		else:
+		- else:
 			~elseResulted = 1
 	}
 	
 
+	{
+		-applyShock < 0: 
+			~applyShock = 0
+	}
 	~return targetPart
 	
 	//*/ woundLocations

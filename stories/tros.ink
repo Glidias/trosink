@@ -78,28 +78,46 @@ Let's fight!
 			-> Combat_Step0.DeclareStancesForAll(0)
 	}
 	->->
+
+	=DeclareStancesForRemaining
+		->DeclareStancesForAll(1)
+
 	= DeclareStancesForAll(repeated)
 	//If it's the 1st exchange at the start of a round,  for all combatants that require, declare stance, in order from lowest to highest adriotness stat.
 
+	{
+		-repeated==0:
+			-> PickCharactersWithAttributeVal("perception", 0, ->DeclareStancesForRemaining)
+	}
 	// TODO: figure out a way to roll off ties (tiebreaking)
-	///* utest perceptionCheck<playerPerceptionCheck
-	{  -charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
-		~charPersonName2_fight_stance = getAIStance(charPersonName2_id)
-		{charPersonName2_fight_stance!=STANCE_NEUTRAL: You noticed {charPersonName2_label} adopting a {getStanceLabel(charPersonName2_fight_stance)} martial stance. }
+	///* utest all
+	{  
+		-charPersonName2_picked && charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
+		{
+			-charPersonName2_AI:
+				~charPersonName2_fight_stance = getAIStance(charPersonName2_id)
+				{charPersonName2_fight_stance!=STANCE_NEUTRAL: You noticed {charPersonName2_label} adopting a {getStanceLabel(charPersonName2_fight_stance)} martial stance. }
+			-else:
+				-> DeclareStance(charPersonName2_label, charPersonName2_isYOU) 
+		}
+		->DeclareStancesForRemaining
+	}
+	{  
+		-charPersonName_picked && charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused: 
+		{
+			-charPersonName_AI:
+				~charPersonName_fight_stance = getAIStance(charPersonName_id)
+				{charPersonName_fight_stance!=STANCE_NEUTRAL: You noticed {charPersonName_label} adopting a {getStanceLabel(charPersonName_fight_stance)} martial stance. }
+			-else:
+				-> DeclareStance(charPersonName_label, charPersonName_isYOU) 
+		}
+		->DeclareStancesForRemaining
 	}
 	//*/
-	///* pc
-	{  -charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused: 
-		-> DeclareStance(charPersonName_label, charPersonName_isYOU) 
-	}
-	//*/
-	///* utest perceptionCheck>=playerPerceptionCheck
-	{  -charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
-		~charPersonName2_fight_stance = getAIStance(charPersonName2_id)
-		{charPersonName2_label} adopted {getStanceLabel(charPersonName2_fight_stance)} a martial stance.
-	}
+	
+
 	->->
-	//*/
+	
 	= DeclareStance(charLabel, isYou)
 	What is the martial stance you wish to adopt and reveal to your enemies?
 	+[Neutral ...(Balanced.)]
