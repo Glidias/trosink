@@ -1,5 +1,3 @@
-
-
 CONST WOUND_BIT_LEVEL_1 = 1
 CONST WOUND_BIT_LEVEL_2 = 2
 CONST WOUND_BIT_LEVEL_3 = 4
@@ -11,7 +9,7 @@ CONST DAMAGE_TYPE_PUNCTURING = 2
 CONST DAMAGE_TYPE_BLUDGEONING = 3
 
 // for each char.body... parts... (tag )
-///* bodyparts
+///* utest player bodyparts
 
 VAR charPersonName_wound_foot = "foot"
 VAR charPersonName_wound_foot_BL = 0
@@ -229,8 +227,7 @@ VAR charPersonName_wound_upper_arm_punctureFreshLevelMask = 0
 VAR charPersonName_wound_upper_arm_bludgeonFreshLevelMask = 0
 VAR charPersonName_wound_upper_arm_cutFreshLevelMask = 0
 
-//*/
-///* bodyparts
+//*/ utest
 
 VAR charPersonName2_wound_foot = "foot"
 VAR charPersonName2_wound_foot_BL = 0
@@ -448,8 +445,7 @@ VAR charPersonName2_wound_upper_arm_punctureFreshLevelMask = 0
 VAR charPersonName2_wound_upper_arm_bludgeonFreshLevelMask = 0
 VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 
-//*/
-
+//*/ utest
 
 === function applyWound(applyPain,  applyBL,  applyShock,  ref charPartShock, ref charPartPain, ref charPartBL )
 {
@@ -3394,7 +3390,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 
 	~return targetPart
 	
-	//*/
+	//*/ 
 	-else:
 		~elseResulted = 1
 }
@@ -3427,7 +3423,6 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		-targetPart:
 			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
 			{ 
-				///* bodyparts
 				
 
 				-targetPart == charPersonName_wound_foot:
@@ -3862,13 +3857,11 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 					}
 				
 
-				//*/
 				- else:
 					~elseResulted = 1
 			}
 			~return
 		- else:
-			///* bodyparts
 			
 
 			~painCollector = painCollector + charPersonName_wound_foot_pain
@@ -3979,7 +3972,6 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			~bloodCollector = bloodCollector + charPersonName_wound_upper_arm_BL
 			
 
-			//*/
 	}
 //*/
 ///* utest bodyparts
@@ -3988,7 +3980,6 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 		-targetPart:
 			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
 			{ 
-				///* bodyparts
 				
 
 				-targetPart == charPersonName2_wound_foot:
@@ -4423,12 +4414,10 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 					}
 				
 
-				//*/
 				- else:
 					~elseResulted = 1
 			}
 		- else:
-			///* bodyparts
 			
 
 			~painCollector = painCollector + charPersonName2_wound_foot_pain
@@ -4539,7 +4528,6 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 			~bloodCollector = bloodCollector + charPersonName2_wound_upper_arm_BL
 			
 
-			//*/
 	}
 //*/
 -else:
