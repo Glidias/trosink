@@ -28,7 +28,7 @@ function duplicateBodyPartLocations () {
      var taggerParams = tagger.split(" ");
      var headTag = '<div v-for="woundLoc in woundLocations">';
        var bodyContent =  source.slice( breakIndex );
-       bodyContent = bodyContent.replace(/{{woundLoc.id}}_/g, '{{woundLoc.id}}_');
+       bodyContent = bodyContent.replace(/bodyPartName/g, '{{woundLoc.id}}');
        var result = headTag;
        result += bodyContent;
        result += "</div>";
@@ -82,26 +82,26 @@ CONST DAMAGE_TYPE_CUTTING =1
 CONST DAMAGE_TYPE_PUNCTURING = 2 
 CONST DAMAGE_TYPE_BLUDGEONING = 3
 
-// for each char.body... parts... (tag {{woundLoc.id}})
+// for each char.body... parts... (tag)
 ///* utest player bodyparts
 ///* bodyparts
-VAR charPersonName_wound_{{woundLoc.id}} = "{{woundLoc.id}}"
-VAR charPersonName_wound_{{woundLoc.id}}_BL = 0
-VAR charPersonName_wound_{{woundLoc.id}}_shock = 0
-VAR charPersonName_wound_{{woundLoc.id}}_pain = 0
-VAR charPersonName_wound_{{woundLoc.id}}_punctureFreshLevelMask = 0
-VAR charPersonName_wound_{{woundLoc.id}}_bludgeonFreshLevelMask = 0
-VAR charPersonName_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
+VAR charPersonName_wound_bodyPartName = "bodyPartName"
+VAR charPersonName_wound_bodyPartName_BL = 0
+VAR charPersonName_wound_bodyPartName_shock = 0
+VAR charPersonName_wound_bodyPartName_pain = 0
+VAR charPersonName_wound_bodyPartName_punctureFreshLevelMask = 0
+VAR charPersonName_wound_bodyPartName_bludgeonFreshLevelMask = 0
+VAR charPersonName_wound_bodyPartName_cutFreshLevelMask = 0
 //*/ bodyparts
 //*/ utest
 ///* bodyparts
-VAR charPersonName2_wound_{{woundLoc.id}} = "{{woundLoc.id}}"
-VAR charPersonName2_wound_{{woundLoc.id}}_BL = 0
-VAR charPersonName2_wound_{{woundLoc.id}}_shock = 0
-VAR charPersonName2_wound_{{woundLoc.id}}_pain = 0
-VAR charPersonName2_wound_{{woundLoc.id}}_punctureFreshLevelMask = 0
-VAR charPersonName2_wound_{{woundLoc.id}}_bludgeonFreshLevelMask = 0
-VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
+VAR charPersonName2_wound_bodyPartName = "bodyPartName"
+VAR charPersonName2_wound_bodyPartName_BL = 0
+VAR charPersonName2_wound_bodyPartName_shock = 0
+VAR charPersonName2_wound_bodyPartName_pain = 0
+VAR charPersonName2_wound_bodyPartName_punctureFreshLevelMask = 0
+VAR charPersonName2_wound_bodyPartName_bludgeonFreshLevelMask = 0
+VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 //*/ bodyparts
 //*/ utest
 
@@ -187,7 +187,7 @@ VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
 	</div>
 	~return targetPart
 	
-	//*/ 
+	//*/ woundLocations
 	-else:
 		~elseResulted = 1
 }
@@ -221,16 +221,16 @@ VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
 			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
 			{ 
 				///* bodyparts
-				-targetPart == charPersonName_wound_{{woundLoc.id}}:
-					~applyWound(applyPain, applyBL, applyShock, charPersonName_wound_{{woundLoc.id}}_shock,  charPersonName_wound_{{woundLoc.id}}_pain, charPersonName_wound_{{woundLoc.id}}_BL)
-					~shockToApply = charPersonName_wound_{{woundLoc.id}}_shock
+				-targetPart == charPersonName_wound_bodyPartName:
+					~applyWound(applyPain, applyBL, applyShock, charPersonName_wound_bodyPartName_shock,  charPersonName_wound_bodyPartName_pain, charPersonName_wound_bodyPartName_BL)
+					~shockToApply = charPersonName_wound_bodyPartName_shock
 					{ 
 						-damageType == DAMAGE_TYPE_CUTTING:
-							~addWoundLevelBit(charPersonName_wound_{{woundLoc.id}}_cutFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName_wound_bodyPartName_cutFreshLevelMask, woundLevel )
 						-damageType == DAMAGE_TYPE_PUNCTURING:
-							~addWoundLevelBit(charPersonName_wound_{{woundLoc.id}}_punctureFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName_wound_bodyPartName_punctureFreshLevelMask, woundLevel )
 						-damageType == DAMAGE_TYPE_BLUDGEONING:
-							~addWoundLevelBit(charPersonName_wound_{{woundLoc.id}}_bludgeonFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName_wound_bodyPartName_bludgeonFreshLevelMask, woundLevel )
 						-else:
 							~elseResulted =1
 							Else exception fonud for damageType search! Should not happen!
@@ -242,8 +242,8 @@ VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
 			~return
 		- else:
 			///* bodyparts
-			~painCollector = painCollector + charPersonName_wound_{{woundLoc.id}}_pain
-			~bloodCollector = bloodCollector + charPersonName_wound_{{woundLoc.id}}_BL
+			~painCollector = painCollector + charPersonName_wound_bodyPartName_pain
+			~bloodCollector = bloodCollector + charPersonName_wound_bodyPartName_BL
 			//*/ bodyparts
 	}
 //*/
@@ -254,16 +254,16 @@ VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
 			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
 			{ 
 				///* bodyparts
-				-targetPart == charPersonName2_wound_{{woundLoc.id}}:
-					~applyWound(applyPain, applyBL, applyShock, charPersonName2_wound_{{woundLoc.id}}_shock,  charPersonName2_wound_{{woundLoc.id}}_pain, charPersonName2_wound_{{woundLoc.id}}_BL)
-					~shockToApply = charPersonName2_wound_{{woundLoc.id}}_shock
+				-targetPart == charPersonName2_wound_bodyPartName:
+					~applyWound(applyPain, applyBL, applyShock, charPersonName2_wound_bodyPartName_shock,  charPersonName2_wound_bodyPartName_pain, charPersonName2_wound_bodyPartName_BL)
+					~shockToApply = charPersonName2_wound_bodyPartName_shock
 					{ 
 						-damageType == DAMAGE_TYPE_CUTTING:
-							~addWoundLevelBit(charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName2_wound_bodyPartName_cutFreshLevelMask, woundLevel )
 						-damageType == DAMAGE_TYPE_PUNCTURING:
-							~addWoundLevelBit(charPersonName2_wound_{{woundLoc.id}}_punctureFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName2_wound_bodyPartName_punctureFreshLevelMask, woundLevel )
 						-damageType == DAMAGE_TYPE_BLUDGEONING:
-							~addWoundLevelBit(charPersonName2_wound_{{woundLoc.id}}_bludgeonFreshLevelMask, woundLevel )
+							~addWoundLevelBit(charPersonName2_wound_bodyPartName_bludgeonFreshLevelMask, woundLevel )
 						-else:
 							~elseResulted =1
 							Else exception fonud for damageType search! Should not happen!
@@ -274,8 +274,8 @@ VAR charPersonName2_wound_{{woundLoc.id}}_cutFreshLevelMask = 0
 			}
 		- else:
 			///* bodyparts
-			~painCollector = painCollector + charPersonName2_wound_{{woundLoc.id}}_pain
-			~bloodCollector = bloodCollector + charPersonName2_wound_{{woundLoc.id}}_BL
+			~painCollector = painCollector + charPersonName2_wound_bodyPartName_pain
+			~bloodCollector = bloodCollector + charPersonName2_wound_bodyPartName_BL
 			//*/ bodyparts
 	}
 //*/

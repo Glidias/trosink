@@ -8,7 +8,7 @@ CONST DAMAGE_TYPE_CUTTING =1
 CONST DAMAGE_TYPE_PUNCTURING = 2 
 CONST DAMAGE_TYPE_BLUDGEONING = 3
 
-// for each char.body... parts... (tag )
+// for each char.body... parts... (tag)
 ///* utest player bodyparts
 
 VAR charPersonName_wound_foot = "foot"
@@ -3390,7 +3390,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 
 	~return targetPart
 	
-	//*/ 
+	//*/ woundLocations
 	-else:
 		~elseResulted = 1
 }
