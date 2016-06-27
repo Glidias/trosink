@@ -7,7 +7,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-//->test_null_string_int_compare
+//->test_ConsiderCharacters
 
 -> GameStart
 

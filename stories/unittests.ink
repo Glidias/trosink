@@ -58,6 +58,22 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
 -> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0, charPersonName2_cp, ->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
 
+=== test_ConsiderCharacters
+considering chars stat order....
+-> PickCharactersWithAttributeVal("reflex", 0, ->pickList)
+
+= pickList
+///* utest all
+{	charPersonName_picked:
+	person #1 is picked!
+	->PickCharactersWithAttributeVal.GotoLoop
+}
+{	charPersonName2_picked:
+	person #2 is picked!
+	->PickCharactersWithAttributeVal.GotoLoop
+}
+->TestDone
+
 
 === test_func_MathExp
 3^7= {MathExp(3,7)} == 2187
