@@ -1,5 +1,6 @@
 // Unit tests
 
+/*
 === testing_inflictWoundOn
 {inflictWoundOn(charPersonName_id, "bodyPartName2", 3)}
 {inflictWoundOn(charPersonName_id, "bodyPartName2", 2)}
@@ -7,6 +8,7 @@
 testing_inflictWoundOn person1 {charPersonName_wound_bodyPartName}  {charPersonName_wound_bodyPartName2}
 testing_inflictWoundOn person2 {charPersonName2_wound_bodyPartName}  {charPersonName2_wound_bodyPartName2}
 -> DONE
+*/
 
 === testing_rollNumSuccesses
 {rollNumSuccesses(7,5,0)}
@@ -56,22 +58,6 @@ initiiatives: {charPersonName_fight_initiative} {charPersonName2_fight_initiativ
 {refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )}
 -> ChooseManueverForChar(1, charPersonName2_id, charPersonName_id, 0,0, charPersonName2_cp, ->TestDone, charPersonName2_manuever, charPersonName2_manueverCost, charPersonName2_manueverTN, charPersonName2_manueverAttackType, charPersonName2_manueverDamageType, charPersonName2_manueverNeedBodyAim, charPersonName2_manuever_attacking, charPersonName2_manueverUsingHands, charPersonName2_manuever_CP, charPersonName2_manuever_targetZone)
 
-=== test_ConsiderCharacters
-considering chars stat order....
--> PickCharactersWithAttributeVal("reflex", 0, ->pickList)
-
-= pickList
-///* utest all
-{	charPersonName_picked:
-	person #1 is picked!
-	->PickCharactersWithAttributeVal.GotoLoop
-}
-{	charPersonName2_picked:
-	person #2 is picked!
-	->PickCharactersWithAttributeVal.GotoLoop
-}
-->TestDone
-
 
 === test_func_MathExp
 3^7= {MathExp(3,7)} == 2187
@@ -117,10 +103,16 @@ considering chars stat order....
 3 OR 3= {OR_2Bits(3,3)} == 3
 ->TestDone
 
+=== test_null_string_int_compare
+~temp numStrTest = "2"
+~temp numTest = 2
+~temp nullFakeStrTest = "null"
+~temp zeroVal = 0
+"2"==2: {numStrTest==numTest:Yes|No}
+"null"==0: {nullFakeStrTest==zeroVal:Yes|No}
+->TestDone
 
-
-
-// -- Inkle engine specific tests below
+// -- Inkle engine specific tests bel_comparew
 // --------------------------------
 
 // This test is ok..

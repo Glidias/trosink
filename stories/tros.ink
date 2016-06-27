@@ -1,19 +1,15 @@
 ﻿//https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md
 
 INCLUDE functions.ink
+INCLUDE damagetables.ink
 INCLUDE weapons.ink
 INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-//->test_ConsiderCharacters
-//->testing_ChooseManueverForChar
+//->test_null_string_int_compare
 
 -> GameStart
-
-
-//*/
-
 
 === GameStart
 // ACTUAL game flow starts here
@@ -31,16 +27,21 @@ Let's fight!
 
 	~boutStep = 0
 	~temp gotReveal = 0
-
+	~temp x = 0
 	{
 		- boutExchange == 1:
 		///* utest all
 		{
 			-charPersonName_FIGHT:
+				~charPersonName2_totalPain= 0
+				~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
+				 
 				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
 		}
 		{
 			-charPersonName2_FIGHT:
+				~charPersonName2_totalPain= 0
+				~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
 				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
 		}
 		//*/
@@ -72,6 +73,7 @@ Let's fight!
 	= DeclareStancesForAll(repeated)
 	//If it's the 1st exchange at the start of a round,  for all combatants that require, declare stance, in order from lowest to highest adriotness stat.
 
+	// TODO: figure out a way to roll off ties (tiebreaking)
 	///* utest perceptionCheck<playerPerceptionCheck
 	{  -charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
 		~charPersonName2_fight_stance = getAIStance(charPersonName2_id)
