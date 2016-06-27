@@ -6,6 +6,12 @@ VAR boutExchange=1
 VAR boutStep=-1
 VAR elseResulted = 0
 
+VAR gameOverFlags = 0
+CONST GAMEOVER_DEAD = 1
+CONST GAMEOVER_TOO_MUCH_PAIN = 2
+CONST GAMEOVER_LOST_BLOOD = 4
+CONST GAMEOVER_NO_MORE_ENEMIES = 8
+
 // Common Functions  (usually stateful, game-specific)
 VAR combatStatusStringCache = ""
 === function showCombatStatus()
@@ -265,6 +271,33 @@ VAR combatStatusStringCache = ""
 }
 
 ~cp = result
+
+
+=== function recountNumEnemiesAndCombatants()
+~numCombatants = 0
+~numEnemies = 0
+///* utest player
+~temp playerSideCheck = charPersonName_fight_side
+//*/	
+
+///* utest all
+{
+- charPersonName_FIGHT:
+	~numCombatants = numCombatants + 1
+	{
+		-playerSideCheck != charPersonName_fight_side:
+			~numEnemies = numEnemies + 1
+	}
+}
+{
+- charPersonName2_FIGHT:
+	~numCombatants = numCombatants + 1	
+	{
+		-playerSideCheck != charPersonName2_fight_side:
+			~numEnemies = numEnemies + 1
+	}
+}
+//*/
 
 
 // FOR COMBAT... (scenerio specific)
@@ -1000,13 +1033,33 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 
 === function getNameOfChar(charId)
 {
-	///* player
+	///* utest player
 	- charId == charPersonName_id:
 		~return charPersonName_label
 	//*/
 	///* utest
 	- charId == charPersonName2_id:
 		~return charPersonName2_label
+	//*/
+	-else:
+	~elseResulted = 1
+}
+
+=== function killChar(charId, gameOverState, defer)
+~temp deadValue = 0
+{
+-defer:
+	~deadValue = -1
+}
+{
+	///* utest player
+	- charId == charPersonName_id:
+		~charPersonName_FIGHT=deadValue
+		~addBit(gameOverFlags, gameOverState)
+	//*/
+	///* utest
+	- charId == charPersonName2_id:
+		~charPersonName2_FIGHT=deadValue
 	//*/
 	-else:
 	~elseResulted = 1

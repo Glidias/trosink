@@ -4,6 +4,9 @@ CONST WOUND_BIT_LEVEL_3 = 4
 CONST WOUND_BIT_LEVEL_4 = 8
 CONST WOUND_BIT_LEVEL_5 = 16
 
+CONST D_DESTROY_PART = 1
+CONST D_DEATH = 2
+
 CONST DAMAGE_TYPE_CUTTING =1
 CONST DAMAGE_TYPE_PUNCTURING = 2 
 CONST DAMAGE_TYPE_BLUDGEONING = 3
@@ -470,7 +473,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 }
 
 
-=== function getPartWoundDamages(targetPart, woundLevel, damageType, ref applyPain, ref applyBL, ref applyShock, wp)
+=== function getPartWoundDamages(targetPart, woundLevel, damageType, ref applyPain, ref applyBL,  ref applyShock, ref applyDestructor, wp)
 {
 	///* woundLocations
 	
@@ -487,30 +490,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 2 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 3 - 1*wp 
 				~applyBL =   1
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   5
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   10
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -518,6 +526,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -531,30 +540,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -562,6 +576,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -605,6 +620,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -625,30 +641,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 2 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   8
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   13
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -656,6 +677,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -669,30 +691,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   1
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   4
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -700,6 +727,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -743,6 +771,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -763,30 +792,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 3 - 1*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   4
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 13 - 1*wp 
 				~applyBL =   8
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   13
 				~applyShock =  12 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -794,6 +828,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -807,30 +842,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   4
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 11 - 1*wp 
 				~applyBL =   6
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -838,6 +878,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -881,6 +922,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -901,30 +943,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 3 - 1*wp 
 				~applyBL =   1
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   2
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -932,6 +979,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -945,30 +993,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   1
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   8
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -976,6 +1029,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1019,6 +1073,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1039,30 +1094,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   6
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 16 - 1*wp 
 				~applyBL =   9
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   12
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   17
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1070,6 +1130,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1114,6 +1175,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1134,30 +1196,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 9 - 1*wp 
 				~applyBL =   6
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   9
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   12
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 1
 			
 
 			- woundLevel == 4:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   18
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   20
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1165,6 +1232,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1178,30 +1246,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 9 - 1*wp 
 				~applyBL =   6
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   8
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 15 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   0
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   15
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1209,6 +1282,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1252,6 +1326,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1272,30 +1347,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 3 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   8
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   12
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1303,6 +1383,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1316,30 +1397,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   6
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1347,6 +1433,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1390,6 +1477,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1410,30 +1498,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   7
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   20
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1441,6 +1534,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1485,6 +1579,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1505,30 +1600,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   9
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   20
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1536,6 +1636,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1580,6 +1681,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1600,30 +1702,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   9
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   20
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1631,6 +1738,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1644,30 +1752,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  9 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   4
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   8
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 13 - 1*wp 
 				~applyBL =   19
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 2
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1675,6 +1788,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1718,6 +1832,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1738,30 +1853,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   8
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 14 - 1*wp 
 				~applyBL =   12
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1769,6 +1889,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1813,6 +1934,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1833,30 +1955,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   1
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   5
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   10
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 11 - 1*wp 
 				~applyBL =   25
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -1864,6 +1991,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1908,6 +2036,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -1928,30 +2057,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   4
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 11 - 1*wp 
 				~applyBL =   9
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 14 - 1*wp 
 				~applyBL =   20
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -1959,6 +2093,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2003,6 +2138,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2023,30 +2159,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   5
 				~applyShock =  1 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   7
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -2054,6 +2195,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2067,30 +2209,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   1
 				~applyShock =  7 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   8
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 13 - 0*wp 
 				~applyBL =   19
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -2098,6 +2245,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2141,6 +2289,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2161,30 +2310,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   5
 				~applyShock =  1 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   7
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -2192,6 +2346,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2236,6 +2391,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2256,30 +2412,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   3
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   3
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   4
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   10
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -2287,6 +2448,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2331,6 +2493,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2351,30 +2514,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  7 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   2
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   6
 				~applyShock =  9 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   8
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 11 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 1
 			
 
 			
@@ -2382,6 +2550,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2395,30 +2564,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  6 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  9 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   5
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   9
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2426,6 +2600,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2469,6 +2644,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2489,30 +2665,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   6
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   12
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 1
 			
 
 			
@@ -2520,6 +2701,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2533,30 +2715,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   1
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   6
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   7
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2564,6 +2751,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2607,6 +2795,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2627,30 +2816,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  5 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   6
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   12
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2658,6 +2852,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2671,30 +2866,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   0
 				~applyShock =  6 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   3
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   5
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 11 - 1*wp 
 				~applyBL =   7
 				~applyShock =  9 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2702,6 +2902,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2745,6 +2946,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2765,30 +2967,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   7
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   20
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2796,6 +3003,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2809,30 +3017,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   6
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   8
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   0
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   18
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2840,6 +3053,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2883,6 +3097,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2903,30 +3118,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  2 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   7
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 12 - 1*wp 
 				~applyBL =   10
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   20
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2934,6 +3154,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -2947,30 +3168,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   8
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   10
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 15 - 1*wp 
 				~applyBL =   13
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = -1 - 0*wp 
 				~applyBL =   19
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -2978,6 +3204,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3021,6 +3248,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3041,30 +3269,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   4
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 10 - 1*wp 
 				~applyBL =   8
 				~applyShock =  8 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 14 - 1*wp 
 				~applyBL =   12
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -3072,6 +3305,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3116,6 +3350,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3168,6 +3403,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3189,30 +3425,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -3220,6 +3461,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3242,30 +3484,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 5 - 1*wp 
 				~applyBL =   2
 				~applyShock =  4 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   6
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 15 - 1*wp 
 				~applyBL =   0
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 20 - 1*wp 
 				~applyBL =   15
 				~applyShock =  -1 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -3273,6 +3520,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3295,30 +3543,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   1
 				~applyShock =  7 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   2
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 9 - 1*wp 
 				~applyBL =   8
 				~applyShock =  10 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 13 - 0*wp 
 				~applyBL =   19
 				~applyShock =  13 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 0 - 0*wp 
 				~applyBL =   0
 				~applyShock =  0 - 0*wp 
+				~applyDestructor = 2
 			
 
 			
@@ -3326,6 +3579,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3348,30 +3602,35 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 4 - 1*wp 
 				~applyBL =   0
 				~applyShock =  4 - 1*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 2:
 				~applyPain = 5 - 1*wp 
 				~applyBL =   1
 				~applyShock =  3 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 3:
 				~applyPain = 6 - 1*wp 
 				~applyBL =   3
 				~applyShock =  5 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 4:
 				~applyPain = 7 - 1*wp 
 				~applyBL =   5
 				~applyShock =  6 - 0*wp 
+				~applyDestructor = 0
 			
 
 			- woundLevel == 5:
 				~applyPain = 8 - 1*wp 
 				~applyBL =   7
 				~applyShock =  7 - 0*wp 
+				~applyDestructor = 0
 			
 
 			
@@ -3379,6 +3638,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		
 
@@ -3416,7 +3676,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 }
 
 
-=== function inflictWoundOn(charId, charWillpower, targetPart, woundLevel, damageType, ref shockToApply, ref painCollector, ref bloodCollector)
+=== function inflictWoundOn(charId, charWillpower, targetPart, woundLevel, damageType, ref shockToApply, ref painCollector, ref bloodCollector, ref applyD)
 ~temp applyPain
 ~temp applyBL
 ~temp applyShock
@@ -3425,7 +3685,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 - charId == charPersonName_id: 
  	{
 		-targetPart:
-			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
+			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, applyD, charWillpower)
 			{ 
 				
 
@@ -3982,7 +4242,7 @@ VAR charPersonName2_wound_upper_arm_cutFreshLevelMask = 0
 - charId == charPersonName2_id: 
 	{
 		-targetPart:
-			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
+			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, applyD, charWillpower)
 			{ 
 				
 

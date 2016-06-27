@@ -224,6 +224,8 @@ troshx_tros_HumanoidBody.__super__ = troshx_BodyChar;
 troshx_tros_HumanoidBody.prototype = $extend(troshx_BodyChar.prototype,{
 });
 var __map_reserved = {}
+troshx_BodyChar.D_DESTROY_PART = 1;
+troshx_BodyChar.D_DEATH = 2;
 troshx_BodyChar.WOUND_TYPE_CUT = 1;
 troshx_BodyChar.WOUND_TYPE_PIERCE = 2;
 troshx_BodyChar.WOUND_TYPE_BLUNT_TRAUMA = 4;

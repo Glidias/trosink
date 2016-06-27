@@ -33,23 +33,10 @@ Let's fight!
 		///* utest all
 		{
 			-charPersonName_FIGHT:
-				~charPersonName_totalPain= 0
-				~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
-				{
-					-charPersonName_totalPain >= charPersonName_reflex + charPersonName_usingProfeciencyLevel:
-						{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain and can no longer fight.
-				}
 				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
 		}
 		{
 			-charPersonName2_FIGHT:
-				~charPersonName2_totalPain= 0
-				~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x)
-				{
-					-charPersonName2_totalPain >= charPersonName2_reflex + charPersonName2_usingProfeciencyLevel:
-						{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain and can no longer fight.
-				}
-
 				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
 		}
 		//*/
@@ -615,11 +602,56 @@ Let's fight!
 	///* utest player
 	~charPersonName_fight_orientation = ORIENTATION_NONE
 	~charPersonName_fight_cautiousLock = 0
+	{
+		-charPersonName_FIGHT== -1:
+			~killChar(charPersonName_id, GAMEOVER_DEAD, 0)
+	}
+	{
+	-charPersonName_FIGHT:
+		~charPersonName_totalPain= 0
+		~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x, x)
+		{
+			-charPersonName_totalPain >= charPersonName_reflex + charPersonName_usingProfeciencyLevel:
+				{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain and can no longer fight.
+				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
+				~charPersonName_FIGHT = 0
+		}
+	}
 	//*/
 	///* utest
 	~charPersonName2_fight_orientation = ORIENTATION_NONE
 	~charPersonName2_fight_cautiousLock = 0
+	{
+		-charPersonName2_FIGHT== -1:
+			~killChar(charPersonName2_id, GAMEOVER_DEAD, 0)
+	}
+	{
+	-charPersonName2_FIGHT:
+		~charPersonName2_totalPain= 0
+		~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x, x)
+		{
+			-charPersonName2_totalPain >= charPersonName2_reflex + charPersonName2_usingProfeciencyLevel:
+				{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain and can no longer fight.
+				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
+				~charPersonName2_FIGHT = 0
+		}
+	}
 	//*/
+
+
+	~recountNumEnemiesAndCombatants()
+	//Recounting enemies/combatants:  {numEnemies} / {numCombatants} 
+
+	{
+		-numEnemies ==  0:
+			~addBit(gameOverFlags, GAMEOVER_NO_MORE_ENEMIES)
+	}
+
+	{
+		-gameOverFlags:
+		->GameOver
+	}
+
 
 	// proceed to next exchange
 	~boutExchange++
@@ -639,4 +671,28 @@ Let's fight!
 
 
 === GameOver
--> END
+GAME OVER!
+{
+	- hasBit(gameOverFlags, GAMEOVER_NO_MORE_ENEMIES):
+		All enemies have either been gone or defeated!
+}
+/*
+{
+	- hasBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN):
+		You suffered too much pain and are no longer in fighting condition.
+}
+*/	
+{
+	- hasBit(gameOverFlags, GAMEOVER_LOST_BLOOD):
+		You lost too much blood and collapsed!
+}
+{
+	- hasBit(gameOverFlags, GAMEOVER_DEAD):
+		You are dead!
+}
+{
+	- gameOverFlags == GAMEOVER_NO_MORE_ENEMIES:
+		You won!
+}
+//*/
+-> DONE

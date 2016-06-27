@@ -78,6 +78,9 @@ CONST WOUND_BIT_LEVEL_3 = 4
 CONST WOUND_BIT_LEVEL_4 = 8
 CONST WOUND_BIT_LEVEL_5 = 16
 
+CONST D_DESTROY_PART = 1
+CONST D_DEATH = 2
+
 CONST DAMAGE_TYPE_CUTTING =1
 CONST DAMAGE_TYPE_PUNCTURING = 2 
 CONST DAMAGE_TYPE_BLUDGEONING = 3
@@ -128,7 +131,7 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 }
 
 
-=== function getPartWoundDamages(targetPart, woundLevel, damageType, ref applyPain, ref applyBL, ref applyShock, wp)
+=== function getPartWoundDamages(targetPart, woundLevel, damageType, ref applyPain, ref applyBL,  ref applyShock, ref applyDestructor, wp)
 {
 	///* woundLocations
 	<div v-for="woundLoc in woundLocations">
@@ -142,12 +145,14 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 				~applyPain = {{w.pain}} - {{w.painWP}}*wp 
 				~applyBL =   {{w.BL}}
 				~applyShock =  {{w.shock}} - {{w.shockWP}}*wp 
+				~applyDestructor = {{w.d}}
 			</div>
 			
 			- else:
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		</div>
 		<div v-if="woundLoc.puncture.length">
@@ -158,12 +163,14 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 				~applyPain = {{w.pain}} - {{w.painWP}}*wp 
 				~applyBL =   {{w.BL}}
 				~applyShock =  {{w.shock}} - {{w.shockWP}}*wp 
+				~applyDestructor = {{w.d}}
 			</div>
 			
 			- else:
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		</div>
 		<div v-if="woundLoc.bludgeon.length">
@@ -179,6 +186,7 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 				~applyPain = 0
 				~applyBL = 0
 				~applyShock = 0
+				~applyDestructor = 0
 			}
 		</div>
 		- else:
@@ -213,7 +221,7 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 }
 
 
-=== function inflictWoundOn(charId, charWillpower, targetPart, woundLevel, damageType, ref shockToApply, ref painCollector, ref bloodCollector)
+=== function inflictWoundOn(charId, charWillpower, targetPart, woundLevel, damageType, ref shockToApply, ref painCollector, ref bloodCollector, ref applyD)
 ~temp applyPain
 ~temp applyBL
 ~temp applyShock
@@ -222,7 +230,7 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 - charId == charPersonName_id: 
  	{
 		-targetPart:
-			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
+			~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, applyD, charWillpower)
 			{ 
 				///* bodyparts
 				-targetPart == charPersonName_wound_bodyPartName:
@@ -255,7 +263,7 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 - charId == charPersonName2_id: 
 	{
 		-targetPart:
-			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, charWillpower)
+			 ~getPartWoundDamages(targetPart, woundLevel, damageType, applyPain, applyBL, applyShock, applyD, charWillpower)
 			{ 
 				///* bodyparts
 				-targetPart == charPersonName2_wound_bodyPartName:

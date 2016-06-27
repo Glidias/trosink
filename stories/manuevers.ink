@@ -1733,6 +1733,7 @@ TN: {manueverTN}
 ~temp usingWeaponAttrIndex
 ~temp _targetBodyPart
 ~temp _woundLevel
+~temp _applyDestruction
 
 // todo: handle double attack and mixed cases
 // kiv todo: resolve all overwatching targeters on character
@@ -1893,6 +1894,7 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 ~useDamageType = 0
 ~_weaponBonusDamage =0
 ~_woundLevel = 0
+~_applyDestruction = 0
 
 {
 	-usingWeapon:
@@ -1950,6 +1952,7 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 						}
 				}
+				// todo: some damages might not be derived from weapons, but from the manuever itself!
 				~_woundLevel = getWeaponDamageStrength(_weaponBonusDamage, usingWeaponAttrIndex, getStrengthByCharId(attackerId) ) + bonusSuccess -  0 - getToughnessByCharId(defenderCharId)
 				{
 					-_woundLevel < 0: 
@@ -1959,10 +1962,12 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 					-else:
 						~elseResulted = 1
 				}
-				~resolveTargetBodyPart(_targetBodyPart, _woundLevel, _atk_targetZone, useDamageType)
+				{
+					- _woundLevel:
+						~resolveTargetBodyPart(_targetBodyPart, _woundLevel, _atk_targetZone, useDamageType)
+						~inflictWoundOn(defenderCharId, getWillpowerByCharId(defenderCharId), _targetBodyPart, _woundLevel, useDamageType, shockToInflict, x,x, _applyDestruction)
 
-				~inflictWoundOn(defenderCharId, getWillpowerByCharId(defenderCharId), _targetBodyPart, _woundLevel, useDamageType, shockToInflict, x,x)
-
+				}
 		}
 		
 		~defenderManueverPool = defenderManueverPool - shockToInflict
@@ -1980,7 +1985,22 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} wound to the {_targetBodyPart} {shockToInflict:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} wound to the {_targetBodyPart} {shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+
+{
+	- _applyDestruction == D_DEATH:
+	{
+		- simultaneousHitResulted == 0:
+			~killChar(defenderCharId, GAMEOVER_DEAD,0)
+		-else:
+			~killChar(defenderCharId, GAMEOVER_DEAD,1)
+	}
+
+}
+{
+	- shockToInflict == 999:
+		{getDescribeLabelOfCharCapital(defenderCharId)} suffered maximum shock for this wound!
+}
 
 // do specific atkManuever resolution here
 {

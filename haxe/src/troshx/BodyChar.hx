@@ -23,9 +23,15 @@ typedef WoundLocation = {
 	var bludgeon:Array<Wound>;
 }
 
+
+
+
 @:expose
 class BodyChar
 {
+	public static var D_DESTROY_PART:Int = 1;
+	public static var D_DEATH:Int = 2;
+
 	public static function getEmptyBodyPartTypeDef():Wound {
 		return {
 			BL:0,
