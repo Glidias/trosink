@@ -538,7 +538,7 @@ isAI?:{_isAI}
 		-> ChooseManueverListDef(0,altAction,divertTo)
 	}
 }
-->ChooseManueverMenu
+->divertTo
 
 
 = AIManueverConfirmFailedErrorDef
@@ -589,6 +589,11 @@ AILooseEndError :: AI decision loose-end reached.
 
 
 = AICannotMakeFavDecision
+{
+	-_diceAvailable <= 0:
+		{getDescribeLabelOfCharCapital(charId)} doesn't have any dice left in his combat pool to fight this exchange.
+		->doneCallbackThread
+}
 AI cannot make default decision from favourites. Handler todo:...
 Choice count..any choices? {choiceCount}
 For now, he will Do Nothing.
@@ -783,6 +788,7 @@ For now, he will Do Nothing.
 //Read more: http://opaque.freeforums.net/thread/22/combat-simulator#ixzz4BUQY0dl5
 // todo kiv other action types, buy initiative espe
 = ChooseManueverMenu
+{ _isAI: AI should not be here}
 {
 	- _diceAvailable > 0:
 		Choose the nature of your action {preferOffhand: (off-hand)}
@@ -927,17 +933,6 @@ ChoosingManuversLooseEndError detected. This should not happen!
 ->doneCallbackThread
 
 = ConfirmCombatPool(amount)
-// kiv todo: change copy to suit multiple PC characters in party
-/*
-{	
-	-_isAI == 0:
-	Spending {amount}(+{manueverCost}) dice to roll on your [{manuever}] manuever...
-	~_diceAvailable = _diceAvailable - amount
-	You have {_diceAvailable} remaining dice left.
-	-else:
-		{""}
-}
-*/
 {""}
 ~manuever_CP = amount
 { 
@@ -1704,7 +1699,7 @@ TN: {manueverTN}
 
 
 
-=== ResolveAtkManuevers(attackerId, ref attackerInitiative, ref attackerPaused, ref attackerCP, ref atkManuever1, ref atkManuever1CP, ref atkManuever1Target, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ->mainCallbackThread, ref reselectCharId, ref reselectCharIdNext)
+=== ResolveAtkManuevers(attackerId, ref attackerInitiative, ref attackerPaused, ref attackerCP, ref atkManuever1, ref atkManuever1CP, ref atkManuever1Target, ref atkManuever2, ref atkManuever2CP, ref atkManuever2Target, ref attackerEquipMasterhand, ref attackerEquipOffhand, ->mainCallbackThread, ref reselectCharId, ref reselectCharIdNext)
 ~temp requiredSuccesses
 ~temp x
 ~temp zeroDefPool = 0
@@ -1723,6 +1718,21 @@ TN: {manueverTN}
 ~temp defenderCharId
 ~temp slotIndexBeingResolved
 ~temp simultaneousHitResulted = 0
+
+
+// varialbes on actal resolve
+~temp shockToInflict
+~temp useDamageType
+~temp usingWeapon
+~temp usingWeaponName
+~temp usingWeaponIsShield
+~temp usingWeaponBlunt
+~temp usingWeaponDamage
+~temp usingWeaponDamage2
+~temp usingWeaponDamage3
+~temp usingWeaponAttrIndex
+~temp _targetBodyPart
+~temp _woundLevel
 
 // todo: handle double attack and mixed cases
 // kiv todo: resolve all overwatching targeters on character
@@ -1864,20 +1874,93 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 = AttemptAttackersManuever(ref defenderManueverPool, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,   ref defenderPaused, ref defManuever)
 ~temp totalAtkSuccess = rollNumSuccesses(_atk_cp, _atk_tn, 0)
 ~temp bonusSuccess = totalAtkSuccess - requiredSuccesses
-~temp shockToInflict
+~temp _weaponBonusDamage
+
+{
+	-_atk_usingHands == MANUEVER_HAND_MASTER || _atk_usingHands == MANUEVER_HAND_BOTH:
+		~usingWeapon = attackerEquipMasterhand
+	-_atk_usingHands == MANUEVER_HAND_SECONDARY:
+		~usingWeapon = attackerEquipOffhand
+	-else:
+		~usingWeapon = ""
+}
+
+
+~shockToInflict = 0
+~useDamageType = 0
+~_weaponBonusDamage =0
+~_woundLevel = 0
+
+{
+	-usingWeapon:
+	/*ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,  ref shieldLimit, ref twoHanded*/
+		~getAllWeaponStats(usingWeapon, usingWeaponName, usingWeaponIsShield, usingWeaponDamage, usingWeaponDamage2, usingWeaponDamage3, usingWeaponAttrIndex, x,x, x,x, usingWeaponBlunt , x, x )
+}
+
+
 {
 	- bonusSuccess >= 0:
-		// todo: calculate shockToInflict based off damage table 
-		/*
-				Determine damage type:
-		- Does manuever prescribe damage type? If so, Use damage type of manuever.
-		- else if both NO target zone is required for manuever, assumed no damage appleid for manuever (because no damage type was found to 
+		{
+			- bonusSuccess == 0:
+				~shockToInflict = 0
+			- else:
+			{
+				- _atk_damageType:
+					~useDamageType = _atk_damageType
+				- _atk_needBodyAim == 0:
+					// assumption made by convention... with manuever without neither damage Type or attack zone
+					~shockToInflict = 0
+				- usingWeapon && usingWeaponBlunt:
+					~useDamageType = DAMAGE_TYPE_BLUDGEONING
+					~_weaponBonusDamage = usingWeaponDamage3
+				- _atk_targetZone >= THRUST_INDEX:
+					~useDamageType = DAMAGE_TYPE_PUNCTURING
+					~_weaponBonusDamage = usingWeaponDamage2
+				- else:
+					~useDamageType = DAMAGE_TYPE_CUTTING
+					~_weaponBonusDamage = usingWeaponDamage
+			}
+			{
+				- _atk_targetZone:
+					~_targetBodyPart = getTargetZoneBodyPart(_atk_targetZone, useDamageType)
+			}
+		}
 
-		be true in the previosu check)
-		- else, since there's target zone...if Weapon is blunt, use Bludgeoning always, else, 
-		- else use target zone to determine if cutting/puncturing damage is used
-		*/
-		~shockToInflict = bonusSuccess
+		// kiv: determine if target location is armored and adjust woundLevel accordingly.
+		// kiv: toughness consider using Flower of Battle/SOS rules after armor is included in.
+
+		{
+			-useDamageType:
+				{
+					// lazy-resolve weapon bonus damage if still at zero
+					- _weaponBonusDamage==0:
+						{
+							- useDamageType == DAMAGE_TYPE_BLUDGEONING && usingWeaponDamage3:
+								~_weaponBonusDamage = usingWeaponDamage3
+							- useDamageType == DAMAGE_TYPE_PUNCTURING && usingWeaponDamage2:
+								~_weaponBonusDamage = usingWeaponDamage2
+							- useDamageType == DAMAGE_TYPE_CUTTING && usingWeaponDamage:
+								~_weaponBonusDamage = usingWeaponDamage
+							- else:
+								~elseResulted = 1
+
+						}
+				}
+				~_woundLevel = getWeaponDamageStrength(_weaponBonusDamage, usingWeaponAttrIndex, getStrengthByCharId(attackerId) ) + bonusSuccess -  0 - getToughnessByCharId(defenderCharId)
+				{
+					-_woundLevel < 0: 
+						~_woundLevel = 0
+					-_woundLevel > 5: 
+						~_woundLevel = 5
+					-else:
+						~elseResulted = 1
+				}
+				~resolveTargetBodyPart(_targetBodyPart, _woundLevel, _atk_targetZone, useDamageType)
+
+				~inflictWoundOn(defenderCharId, getWillpowerByCharId(defenderCharId), _targetBodyPart, _woundLevel, useDamageType, shockToInflict, x,x)
+
+		}
+		
 		~defenderManueverPool = defenderManueverPool - shockToInflict
 		{
 			- defenderManueverPool < 0:
@@ -1893,7 +1976,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {simultaneousHitResulted: while...}.
+{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} wound to the {_targetBodyPart} {shockToInflict:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
 
 // do specific atkManuever resolution here
 {
@@ -2175,12 +2258,13 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 	}	
 
 -else:
+	Exception occured for target zone part search....{targetZone}
 	~return ""
 }
 //*/
 
 // handling of special cases for targeted body part
-=== function resolveTargetBodyPart(ref targetBodyPart, woundLevel, targetZone, damageType)
+=== function resolveTargetBodyPart(ref targetBodyPart, ref woundLevel, targetZone, damageType)
 ///* #if TROS
 {
 -damageType == DAMAGE_TYPE_BLUDGEONING:
@@ -2189,15 +2273,15 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 			{
 
 				-woundLevel <= 1:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 2:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 3:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 4:
-					targetBodyPart = "lower_head"
+					~targetBodyPart = "lower_head"
 				-woundLevel >=5:
-					targetBodyPart = "lower_head"
+					~targetBodyPart = "lower_head"
 				-else:
 					~elseResulted = 1
 			}
@@ -2206,19 +2290,21 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 	}
 -else:
 	{
+	- targetBodyPart == "flesh_to_the_side":
+		~woundLevel = 1
 	-targetZone==13 && targetBodyPart == "face_or_head":
 			{
 
 				-woundLevel <= 1:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 2:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 3:
-					targetBodyPart = "face"
+					~targetBodyPart = "face"
 				-woundLevel == 4:
-					targetBodyPart = "head"
+					~targetBodyPart = "head"
 				-woundLevel >=5:
-					targetBodyPart = "head"
+					~targetBodyPart = "head"
 				-else:
 					~elseResulted = 1
 			}

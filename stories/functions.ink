@@ -257,6 +257,7 @@ VAR combatStatusStringCache = ""
 ~temp result = profeciencyLevel + useReflex -MathMax(carryOverShock, totalPain)
 {inCritical: result = result/2}
 {result < 0: result = 0}
+
 ~cp = result
 
 
@@ -288,30 +289,36 @@ VAR charPersonName2_picked = 0
 ///* utest player var
 CONST charPersonName_id = 1
 VAR charPersonName_label = "CharPersonName"
-VAR charPersonName_reflex = 5
-VAR charPersonName_mobility = 5
-CONST charPersonName_perception = 5
+VAR charPersonName_strength = 4
+VAR charPersonName_toughness = 4
+VAR charPersonName_reflex = 4
+VAR charPersonName_willpower = 4
+VAR charPersonName_mobility = 6
+CONST charPersonName_perception = 4
 VAR charPersonName_usingProfeciency ="swordandshield"
-VAR charPersonName_usingProfeciencyLevel = 15
+VAR charPersonName_usingProfeciencyLevel = 8
 VAR charPersonName_carryOverShock = 0
 VAR charPersonName_cp = 0
 VAR charPersonName_totalPain = 0
-VAR charPersonName_health = 5
+VAR charPersonName_health = 4
 VAR charPersonName_equipOffhand = "gladius"
 VAR charPersonName_equipMasterhand = "gladius"
 //*/
 ///* utest var
 CONST charPersonName2_id = 2
 VAR charPersonName2_label = "CharPersonName2"
-VAR charPersonName2_reflex = 5
-VAR charPersonName2_mobility = 4
+VAR charPersonName2_strength = 4
+VAR charPersonName2_toughness = 4
+VAR charPersonName2_reflex = 4
+VAR charPersonName2_willpower = 4
+VAR charPersonName2_mobility = 6
 VAR charPersonName2_perception = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
 VAR charPersonName2_usingProfeciencyLevel = 8
 VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
-VAR charPersonName2_health = 5
+VAR charPersonName2_health = 4
 VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
 //*/
@@ -665,6 +672,48 @@ Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_figh
 	///* utest
 - charId == charPersonName2_id:
 	~return charPersonName2_reflex
+	//*/
+-else:
+	~elseResulted = 1
+}
+
+=== function getWillpowerByCharId(charId)
+{
+	///* utest player
+- charId == charPersonName_id: 
+	~return charPersonName_reflex
+	//*/
+	///* utest
+- charId == charPersonName2_id:
+	~return charPersonName2_reflex
+	//*/
+-else:
+	~elseResulted = 1
+}
+
+=== function getStrengthByCharId(charId)
+{
+	///* utest player
+- charId == charPersonName_id: 
+	~return charPersonName_strength
+	//*/
+	///* utest
+- charId == charPersonName2_id:
+	~return charPersonName2_strength
+	//*/
+-else:
+	~elseResulted = 1
+}
+
+=== function getToughnessByCharId(charId)
+{
+	///* utest player
+- charId == charPersonName_id: 
+	~return charPersonName_toughness
+	//*/
+	///* utest
+- charId == charPersonName2_id:
+	~return charPersonName2_toughness
 	//*/
 -else:
 	~elseResulted = 1

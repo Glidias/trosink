@@ -185,6 +185,10 @@ VAR charPersonName2_wound_bodyPartName_cutFreshLevelMask = 0
 			~elseResulted = 1
 	}
 	</div>
+	{
+		-applyShock < 0: 
+			~applyShock = 0
+	}
 	~return targetPart
 	
 	//*/ woundLocations

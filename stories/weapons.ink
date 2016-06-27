@@ -3,6 +3,15 @@
 CONST ATTR_BASE_NONE = -1
 CONST ATTR_BASE_STRENGTH = 0
 
+=== function getWeaponDamageStrength(damage, attrBaseIndex, charStrength)
+{
+	-attrBaseIndex == ATTR_BASE_STRENGTH:
+		~return charStrength + damage
+	-else:
+		~return damage
+}
+
+
 
 === function getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,  ref shieldLimit, ref twoHanded  )
 {
@@ -10,8 +19,8 @@ CONST ATTR_BASE_STRENGTH = 0
 	~name = "Gladius"
 	~isShield = 0
 	~shieldLimit = 0
-	~damage = 2
-	~damage2 = 2
+	~damage = 0
+	~damage2 = 1
 	~damage3 = 0
 	~attrBaseIndex = ATTR_BASE_STRENGTH
 	~dtn = 6
@@ -25,9 +34,9 @@ CONST ATTR_BASE_STRENGTH = 0
 	~name = "Mace"
 	~isShield = 0
 	~shieldLimit = 0
-	~damage = 2
-	~damage2 = 2
-	~damage3 = 4
+	~damage = 0
+	~damage2 = 0
+	~damage3 = 1
 	~attrBaseIndex = ATTR_BASE_STRENGTH
 	~dtn = 4
 	~dtnT = 0

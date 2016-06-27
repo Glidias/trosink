@@ -33,15 +33,23 @@ Let's fight!
 		///* utest all
 		{
 			-charPersonName_FIGHT:
-				~charPersonName2_totalPain= 0
+				~charPersonName_totalPain= 0
 				~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
-				 
+				{
+					-charPersonName_totalPain >= charPersonName_reflex + charPersonName_usingProfeciencyLevel:
+						{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain and can no longer fight.
+				}
 				~refreshCombatPool(charPersonName_cp, charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, charPersonName_carryOverShock, charPersonName_health )
 		}
 		{
 			-charPersonName2_FIGHT:
 				~charPersonName2_totalPain= 0
-				~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x)
+				~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x)
+				{
+					-charPersonName2_totalPain >= charPersonName2_reflex + charPersonName2_usingProfeciencyLevel:
+						{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain and can no longer fight.
+				}
+
 				~refreshCombatPool(charPersonName2_cp, charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, charPersonName2_carryOverShock, charPersonName2_health )
 		}
 		//*/
@@ -470,7 +478,7 @@ Let's fight!
 				~charPersonName2_fight_lastAttacked = 1
 				~charPersonName2_fight_paused = 0
 				~charPersonName2_fight_stance = STANCE_NEUTRAL
-				->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop, selectId, selectNextId )
+				->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, charPersonName2_equipMasterhand, charPersonName2_equipOffhand, ->ResolveLoop, selectId, selectNextId )
 		}
 		{
 			-   (selectId == charPersonName_id && charPersonName_FIGHT && (charPersonName_manuever=="")==0) || (selectId == 0 && charPersonName_FIGHT && charPersonName_fight_initiative==1 &&  (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking):
@@ -479,7 +487,7 @@ Let's fight!
 				~charPersonName_fight_lastAttacked = 1
 				~charPersonName_fight_paused = 0
 				~charPersonName_fight_stance = STANCE_NEUTRAL
-				->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP,  charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop, selectId, selectNextId)	
+				->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP,  charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_equipMasterhand, charPersonName_equipOffhand, ->ResolveLoop, selectId, selectNextId)	
 		}
 		//*/
 	}
@@ -503,7 +511,7 @@ Let's fight!
 			~charPersonName2_fight_lastAttacked = 1
 			~charPersonName2_fight_paused = 0
 			~charPersonName2_fight_stance = STANCE_NEUTRAL
-			->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2, ->ResolveLoop, x,x )
+			->ResolveAtkManuevers(charPersonName2_id, charPersonName2_fight_initiative, charPersonName2_fight_paused, charPersonName2_cp, charPersonName2_manuever, charPersonName2_manuever_CP, charPersonName2_fight_target, charPersonName2_manuever2, charPersonName2_manuever2_CP, charPersonName2_fight_target2,charPersonName2_equipMasterhand, charPersonName_equipOffhand, ->ResolveLoop, x,x )
 	}
 	{
 		-  charPersonName_FIGHT && charPersonName_fight_initiative==0 && (charPersonName_manuever=="")==0 &&  charPersonName_manuever_attacking:
@@ -511,7 +519,7 @@ Let's fight!
 			~charPersonName_fight_lastAttacked = 1
 			~charPersonName_fight_paused = 0
 			~charPersonName_fight_stance = STANCE_NEUTRAL
-			->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, ->ResolveLoop, x,x)
+			->ResolveAtkManuevers(charPersonName_id, charPersonName_fight_initiative, charPersonName_fight_paused, charPersonName_cp, charPersonName_manuever, charPersonName_manuever_CP, charPersonName_fight_target, charPersonName_manuever2, charPersonName_manuever2_CP, charPersonName_fight_target2, charPersonName_equipMasterhand, charPersonName_equipOffhand, ->ResolveLoop, x,x)
 	}
 	//*/
 	
