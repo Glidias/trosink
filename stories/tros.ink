@@ -613,10 +613,14 @@ Let's fight!
 		~charPersonName_totalPain= 0
 		~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x, x)
 		{
-			-charPersonName_totalPain >= charPersonName_reflex + charPersonName_usingProfeciencyLevel:
+			- getCombatPool(charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, 0, charPersonName_totalHealth) == 0:
 				{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
 				~charPersonName_FIGHT = 0
+		}
+		{
+			-charPersonName_cp < 0 && charPersonName_cp > -500:
+				~charPersonName_carryOverShock = -charPersonName_cp
 		}
 	}
 	//*/
@@ -632,9 +636,13 @@ Let's fight!
 		~charPersonName2_totalPain= 0
 		~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x, x)
 		{
-			-charPersonName2_totalPain >= charPersonName2_reflex + charPersonName2_usingProfeciencyLevel:
+			- getCombatPool(charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, 0, charPersonName2_totalHealth) == 0:
 				{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~charPersonName2_FIGHT = 0
+		}
+		{
+			-charPersonName2_cp < 0 && charPersonName2_cp > -500:
+				~charPersonName2_carryOverShock = -charPersonName2_cp
 		}
 	}
 	//*/

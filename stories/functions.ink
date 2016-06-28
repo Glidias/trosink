@@ -275,8 +275,9 @@ VAR combatStatusStringCache = ""
 }
 ~return 0
 
-=== function refreshCombatPool(ref cp, profeciencyLevel, reflex, totalPain, carryOverShock, health)
+=== function refreshCombatPool(ref cp, profeciencyLevel, reflex, totalPain, ref carryOverShock, health)
 ~cp = getCombatPool(profeciencyLevel, reflex, totalPain, carryOverShock, health)
+~carryOverShock = 0
 
 === function getCombatPool(profeciencyLevel, reflex, totalPain, carryOverShock, health)
 ~temp inCritical =  inCriticalCondition(health)
