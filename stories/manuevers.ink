@@ -12,9 +12,9 @@ CONST MANUEVER_HAND_BOTH = 3
 	- damageType == DAMAGE_TYPE_PUNCTURING: ~return "puncturing"
 	- damageType == DAMAGE_TYPE_BLUDGEONING: ~return "bludgeoning"
 	-else:
-	~elseResulted = 1
+		~return ""
 }
-~return "none"
+~return ""
 
 CONST ATTACK_TYPE_STRIKE = 1
 CONST ATTACK_TYPE_THRUST = 2
@@ -2004,7 +2004,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 		{getDescribeLabelOfCharCapital(attackerId)} {def_isYou:miss|misses} a part on {def_isYou:the|his} target's body!
 }
 
-{getDescribeLabelOfCharCapital(attackerId)} attacked {bonusSuccess && (_targetBodyPart=="")==0:successfully} against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+{getDescribeLabelOfCharCapital(attackerId)} attacked {bonusSuccess && (_targetBodyPart=="")==0:successfully} against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} {getDamageTypeLabel(useDamageType)} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
 
 
 
