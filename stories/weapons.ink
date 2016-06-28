@@ -3,11 +3,13 @@
 CONST ATTR_BASE_NONE = -1
 CONST ATTR_BASE_STRENGTH = 0
 
-=== function getWeaponDamageStrength(damage, attrBaseIndex, charStrength)
+=== function getWeaponDamageStrength(damage, attrBaseIndex, charId, ref damageFromChar)
 {
 	-attrBaseIndex == ATTR_BASE_STRENGTH:
-		~return charStrength + damage
+		~damageFromChar = getStrengthByCharId(charId)
+		~return damageFromChar + damage
 	-else:
+		~damageFromChar = 0
 		~return damage
 }
 

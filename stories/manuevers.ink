@@ -1938,7 +1938,7 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 		}
 
 		// kiv: determine if target location is armored and adjust woundLevel accordingly.
-		// kiv: toughness consider using Flower of Battle/SOS rules after armor is included in.
+
 
 		{
 			-useDamageType:
@@ -1958,7 +1958,9 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 						}
 				}
 				// todo: some damages might not be derived from weapons, but from the manuever itself!
-				~_woundLevel = getWeaponDamageStrength(_weaponBonusDamage, usingWeaponAttrIndex, getStrengthByCharId(attackerId) ) + bonusSuccess -  0 - getToughnessByCharId(defenderCharId)
+				~temp bStrengthFromChar
+				~_woundLevel = getWeaponDamageStrength(_weaponBonusDamage, usingWeaponAttrIndex, attackerId, bStrengthFromChar )
+				~_woundLevel = _woundLevel + bonusSuccess -  0 - MathMin(bStrengthFromChar, getToughnessByCharId(defenderCharId))
 				{
 					-_woundLevel < 0: 
 						~_woundLevel = 0
