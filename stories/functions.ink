@@ -40,7 +40,7 @@ VAR combatStatusStringCache = ""
 === function showPlayerHealthStatus()
 ///* utest player
 ..
- ~return "Your Health: " + charPersonName_health + "/" + charPersonName_totalHealth + ", CP:" + clampCPShow(charPersonName_cp)+"/"+getCombatPool(charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, 0, charPersonName_health) + ", BL:" + charPersonName_totalBL + ", Pain:" + charPersonName_totalPain
+ ~return "Your Health: " + charPersonName_health + "/" + charPersonName_totalHealth + ", CP:" + clampCPShow(charPersonName_cp)+"/"+getCombatPool(charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, 0, charPersonName_health) + ", BL:" + charPersonName_totalBL + ", Pain:" + clampCPShow(charPersonName_totalPain)
  //*/	
 
 // Static Functions (stateless)

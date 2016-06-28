@@ -408,9 +408,12 @@ Let's fight!
 			}
 		}
 		- else:
+		{
+		-charPersonName_fight_cautiousLock !=  RESOLVED_LOCKED: 
 			~charPersonName_fight_initiative = 0
 			~charPersonName_fight_cautiousLock = 0
 			{charPersonName_FIGHT: {getDescribeLabelOfCharCapital(charPersonName_id)} lost track of your moving target: {getDescribeLabelOfCharCapital(charPersonName_fight_target)}. }
+		}
 	}	
 	//*/
 	///* utest
@@ -433,9 +436,13 @@ Let's fight!
 			}
 		} 
 		- else:
+		{
+		-charPersonName2_fight_cautiousLock !=  RESOLVED_LOCKED: 
+
 			~charPersonName2_fight_initiative = 0
 			~charPersonName2_fight_cautiousLock = 0
-			{charPersonName2_FIGHT: {getDescribeLabelOfCharCapital(charPersonName2_id)} lost track of your moving target: {getDescribeLabelOfCharCapital(charPersonName2_fight_target)}. }
+			{charPersonName2_FIGHT: {getDescribeLabelOfCharCapital(charPersonName2_id)} lost track of his moving target: {getDescribeLabelOfCharCapital(charPersonName2_fight_target)}. }
+		}
 	}
 	//*/
 	{showPlayerInitiativeState()}
