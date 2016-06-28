@@ -1929,6 +1929,11 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 			{
 				- _atk_targetZone:
 					~_targetBodyPart = getTargetZoneBodyPart(_atk_targetZone, useDamageType)
+					{
+						// miss detected
+						-_targetBodyPart=="":
+							~useDamageType = 0
+					}
 			}
 		}
 
@@ -1985,7 +1990,19 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} wound to the {_targetBodyPart} {shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+~temp def_isAI
+~temp def_isEnemy
+~temp def_isYou
+~getCharMetaInfo(defenderCharId, x, def_isAI, def_isEnemy, def_isYou)
+
+{
+	- bonusSuccess && (_targetBodyPart == "")==1: 
+		{getDescribeLabelOfCharCapital(attackerId)} misses his target's body!
+}
+
+{getDescribeLabelOfCharCapital(attackerId)} attacked {bonusSuccess && (_targetBodyPart=="")==0:successfully} against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+
+
 
 {
 	- _applyDestruction == D_DEATH:

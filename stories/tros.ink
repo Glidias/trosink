@@ -612,7 +612,7 @@ Let's fight!
 		~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x, x)
 		{
 			-charPersonName_totalPain >= charPersonName_reflex + charPersonName_usingProfeciencyLevel:
-				{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain and can no longer fight.
+				{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
 				~charPersonName_FIGHT = 0
 		}
@@ -631,8 +631,7 @@ Let's fight!
 		~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x, x)
 		{
 			-charPersonName2_totalPain >= charPersonName2_reflex + charPersonName2_usingProfeciencyLevel:
-				{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain and can no longer fight.
-				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
+				{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~charPersonName2_FIGHT = 0
 		}
 	}
