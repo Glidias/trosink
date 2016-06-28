@@ -7,7 +7,7 @@ INCLUDE manuevers.ink
 
 // Unit tests goes here  (comment away to avoid it)
 INCLUDE unittests.ink
-//->test_ConsiderCharacters
+//->testing_rollNumSuccesses
 
 -> GameStart
 
@@ -24,11 +24,12 @@ Let's fight!
 
 
 === Combat_Step0
-	{showPlayerHealthStatus()}
+
 
 	~boutStep = 0
 	~temp gotReveal = 0
 	~temp x = 0
+
 	{
 		- boutExchange == 1:
 		///* utest all
@@ -42,18 +43,25 @@ Let's fight!
 		}
 		//*/
 	}
+
 	
 
+
 	///* utest player
+	~charPersonName_carryOverShock = 0
 	{	charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused:
 		~gotReveal = 1
 	}
 	//*/
 	///* utest
+	~charPersonName2_carryOverShock = 0
 	{ charPersonName2_FIGHT && charPersonName2_fight_stance==STANCE_RESET && charPersonName2_fight_paused: 
 		~gotReveal = 1
 	}
 	//*/
+
+	{showPlayerHealthStatus()}
+
 	{ gotReveal==0: 
 		...
 		->->
@@ -601,6 +609,7 @@ Let's fight!
 	}
 	+ [{boutExchange==1 && gotResolve!=0: Proceed to 2nd Exchange|Proceed to Next Round}]
 	// reset combat flags
+	~temp rolledValue
 	///* utest player
 	~charPersonName_fight_orientation = ORIENTATION_NONE
 	~charPersonName_fight_cautiousLock = 0
@@ -611,10 +620,25 @@ Let's fight!
 	{
 	-charPersonName_FIGHT:
 		~charPersonName_totalPain= 0
-		~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  x, x)
+		~inflictWoundOn(charPersonName_id, 0,    0, 0, 0,  x,  charPersonName_totalPain,  charPersonName_totalBL, x)
+		{
+			- boutExchange == 2 && charPersonName_totalBL:
+				~rolledValue =  rollNumSuccesses(charPersonName_endurance, charPersonName_totalBL,0) >= 0
+				{
+					-rolledValue: 
+						~charPersonName_health =  charPersonName_health - 1
+						{
+							-charPersonName_health <= 0:
+								~addBit(gameOverFlags, GAMEOVER_LOST_BLOOD)
+								~charPersonName_FIGHT = 0
+							-else:
+								{getDescribeLabelOfCharCapital(charPersonName_id)} lost some blood.
+						}
+				}
+
+		}
 		{
 			- getCombatPool(charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, 0, charPersonName_totalHealth) == 0:
-				{getDescribeLabelOfCharCapital(charPersonName_id)} {charPersonName_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~addBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN)
 				~charPersonName_FIGHT = 0
 		}
@@ -634,9 +658,24 @@ Let's fight!
 	{
 	-charPersonName2_FIGHT:
 		~charPersonName2_totalPain= 0
-		~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  x, x)
+		~inflictWoundOn(charPersonName2_id, 0,    0, 0, 0,  x,  charPersonName2_totalPain,  charPersonName2_totalBL, x)
 		{
-			- getCombatPool(charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, 0, charPersonName2_totalHealth) == 0:
+			- boutExchange == 2 && charPersonName2_totalBL:
+				~rolledValue =  rollNumSuccesses(charPersonName2_endurance, charPersonName2_totalBL,0) >= 0
+				{
+					-rolledValue: 
+						~charPersonName2_health =  charPersonName2_health - 1
+						{
+							-charPersonName2_health <= 0:
+								~charPersonName2_FIGHT = 0
+								{getDescribeLabelOfCharCapital(charPersonName2_id)} lost too much blood and collapsed!
+							-else:
+								{getDescribeLabelOfCharCapital(charPersonName2_id)} lost some blood.
+						}
+				}
+		}
+		{
+			- charPersonName2_FIGHT && getCombatPool(charPersonName2_usingProfeciencyLevel, charPersonName2_reflex, charPersonName2_totalPain, 0, charPersonName2_totalHealth) == 0:
 				{getDescribeLabelOfCharCapital(charPersonName2_id)} {charPersonName2_isYOU:are|is} in too much pain from injuries and can no longer fight.
 				~charPersonName2_FIGHT = 0
 		}
@@ -681,16 +720,11 @@ Let's fight!
 
 === GameOver
 GAME OVER!
-{
-	- hasBit(gameOverFlags, GAMEOVER_NO_MORE_ENEMIES):
-		All enemies have either been gone or defeated!
-}
-/*
+({boutRounds} rounds.)
 {
 	- hasBit(gameOverFlags, GAMEOVER_TOO_MUCH_PAIN):
-		You suffered too much pain and are no longer in fighting condition.
+		You suffered too much pain from your injuries and can no longer fight.
 }
-*/	
 {
 	- hasBit(gameOverFlags, GAMEOVER_LOST_BLOOD):
 		You lost too much blood and collapsed!
@@ -701,7 +735,13 @@ GAME OVER!
 }
 {
 	- gameOverFlags == GAMEOVER_NO_MORE_ENEMIES:
-		You won!
+		You won this bout!
+		Surviving stats: {showPlayerHealthStatus()}
+	-else:
+		Ending stats: {showPlayerHealthStatus()}
 }
+
+
+
 //*/
 -> DONE

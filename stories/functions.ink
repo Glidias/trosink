@@ -210,6 +210,23 @@ VAR combatStatusStringCache = ""
  	- ~return 9
  	- ~return 10
 }
+
+=== function rollD10Stackable(tn) 
+~temp valer = 0
+~rD10Stackable(valer, tn)
+~return valer
+
+
+=== function rD10Stackable(ref curVal, tn) 
+~temp val = rollD10()
+~curVal = curVal + val
+{
+	-curVal < tn && val == 10:
+		~rD10Stackable(curVal, tn)
+}
+
+
+
 === function breakTie(result, result2)
 //comparing {result} vs {result2}
 { 
@@ -240,7 +257,7 @@ VAR combatStatusStringCache = ""
 === function rollNumSuccessesEcho(numDiceLeft, tn, curSuccesses) 
 {	
 	- numDiceLeft !=0:
-	     ~ temp rolledVal = rollD10()
+	     ~ temp rolledVal = rollD10Stackable(tn)
 	    <> {rolledVal}
 	     { 
 		  - rolledVal>=tn: 
@@ -257,7 +274,7 @@ VAR combatStatusStringCache = ""
 {	
 	- numDiceLeft !=0:
 		 { 
-		 	- rollD10()>=tn: 
+		 	- rollD10Stackable(tn)>=tn: 
 				~curSuccesses = curSuccesses+1
 		}
 	     ~numDiceLeft = numDiceLeft - 1
@@ -346,6 +363,8 @@ VAR charPersonName2_avail = 0
 VAR charPersonName2_picked = 0
 //*/
 
+
+
 // CharacterSheet 
 // for each char (tag charPersonName)
 ///* utest player var
@@ -356,7 +375,8 @@ VAR charPersonName_toughness = 4
 VAR charPersonName_reflex = 4
 VAR charPersonName_willpower = 4
 VAR charPersonName_mobility = 6
-CONST charPersonName_perception = 4
+VAR charPersonName_endurance = 4
+VAR charPersonName_perception = 4
 VAR charPersonName_usingProfeciency ="swordandshield"
 VAR charPersonName_usingProfeciencyLevel = 8
 VAR charPersonName_carryOverShock = 0
@@ -376,6 +396,7 @@ VAR charPersonName2_toughness = 4
 VAR charPersonName2_reflex = 4
 VAR charPersonName2_willpower = 4
 VAR charPersonName2_mobility = 6
+VAR charPersonName2_endurance = 4
 VAR charPersonName2_perception = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
 VAR charPersonName2_usingProfeciencyLevel = 8

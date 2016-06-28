@@ -11,7 +11,39 @@ testing_inflictWoundOn person2 {charPersonName2_wound_bodyPartName}  {charPerson
 */
 
 === testing_rollNumSuccesses
-{rollNumSuccesses(7,5,0)}
+rollD10Stackables...
+For 19..
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+{rollD10Stackable(19)},
+For 20...
+{rollD10Stackable(20)},
+{rollD10Stackable(20)},
+{rollD10Stackable(20)},
+{rollD10Stackable(20)},
+{rollD10Stackable(20)}
+7 dice over TN5..
+{rollNumSuccesses(7,5,0)},
+7 dice over TN13..
+{rollNumSuccesses(7,13,0)},
+{rollNumSuccesses(7,13,0)},
+{rollNumSuccesses(7,13,0)},
+{rollNumSuccesses(7,13,0)},
+55 dice over TN20..
+{rollNumSuccesses(55,20,0)},
+{rollNumSuccesses(55,20,0)},
+{rollNumSuccesses(55,20,0)},
+{rollNumSuccesses(55,20,0)},
+16 dice over TN24..
+{rollNumSuccesses(16,24,0)},
+{rollNumSuccesses(16,24,0)},
+{rollNumSuccesses(16,24,0)},
+{rollNumSuccesses(16,24,0)},
 -> DONE
 
 === testing_fight_resolve_initiative
