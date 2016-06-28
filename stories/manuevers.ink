@@ -1993,11 +1993,15 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 ~temp def_isAI
 ~temp def_isEnemy
 ~temp def_isYou
+~temp atk_isAI
+~temp atk_isEnemy
+~temp atk_isYou
 ~getCharMetaInfo(defenderCharId, x, def_isAI, def_isEnemy, def_isYou)
+~getCharMetaInfo(defenderCharId, x, atk_isAI, atk_isEnemy, atk_isYou)
 
 {
 	- bonusSuccess && (_targetBodyPart == "")==1: 
-		{getDescribeLabelOfCharCapital(attackerId)} misses his target's body!
+		{getDescribeLabelOfCharCapital(attackerId)} {def_isYou:miss|misses} a part on {def_isYou:the|his} target's body!
 }
 
 {getDescribeLabelOfCharCapital(attackerId)} attacked {bonusSuccess && (_targetBodyPart=="")==0:successfully} against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.

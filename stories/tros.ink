@@ -24,6 +24,7 @@ Let's fight!
 
 
 === Combat_Step0
+	{showPlayerHealthStatus()}
 
 	~boutStep = 0
 	~temp gotReveal = 0
@@ -307,6 +308,7 @@ Let's fight!
 		-> DeclareCombatManuevers
 	}
 	= DeclareCombatManuevers
+	{showPlayerHealthStatus()}
 	{showCombatStatus()}
 	// Declare/reveal combat manuevers (their costs and details) in order of combatants that have initiative, then those without initiative, in order of lowest to highest adriotness stat.
 	//TODO: Declare moves...get lists of available moves, AI choose suitable move and CP, 

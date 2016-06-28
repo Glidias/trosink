@@ -24,6 +24,25 @@ VAR combatStatusStringCache = ""
 ~ return ""
 
 
+=== function clampCPShow(cp) 
+{
+	-cp < 0: 
+		{
+			-cp < -500:
+				~return "\~"
+			-else:
+				~return cp
+		}
+	-else:
+		~return cp
+}
+
+=== function showPlayerHealthStatus()
+///* utest player
+..
+ ~return "Your Health: " + charPersonName_health + "/" + charPersonName_totalHealth + ", CP:" + clampCPShow(charPersonName_cp)+"/"+getCombatPool(charPersonName_usingProfeciencyLevel, charPersonName_reflex, charPersonName_totalPain, 0, charPersonName_health) + ", BL:" + charPersonName_totalBL + ", Pain:" + charPersonName_totalPain
+ //*/	
+
 // Static Functions (stateless)
 === function MathMax(v,v2)
 {  
@@ -257,6 +276,9 @@ VAR combatStatusStringCache = ""
 ~return 0
 
 === function refreshCombatPool(ref cp, profeciencyLevel, reflex, totalPain, carryOverShock, health)
+~cp = getCombatPool(profeciencyLevel, reflex, totalPain, carryOverShock, health)
+
+=== function getCombatPool(profeciencyLevel, reflex, totalPain, carryOverShock, health)
 ~temp inCritical =  inCriticalCondition(health)
 ~temp useReflex = reflex
 {inCritical: 
@@ -269,8 +291,8 @@ VAR combatStatusStringCache = ""
 {result < 0: 
 	~result = 0
 }
+~return result
 
-~cp = result
 
 
 === function recountNumEnemiesAndCombatants()
@@ -339,7 +361,9 @@ VAR charPersonName_usingProfeciencyLevel = 8
 VAR charPersonName_carryOverShock = 0
 VAR charPersonName_cp = 0
 VAR charPersonName_totalPain = 0
+VAR charPersonName_totalBL = 0
 VAR charPersonName_health = 4
+VAR charPersonName_totalHealth = 4
 VAR charPersonName_equipOffhand = "gladius"
 VAR charPersonName_equipMasterhand = "gladius"
 //*/
@@ -357,7 +381,9 @@ VAR charPersonName2_usingProfeciencyLevel = 8
 VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
+VAR charPersonName2_totalBL = 0
 VAR charPersonName2_health = 4
+VAR charPersonName2_totalHealth = 4
 VAR charPersonName2_equipOffhand = "shield"
 VAR charPersonName2_equipMasterhand = "mace"
 //*/
