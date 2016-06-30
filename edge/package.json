@@ -1,0 +1,21 @@
+{
+  "name": "TROSink",
+  "description": "TROSINk EdgeJS dependencies!",
+  "tags": [
+    "owin",
+    "edge",
+    "net",
+    "clr",
+    "coreclr",
+    "c#",
+    "mono",
+    "managed",
+    ".net"
+  ],
+  "dependencies": {
+	"path": "*",
+    "edge":"*",
+    "express": "^4.10.2",
+	"socket.io": "^1.4.5"
+  }
+}
