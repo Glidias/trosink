@@ -33,16 +33,16 @@ function InkleSessionInstance(socket) {
 				using System;
 				using System.Threading.Tasks;
 				using Ink.Runtime;
+				using System.Collections.Generic;
 
 				public class Startup
 				{
 					Story _story;
-					
+
+
 					public async Task<object> Invoke(string input)
 					{
-						// 1) Load story
 						 _story = new Story(input);
-						// 2) Game content, line by line
 				
 						 return new {
 							helloWorld = (Func<object,Task<object>>)(
@@ -57,22 +57,129 @@ function InkleSessionInstance(socket) {
 									return _story;
 								}
 							)
+							,getOutputMessages = (Func<object,Task< object  >>)(
+								async (obj) => 
+								{ 
+									return StoryUtil.getOutputMessages(_story);
+								}
+							) 
+							,setChoiceIndex = (Func<object,Task<object>>)(
+								async (obj) => 
+								{ 
+									await Task.Run(() => _story.ChooseChoiceIndex((int)obj));
+									return StoryUtil.getOutputMessages(_story);
+
+								}
+							) 
 						};
 					}
+
+
+					public class StoryUtil {
+	
+						public static object getOutputMessages(Story story) {
+							List<string> lineList = new List<string>();
+							List<string> choiceList = new List<string>();
+							while (story.canContinue) {
+								lineList.Add(story.Continue());
+							}
+							//int count = ;
+							for (int i = 0; i < story.currentChoices.Count; ++i) {
+						        Choice choice = story.currentChoices[i];
+						  		choiceList.Add(choice.text);
+						    }
+							
+							return new {
+								lines = lineList,
+								choices = choiceList
+							};
+						}
+					}
+
+					
 				}
+
+
 			*/},
 			references: ['ink-engine.dll']
 		});
 		
 	}
+
+	/*
+						
+							*/
 	
+
+
+	var CHOICES_AVAILABLE = 0;
+	var _LOCKED = true;
+
 	function onInklePackageCompiled() {
 		
 		if (socket) {
-			var testoutput = inklePackage.helloStory(null, true);
-			socket.emit("chat message", testoutput);
+			//var testoutput = inklePackage.helloStory(null, true);
+			//socket.emit("chat message", testoutput);
+
+			socket.emit("data", inklePackage.getOutputMessages(0,true));
+
+			var data = inklePackage.getOutputMessages(0, true);
+			CHOICES_AVAILABLE = data.choices.length;
+			if (CHOICES_AVAILABLE <= 0) {
+				if (socket) {
+					socket.emit("serverchat", "== End detected ==");
+					socket.emit("end");
+
+				}
+				_LOCKED = true;
+			}
+			_LOCKED = false;
+
+
 		} 
+		else {
+			console.log("Successfully compiled.");
+			//var testoutput = inklePackage.helloStory(null, true);
+
+		}
 	}
+
+	function setChoiceIndex(index) {
+		if (_LOCKED) return;
+
+		index = parseInt(index);
+		if (isNaN (index)) return;
+		if (index <0 || index >= CHOICES_AVAILABLE) {
+			if (socket) socket.emit("serverchat", "Choice selection ("+(index+1)+") out of range..")
+			return;
+		}
+
+		if (inklePackage == null) return
+		_LOCKED = true;
+
+		inklePackage.setChoiceIndex(index, function(error, data) {
+			if (error) {
+				console.error(error);
+				if (socket) socket.emit("error", "ERROR: sorry something went wrong...")
+				return;
+			}
+
+
+			CHOICES_AVAILABLE = data.choices.length;
+			if (socket) {
+				socket.emit("data", data);
+			}
+			else {
+				console.log(data);
+			}
+			_LOCKED = false;
+
+		});
+	}
+	this.setChoiceIndex = setChoiceIndex;
+
+
+
 
 	function executeCompileProcess(filePath) {
 		var fs = require('fs');
@@ -130,43 +237,73 @@ function InkleSessionInstance(socket) {
 	init();
 }
 
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+function setupServer() {
+
+	var app = require('express')();
+	var http = require('http').Server(app);
+	var io = require('socket.io')(http);
 
 
-app.get('/', function(req, res){
-  var path = require("path");
-  res.sendFile(path.join(__dirname, '../views', 'inkleconsole.html'));
-});
+	app.get('/', function(req, res){
+	  var path = require("path");
+	  res.sendFile(path.join(__dirname, '../views', 'inkleconsole.html'));
+	});
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});
-
-
-var sessionHash = {};
-
-io.on('connection', function(socket){
-
- // when the client emits 'adduser', this listens and executes
-	
-	// add the client's username to the global list
-	sessionHash[socket.username] = new InkleSessionInstance(socket);
-	
-	sessionHash[socket.username].readDefaultTROS();
-
-   socket.on('disconnect', function(reason){
-		if (sessionHash[socket.username]) {
-			sessionHash[socket.username].destroy();
-		}
-		delete sessionHash[socket.username];
-  });
-  
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-  });
-});
+	http.listen(3000, function(){
+	  console.log('listening on *:3000');
+	});
 
 
+	var sessionHash = {};
 
+	io.on('connection', function(socket){
+
+	 // when the client emits 'adduser', this listens and executes
+		
+		// add the client's username to the global list
+		sessionHash[socket.username] = new InkleSessionInstance(socket);
+		
+		sessionHash[socket.username].readDefaultTROS();
+
+	   socket.on('disconnect', function(reason){
+			if (sessionHash[socket.username]) {
+				sessionHash[socket.username].destroy();
+			}
+			delete sessionHash[socket.username];
+	  });
+	  
+	  socket.on('serverchat', function(msg){
+	    io.emit('serverchat', msg);
+	  });
+
+/*
+	   socket.on('chat message', function(msg){
+	    //io.emit('serverchat', msg);
+	  });
+*/
+
+	  socket.on('sendChoice', function(index) {
+	  	if (isNaN(index)) return;
+	  	//	console.log(setChoiceIndex);
+	  	if (!sessionHash[socket.username]) return;
+	  	 sessionHash[socket.username].setChoiceIndex(index);
+	  });
+	});
+
+}
+
+function testCode() {
+	var comp = new InkleSessionInstance(null);
+	comp.readDefaultTROS();
+
+}
+
+function compileTROS() {
+	var comp = new InkleSessionInstance(null);
+	comp._executeCompileProcess();
+
+}
+
+//testCode();
+//compileTROS();
+setupServer();

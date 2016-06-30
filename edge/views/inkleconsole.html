@@ -4,37 +4,137 @@
     <title>TROSink! console client</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
+      body { font: 13px Helvetica, Arial; height:100%; overflow:hidden; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages { padding:15px; list-style-type: none; margin: 0;  position:absolute;top:0;left:0; width:100%;height:90%; overflow:auto; border-bottom:1px solid #cccccc;}
       #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+      #messages .serverchat { color:green; }
+      #messages li.choice { background: #eee;  }
+       #messages li.choice.selected { background: #ffdddd;  }
+       #messages section { padding:5px; }
+       #messages section.current  { border:2px solid black;; }
+        #messages section.current li.choice { cursor:pointer; } 
+        #messages section.current li.choice:hover { background-color:#ffdd66; } 
+      #messages ol {
+        margin-left:20px;
+        list-style-type: decimal;
+      }
+      #messages p {
+        margin-top:8px;
+      }
+      #messages section {
+        margin-top:20px;
+      }
+      #messages section:first-child {
+        margin-top:0px;
+      }
+      #messages p:first-child {
+        margin-top:0;
+      }
     </style>
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   </head>
   <body>
-    <ul id="messages"></ul>
+    <div id="messages"></div>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
 	  
 	  
 	<script>
+  (function() {
+
 	  var socket = io();
-	  $('form').submit(function(){
-		socket.emit('chat message', $('#m').val());
-		$('#m').val('');
-		return false;
+    var messageBox = $('#messages');
+    var curSection = null;
+    var _choiceJ = [];
+
+    function makeChoice(index) {
+        $(_choiceJ[index]).addClass("selected");
+        socket.emit("sendChoice", index);
+        $('#m').val('');
+    }
+
+	  $('form').submit(function(e){
+      e.preventDefault();
+	   //socket.emit('chat message', $('#m').val());
+     var val= $('#m').val();
+
+  var isValidChoice = true;
+   //  alert(typeof(val));
+     var checkChoice = parseInt(val);
+     if (isNaN(checkChoice)) {
+        isValidChoice = false;
+       // return
+     };
+      if (parseFloat(checkChoice) != checkChoice) {
+      //  return;
+        isValidChoice = false;
+      }
+      checkChoice--;
+     if (checkChoice < 0 || checkChoice >= _choiceJ.length) {
+        isValidChoice = false;
+       // return;
+
+     }
+    
+     if (isValidChoice) {
+        makeChoice(checkChoice)
+     }
+	   	return false;
 	  });
-	  socket.on('chat message', function(msg){
+
+	  socket.on('serverchat', function(msg){
 		  if (typeof msg === "object") {
-			console.log(msg);
+		  	 console.log(msg);
 		  }
-		$('#messages').append($('<li>').text(msg));
-	  });
+        messageBox.append($('<li class="serverchat">').text(msg));
+    });
+
+
+    socket.on('data', function(data){
+      if (curSection!= null) {
+         curSection.removeClass("current");
+         curSection.children("ol").children("li").unbind();
+      }
+      curSection = $('<section class="current">');
+     messageBox.append(curSection);
+
+      var lines = data.lines;
+      var choices = data.choices;
+      _totalChoices = choices.length;
+      var i;
+      if (lines.length) {
+        var p = $("<p>");
+        var pStream = ""
+        for (i=0;i<lines.length; i++) {
+            if (i!=0) pStream+="<br/>";
+            pStream+=lines[i];
+
+         // messageBox.append($('<li class="line">').text(lines[i]));
+        }
+        curSection.append(p.html(pStream));
+      }
+
+      var listBox = $("<ol>");
+       for (i=0;i<choices.length; i++) {
+        listBox.append($('<li class="choice">').text(choices[i]));
+      }
+      curSection.append(listBox);
+
+      _choiceJ = listBox.children("li");
+      _choiceJ.click( function() {
+        makeChoice( _choiceJ.index(this) );
+      });
+
+      messageBox.scrollTop(messageBox[0].scrollHeight);
+    });
+
+
+  })();
 	</script>
   </body>
 </html>

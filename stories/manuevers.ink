@@ -1281,7 +1281,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_beat = 1
 			{
 				- _altAction <= 0:
-					+ Beat....[({stipulateCost})tn:{stipulateTN}]
+					+ Beat....[({stipulateCost})tn:{stipulateTN}] (TODO)
 					-> ChooseManueverListAtk("beat", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1316,7 +1316,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_bindstrike = 1
 			{
 			- _altAction <= 0:
-				+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}]
+				+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}] (TODO)
 				-> ChooseManueverListAtk("bindstrike", _altAction, 	_callbackThread )
 			//- else:
 			//	->_callbackThread
@@ -1535,7 +1535,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_blockopenstrike = 1
 				{
 					- _altAction <= 0:
-						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}]
+						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}] (TODO)
 						-> ChooseManueverListDef("blockopenstrike", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1568,7 +1568,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_counter = 1
 				{
 					- _altAction <= 0:
-						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}] (TODO)
 						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1593,7 +1593,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_rota = 1
 				{
 					- _altAction <= 0:
-						+ Rota....[({stipulateCost})tn:{stipulateTN}]
+						+ Rota....[({stipulateCost})tn:{stipulateTN}] (TODO)
 						-> ChooseManueverListDef("rota", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1618,7 +1618,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_expulsion = 1
 				{
 					- _altAction <= 0:
-						+ Expulsion....[({stipulateCost})tn:{stipulateTN}]
+						+ Expulsion....[({stipulateCost})tn:{stipulateTN}] (TODO)
 						-> ChooseManueverListDef("expulsion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1643,7 +1643,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_disarm = 1
 				{
 					- _altAction <= 0:
-						+ Disarm....[({stipulateCost})tn:{stipulateTN}]
+						+ Disarm....[({stipulateCost})tn:{stipulateTN}] (TODO)
 						-> ChooseManueverListDef("disarm", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
