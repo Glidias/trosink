@@ -1,17 +1,6 @@
 {
   "name": "TROSink",
   "description": "TROSINk EdgeJS dependencies!",
-  "tags": [
-    "owin",
-    "edge",
-    "net",
-    "clr",
-    "coreclr",
-    "c#",
-    "mono",
-    "managed",
-    ".net"
-  ],
   "dependencies": {
 	"path": "*",
     "edge":"*",
