@@ -1,0 +1,1 @@
+inklecate ../stories/tros.ink
