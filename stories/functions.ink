@@ -58,6 +58,13 @@ VAR combatStatusStringCache = ""
 	- else:
 		~ return v2
 }
+=== function clampNegative(v)
+{
+	- v >=0:
+		~return v
+	- else:
+		~return 0
+}
 === function MathExp(base, power)
 ~return _MathExp(base,power, 1)
 

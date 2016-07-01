@@ -55,13 +55,14 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~return 0
 }
 
-=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref blunt2, ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel, ref twoHanded )
+=== function getManueverSelectReadonlyDependencies(charId, ref stance,  ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref blunt2, ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel, ref twoHanded )
 ~temp x
 {
 ///* utest player
 - charId == charPersonName_id:
 	// common to both attack/defense
 	~initiative = charPersonName_fight_initiative
+	~stance = charPersonName_fight_stance
 	~profeciencyType = charPersonName_usingProfeciency
 	~profeciencyLevel = charPersonName_usingProfeciencyLevel
 	~diceAvailable = charPersonName_cp
@@ -76,6 +77,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 - charId == charPersonName2_id:
 
 	~initiative = charPersonName2_fight_initiative
+	~stance = charPersonName2_fight_stance
 	~profeciencyType = charPersonName2_usingProfeciency
 	~profeciencyLevel = charPersonName2_usingProfeciencyLevel
 	~diceAvailable = charPersonName2_cp
@@ -383,6 +385,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 ~temp x
 
 // common to both attack/defense
+~temp _stance
 ~temp _profeciencyType
 ~temp _profeciencyLevel
 ~temp _diceAvailable
@@ -437,7 +440,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 ~temp stipulateTN
 
 // kiv: some overlap below with getTargetInitiativeStatesByCharId() by above, can consider re-factoring later? bah nvm..
-{getManueverSelectReadonlyDependencies(charId, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt, _blunt2,  _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand, _twoHanded)}
+{getManueverSelectReadonlyDependencies(charId, _stance, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt, _blunt2,  _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand, _twoHanded)}
 {getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
 
 ~temp charCanAttack = _charTarget == enemyId && slotIndex != 3
@@ -782,7 +785,7 @@ For now, he will Do Nothing.
 		//You switched back to your main hand weapon.
 		{
 		- charNoMasterHand == 0:
-			~getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x, x,  x,   x, x, x, x, x, x, x, x, x, x)
+			~getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x, x,  x,   x, x, x, x, x, x, x, x, x, x)
 		}
 }
 -> ChooseManueverMenu
@@ -940,12 +943,8 @@ ChoosingManuversLooseEndError detected. This should not happen!
 = ConfirmCombatPool(amount)
 {""}
 ~manuever_CP = amount
-{ 
-	-manueverNeedBodyAim:
-		->AimTargetZone
-	-else:
-		->ConfirmManuever
-}
+->ConfirmManuever
+
 
 = AimTargetZone
 {
@@ -955,93 +954,93 @@ ChoosingManuversLooseEndError detected. This should not happen!
 	How do you wish to aim your swing?
 	+ to the Lower Legs
 		~manuever_targetZone = 1
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ to the Upper Legs 
 		~manuever_targetZone = 2
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Horizontal Swing
 		~manuever_targetZone = 3
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Overhand Swing
 		~manuever_targetZone = 4
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Downward Swing from Above
 		~manuever_targetZone = 5
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Upward Swing from Below
 		~manuever_targetZone = 6
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ to the Arms
 		~manuever_targetZone = 7
-		->ConfirmManuever 
+		->AssignCombatPool 
 	-manueverAttackType == ATTACK_TYPE_THRUST:
 	Where on your opponent do you wish to aim your thrust?
 	+ to the Lower Legs
 		~manuever_targetZone = 8
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ to the Upper Legs
 		~manuever_targetZone = 9
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ to the Pelvis
 		~manuever_targetZone = 10
-		->ConfirmManuever
+		->AssignCombatPool
 	+ to the Belly
 		~manuever_targetZone = 11
-	 	->ConfirmManuever
+	 	->AssignCombatPool
 	+ to the Chest
 		~manuever_targetZone = 12
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ to the Head
 		~manuever_targetZone = 13
-		->ConfirmManuever 	
+		->AssignCombatPool 	
 	+ to the Arm
 		~manuever_targetZone = 14
-		->ConfirmManuever 
+		->AssignCombatPool 
 	-else:
 	How do you wish to aim your strike?
 	///* #if TROS
 	+ Swing to the Lower Legs
 		~manuever_targetZone = 1
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Swing to the Upper Legs 
 		~manuever_targetZone = 2
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Horizontal Swing
 		~manuever_targetZone = 3
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Overhand Swing
 		~manuever_targetZone = 4
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Downward Swing from Above
 		~manuever_targetZone = 5
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Upward Swing from Below
 		~manuever_targetZone = 6
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Swing to the Arms
 		~manuever_targetZone = 7
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Thrust to the Lower Legs
 		~manuever_targetZone = 8
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Thrust to the Upper Legs
 		~manuever_targetZone = 9
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Thrust to the Pelvis
 		~manuever_targetZone = 10
-		->ConfirmManuever
+		->AssignCombatPool
 	+ Thrust to the Belly
 		~manuever_targetZone = 11
-	 	->ConfirmManuever
+	 	->AssignCombatPool
 	+ Thrust to the Chest
 		~manuever_targetZone = 12
-		->ConfirmManuever 
+		->AssignCombatPool 
 	+ Thrust to the Head
 		~manuever_targetZone = 13
-		->ConfirmManuever 	
+		->AssignCombatPool 	
 	+ Thrust to the Arm
 		~manuever_targetZone = 14
-		->ConfirmManuever 
+		->AssignCombatPool 
 	}
 
 //*/
@@ -1120,13 +1119,23 @@ AimTargetZoneLooseEndError detected. This should not happen!
 ~manueverUseHands = MANUEVER_HAND_NONE
 ~temp usingOffhand = 0
 ~manueverNeedBodyAim = 1
+~temp stanceCostModifier =0
+{
+	-_stance == STANCE_OFFENSIVE:
+		~stanceCostModifier =  -2
+	-_stance == STANCE_DEFENSIVE:
+		~stanceCostModifier = 2
+	-else:
+		~elseResulted = 1
+}
+
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
 }
 { 	// Bash
 	- (_confirmSelection==0||_confirmSelection=="bash") && _blunt!=0 && (_ATN || _ATN_off): 
-	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "bash", _hasShield)
+	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "bash", _hasShield) + stanceCostModifier
 	~stipulateTN = _ATN
 	{ 
 		-stipulateTN == 0: 
@@ -1150,7 +1159,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_bash = 1
 			{
 				- _altAction <= 0:
-					+ Bash....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+					+ Bash....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("bash", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1160,7 +1169,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	// Spike
 	- (_confirmSelection==0||_confirmSelection=="spike") && ( (_blunt && _ATN2) || (_blunt2  && _ATN2_off ) ): 
-	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "spike", _hasShield)
+	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "spike", _hasShield) + stanceCostModifier
 	~stipulateTN = _ATN2
 	{ 
 		-stipulateTN == 0: 
@@ -1185,7 +1194,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_spike = 1
 			{
 				- _altAction <= 0:
-					+ Spike....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+					+ Spike....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("spike", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1196,7 +1205,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 { 	// Cut
 	- (_confirmSelection==0||_confirmSelection=="cut") && _blunt==0 && (_ATN || _ATN_off):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "cut", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "cut", _hasShield)  + stanceCostModifier
 	~stipulateTN = _ATN
 	{ 
 		-stipulateTN == 0: 
@@ -1221,7 +1230,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_cut = 1
 			{
 				- _altAction <= 0:
-					+ Cut....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+					+ Cut....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("cut", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1232,7 +1241,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 { 	// Thrust
 	- (_confirmSelection==0||_confirmSelection=="thrust") && _blunt==0 && (_ATN2||_ATN2_off):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "thrust", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "thrust", _hasShield) + stanceCostModifier
 	~stipulateTN = _ATN2
 	{
 		-stipulateTN == 0: 
@@ -1257,7 +1266,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_thrust = 1
 			{
 				- _altAction <= 0:
-					+ Thrust....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+					+ Thrust....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 					-> ChooseManueverListAtk("thrust", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1270,7 +1279,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 /*  todo manuever resolutions for these
 { 	// Beat - Striking with the weapon at hand to knock an opponent's weapon or shield to the side
 	- (_confirmSelection==0||_confirmSelection=="beat") && _orientation == ORIENTATION_AGGRESSIVE && _ATN && _profeciencyLevel >=4:
-	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "beat", _hasShield)
+	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "beat", _hasShield) + stanceCostModifier
 	~stipulateTN = _ATN
 	{
 	- _diceAvailable > stipulateCost:
@@ -1287,7 +1296,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_beat = 1
 			{
 				- _altAction <= 0:
-					+ Beat....[({stipulateCost})tn:{stipulateTN}] (TODO)
+					+ Beat....[({clampNegative(stipulateCost)})tn:{stipulateTN}] (TODO)
 					-> ChooseManueverListAtk("beat", _altAction, _callbackThread )
 				//-else:
 				//	->_callbackThread
@@ -1297,7 +1306,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	// Bind and Strike - Attacking with the offhand weapon to tie up an opponent's weapon.
 	- (_confirmSelection==0||_confirmSelection=="bindstrike") && (_ATN_off!=0 || _ATN2_off!=0):
-	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "bindstrike", _hasShield)
+	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "bindstrike", _hasShield) + stanceCostModifier
 	{
 		-_ATN_off !=0 && _ATN2_off !=0:
 			~stipulateTN =  MathMin(_ATN_off, _ATN2_off)
@@ -1322,7 +1331,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~AVAIL_bindstrike = 1
 			{
 			- _altAction <= 0:
-				+ Bind and Strike....[({stipulateCost})tn:{stipulateTN}] (TODO)
+				+ Bind and Strike....[({clampNegative(stipulateCost)})tn:{stipulateTN}] (TODO)
 				-> ChooseManueverListAtk("bindstrike", _altAction, 	_callbackThread )
 			//- else:
 			//	->_callbackThread
@@ -1384,20 +1393,36 @@ AimTargetZoneLooseEndError detected. This should not happen!
 	-else:
 		~elseResulted = 1
 }
-->AssignCombatPool
+{
+	-manueverNeedBodyAim:
+		->AimTargetZone
+	-else:
+		->AssignCombatPool
+}
+
 
 = ChooseManueverListDef(_confirmSelection, _altAction, ->_callbackThread ) 
 ~choiceCount=0
 ~manueverUseHands = MANUEVER_HAND_NONE
 ~temp usingOffhand = 0
 ~manueverNeedBodyAim = 0
+
+~temp stanceCostModifier =0
+{
+	-_stance == STANCE_OFFENSIVE:
+		~stanceCostModifier =  2
+	-_stance == STANCE_DEFENSIVE:
+		~stanceCostModifier = -2
+	-else:
+		~elseResulted = 1
+}
 {	
 	-_confirmSelection:
 		~theConfirmedManuever = _confirmSelection
 }
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
 	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN_off
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1412,7 +1437,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_block = 1
 				{
 					- _altAction <= 0:
-						+ Block....[({stipulateCost})tn:{stipulateTN}]
+						+ Block....[({clampNegative(stipulateCost)})tn:{stipulateTN}]
 						-> ChooseManueverListDef("block", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1422,7 +1447,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Parry (Defensive) - Deflect an incoming attack with the weapon at hand.
 	- (_confirmSelection==0||_confirmSelection=="parry") && (_DTN||_DTN_off):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		-stipulateTN==0: 
@@ -1445,7 +1470,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_parry  = 1
 				{
 					- _altAction <= 0:
-						+ Parry....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+						+ Parry....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("parry", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1456,7 +1481,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 /*
 {	//Duck and Weave (Defensive) - Avoiding an incoming attack while moving in for a follow up.
 	- (_confirmSelection==0||_confirmSelection=="duckweave") :
-	~stipulateCost = 0
+	~stipulateCost = 0 +stanceCostModifier
 	~stipulateTN = 9
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1470,7 +1495,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_duckweave = 1
 				{
 					- _altAction <= 0:
-						+ Duck and Weave....[({stipulateCost})tn:{stipulateTN}]
+						+ Duck and Weave....[({clampNegative(stipulateCost)})tn:{stipulateTN}]
 						-> ChooseManueverListDef("duckweave", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1481,7 +1506,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 */
 {	//Partial Evasion (Defensive) - Avoiding an incoming attack.
 	- (_confirmSelection==0||_confirmSelection=="partialevasion") :
-	~stipulateCost = 0
+	~stipulateCost = 0 +stanceCostModifier
 	~stipulateTN = 7
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1495,7 +1520,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_partialevasion = 1
 				{
 					- _altAction <= 0:
-						+ Partial Evasion....[({stipulateCost})tn:{stipulateTN}]
+						+ Partial Evasion....[({clampNegative(stipulateCost)})tn:{stipulateTN}]
 						-> ChooseManueverListDef("partialevasion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1505,7 +1530,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Full Evasion (Defensive) - Avoiding an incoming attack and exit the fight.
 	- (_confirmSelection==0||_confirmSelection=="fullevasion") && (_orientation == ORIENTATION_DEFENSIVE) || _lastAttacked==0:
-	~stipulateCost = 0
+	~stipulateCost = 0 
 	~stipulateTN = 5
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1519,7 +1544,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_fullevasion = 1
 				{
 					- _altAction <= 0:
-						+ Full Evasion....[({stipulateCost})tn:{stipulateTN}]
+						+ Full Evasion....[({clampNegative(stipulateCost)})tn:{stipulateTN}]
 						-> ChooseManueverListDef("fullevasion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1530,7 +1555,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 /*  // todo manuever resolutions
 {	//Block Open and Strike - Deflecting an incoming attack with the offhand weapon to leave an opponent open for the next strike.
 	- (_confirmSelection==0||_confirmSelection=="blockopenstrike") && _DTN_off != 0 && _profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN_off
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1545,7 +1570,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_blockopenstrike = 1
 				{
 					- _altAction <= 0:
-						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}] 
+						+ Block Open and Strike....[({clampNegative(stipulateCost)})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("blockopenstrike", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1555,7 +1580,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Counter - Deflecting an incoming attack with the weapon at hand while using an opponent's attack against them.
 	- (_confirmSelection==0||_confirmSelection=="counter") && (_DTN || _DTN_off) && _profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		-stipulateTN==0: 
@@ -1578,7 +1603,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_counter = 1
 				{
 					- _altAction <= 0:
-						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
+						+ Counter....[({clampNegative(stipulateCost)})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1588,7 +1613,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Rota - Deflect an incoming attack with the back of weapon at hand and countering with the front.
 	- (_confirmSelection==0||_confirmSelection=="rota") && _DTN && _profeciencyLevel>=3 && _enemyManueverType!=ATTACK_TYPE_THRUST && isThrustingMotion(_enemyTargetZone)==0:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "rota", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "rota", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1603,7 +1628,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_rota = 1
 				{
 					- _altAction <= 0:
-						+ Rota....[({stipulateCost})tn:{stipulateTN}] 
+						+ Rota....[({clampNegative(stipulateCost)})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("rota", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1613,7 +1638,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Expulsion
 	- (_confirmSelection==0||_confirmSelection=="expulsion") && _DTN && _profeciencyLevel>=5 && ( (_enemyDiceRolled<=4) || (_enemyManueverType == ATTACK_TYPE_THRUST || isThrustingMotion(_enemyTargetZone)) ):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "expulsion", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "expulsion", _hasShield) +stanceCostModifier
 	~stipulateTN = 9
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1628,7 +1653,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_expulsion = 1
 				{
 					- _altAction <= 0:
-						+ Expulsion....[({stipulateCost})tn:{stipulateTN}] 
+						+ Expulsion....[({clampNegative(stipulateCost)})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("expulsion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1638,7 +1663,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Disarm (Defensive) - Striking with the weapon at hand to remove an opponent's weapon from his control before he hits.
 	- (_confirmSelection==0||_confirmSelection=="disarm") && _DTN != 0 && _profeciencyLevel>=4:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1653,7 +1678,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_disarm = 1
 				{
 					- _altAction <= 0:
-						+ Disarm....[({stipulateCost})tn:{stipulateTN}] 
+						+ Disarm....[({clampNegative(stipulateCost)})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("disarm", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
