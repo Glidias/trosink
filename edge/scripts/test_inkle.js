@@ -261,19 +261,19 @@ function setupServer() {
 	 // when the client emits 'adduser', this listens and executes
 		
 		// add the client's username to the global list
-		sessionHash[socket.username] = new InkleSessionInstance(socket);
+		sessionHash[socket.id] = new InkleSessionInstance(socket);
 		
-		sessionHash[socket.username].readDefaultTROS();
+		sessionHash[socket.id].readDefaultTROS();
 
 	   socket.on('disconnect', function(reason){
-			if (sessionHash[socket.username]) {
-				sessionHash[socket.username].destroy();
+			if (sessionHash[socket.id]) {
+				sessionHash[socket.id].destroy();
 			}
-			delete sessionHash[socket.username];
+			delete sessionHash[socket.id];
 	  });
 	  
 	  socket.on('serverchat', function(msg){
-	    io.emit('serverchat', msg);
+	    socket.emit('serverchat', msg);
 	  });
 
 /*
@@ -285,8 +285,8 @@ function setupServer() {
 	  socket.on('sendChoice', function(index) {
 	  	if (isNaN(index)) return;
 	  	//	console.log(setChoiceIndex);
-	  	if (!sessionHash[socket.username]) return;
-	  	 sessionHash[socket.username].setChoiceIndex(index);
+	  	if (!sessionHash[socket.id]) return;
+	  	 sessionHash[socket.id].setChoiceIndex(index);
 	  });
 	});
 
