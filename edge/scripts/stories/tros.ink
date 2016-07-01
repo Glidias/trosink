@@ -96,7 +96,7 @@ Let's fight!
 			-else:
 				-> DeclareStance(charPersonName2_label, charPersonName2_isYOU) 
 		}
-		->DeclareStancesForRemaining
+		->PickCharactersWithAttributeVal.GotoLoop
 	}
 	{  
 		-charPersonName_picked && charPersonName_FIGHT && charPersonName_fight_stance==STANCE_RESET && charPersonName_fight_paused: 
@@ -107,7 +107,7 @@ Let's fight!
 			-else:
 				-> DeclareStance(charPersonName_label, charPersonName_isYOU) 
 		}
-		->DeclareStancesForRemaining
+		->PickCharactersWithAttributeVal.GotoLoop
 	}
 	//*/
 	

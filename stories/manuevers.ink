@@ -55,7 +55,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~return 0
 }
 
-=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel, ref twoHanded )
+=== function getManueverSelectReadonlyDependencies(charId,   ref initiative, ref profeciencyType, ref profeciencyLevel, ref diceAvailable, ref orientation, ref hasShield  ,   ref lastAttacked, ref DTN, ref DTNt, ref DTN_off, ref DTNt_off   ,   ref ATN, ref ATN2, ref ATN_off, ref ATN2_off, ref blunt,  ref blunt2, ref hasShield, ref damage, ref damage2, ref damage3, ref damage_off, ref damage2_off, ref damage3_off, ref shieldLimit, ref weaponMainLabel, ref weaponOffhandLabel, ref twoHanded )
 ~temp x
 {
 ///* utest player
@@ -69,7 +69,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~lastAttacked = charPersonName_fight_lastAttacked
 //getAllWeaponStats(weaponId, ref name, ref isShield, ref damage, ref damage2, ref damage3, ref attrBaseIndex,  ref dtn, ref dtnT, ref atn, ref atn2, ref blunt ,   ~ref shieldLimit  )
 	{getAllWeaponStats(charPersonName_equipMasterhand, weaponMainLabel, hasShield,  damage, damage2, damage3,x,DTN, DTNt, ATN, ATN2, blunt, shieldLimit, twoHanded )}
-	{getAllWeaponStats(charPersonName_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt, shieldLimit, twoHanded )}
+	{getAllWeaponStats(charPersonName_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt2, shieldLimit, twoHanded )}
 
 //*/
 ///* utest
@@ -82,7 +82,7 @@ CONST MANUEVER_TYPE_RANGED = 1
 	~orientation = charPersonName2_fight_orientation
 	~lastAttacked = charPersonName2_fight_lastAttacked
 	{getAllWeaponStats(charPersonName2_equipMasterhand, weaponMainLabel, hasShield,  damage, damage2, damage3,x,DTN, DTNt, ATN, ATN2, blunt, shieldLimit, twoHanded )}
-	{getAllWeaponStats(charPersonName2_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt, shieldLimit, twoHanded )}
+	{getAllWeaponStats(charPersonName2_equipOffhand, weaponOffhandLabel, hasShield, damage_off,damage2_off,damage3_off,x,DTN_off, DTNt_off, ATN_off, ATN2_off, blunt2, shieldLimit, twoHanded )}
 //*/
 -else:
 	~elseResulted = 1
@@ -407,6 +407,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 ~temp _ATN2_off
 ~temp _equipMainHand
 ~temp _blunt  
+~temp _blunt2
 ~temp _damage
 ~temp _damage2
 ~temp _damage3
@@ -436,7 +437,7 @@ slotIndex will either be "2" or "3", depending which is already used up.
 ~temp stipulateTN
 
 // kiv: some overlap below with getTargetInitiativeStatesByCharId() by above, can consider re-factoring later? bah nvm..
-{getManueverSelectReadonlyDependencies(charId, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt,   _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand, _twoHanded)}
+{getManueverSelectReadonlyDependencies(charId, x, _profeciencyType, _profeciencyLevel, _diceAvailable, _orientation, _hasShield  ,   _lastAttacked,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, _blunt, _blunt2,  _hasShield,   _damage, _damage2, _damage3, _damage_off, _damage2_off, _damage3_off, _shieldLimit, _equipMainHand, _equipOffhand, _twoHanded)}
 {getManueverSelectReadonlyEnemyDependencies(charId, enemyId, _enemyDiceRolled, _enemyTargetZone, _enemyManueverType)}
 
 ~temp charCanAttack = _charTarget == enemyId && slotIndex != 3
@@ -487,6 +488,7 @@ ProfLevel: {_profeciencyLevel}
 HasShield: {_hasShield}
 Last Attacked: {_lastAttacked}
 Blunt Weapon: {_blunt}
+Blunt Weapon offhand: {_blunt2}
 isAI?:{_isAI}
 */
 
@@ -509,6 +511,7 @@ isAI?:{_isAI}
 ~temp AVAIL_rota = 0
 ~temp AVAIL_expulsion = 0
 ~temp AVAIL_disarm = 0
+
 
 ~temp altAction
 ~temp divertTo
@@ -779,7 +782,7 @@ For now, he will Do Nothing.
 		//You switched back to your main hand weapon.
 		{
 		- charNoMasterHand == 0:
-			~getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x,   x,   x, x, x, x, x, x, x, x, x, x)
+			~getManueverSelectReadonlyDependencies(charId, x, x, x, x, x, x  ,   x,    _DTN, _DTNt, _DTN_off, _DTNt_off   ,    _ATN, _ATN2,  _ATN_off, _ATN2_off, x, x,  x,   x, x, x, x, x, x, x, x, x, x)
 		}
 }
 -> ChooseManueverMenu
@@ -801,8 +804,10 @@ For now, he will Do Nothing.
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
 + {_diceAvailable>0 && _initiative && _orientation!=ORIENTATION_AGGRESSIVE}  Defend (with initiative)   // Quick Defense falls under here
 	-> ChooseManueverListDef(0,0,->ChooseManueverMenu )
-+ {_diceAvailable>0 && _initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (buy initiative)
+/*  // todo: not available atm
++ {_diceAvailable>0 && _initiative==0 && _charTarget == enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (buy initiative)  
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
+*/
 + {_diceAvailable>0 && _initiative==0 && _charTarget==enemyId && _orientation!= ORIENTATION_DEFENSIVE && charCanAttack} Attack (no initiative) 
 //+ {_initiative==0 && _orientation!= ORIENTATION_DEFENSIVE } Attack (seize initiative)  // TODO, if not being engaged by offenseive manuever from target
 	-> ChooseManueverListAtk(0,0,->ChooseManueverMenu )
@@ -1154,7 +1159,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 	}
 }
 {	// Spike
-	- (_confirmSelection==0||_confirmSelection=="spike") && _blunt!=0 && (_ATN2 || _ATN2_off): 
+	- (_confirmSelection==0||_confirmSelection=="spike") && ( (_blunt && _ATN2) || (_blunt2  && _ATN2_off ) ): 
 	~stipulateCost= getManueverCostWithProfeciency(_profeciencyType, "spike", _hasShield)
 	~stipulateTN = _ATN2
 	{ 
@@ -1262,6 +1267,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 		
 	}
 }
+/*  todo manuever resolutions for these
 { 	// Beat - Striking with the weapon at hand to knock an opponent's weapon or shield to the side
 	- (_confirmSelection==0||_confirmSelection=="beat") && _orientation == ORIENTATION_AGGRESSIVE && _ATN && _profeciencyLevel >=4:
 	~stipulateCost =  getManueverCostWithProfeciency(_profeciencyType, "beat", _hasShield)
@@ -1326,6 +1332,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 	
 	}
 }
+*/
 { 
 	- _altAction <= 0:
 		+ [(Try Something Else)]
@@ -1446,6 +1453,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 		}
 	}
 }
+/*
 {	//Duck and Weave (Defensive) - Avoiding an incoming attack while moving in for a follow up.
 	- (_confirmSelection==0||_confirmSelection=="duckweave") :
 	~stipulateCost = 0
@@ -1470,6 +1478,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 		}
 	}
 }
+*/
 {	//Partial Evasion (Defensive) - Avoiding an incoming attack.
 	- (_confirmSelection==0||_confirmSelection=="partialevasion") :
 	~stipulateCost = 0
@@ -1517,7 +1526,8 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				}
 		}
 	}
-}
+} 
+/*  // todo manuever resolutions
 {	//Block Open and Strike - Deflecting an incoming attack with the offhand weapon to leave an opponent open for the next strike.
 	- (_confirmSelection==0||_confirmSelection=="blockopenstrike") && _DTN_off != 0 && _profeciencyLevel>=6:
 	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield) 
@@ -1535,7 +1545,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_blockopenstrike = 1
 				{
 					- _altAction <= 0:
-						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}] (TODO)
+						+ Block Open and Strike....[({stipulateCost})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("blockopenstrike", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1568,7 +1578,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_counter = 1
 				{
 					- _altAction <= 0:
-						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}] (TODO)
+						+ Counter....[({stipulateCost})tn:{stipulateTN} {usingOffhand:(off-hand)}]
 						-> ChooseManueverListDef("counter", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1593,7 +1603,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_rota = 1
 				{
 					- _altAction <= 0:
-						+ Rota....[({stipulateCost})tn:{stipulateTN}] (TODO)
+						+ Rota....[({stipulateCost})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("rota", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1618,7 +1628,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_expulsion = 1
 				{
 					- _altAction <= 0:
-						+ Expulsion....[({stipulateCost})tn:{stipulateTN}] (TODO)
+						+ Expulsion....[({stipulateCost})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("expulsion", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1643,7 +1653,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 				~AVAIL_disarm = 1
 				{
 					- _altAction <= 0:
-						+ Disarm....[({stipulateCost})tn:{stipulateTN}] (TODO)
+						+ Disarm....[({stipulateCost})tn:{stipulateTN}] 
 						-> ChooseManueverListDef("disarm", _altAction, _callbackThread )
 					//-else:
 					//	->_callbackThread
@@ -1651,6 +1661,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 		}
 	}
 }
+*/
 { 
 	- _altAction <= 0:
 		+ [(Try Something Else)]

@@ -385,7 +385,7 @@ VAR charPersonName_totalPain = 0
 VAR charPersonName_totalBL = 0
 VAR charPersonName_health = 4
 VAR charPersonName_totalHealth = 4
-VAR charPersonName_equipOffhand = "gladius"
+VAR charPersonName_equipOffhand = "shield"
 VAR charPersonName_equipMasterhand = "gladius"
 //*/
 ///* utest var
