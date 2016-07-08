@@ -1107,7 +1107,7 @@ ChoosingManuversLooseEndError detected. This should not happen!
 
 		}
 	}
-	-> ConfirmManuever
+	-> AssignCombatPool
 }
 
 = AimTargetZoneLooseEndError
@@ -1407,12 +1407,13 @@ AimTargetZoneLooseEndError detected. This should not happen!
 ~temp usingOffhand = 0
 ~manueverNeedBodyAim = 0
 
+
 ~temp stanceCostModifier =0
 {
 	-_stance == STANCE_OFFENSIVE:
 		~stanceCostModifier =  2
 	-_stance == STANCE_DEFENSIVE:
-		~stanceCostModifier = -1
+		~stanceCostModifier = -2
 	-else:
 		~elseResulted = 1
 }
@@ -1422,7 +1423,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {  //Block (Defensive) - Deflecting an incoming attack with the shield.
 	- (_confirmSelection==0||_confirmSelection=="block") && _hasShield && _DTN_off!=0:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "block", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN_off
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1447,7 +1448,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Parry (Defensive) - Deflect an incoming attack with the weapon at hand.
 	- (_confirmSelection==0||_confirmSelection=="parry") && (_DTN||_DTN_off):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "parry", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		-stipulateTN==0: 
@@ -1481,7 +1482,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 /*
 {	//Duck and Weave (Defensive) - Avoiding an incoming attack while moving in for a follow up.
 	- (_confirmSelection==0||_confirmSelection=="duckweave") :
-	~stipulateCost = 0
+	~stipulateCost = 0 +stanceCostModifier
 	~stipulateTN = 9
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1506,7 +1507,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 */
 {	//Partial Evasion (Defensive) - Avoiding an incoming attack.
 	- (_confirmSelection==0||_confirmSelection=="partialevasion") :
-	~stipulateCost = 0
+	~stipulateCost = 0 +stanceCostModifier
 	~stipulateTN = 7
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1530,7 +1531,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Full Evasion (Defensive) - Avoiding an incoming attack and exit the fight.
 	- (_confirmSelection==0||_confirmSelection=="fullevasion") && (_orientation == ORIENTATION_DEFENSIVE) || _lastAttacked==0:
-	~stipulateCost = 0
+	~stipulateCost = 0 
 	~stipulateTN = 5
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1555,7 +1556,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 /*  // todo manuever resolutions
 {	//Block Open and Strike - Deflecting an incoming attack with the offhand weapon to leave an opponent open for the next strike.
 	- (_confirmSelection==0||_confirmSelection=="blockopenstrike") && _DTN_off != 0 && _profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "blockopenstrike", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN_off
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1580,7 +1581,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Counter - Deflecting an incoming attack with the weapon at hand while using an opponent's attack against them.
 	- (_confirmSelection==0||_confirmSelection=="counter") && (_DTN || _DTN_off) && _profeciencyLevel>=6:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		-stipulateTN==0: 
@@ -1613,7 +1614,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Rota - Deflect an incoming attack with the back of weapon at hand and countering with the front.
 	- (_confirmSelection==0||_confirmSelection=="rota") && _DTN && _profeciencyLevel>=3 && _enemyManueverType!=ATTACK_TYPE_THRUST && isThrustingMotion(_enemyTargetZone)==0:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "rota", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "rota", _hasShield)  +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1638,7 +1639,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Expulsion
 	- (_confirmSelection==0||_confirmSelection=="expulsion") && _DTN && _profeciencyLevel>=5 && ( (_enemyDiceRolled<=4) || (_enemyManueverType == ATTACK_TYPE_THRUST || isThrustingMotion(_enemyTargetZone)) ):
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "expulsion", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "expulsion", _hasShield) +stanceCostModifier
 	~stipulateTN = 9
 	{
 		- _diceAvailable > stipulateCost: 
@@ -1663,7 +1664,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 }
 {	//Disarm (Defensive) - Striking with the weapon at hand to remove an opponent's weapon from his control before he hits.
 	- (_confirmSelection==0||_confirmSelection=="disarm") && _DTN != 0 && _profeciencyLevel>=4:
-	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) 
+	~stipulateCost = getManueverCostWithProfeciency(_profeciencyType, "counter", _hasShield) +stanceCostModifier
 	~stipulateTN = _DTN
 	{
 		- _diceAvailable > stipulateCost: 
