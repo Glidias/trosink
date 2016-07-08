@@ -1,0 +1,82 @@
+.phoneframe {
+  width: 378px;
+  height: 765px;
+  background-image: url(../img/mock/phoneframe_large.png);
+  transform-origin: 0 0;
+  background-size: 100% 99.6%;
+  background-repeat: no-repeat;
+  position: relative; }
+  .phoneframe.scaleddown {
+    transform: scaleX(0.81301) scaleY(0.81301); }
+  .phoneframe .appwrapper {
+    position: absolute;
+    top: 97px;
+    left: 29px;
+    font-size: 16px; }
+
+.appwrapper {
+  background-color: grey;
+  transform-origin: 0 0;
+  width: 320px;
+  height: 568px;
+  overflow: hidden; }
+  .appwrapper .clear {
+    clear: both; }
+  .appwrapper #contentwrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%; }
+  .appwrapper .contents {
+    padding: 10px;
+    padding-top: 100px;
+    font-size: 15px;
+    font-family: 'Georgia'; }
+    .appwrapper .contents .area {
+      margin-top: 8px; }
+    .appwrapper .contents .describeline {
+      background-color: white;
+      padding: 8px;
+      box-sizing: border-box; }
+    .appwrapper .contents .choices {
+      background-color: white;
+      margin-top: 15px;
+      box-sizing: border-box; }
+      .appwrapper .contents .choices .choice {
+        padding: 15px;
+        font-style: italic;
+        font-size: 18px;
+        border: 0.25px solid #dddddd; }
+    .appwrapper .contents .person {
+      box-sizing: border-box; }
+      .appwrapper .contents .person .circlebg {
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        background-color: #bbbbbb; }
+      .appwrapper .contents .person.connect {
+        margin-top: 0; }
+      .appwrapper .contents .person .portrait {
+        width: 64px;
+        height: 64px;
+        padding: 8px;
+        box-sizing: border-box;
+        float: right;
+        width: 25%; }
+      .appwrapper .contents .person .copy {
+        float: left;
+        min-height: 64px;
+        box-sizing: border-box;
+        border: 1px solid #dddddd;
+        background-color: white;
+        width: 75%;
+        padding: 10px; }
+      .appwrapper .contents .person.portrait-left .portrait {
+        float: left; }
+      .appwrapper .contents .person.portrait-left .copy {
+        float: left;
+        text-indent: 5px; }
+
+/*# sourceMappingURL=mock.css.map */

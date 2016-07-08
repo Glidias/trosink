@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script src="js/lib/jquery.2.1.0.min.js"></script>	
+	<script src="js/lib/iscroll.js"></script>	
+	<script src="js/lib/vue.js"></script>	
+	<script src="js/lib/vue-animated-list.js"></script>	
+	<link rel="stylesheet" type="text/css" href="css/mock.css">
+</head>
+<body>
+	<div class="phoneframe" id="phoneframe">
+		<div class="appwrapper" id="appwrapper">
+			<div class="nav">
+				
+			</div> 
+			<div id="contentwrapper">
+				<div class="contents" id="contents">
+					<div class="area" v-if="!a.orientation || a.target" v-bind:class="{'temp':a.temp, 'tempCurrent':a.tempCurrent, 'portrait-left': a.charId && isPortraitLeftAligned(this.charInfo[a.charId]), 'person':a.charId, 'describeline':!a.charId ,  'connect':$index > 0 && (a.charId==lines[$index-1].charId || (  getCharInfo(lines[$index-1]).target ==a.charId && getCharInfo(a).target && getCharInfo(a).target == lines[$index-1].charId )  )  }" v-for="a in lines">
+						<div class="portrait" v-if="a.charId">
+							<div class="circlecont" v-if="($index == 0 || lines[$index-1].charId != a.charId)">
+								<div class="circlebg"></div>
+								<div class="circleimg"></div>
+								<div class="circleoutline"></div>
+							</div>
+						</div>
+						<div class="copy">{{a.text}}</div>
+						<div class="clear"></div>
+					</div>
+						
+						
+						
+					<div class="area choices">
+						<div class="choice" v-for="c in choices">{{c.text}}</div>
+					</div>
+						
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/mock.js"></script>	
+</body>
+</html>
