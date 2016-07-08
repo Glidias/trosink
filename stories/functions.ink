@@ -406,7 +406,7 @@ VAR charPersonName2_mobility = 6
 VAR charPersonName2_endurance = 4
 VAR charPersonName2_perception = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
-VAR charPersonName2_usingProfeciencyLevel = 8
+VAR charPersonName2_usingProfeciencyLevel = 11
 VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
@@ -632,7 +632,10 @@ CONST RESOLVED_LOCKED = -1
 
 === function showPlayerInitiativeState()
 ///* utest player
-{ charPersonName_fight_target==TARGET_NONE:{~return} }
+{ 
+	-charPersonName_fight_target==TARGET_NONE:
+		~return
+}
 ~temp mutual =  getTargetByCharId(charPersonName_fight_target) == charPersonName_id
 ~temp mutualOrientation
 Target{mutual:{" Opponent"}}: {getDescribeLabelOfCharCapital(charPersonName_fight_target)}{"   "}<>

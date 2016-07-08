@@ -1107,7 +1107,7 @@ ChoosingManuversLooseEndError detected. This should not happen!
 
 		}
 	}
-	-> ConfirmManuever
+	-> AssignCombatPool
 }
 
 = AimTargetZoneLooseEndError
@@ -1406,6 +1406,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 ~manueverUseHands = MANUEVER_HAND_NONE
 ~temp usingOffhand = 0
 ~manueverNeedBodyAim = 0
+
 
 ~temp stanceCostModifier =0
 {
