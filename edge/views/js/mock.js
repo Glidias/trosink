@@ -180,7 +180,8 @@
 		},
 		"partialEvasion": {
 			lines: [
-				{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				{ text:"You defended with Partial Evasion for 6 CP", type:"manueverDeclare", charId:1, against:2, cp:6 }
+				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
 				,{ text:"CharPersonName2 failed to attack successfully against you with BS:-1", type:"manueverResolve", charId:2, bs:-1, ts:3 }
 				,{ text:"Do you wish to seize initiative for 2 CP? (Will have 3 CP left.)", type:"choiceHeader", charId:1, choiceHeader:"manueverResolvePost"}
 			],
@@ -191,7 +192,8 @@
 		},
 		"resolve": {
 			lines: [
-				{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				{ text:"You defended with Block for 9 CP", type:"manueverDeclare", charId:1, against:2, cp:9 }
+				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
 				,{ text:"CharPersonName2 attacked successfully with BS:1", type:"manueverResolve", bs:1, ts:3, charId:2 }
 				,{ text:"CharPersonName3 managed to attack through, but only dealt a close-shave with BS:0", type:"manueverResolve",  bs:0, ts:3, charId:3 }
 			],
@@ -201,7 +203,8 @@
 		},
 		"resolve2": {
 			lines: [
-			{ text:"CharPersonName2 defends with Block for 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8 }
+			{ text:"You attack with Cut (swing from above) with 8 CP", type:"manueverDeclare", charId:1, against:2, cp:8 }
+			,{ text:"CharPersonName2 defends with Block for 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8 }
 			,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
 			,{ text:"Your attack succeeded with BS:3, but failed to deal any damage.", type:"manueverResolve", bs:3, ts:3, damageReduc:"armour", armour:4, charId:1 }
 			,{ text:"CharPersonName3's attack failed with BS:-1",  bs:0, ts:3, type:"manueverResolve", charId:3 }
