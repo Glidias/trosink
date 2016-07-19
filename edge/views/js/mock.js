@@ -43,9 +43,30 @@
 
 	//  Js frontend include: "temp" + charId insertion
 	
+	
 	var testMockData = [
-		
+		"stance", "orientation", ["target", "engaged"], "manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP", "resolve"
 	];
+	var testMockData2 = [
+		"manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP",  "resolve2"
+	];
+	
+	var testMockData3 = [
+		"manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP",   "partialEvasion", "resolve3"
+	];
+	
+	var testMockDataCyles = [
+		testMockData, testMockData2, testMockData, testMockData3
+	];
+	
+	function generateMockCPChoices(amount) {
+		var arr = [];
+		var i;
+		for(i=0;i < amount; i++) {
+			arr.push( {text:(i+1)+" dice"} );
+		}
+		return arr;
+	}
 	
 	var testMockDataHash = {
 		"stance": {
@@ -92,7 +113,7 @@
 				,{ text:"CharPersonName3 revealed an orientation of: Cautious", type:"orientation", charId:3, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:1 }
 				,{ text:"CharPersonName3 targets you, cautiously.", type:"target", charId:2, target:1 }
-				,{ text:"CharPersonName2 attacks you with Bash (swing) (for Overhand Swing) with 8 CP", type:"target", charId:2, target:1 }
+				,{ text:"CharPersonName2 attacks you with Bash (for overhand swing) with 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8, targetZone:0 }
 				,{ text:"Defend", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
 				
 			],
@@ -113,27 +134,94 @@
 				,{ text: "Thrust....(0)tn:6", tn:6, cost:0, manuever:"thrust" }	
 			]
 		},
-		"manueverDeclareChooseOpponent": {
+		"manueverChooseOpponent": {
 			lines: [
 				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
 				,{ text:"Pick an opponent to deal against:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseOpponent"}
 			],
 			choices: [
-			
+				{ text: "CharPersonName2", charId:2 }
+				,{ text: "CharPersonName3",  charId:3 }	
 			]
 		},
-		
-		"manueverChooseManueverType": {
+		"manueverChooseType": {
 			lines: [
 				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
 				,{ text:"Choose the nature of your action:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manueverType"}
 			],
 			choices: [
-		
+				{ text: "Attack" }
+				,{ text: "Defend (with initiative)" }	
+				,{ text: "Change Target (buy initiative)" }
+				,{ text: "Change Target (no initiative)" }
+				,{ text: "Switch to off-hand" }	
+				,{ text: "Do Nothing" }	
+			]
+		},
+		"manueverChooseCP": {
+			lines: [
+				{ text:"How much dice in your combat pool do you wish to roll for this manuever?", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseCP"}
+			],
+			choices: generateMockCPChoices(12)
+		},
+		"manueverChooseTargetZone": {
+			lines: [
+				{ text:"How much dice in your combat pool do you wish to roll for this manuever?", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseCP"}
+			],
+			choices: [
+				"to the Lower Legs"
+				,"to the Upper Legs"
+				,"Horizontal Swing"
+				,"Overhand Swing"
+				,"Downward Swing from Above"
+				,"Upward Swing from Below"
+				,"to the Arms"
+			]
+		},
+		"partialEvasion": {
+			lines: [
+				{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				,{ text:"CharPersonName2 failed to attack successfully against you with BS:-1", type:"manueverResolve", charId:2, bs:-1, ts:3 }
+				,{ text:"Do you wish to seize initiative for 2 CP? (Will have 3 CP left.)", type:"choiceHeader", charId:1, choiceHeader:"manueverResolvePost"}
+			],
+			choices: [
+				{text:"Yes"}
+				,{text:"No"}
+			]
+		},
+		"resolve": {
+			lines: [
+				{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				,{ text:"CharPersonName2 attacked successfully with BS:1", type:"manueverResolve", bs:1, ts:3, charId:2 }
+				,{ text:"CharPersonName3 managed to attack through, but only dealt a close-shave with BS:0", type:"manueverResolve",  bs:0, ts:3, charId:3 }
+			],
+			choices: [
+				{text:"Proceed to 2nd Exchange", type:"endExchange", "endExchange":1}
+			]
+		},
+		"resolve2": {
+			lines: [
+			{ text:"CharPersonName2 defends with Block for 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8 }
+			,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+			,{ text:"Your attack succeeded with BS:3, but failed to deal any damage.", type:"manueverResolve", bs:3, ts:3, damageReduc:"armour", armour:4, charId:1 }
+			,{ text:"CharPersonName3's attack failed with BS:-1",  bs:0, ts:3, type:"manueverResolve", charId:3 }
+			],
+			choices: [
+				{text:"Proceed to Next Round", type:"endExchange", "endExchange":2}
+			]
+		},
+		"resolve3": {
+			lines: [
+				{ text:"CharPersonName3 managed to attack through, but only dealt a close-shave with BS:0", type:"manueverResolve", bs:0, ts:3, charId:3 }
+			],
+			choices: [
+				{text:"Proceed to Next Round", type:"endExchange", "endExchange":2}
+			
 			]
 		}
-		
 	}
+	
+	
 	
 	
 	
