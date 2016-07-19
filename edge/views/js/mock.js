@@ -166,16 +166,16 @@
 		},
 		"manueverChooseTargetZone": {
 			lines: [
-				{ text:"How much dice in your combat pool do you wish to roll for this manuever?", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseCP"}
+				{ text:"Where on your opponent do you wish to aim your thrust?", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseTargetZone"}
 			],
 			choices: [
-				"to the Lower Legs"
-				,"to the Upper Legs"
-				,"Horizontal Swing"
-				,"Overhand Swing"
-				,"Downward Swing from Above"
-				,"Upward Swing from Below"
-				,"to the Arms"
+				{text:"to the Lower Legs", targetZone:0}
+				,{text:"to the Upper Legs", targetZone:0}
+				,{text:"Horizontal Swing", targetZone:0}
+				,{text:"Overhand Swing", targetZone:0}
+				,{text:"Downward Swing from Above", targetZone:0}
+				,{text:"Upward Swing from Below", targetZone:0}
+				,{text:"to the Arms", targetZone:0}
 			]
 		},
 		"partialEvasion": {
