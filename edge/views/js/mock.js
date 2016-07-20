@@ -44,20 +44,25 @@
 
 	//  Js frontend include: "temp" + charId insertion
 	
-	
+	//"target",
 	var testMockData = [
-		"stance", "orientation", ["target", "engaged"], "manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP", "resolve"
+		"stance", "orientation", [ "engaged"], "manueverChooseTargetZone", "manueverChooseCP", "resolve"
 	];
+	
+	var testMockData1 = [
+		"stance", "orientation", "target", "manueverChooseOpponent",["manueverChooseType", "manueverDeclare"], "manueverChooseTargetZone", "manueverChooseCP", "resolve"
+	];
+	
 	var testMockData2 = [
-		"manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP",  "resolve2"
+		"manueverChooseOpponent",["manueverChooseType", "manueverDeclare"], "manueverChooseTargetZone", "manueverChooseCP",  "resolve2"
 	];
 	
 	var testMockData3 = [
-		"manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP",   "partialEvasion", "resolve3"
+		"manueverChooseOpponent", ["manueverChooseType", "manueverDeclare"], "manueverChooseTargetZone", "manueverChooseCP",   "partialEvasion", "resolve3"
 	];
 	
 	var testMockDataCycles = [
-		testMockData, testMockData2, testMockData, testMockData3
+		testMockData, testMockData2, testMockData, testMockData3, testMockData1, testMockData2
 	];
 	
 	function generateMockCPChoices(amount) {
@@ -94,7 +99,7 @@
 		},
 		"target": {
 			lines: [
-				,{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
+				{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
 				,{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Defensive", type:"orientation", charId:3, orientation:ORIENTATION_DEFENSIVE }
@@ -113,7 +118,7 @@
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Cautious", type:"orientation", charId:3, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:1 }
-				,{ text:"CharPersonName3 targets you, cautiously.", type:"target", charId:2, target:1 }
+				,{ text:"CharPersonName3 targets you, cautiously.", type:"target", charId:3, target:1 }
 				,{ text:"CharPersonName2 attacks you with Bash (for overhand swing) with 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8, targetZone:0 }
 				,{ text:"Defend", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
 				
@@ -127,8 +132,8 @@
 		},
 		"manueverDeclare": {
 			lines: [
-				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
-				,{ text:"Attack", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
+				//{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
+				{ text:"Attack", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
 			],
 			choices: [
 				{ text: "Cut....(0)tn:6", tn:6, cost:0, manuever:"cut" }
@@ -137,18 +142,18 @@
 		},
 		"manueverChooseOpponent": {
 			lines: [
-				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
-				,{ text:"Pick an opponent to deal against:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseOpponent"}
+				//{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
+				{ text:"Pick an opponent to deal against:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseOpponent"}
 			],
 			choices: [
-				{ text: "CharPersonName2", charId:2 }
+				{ text: "CharPersonName2 (Your target)", charId:2 }
 				,{ text: "CharPersonName3",  charId:3 }	
 			]
 		},
 		"manueverChooseType": {
 			lines: [
-				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
-				,{ text:"Choose the nature of your action:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manueverType"}
+				//{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
+				{ text:"Choose the nature of your action:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manueverType"}
 			],
 			choices: [
 				{ text: "Attack" }
@@ -253,14 +258,84 @@
 		return outputData;
 	}
 	
+	function resetMockExchange(data) {
+		
+		//if (data.endExchange == 2) {
+			mockRoundCount++;
+			if (mockRoundCount >= testMockDataCycles.length) {
+				mockRoundCount = 0;
+			}
+		//}
+		
+		mockRecieveCount = 0;
+		vm.lines = [];
+	}
+	
+	
+	// start reeal
+	
+	
+	var typesCharRelated = {
+		stance:true,
+		orientation:true,	
+		target:true,
+		manueverDeclare:true
+	}
+	
+	function insertCharRelatedData(lines, c) {
+		// todo: place into already exisiting data slot. may replace across orientation/target ...manueverDeclare
+		lines.push(c);
+	}
 	
 	
 	
-	
+
 	function receiveData(data) {
 		var lines = data.lines;
 		
-		vm.lines = data.lines;
+		var len = lines.length;
+		var i;
+		var choiceHeader = null;
+		var lastChoiceHeader = vm.choiceHeader;
+		var c;
+		for (i=0; i< len; i++) {
+			c = lines[i];
+			if (c.type != "choiceHeader") {
+
+				if (typesCharRelated[c.type]) {
+					insertCharRelatedData(vm.lines, c);
+					
+				}
+				else {
+					
+					vm.lines.push( c );
+				}
+			}
+			else {
+				choiceHeader = c;
+			}
+		}
+		
+		if (lastChoiceHeader != null) {
+			
+			vm.lines.$remove( lastChoiceHeader);
+			
+		}
+		
+		if (choiceHeader != null) {
+			// todo: determine best way to place choiceHeader in the various cases
+			vm.lines.push(choiceHeader);
+			
+			vm.choiceHeader = choiceHeader;
+
+		}
+		else {
+			vm.choiceHeader = { type:"choiceHeader" };
+			vm.lines.push(vm.choiceHeader);
+		}
+		
+		//vm.lines.push(
+		
 		vm.choices = data.choices;
 		
 		refreshView();
@@ -268,17 +343,17 @@
 	
 	
 	
+	var testChoiceHeader = { type:"choiceHeader" };
 	var testVueModelData = {
 		charInfo: mockStartCharInfo
 		,lines: [
-			
+			testChoiceHeader
 		]
-		,choiceHeader:false
+		,typesCharRelated:typesCharRelated
+		,choiceHeader: testChoiceHeader
 		,choices:[
-			{ text:"start" }
+			{text:"start mock"}
 		]
-		
-		
 	};
 	
 	
@@ -291,9 +366,13 @@
 				return a.target ? (a.initiative!=null ? !a.initiative : false )  : (a.orientation ? a.orientation === ORIENTATION_CAUTIOUS  : a.stance === STANCE_DEFENSIVE) 
 			}
 			,getCharInfo(packet, prop) {
-				return packet.charId ? this.charInfo[packet.charId] : {};
+				return packet.charId ? this.charInfo[packet.charId] : {target:{}};
 			}
 			,onChoiceClick(c) {
+				if (this.choiceHeader && c.type == "endExchange") {
+					resetMockExchange(c);
+		
+				}
 				receiveData( getMockData() );
 			}
 		 }
