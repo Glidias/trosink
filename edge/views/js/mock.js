@@ -10,6 +10,7 @@
 		HWCompositing: false,
 		mouseWheel: true,
 		bounce:false
+		,click:true
 	});
 
 
@@ -55,7 +56,7 @@
 		"manueverChooseOpponent", "manueverChooseType", "manueverDeclare", "manueverChooseTargetZone", "manueverChooseCP",   "partialEvasion", "resolve3"
 	];
 	
-	var testMockDataCyles = [
+	var testMockDataCycles = [
 		testMockData, testMockData2, testMockData, testMockData3
 	];
 	
@@ -223,89 +224,61 @@
 			]
 		}
 	}
+	var mockStartCharInfo = [
+		{}
+		,{portraitSrc:"", isYou:true, isAI:false}
+		,{portraitSrc:"", isYou:false, isAI:true}
+		,{potraitSrc:"", isYou:false, isAI:true}
+	];
+	
+	var mockRecieveCount = 0;
+	var mockRoundCount=0;
+	function getMockData() {
+		var roundChoose = testMockDataCycles[mockRoundCount];
+		
+		var data = roundChoose[mockRecieveCount];
+		var i;
+		
+		if (typeof data === "object") {  // assumed array
+			data = data[Math.floor(Math.random()*data.length)];
+		}
+		data = testMockDataHash[data];
+	
+		var outputData = $.extend(false, data ,{});
+	
+		
+		mockRecieveCount++;
+		if (mockRecieveCount >= roundChoose.length) mockRecieveCount = 0;
+		
+		return outputData;
+	}
 	
 	
 	
+	
+	
+	function receiveData(data) {
+		var lines = data.lines;
+		
+		vm.lines = data.lines;
+		vm.choices = data.choices;
+		
+		refreshView();
+	}
 	
 	
 	
 	var testVueModelData = {
-		charInfo: [
-			{}
-			,{stance:STANCE_RESET, orientation: ORIENTATION_NONE, target:2, isYou:true, isAI:false}
-			,{stance:STANCE_RESET, orientation: ORIENTATION_NONE, target:1, initiative:false, isYou:false, isAI:true}
-			,{stance:STANCE_RESET, orientation: ORIENTATION_NONE, isYou:false, isAI:true}
-		]
+		charInfo: mockStartCharInfo
 		,lines: [
-			{
-				text:"Copy of person goes here adopting stance, if any"
-				,charId:1
-				,stance:true
-			}
-			,{
-				text:"Copy of person goes here adopting orientation if any"
-				,charId:1
-				,orientation:true
-			}
-			,{
-				text:"Copy of person targets so and so with orientation "
-				,charId:1
-				,target:true
-			}
-			,{
-				text:"You"
-				,charId:1
-				,temp:true
-				,tempCurrent:true
-			}
-			,{
-				text:"Copy of person 2 goes here adopting stance, if any"
-				,charId:2
-				,stance:true
-			}
-			,{
-				text:"Copy of person 2 goes here adopting orientation, if any"
-				,charId:2
-				,orientation:true
-			}
-			,{
-				text:"Copy of person 2 goes  here targeting back, with orientation (if any), and with initiative state mentioned"
-				,charId:2
-				,target:true
-				,initiative:true
-			}	
-			,{
-				text:"CharPerson2.."
-				,charId:2
-				,temp:true
-			}
-			,{
-				text:"What would you choose?"
-	
-			}
+			
 		]
 		,choiceHeader:false
 		,choices:[
-			{
-				text:"A choice"
-			}
-			,{
-				text:"Another choice.."
-			}
-			,{
-				text:"A choice"
-			}
-			,{
-				text:"Another choice.."
-			}
-			,{
-				text:"A choice"
-			}
-			,{
-				text:"Another choice.."
-			}
-		
+			{ text:"start" }
 		]
+		
+		
 	};
 	
 	
@@ -320,12 +293,17 @@
 			,getCharInfo(packet, prop) {
 				return packet.charId ? this.charInfo[packet.charId] : {};
 			}
+			,onChoiceClick(c) {
+				receiveData( getMockData() );
+			}
 		 }
 	});
 	
 	
 	
-	
+	function refreshView() {
+		setTimeout(onVueUpdate, 0);
+	}
 	
 	
 	function onVueUpdate() {

@@ -32,7 +32,7 @@
 						
 						
 					<div class="area choices">
-						<div class="choice" v-for="c in choices">{{c.text}}</div>
+						<div class="choice" v-for="c in choices" v-on:click="this.onChoiceClick(c)">{{c.text}}</div>
 					</div>
 						
 					

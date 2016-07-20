@@ -48,6 +48,7 @@
         padding: 15px;
         font-style: italic;
         font-size: 18px;
+		cursor:pointer;
         border: 0.25px solid #dddddd; }
     .appwrapper .contents .person {
       box-sizing: border-box; }
