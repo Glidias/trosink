@@ -13,6 +13,13 @@
     top: 97px;
     left: 29px;
     font-size: 16px; }
+	
+.abs {
+	position:absolute;
+	display:block;
+	top:0;
+	left:0;
+}
 
 .appwrapper {
   background-color: grey;
@@ -55,6 +62,7 @@
       .appwrapper .contents .person .circlebg {
         border-radius: 50%;
         width: 60px;
+		position:relative;
         height: 60px;
         background-color: #bbbbbb; }
       .appwrapper .contents .person.connect {
@@ -62,13 +70,14 @@
       .appwrapper .contents .person .portrait {
         width: 64px;
         height: 64px;
-        padding: 8px;
+        padding: 6px 6px;
         box-sizing: border-box;
         float: right;
         width: 25%; }
+	
       .appwrapper .contents .person .copy {
         float: left;
-        min-height: 64px;
+        min-height: 68px;
         box-sizing: border-box;
         border: 1px solid #dddddd;
         background-color: white;
@@ -79,5 +88,6 @@
       .appwrapper .contents .person.portrait-left .copy {
         float: left;
         text-indent: 5px; }
+	 }
 
 /*# sourceMappingURL=mock.css.map */

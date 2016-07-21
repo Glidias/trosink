@@ -18,10 +18,10 @@
 			<div id="contentwrapper">
 				<div class="contents" id="contents">
 					<!-- && (a.orientation || a.target)-->
-					<div class="area" v-if="a.type != 'choiceHeader'" v-bind:class="{'temp':a.temp, 'tempCurrent':a.tempCurrent, 'portrait-left': (a.charId && this.typesCharRelated[a.type]) && isPortraitLeftAligned(this.charInfo[a.charId]), 'person':(a.charId && this.typesCharRelated[a.type]), 'describeline':!(a.charId && this.typesCharRelated[a.type]) ,  'connect':$index > 0 && (a.charId==this.lines[$index-1].charId || (  getCharInfo(this.lines[$index-1]).target ===a.charId && getCharInfo(a).target && getCharInfo(a).target === this.lines[$index-1].charId )  )  }" v-for="a in lines">
-						<div class="portrait" v-if="a.charId && this.typesCharRelated[a.type]">
-							<div class="circlecont" v-if="($index == 0 || this.lines[$index-1].charId != a.charId)">
-								<div class="circlebg"></div>
+					<div class="area" v-if="a.type != 'choiceHeader'" v-bind:class="{'temp':a.temp, 'tempCurrent':a.tempCurrent, 'portrait-left': (a.charId && this.typesCharRelated[a.type]) && isPortraitLeftAligned(this.charInfo[a.charId]), 'person':(a.charId && this.typesCharRelated[a.type]), 'describeline':!(a.charId && this.typesCharRelated[a.type]) ,  'connect':(this.isConnectedToAboveEntry(a, $index)) }" v-for="a in lines">
+						<div class="portrait" v-if="a.charId && this.typesCharRelated[a.type] ">
+							<div class="circlecont" v-if="($index == 0 || (this.lines[$index-1].charId != a.charId || !this.typesCharRelated[this.lines[$index-1].type] ) ) ">
+								<div class="circlebg"><span class="abs">{{ a.charId }}</span></div>
 								<div class="circleimg"></div>
 								<div class="circleoutline"></div>
 							</div>

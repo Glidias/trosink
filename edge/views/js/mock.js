@@ -27,6 +27,12 @@
 	var ORIENTATION_CAUTIOUS = 2
 	var ORIENTATION_AGGRESSIVE = 3
 	
+	var GOT_INITIATIVE = 2;
+	var CONTESTING_INITIATIVE = 1;
+	var NO_INITIATIVE = 0;
+	var REROLL_INITIATIVE = -1
+	var UNCERTAIN_INITATIVE = -2
+	
 	// Assumptions and TODOs
 	// - After every exchange, for every character in charInfo.....  nullify orientation, nullify stance
 	//  Check if still got target, or target lost after every exchange, and display current target enagements above any new engagements. 
@@ -88,6 +94,7 @@
 		},
 		"orientation": {
 			lines: [
+				//{ text:"CharPersonName3 adopted a defensive martial stance", type:"stance", charId:1, stance:STANCE_OFFENSIVE }
 				{ text:"CharPersonName3 adopted a defensive martial stance", type:"stance", charId:3, stance:STANCE_DEFENSIVE }
 				,{ text:"What is your orientation intent you wish to secretly adopt?", type:"choiceHeader", choiceHeader:"stance", charId:1 }
 			],
@@ -99,11 +106,11 @@
 		},
 		"target": {
 			lines: [
-				{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
+				//{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
 				,{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Defensive", type:"orientation", charId:3, orientation:ORIENTATION_DEFENSIVE }
-				,{ text:"CharPersonName2 targeted you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1 }
+				,{ text:"CharPersonName2 targeted you, aggressively.", type:"target", charId:2, target:1 }
 				,{ text:"Choosing target for player character: You", type:"choiceHeader", choiceHeader:"target", charId:1 }
 			],
 			choices: [	
@@ -117,7 +124,7 @@
 				,{ text:"You revealed an orientation of: Cautious", type:"orientation", charId:1, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Cautious", type:"orientation", charId:3, orientation:ORIENTATION_CAUTIOUS }
-				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:1 }
+				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:GOT_INITIATIVE }
 				,{ text:"CharPersonName3 targets you, cautiously.", type:"target", charId:3, target:1 }
 				,{ text:"CharPersonName2 attacks you with Bash (for overhand swing) with 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8, targetZone:0 }
 				,{ text:"Defend", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
@@ -231,9 +238,9 @@
 	}
 	var mockStartCharInfo = [
 		{}
-		,{portraitSrc:"", isYou:true, isAI:false}
-		,{portraitSrc:"", isYou:false, isAI:true}
-		,{potraitSrc:"", isYou:false, isAI:true}
+		,{portraitSrc:"", isYou:true, isAI:false, slug:"charPersonName", stance:STANCE_RESET, orientation:ORIENTATION_NONE, target:0, initiative:false}
+		,{portraitSrc:"", isYou:false, isAI:true, slug:"charPersonName2", stance:STANCE_RESET, orientation:ORIENTATION_NONE, target:0, initiative:false}
+		,{portraitSrc:"", isYou:false, isAI:true, slug:"charPersonName3", stance:STANCE_RESET, orientation:ORIENTATION_NONE, target:0, initiative:false}
 	];
 	
 	var mockRecieveCount = 0;
@@ -267,6 +274,14 @@
 			}
 		//}
 		
+		charStacks = [];
+		// reset stance and orientations by convention
+		var i = vm.charInfo;
+		while(--i > 0) {
+			vm.charInfo[i].stance = STANCE_RESET;
+			vm.charInfo[i].orientation = ORIENTATION_NONE;
+		}
+		
 		mockRecieveCount = 0;
 		vm.lines = [];
 	}
@@ -275,17 +290,131 @@
 	// start reeal
 	
 	
+	
+	
 	var typesCharRelated = {
 		stance:true,
 		orientation:true,	
 		target:true,
 		manueverDeclare:true
-	}
+	};
+	var typesConflictRelated = {
+		manueverResolve:true
+	};
+	
+	var charStacks = [];
 	
 	function insertCharRelatedData(lines, c) {
-		// todo: place into already exisiting data slot. may replace across orientation/target ...manueverDeclare
+		
+		
+		var charInfoSlot = vm.charInfo[c.charId];
+		var slug = charInfoSlot.slug;
+		if (!slug) {
+			alert("INvalid char slug data found for:"+slug +":" + " :: charID:"+c);
+		}
+		
+		var stack = charStacks[slug];
+		if (stack == null) {
+			stack = [];
+			charStacks[slug] = charStacks.length;
+			charStacks.push(stack);
+		}
+		else {
+			stack = charStacks[stack];
+		}
+		
+		
+		if (c.type === "orientation" || c.type === "target") {
+			c.channel = "charPreManuever";
+			
+			if (c.type === "orientation") {
+				charInfoSlot.orientation = c.target;
+			}
+			else if (c.type === "target") {
+				charInfoSlot.target = c.target;
+				var targInfoSlot = vm.charInfo[c.target];
+				
+				if (c.targetIsCautious) { // this flag indicates that char is actively targeting someone that is forced to target back
+					if (charInfoSlot.orientation == ORIENTATION_CAUTIOUS) {
+						c.initiative = UNCERTAIN_INITATIVE;
+						charInfoSlot.initiative = false;
+						targInfoSlot.initiative = false;
+							
+					}
+					else {
+						charInfoSlot.initiative = true;
+						targInfoSlot.initiative = false;
+						
+					}
+					targInfoSlot.target = c.charId;
+				
+				}
+				
+				if (c.initiative != null) {  // resolve conflict initiative
+					if (c.initiative < 0) {
+						charInfoSlot.initiative = false; 
+						targInfoSlot.initiative = false;
+					}
+					else if (c.initiative == NO_INITIATIVE) {
+						targInfoSlot.initiative = true;  // is this needed? reiteration
+						charInfoSlot.initiative = false;
+						
+					}
+					else if (c.initiative == CONTESTING_INITIATIVE) {
+						targInfoSlot.initiative = true;  // is this needed? reiteration
+						charInfoSlot.initiative = true;
+						
+					}
+					else {  // seized initiative over  === GOT_INITIATIVE
+						targInfoSlot.initiative = false; 
+						charInfoSlot.initiative = true;
+					}
+					
+					
+				}
+				else {
+					// convention by SOS
+					charInfoSlot.initiative = charInfoSlot.orientation != ORIENTATION_DEFENSIVE;
+					
+				}
+			}
+			
+			var replaceIndex = -1;
+			if ( (stack[0] && stack[0].channel === "charPreManuever") ) {
+				replaceIndex = 0;
+			}
+			else if ((stack[1] && stack[1].channel === "charPreManuever")) {
+				replaceIndex = 1;
+			}
+			
+			if (replaceIndex>=0) {
+				stack[replaceIndex] = c;
+			}
+			else {
+				stack.push(c);
+			}
+		}
+		else if (c.type === "manueverDeclare") {
+			stack.push(c);
+		
+		}
+		else if (c.type === "stance") {
+			charInfoSlot.stance = c.stance;
+			stack.push(c);
+		}
+		else {
+			alert("insertCharRelatedData - UNresolved type:"+c.type);
+		}
+		
+		// todo: factor this out into a grouped arranged
 		lines.push(c);
 	}
+	function insertConflictRelatedData(lines, c) {
+		if (c.type === "manueverResolve") {
+			
+		}
+	}
+	
 	
 	
 	
@@ -350,6 +479,7 @@
 			testChoiceHeader
 		]
 		,typesCharRelated:typesCharRelated
+		,typesConflictRelated:typesConflictRelated
 		,choiceHeader: testChoiceHeader
 		,choices:[
 			{text:"start mock"}
@@ -364,6 +494,9 @@
 		 methods: {
 			isPortraitLeftAligned: function(a) {
 				return a.target ? (a.initiative!=null ? !a.initiative : false )  : (a.orientation ? a.orientation === ORIENTATION_CAUTIOUS  : a.stance === STANCE_DEFENSIVE) 
+			}
+			,isConnectedToAboveEntry: function(a, $index) {
+				return (this.typesCharRelated[a.type] || this.typesConflictRelated[a.type] ) && $index > 0 &&  ( this.typesCharRelated[this.lines[$index-1].type] || this.typesConflictRelated[this.lines[$index-1].type] ) &&   ( a.charId==this.lines[$index-1].charId || (  this.getCharInfo(this.lines[$index-1]).target ===a.charId && this.getCharInfo(a).target && this.getCharInfo(a).target === this.lines[$index-1].charId )  );
 			}
 			,getCharInfo(packet, prop) {
 				return packet.charId ? this.charInfo[packet.charId] : {target:{}};
