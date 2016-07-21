@@ -107,7 +107,7 @@
 		"target": {
 			lines: [
 				//{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
-				,{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
+				{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Defensive", type:"orientation", charId:3, orientation:ORIENTATION_DEFENSIVE }
 				,{ text:"CharPersonName2 targeted you, aggressively.", type:"target", charId:2, target:1 }
@@ -120,13 +120,13 @@
 		},
 		"engaged": {
 			lines: [
-				{ text:"You intend to be Cautious", type:"choiceFeedback", charId:1}
-				,{ text:"You revealed an orientation of: Cautious", type:"orientation", charId:1, orientation:ORIENTATION_CAUTIOUS }
+			//	{ text:"You intend to be Cautious", type:"choiceFeedback", charId:1}
+				{ text:"You revealed an orientation of: Cautious", type:"orientation", charId:1, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Cautious", type:"orientation", charId:3, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:GOT_INITIATIVE }
 				,{ text:"CharPersonName3 targets you, cautiously.", type:"target", charId:3, target:1 }
-				,{ text:"CharPersonName2 attacks you with Bash (for overhand swing) with 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8, targetZone:0 }
+				,{ text:"CharPersonName2 attacks you with Bash (for overhand swing) with 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8, targetZone:0, isAttacking:1 }
 				,{ text:"Defend", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
 				
 			],
@@ -193,8 +193,8 @@
 		},
 		"partialEvasion": {
 			lines: [
-				{ text:"You defended with Partial Evasion for 6 CP", type:"manueverDeclare", charId:1, against:2, cp:6 }
-				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				{ text:"You defended with Partial Evasion for 6 CP", type:"manueverDeclare", isAttacking:0, charId:1, against:2, cp:6 }
+				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", isAttacking:1, charId:3, against:1, cp:3, targetZone:0 }
 				,{ text:"CharPersonName2 failed to attack successfully against you with BS:-1", type:"manueverResolve", charId:2, bs:-1, ts:3 }
 				,{ text:"Do you wish to seize initiative for 2 CP? (Will have 3 CP left.)", type:"choiceHeader", charId:1, choiceHeader:"manueverResolvePost"}
 			],
@@ -205,8 +205,8 @@
 		},
 		"resolve": {
 			lines: [
-				{ text:"You defended with Block for 9 CP", type:"manueverDeclare", charId:1, against:2, cp:9 }
-				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+				{ text:"You defended with Block for 9 CP", type:"manueverDeclare", isAttacking:0, charId:1, against:2, cp:9 }
+				,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", isAttacking:1, charId:3, against:1, cp:3, targetZone:0 }
 				,{ text:"CharPersonName2 attacked successfully with BS:1", type:"manueverResolve", bs:1, ts:3, charId:2 }
 				,{ text:"CharPersonName3 managed to attack through, but only dealt a close-shave with BS:0", type:"manueverResolve",  bs:0, ts:3, charId:3 }
 			],
@@ -216,9 +216,9 @@
 		},
 		"resolve2": {
 			lines: [
-			{ text:"You attack with Cut (swing from above) with 8 CP", type:"manueverDeclare", charId:1, against:2, cp:8 }
-			,{ text:"CharPersonName2 defends with Block for 8 CP", type:"manueverDeclare", charId:2, against:1, cp:8 }
-			,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", charId:3, against:1, cp:3, targetZone:0 }
+			{ text:"You attack with Cut (swing from above) with 8 CP", type:"manueverDeclare", isAttacking:1, charId:1, against:2, cp:8 }
+			,{ text:"CharPersonName2 defends with Block for 8 CP", type:"manueverDeclare", isAttacking:0, charId:2, against:1, cp:8 }
+			,{ text:"CharPersonName3 attacks you with Thrust (to the head) with 3 CP",  type:"manueverDeclare", isAttacking:1, charId:3, against:1, cp:3, targetZone:0 }
 			,{ text:"Your attack succeeded with BS:3, but failed to deal any damage.", type:"manueverResolve", bs:3, ts:3, damageReduc:"armour", armour:4, charId:1 }
 			,{ text:"CharPersonName3's attack failed with BS:-1",  bs:0, ts:3, type:"manueverResolve", charId:3 }
 			],
@@ -318,6 +318,7 @@
 			stack = [];
 			charStacks[slug] = charStacks.length;
 			charStacks.push(stack);
+			stack['timestamp'] = -1;
 		}
 		else {
 			stack = charStacks[stack];
@@ -395,8 +396,25 @@
 			}
 		}
 		else if (c.type === "manueverDeclare") {
-			stack.push(c);
-		
+			if (c.against == charInfoSlot.target) {
+				//alert("Declared manuever against primary target opponent");
+				// TODO: always ensure this is displaced above the rest of the other manuevers in t
+				stack.push(c);
+			}
+			else if (c.against == 0) {
+				//alert("Declaring defensive manuever with initiative against no one in particular");
+				stack.push(c);
+			}
+			else {
+				if (!c.isAttacking) {
+					//alert("Declared def manuever against someone else");
+					// TODO: find a away to place it in response to manueverDeclare slot of against target (right below)
+				}
+				else {
+					//alert("Declared atk manuever against someone else");
+					stack.push(c);
+				}
+			}
 		}
 		else if (c.type === "stance") {
 			charInfoSlot.stance = c.stance;
@@ -406,44 +424,117 @@
 			alert("insertCharRelatedData - UNresolved type:"+c.type);
 		}
 		
-		// todo: factor this out into a grouped arranged
-		lines.push(c);
+		return stack;
 	}
 	function insertConflictRelatedData(lines, c) {
+		// todo
 		if (c.type === "manueverResolve") {
 			
 		}
 	}
 	
 	
+	function pushStackIntoLinearList(stack, list) {
+		var v;
+		var vLen;
+		vLen = stack.length;
+		for (v =0; v<vLen; v++) {
+			list.push( stack[v] );
+		}
+	}
 	
-	
+	function insertStackWithPossibleConflict(stack, bufferLines) {
+		var charInfo = vm.charInfo[ stack[0].charId ];
+		if (!charInfo.target ) {
+			bufferLines.push(stack);
+			stack.timestamp = receiveTimestamp;
 
+			return;
+		}
+		
+		var targInfo = vm.charInfo[charInfo.target];
+		var targStack = charStacks[targInfo.slug];
+		if (targStack == null) {
+			bufferLines.push(stack);
+			stack.timestamp = receiveTimestamp;
+			return;
+		}
+		
+		if (charInfo.initiative || !targInfo.initiative) {
+			bufferLines.push(stack);
+			bufferLines.push(targStack);
+			
+		}
+		else {
+			bufferLines.push(targStack);
+			bufferLines.push(stack);
+			
+		}
+		stack.timestamp = receiveTimestamp;
+		targStack.timestamp = receiveTimestamp;
+	}
+	
+	var receiveTimestamp = 0;
+	
 	function receiveData(data) {
 		var lines = data.lines;
+		receiveTimestamp++;
 		
-		var len = lines.length;
+		var bufferLines = [];
+		var len;
 		var i;
 		var choiceHeader = null;
 		var lastChoiceHeader = vm.choiceHeader;
 		var c;
+		var stack;
+		
+		len = charStacks.length;
+		for (i=0; i< len; i++) {
+			stack = charStacks[i];
+			if (stack.timestamp != receiveTimestamp) {
+				insertStackWithPossibleConflict(stack, bufferLines);
+			}
+		}
+		
+		len =   lines.length
 		for (i=0; i< len; i++) {
 			c = lines[i];
 			if (c.type != "choiceHeader") {
 
 				if (typesCharRelated[c.type]) {
-					insertCharRelatedData(vm.lines, c);
+					stack = insertCharRelatedData(vm.lines, c);
+					if (stack.timestamp != receiveTimestamp) {
+						insertStackWithPossibleConflict(stack, bufferLines);
+					}
+				}
+				else if (c.type == choiceHeader) {
 					
 				}
 				else {
-					
-					vm.lines.push( c );
+					bufferLines.push( c );
 				}
 			}
 			else {
 				choiceHeader = c;
 			}
 		}
+		
+		var newLines = [];
+		len = bufferLines.length;
+		var lineObj;
+		for (i =0; i < len; i++) {
+			lineObj = bufferLines[i];
+			if (lineObj.length) {  // assumed stack
+				pushStackIntoLinearList(lineObj, newLines);
+			}
+			else {
+				newLines.push(lineObj);
+			}	
+		}
+		// todo: figure out contextual arrangement of items
+		vm.lines = newLines;
+		
+		
 		
 		if (lastChoiceHeader != null) {
 			
@@ -466,6 +557,7 @@
 		//vm.lines.push(
 		
 		vm.choices = data.choices;
+		
 		
 		refreshView();
 	}
