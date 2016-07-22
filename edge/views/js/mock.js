@@ -453,7 +453,7 @@
 		}
 		
 		var targInfo = vm.charInfo[charInfo.target];
-		var targStack = charStacks[targInfo.slug];
+		var targStack = charStacks [ charStacks[targInfo.slug] ];  // is double lookup needed?
 		if (targStack == null) {
 			bufferLines.push(stack);
 			stack.timestamp = receiveTimestamp;
@@ -507,8 +507,8 @@
 						insertStackWithPossibleConflict(stack, bufferLines);
 					}
 				}
-				else if (c.type == choiceHeader) {
-					
+				else if (c.type == "choiceFeedback") {
+					bufferLines.push( c );
 				}
 				else {
 					bufferLines.push( c );
@@ -524,7 +524,7 @@
 		var lineObj;
 		for (i =0; i < len; i++) {
 			lineObj = bufferLines[i];
-			if (lineObj.length) {  // assumed stack
+			if (lineObj.length != null)  {  // assumed stack
 				pushStackIntoLinearList(lineObj, newLines);
 			}
 			else {
