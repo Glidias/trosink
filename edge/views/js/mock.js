@@ -56,7 +56,7 @@
 	];
 	
 	var testMockData1 = [
-		"stance", "orientation", "target", "manueverChooseOpponent",["manueverChooseType", "manueverDeclare"], "manueverChooseTargetZone", "manueverChooseCP", "resolve"
+		"stance", "orientation", "target", "manueverChooseOpponentAggressively",["manueverChooseTypeAggressively", "manueverDeclareAggressively"], "manueverChooseTargetZone", "manueverChooseCP", "resolve"
 	];
 	
 	var testMockData2 = [
@@ -106,8 +106,8 @@
 		},
 		"target": {
 			lines: [
-				//{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
-				{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
+				{ text:"You intend to be Aggressive", type:"choiceFeedback", charId:1}
+				,{ text:"You revealed an orientation of: Aggressive", type:"orientation", charId:1, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Defensive", type:"orientation", charId:3, orientation:ORIENTATION_DEFENSIVE }
 				,{ text:"CharPersonName2 targeted you, aggressively.", type:"target", charId:2, target:1 }
@@ -120,8 +120,8 @@
 		},
 		"engaged": {
 			lines: [
-			//	{ text:"You intend to be Cautious", type:"choiceFeedback", charId:1}
-				{ text:"You revealed an orientation of: Cautious", type:"orientation", charId:1, orientation:ORIENTATION_CAUTIOUS }
+				{ text:"You intend to be Cautious", type:"choiceFeedback", charId:1}
+				,{ text:"You revealed an orientation of: Cautious", type:"orientation", charId:1, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 revealed an orientation of: Aggressive", type:"orientation", charId:2, orientation:ORIENTATION_AGGRESSIVE }
 				,{ text:"CharPersonName3 revealed an orientation of: Cautious", type:"orientation", charId:3, orientation:ORIENTATION_CAUTIOUS }
 				,{ text:"CharPersonName2 engaged you, aggressively.", type:"target", charId:2, target:1, targetIsCautious:1, initiative:GOT_INITIATIVE }
@@ -147,6 +147,16 @@
 				,{ text: "Thrust....(0)tn:6", tn:6, cost:0, manuever:"thrust" }	
 			]
 		},
+		"manueverDeclareAggressively": {
+			lines: [
+				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:CONTESTING_INITIATIVE  }
+				,{ text:"Attack", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manuever" }
+			],
+			choices: [
+				{ text: "Cut....(0)tn:6", tn:6, cost:0, manuever:"cut" }
+				,{ text: "Thrust....(0)tn:6", tn:6, cost:0, manuever:"thrust" }	
+			]
+		},
 		"manueverChooseOpponent": {
 			lines: [
 				//{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
@@ -157,10 +167,34 @@
 				,{ text: "CharPersonName3",  charId:3 }	
 			]
 		},
+		"manueverChooseOpponentAggressively": {
+			lines: [
+				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:CONTESTING_INITIATIVE  }
+				,{ text:"Pick an opponent to deal against:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"chooseOpponent"}
+			],
+			choices: [
+				{ text: "CharPersonName2 (Your target)", charId:2 }
+				,{ text: "CharPersonName3",  charId:3 }	
+			]
+		},
 		"manueverChooseType": {
 			lines: [
 				//{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:2  }
 				{ text:"Choose the nature of your action:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manueverType"}
+			],
+			choices: [
+				{ text: "Attack" }
+				,{ text: "Defend (with initiative)" }	
+				,{ text: "Change Target (buy initiative)" }
+				,{ text: "Change Target (no initiative)" }
+				,{ text: "Switch to off-hand" }	
+				,{ text: "Do Nothing" }	
+			]
+		},
+		"manueverChooseTypeAggressively": {
+			lines: [
+				{ text:"You targeted CharPersonName2, aggressively.", type:"target", charId:1, target:2, initiative:CONTESTING_INITIATIVE  }
+				,{ text:"Choose the nature of your action:", type:"choiceHeader", charId:1, choiceHeader:"manueverDeclare", choiceSubHeader:"manueverType"}
 			],
 			choices: [
 				{ text: "Attack" }
@@ -274,7 +308,11 @@
 			}
 		//}
 		
-		charStacks = [];
+		//if (data.endExchange == 2) {
+			charStacks = [];
+			vm.lines = [];
+		//}
+		
 		// reset stance and orientations by convention
 		var i = vm.charInfo;
 		while(--i > 0) {
@@ -283,7 +321,7 @@
 		}
 		
 		mockRecieveCount = 0;
-		vm.lines = [];
+		
 	}
 	
 	
@@ -454,7 +492,7 @@
 		
 		var targInfo = vm.charInfo[charInfo.target];
 		var targStack = charStacks [ charStacks[targInfo.slug] ];  // is double lookup needed?
-		if (targStack == null) {
+		if (targStack == null || targInfo.target != stack[0].charId)  {
 			bufferLines.push(stack);
 			stack.timestamp = receiveTimestamp;
 			return;
@@ -463,6 +501,7 @@
 		if (charInfo.initiative || !targInfo.initiative) {
 			bufferLines.push(stack);
 			bufferLines.push(targStack);
+			//alert("A:"+stack[0].charId + " vs " +targStack[0].charId);
 			
 		}
 		else {
@@ -470,6 +509,7 @@
 			bufferLines.push(stack);
 			
 		}
+	
 		stack.timestamp = receiveTimestamp;
 		targStack.timestamp = receiveTimestamp;
 	}
@@ -488,6 +528,17 @@
 		var c;
 		var stack;
 		
+		
+		
+		len =   lines.length
+		for (i=0; i< len; i++) {
+			c = lines[i];
+			if (typesCharRelated[c.type]) {
+				insertCharRelatedData(vm.lines, c);
+				
+			}
+		}
+		
 		len = charStacks.length;
 		for (i=0; i< len; i++) {
 			stack = charStacks[i];
@@ -502,13 +553,16 @@
 			if (c.type != "choiceHeader") {
 
 				if (typesCharRelated[c.type]) {
-					stack = insertCharRelatedData(vm.lines, c);
-					if (stack.timestamp != receiveTimestamp) {
-						insertStackWithPossibleConflict(stack, bufferLines);
-					}
+					// already handled above.
+						//	stack = charStacks [ charStacks[vm.charInfo[c.charId].slug] ];
+						//if (stack.timestamp != receiveTimestamp) {
+						//		insertStackWithPossibleConflict(stack, bufferLines);
+						//	}
 				}
 				else if (c.type == "choiceFeedback") {
-					bufferLines.push( c );
+					// any good place to place this?
+					//bufferLines.push( c );
+				//	bufferLines.unshift(c);
 				}
 				else {
 					bufferLines.push( c );
@@ -531,7 +585,7 @@
 				newLines.push(lineObj);
 			}	
 		}
-		// todo: figure out contextual arrangement of items
+	
 		vm.lines = newLines;
 		
 		
@@ -543,7 +597,7 @@
 		}
 		
 		if (choiceHeader != null) {
-			// todo: determine best way to place choiceHeader in the various cases
+			// todo: determine best way to place choiceHeader in the various cases (Maybe below would work, but a marker to shift this may be good..)
 			vm.lines.push(choiceHeader);
 			
 			vm.choiceHeader = choiceHeader;
