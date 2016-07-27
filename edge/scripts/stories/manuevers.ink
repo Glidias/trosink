@@ -943,6 +943,7 @@ ChoosingManuversLooseEndError detected. This should not happen!
 = ConfirmCombatPool(amount)
 {""}
 ~manuever_CP = amount
+
 ->ConfirmManuever
 
 
@@ -1149,6 +1150,7 @@ AimTargetZoneLooseEndError detected. This should not happen!
 			~manueverAttackType = ATTACK_TYPE_STRIKE
 			~manueverDamageType = DAMAGE_TYPE_BLUDGEONING
 			~manueverCost = stipulateCost
+			~manueverTN = stipulateTN
 			~manueverUseHands = MANUEVER_HAND_MASTER
 			{ _ATN==0:
 				~manueverUseHands = MANUEVER_HAND_SECONDARY
@@ -1837,7 +1839,7 @@ ResolveAtkManuever:: Couldn't find target exception found for ID: {atkManueverTa
 				AttemptDefense else exception found :: Should NOT HAPPEN!!
 		}
 	-else:
-		->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+		->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense, 0)
 }
 
 AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
@@ -1873,7 +1875,7 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 			 		//testing: successive resolution of atk manuevers from target AFTER targeter
 			 		~reselectCharId = defenderId
 			 		~reselectCharIdNext = 0
-			 		 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
+			 		 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense, defManueverAttacking)
 			 	-c2 > c1:
 				 	{getDescribeLabelOfCharCapital(defenderId)} won the initaitive contest
 			 		~attackerInitiative  = 0
@@ -1890,29 +1892,29 @@ AttemptDefense loose-ended exception found :: Should NOT HAPPEN but redirect!!
 			 		~reselectCharId = defenderId
 			 		~reselectCharIdNext = 0
 			 		
-			 		 ->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense)
+			 		 ->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget, defenderPaused, noDefense, defManueverAttacking)
 			 }
-			 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative,defenderTarget,  defenderPaused, noDefense)
+			 ->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative,defenderTarget,  defenderPaused, noDefense, defManueverAttacking)
 		-else:
 			{
 				- attackerInitiative:
-					->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+					->AttemptAttackersManuever(defManueverCP, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense, defManueverAttacking)
 				- else:
 					// assumption made due to both defender and attacker not having initaitive, assumed simultatenous hit situation!
-					->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense)
+					->AttemptAttackersManuever(zeroDefPool, defenderCP, 0, defenderInitiative, defenderTarget,  defenderPaused, noDefense, defManueverAttacking)
 			}
 			
 	}
 	-else:
 		~requiredSuccesses = rollNumSuccesses(_def_cp, _def_tn, 0)
-		->AttemptAttackersManuever(zeroDefPool, defenderCP, 1, defenderInitiative, defenderTarget,  defenderPaused, defManuever)
+		->AttemptAttackersManuever(zeroDefPool, defenderCP, 1, defenderInitiative, defenderTarget,  defenderPaused, defManuever, defManueverAttacking)
 
 }
 AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 -> ResolveComplete
 
 
-= AttemptAttackersManuever(ref defenderManueverPool, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,   ref defenderPaused, ref defManuever)
+= AttemptAttackersManuever(ref defenderManueverPool, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,   ref defenderPaused, ref defManuever, defManueverAttacking)
 ~temp totalAtkSuccess = rollNumSuccesses(_atk_cp, _atk_tn, 0)
 ~temp bonusSuccess = totalAtkSuccess - requiredSuccesses
 ~temp _weaponBonusDamage
@@ -2020,14 +2022,14 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 				~defenderCP =  defenderCP + defenderManueverPool
 				~defenderManueverPool = 0
 		}
-		-> ResolveAttackManueverResultsWin(totalAtkSuccess, bonusSuccess, defenderCP, gotDefense, defenderInitiative, defenderTarget, defenderPaused, defManuever)
+		-> ResolveAttackManueverResultsWin(totalAtkSuccess, bonusSuccess, defenderCP, gotDefense, defenderInitiative, defenderTarget, defenderPaused, defManuever, defManueverAttacking)
 	- else:
 		-> ResolveAttackManueverResultsFail(totalAtkSuccess, bonusSuccess, defenderCP, gotDefense, defenderInitiative, defenderTarget,  defenderPaused, defManuever)
 }
 AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 -> ResolveComplete
 
-= ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever)
+= ResolveAttackManueverResultsWin(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative,ref defenderTarget,  ref defenderPaused, ref defManuever, defManueverAttacking)
 ...
 ~temp def_isAI
 ~temp def_isEnemy
@@ -2038,13 +2040,24 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 ~getCharMetaInfo(defenderCharId, x, def_isAI, def_isEnemy, def_isYou)
 ~getCharMetaInfo(defenderCharId, x, atk_isAI, atk_isEnemy, atk_isYou)
 
+
 {
-	- bonusSuccess && (_targetBodyPart == "")==1: 
-		{getDescribeLabelOfCharCapital(attackerId)} {def_isYou:miss|misses} a part on {def_isYou:the|his} target's body!
+	- defManueverAttacking == 0 && slotIndexBeingResolved == 1:
+		~attackerInitiative = 1
+		~defenderInitiative = 0
 }
 
-{getDescribeLabelOfCharCapital(attackerId)} attacked {bonusSuccess && (_targetBodyPart=="")==0:successfully} against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} {getDamageTypeLabel(useDamageType)} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
-
+{
+	- bonusSuccess && (_targetBodyPart == "")==0:
+	{getDescribeLabelOfCharCapital(attackerId)} attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {_woundLevel:..dealing a Level {_woundLevel} {_applyDestruction == D_DEATH:fatal} {getDamageTypeLabel(useDamageType)} wound to the {_targetBodyPart} {def_isYou && shockToInflict && shockToInflict != 999:({shockToInflict} shock)} } {simultaneousHitResulted: while...}.
+	- else:
+	{
+		-(_targetBodyPart == "")==1:
+			 {getDescribeLabelOfCharCapital(attackerId)} managed to attack through, but only dealt a close-shave with BS:0
+		-else:
+			 {getDescribeLabelOfCharCapital(attackerId)} managed to attack through, but missed a part on {atk_isYou:your|his} target's body!
+	}
+}
 
 
 {
@@ -2071,7 +2084,7 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 
 = ResolveAttackManueverResultsFail(totalSuccess, bonusSuccess, ref defenderCP, gotDefense, ref defenderInitiative, ref defenderTarget,  ref defenderPaused, ref defManuever)
 ...
-~temp giveInitiativeToDefender = 1
+~temp giveInitiativeToDefender = gotDefense
 ~temp userPrompted = 0
 
 {getDescribeLabelOfCharCapital(attackerId)} failed to attacked successfully against {getDescribeLabelOfChar(defenderCharId)}{gotDefense:(defending)} with BS:{bonusSuccess} {simultaneousHitResulted: while...}.
@@ -2108,9 +2121,9 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 						+ [Yes]
 							~defenderCP = defenderCP - 2
 							~giveInitiativeToDefender = 1
-							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, defenderTarget,  gotDefense, defManuever)
 						+ [No]
-							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+							-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, defenderTarget, gotDefense, defManuever)
 					-else:
 						// kiv: better AI to decide if wish to take initiative or not
 						~defenderCP = defenderCP - 2
@@ -2121,15 +2134,22 @@ AttemptAttackersManuever loose-ended exception found :: Should NOT HAPPEN!!
 		~elseResulted = 1 
 }
 {	userPrompted == 0:
-	-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, gotDefense, defManuever)
+	-> ResolveAttackManueverFailedDefault(giveInitiativeToDefender, defenderInitiative, defenderTarget, gotDefense, defManuever)
 }
 
-= ResolveAttackManueverFailedDefault(giveInitiativeToDefender, ref defenderInitiative, gotDefense, ref defManuever)
+= ResolveAttackManueverFailedDefault(giveInitiativeToDefender, ref defenderInitiative, ref defenderTarget,  gotDefense, ref defManuever)
 {
-- giveInitiativeToDefender:
+- giveInitiativeToDefender && defenderTarget == attackerId:
 	~defenderInitiative = 1
 	~attackerInitiative = 0
 }
+// todo: the below variant will allow defender to change target to assailants that lost initiative and gain/keep initiative.
+{
+- giveInitiativeToDefender && defenderTarget != attackerId:
+	~attackerInitiative = 0	
+}
+
+
 {
 -gotDefense:
 	~defManuever = ""

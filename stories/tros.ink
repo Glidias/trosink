@@ -119,17 +119,17 @@ Let's fight!
 	+[Neutral ...(Balanced.)]
 	~charPersonName_fight_stance = STANCE_NEUTRAL
 	{isYou: You|{charLabel}} adopted a neutral stance.
-	->DeclareStancesForAll(1)
+	->PickCharactersWithAttributeVal.GotoLoop
 	//->->
 	+[Offensive ...(+2 roll for attack manuevers. -2 roll for defensive manuevers)]
 	~charPersonName_fight_stance = STANCE_OFFENSIVE 
 	{isYou: You|{charLabel}} adopted an offensive stance. 
-	->DeclareStancesForAll(1)
+	->PickCharactersWithAttributeVal.GotoLoop
 	//->->
 	+[Defensive ...(-2 roll for attack manuevers. +2 roll for defensive manuevers)] 
 	~charPersonName_fight_stance = STANCE_DEFENSIVE
 	{isYou: You|{charLabel}} adopted a defensive stance.
-	->DeclareStancesForAll(1)
+	->PickCharactersWithAttributeVal.GotoLoop
 	//->->
 
 	
@@ -395,7 +395,7 @@ Let's fight!
 						- whoWins:
 						You took the initaitive over your cautious opponent. 
 						- else:
-						The enemy took the initiative over your cautious presence.
+						{getDescribeLabelOfCharCapital(charPersonName_fight_target)} took initiative over your cautious presence.
 					}
 				-else:
 					Both parties remain cautiously uncertain.
