@@ -24,7 +24,6 @@ function InkleSessionInstance(socket) {
 		setupEdge();
 	}
 	
-	
 	function setupEdge() {
 		var edge = require('edge');
 
@@ -89,6 +88,7 @@ function InkleSessionInstance(socket) {
 						  		choiceList.Add(choice.text);
 						    }
 							
+							
 							return new {
 								lines = lineList,
 								choices = choiceList
@@ -101,7 +101,7 @@ function InkleSessionInstance(socket) {
 
 
 			*/},
-			references: ['ink-engine.dll']
+			references: ['ink-engine.dll', 'trosink.dll']
 		});
 		
 	}
@@ -121,6 +121,7 @@ function InkleSessionInstance(socket) {
 			//var testoutput = inklePackage.helloStory(null, true);
 			//socket.emit("chat message", testoutput);
 
+			///*
 			socket.emit("data", inklePackage.getOutputMessages(0,true));
 
 			var data = inklePackage.getOutputMessages(0, true);
@@ -134,7 +135,7 @@ function InkleSessionInstance(socket) {
 				_LOCKED = true;
 			}
 			_LOCKED = false;
-
+			//*/
 
 		} 
 		else {
