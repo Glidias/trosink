@@ -1,4 +1,5 @@
 package troshx.util;
+import troshx.tros.ai.TROSAiBot;
 
 /**
  * AI utility module for handling calculations/automating strategies. Can also reflect probability judgements to player. Also may contain alternative roll methods.
@@ -216,6 +217,25 @@ class TROSAI
 		probability *= 100;
 		return probability < 1 && probability > 0 ? maxPrecision(probability,2) : Math.floor(probability);
 	}
+}
+
+
+class AIManueverChoice {
+	public var manuever:String;
+	public var manueverCP:Int; 
+	public var targetZone:Int;
+	public var attacking:Bool;
+	public var againstID:Int;
 	
+	public function new() 
+	{
+		
+	}
+}
+
+
+interface AITrosImpl {
 	
+
+
 }

@@ -2,6 +2,7 @@
 $hx_exports.troshx = $hx_exports.troshx || {};
 $hx_exports.troshx.util = $hx_exports.troshx.util || {};
 ;$hx_exports.troshx.tros = $hx_exports.troshx.tros || {};
+$hx_exports.troshx.tros.ai = $hx_exports.troshx.tros.ai || {};
 var $estr = function() { return js_Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
@@ -140,6 +141,9 @@ var Std = function() { };
 Std.__name__ = ["Std"];
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
+};
+Std["int"] = function(x) {
+	return x | 0;
 };
 Std.parseInt = function(x) {
 	var v = parseInt(x,10);
@@ -1587,6 +1591,205 @@ troshx_tros_HumanoidBody.getInstance = function() {
 troshx_tros_HumanoidBody.__super__ = troshx_BodyChar;
 troshx_tros_HumanoidBody.prototype = $extend(troshx_BodyChar.prototype,{
 });
+var troshx_util_AIManueverChoice = function() {
+};
+troshx_util_AIManueverChoice.__name__ = ["troshx","util","AIManueverChoice"];
+var troshx_tros_ai_TROSAiBot = $hx_exports.troshx.tros.ai.TROSAiBot = function() {
+	this.decidedManuevers = [null,null,null,null];
+	this.currentExchange = 0;
+	this.plannedCombos = [0,0,0,0];
+	this.cpBudget = [];
+	this.opponentLen = 0;
+	this.opponents = [];
+};
+troshx_tros_ai_TROSAiBot.__name__ = ["troshx","tros","ai","TROSAiBot"];
+troshx_tros_ai_TROSAiBot.getBestRegularAttack = function() {
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBestRegularDefense = function() {
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getFavorableAttack = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getFavorableDefense = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBorderlineAttack = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBorderlineDefense = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBlockOpenAndStrike = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getRotaOrCounter = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getDisarm = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getHook = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBeat = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getBindStrike = function(availableCP,againstCP,againstRoll,secondExchange) {
+	if(secondExchange == null) secondExchange = false;
+	if(againstRoll == null) againstRoll = 0;
+	return false;
+};
+troshx_tros_ai_TROSAiBot.getComboAction = function(combo,cp,cp2,vsRoll,secondExc,secondInitiative) {
+	if(secondInitiative == null) secondInitiative = false;
+	if(secondExc == null) secondExc = false;
+	if(vsRoll == null) vsRoll = 0;
+	switch(combo) {
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	case 4:
+		break;
+	case 5:
+		break;
+	case 6:
+		break;
+	case 7:
+		break;
+	case 8:
+		break;
+	case 9:
+		break;
+	case 10:
+		break;
+	case -1:
+		break;
+	case -2:
+		break;
+	case -3:
+		break;
+	case -4:
+		break;
+	}
+	return false;
+};
+troshx_tros_ai_TROSAiBot.prototype = {
+	getDecidedManueverForSlot: function(slot) {
+		if(this.decidedManuevers[slot] != null) return this.decidedManuevers[slot].manuever; else return "";
+	}
+	,getDecidedManueverCP: function(slot) {
+		if(this.decidedManuevers[slot] != null) return this.decidedManuevers[slot].manueverCP; else return 0;
+	}
+	,getDecidedManueverTargetZone: function(slot) {
+		if(this.decidedManuevers[slot] != null) return this.decidedManuevers[slot].targetZone; else return 0;
+	}
+	,newExchange: function(newRound) {
+		if(newRound == null) newRound = false;
+		var _g1 = 0;
+		var _g = this.decidedManuevers.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.decidedManuevers[i] = null;
+		}
+		if(newRound) {
+			this.currentExchange = 1;
+			var _g11 = 0;
+			var _g2 = this.decidedManuevers.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				this.plannedCombos[i1] = 0;
+			}
+		} else this.currentExchange = 2;
+	}
+	,decideStance: function(enemies,target,targetedBy) {
+	}
+	,decideOrientation: function(enemies,target,targetedBy) {
+	}
+	,decideTarget: function(enemies) {
+	}
+	,preDeclareManuevers: function(target,targetedBy) {
+		this.opponents[0] = target;
+		var count = 1;
+		var totalOpponentCP = 0;
+		var _g1 = 0;
+		var _g = targetedBy.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(targetedBy[i] != target) {
+				this.opponents[count++] = targetedBy[i];
+				totalOpponentCP += targetedBy[i].cp;
+			}
+		}
+		this.opponentLen = count;
+		var _g11 = this.opponentLen;
+		var _g2 = this.opponents.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			this.opponents[i1] = null;
+		}
+		var cpLeft = this.cp;
+		var _g12 = 0;
+		var _g3 = this.opponentLen;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			var cpToAssign = Std["int"](Math.min(cpLeft,Math.ceil(this.opponents[i2].cp / totalOpponentCP * this.cp)));
+			this.cpBudget[i2] = cpToAssign;
+			cpLeft -= cpToAssign;
+		}
+	}
+	,declareManuevers: function() {
+		var _g1 = 0;
+		var _g = this.opponentLen;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.declareManueverAgainstOpponent(i);
+		}
+	}
+	,declareManueverAgainstOpponent: function(index) {
+		var cpAvailable = this.cpBudget[index];
+		var cpAvailable2;
+		var opponent = this.opponents[index];
+		var threatManuever = null;
+		var threatManuever2 = null;
+		if(opponent.decidedManuevers[0] != null && opponent.decidedManuevers[0].againstID == this.id) threatManuever = opponent.decidedManuevers[0]; else if(opponent.decidedManuevers[0] == null) {
+		}
+		if(opponent.decidedManuevers[1] != null && opponent.decidedManuevers[1].againstID == this.id) {
+			if(threatManuever != null) threatManuever2 = opponent.decidedManuevers[1]; else threatManuever = opponent.decidedManuevers[1];
+		}
+		if(threatManuever2 != null) {
+		}
+		if(this.currentExchange != 2) {
+			if(this.initiative) {
+			} else {
+			}
+		} else if(this.plannedCombos[index] != 0) {
+			if(troshx_tros_ai_TROSAiBot.getComboAction(this.plannedCombos[index],this.cp,opponent.cp,threatManuever != null?threatManuever.manueverCP:0,true,this.initiative)) return true;
+		}
+		return false;
+	}
+};
 var troshx_util_ReflectUtil = $hx_exports.troshx.util.ReflectUtil = function() { };
 troshx_util_ReflectUtil.__name__ = ["troshx","util","ReflectUtil"];
 troshx_util_ReflectUtil.setItemStaticMethodsTo = function(c,to) {
@@ -1749,6 +1952,8 @@ troshx_util_TROSAI.displayAsPercentage = function(probability) {
 	probability *= 100;
 	if(probability < 1 && probability > 0) return troshx_util_TROSAI.roundTo(probability,Math.pow(10,-2)); else return Math.floor(probability);
 };
+var troshx_util_AITrosImpl = function() { };
+troshx_util_AITrosImpl.__name__ = ["troshx","util","AITrosImpl"];
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 if(Array.prototype.indexOf) HxOverrides.indexOf = function(a,o,i) {
@@ -1798,6 +2003,56 @@ troshx_tros_HumanoidBody.ZONE_XIII = 13;
 troshx_tros_HumanoidBody.ZONE_XIV = 14;
 troshx_tros_HumanoidBody.CENTER_OF_MASS = [3,2,5,6];
 troshx_tros_HumanoidBody.CENTER_OF_MASS_T = [10,11,11,12];
-troshx_util_TROSAI.__rtti = "<class path=\"troshx.util.TROSAI\" params=\"\">\n\t<factorial public=\"1\" get=\"inline\" set=\"null\" line=\"24\" static=\"1\"><f a=\"val\">\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></factorial>\n\t<binomialCoef public=\"1\" get=\"inline\" set=\"null\" line=\"38\" static=\"1\"><f a=\"n:r\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></binomialCoef>\n\t<getTNSuccessProbForDie public=\"1\" get=\"inline\" set=\"null\" line=\"48\" static=\"1\"><f a=\"tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getTNSuccessProbForDie>\n\t<getXSuccessesProb public=\"1\" get=\"inline\" set=\"null\" line=\"52\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getXSuccessesProb>\n\t<getAtLeastXSuccessesProb public=\"1\" set=\"method\" line=\"57\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getAtLeastXSuccessesProb>\n\t<probabilityAOrB public=\"1\" get=\"inline\" set=\"null\" line=\"67\" static=\"1\"><f a=\"a:b\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></probabilityAOrB>\n\t<probabilityOfArrayOr public=\"1\" get=\"inline\" set=\"null\" line=\"71\" static=\"1\"><f a=\"arr\">\n\t<c path=\"Array\"><x path=\"Float\"/></c>\n\t<x path=\"Float\"/>\n</f></probabilityOfArrayOr>\n\t<getBelowOrEqualXSuccessesProb public=\"1\" set=\"method\" line=\"81\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getBelowOrEqualXSuccessesProb>\n\t<getChanceToSucceedContest public=\"1\" set=\"method\" line=\"103\" static=\"1\">\n\t\t<f a=\"numDice:tn:againstNumDice:againstTN:?rs:?requireAtLeast1TS\" v=\"::::1:true\">\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Float\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{requireAtLeast1TS:true,rs:1}</e></m></meta>\n\t</getChanceToSucceedContest>\n\t<getChanceToSucceed public=\"1\" set=\"method\" line=\"140\" static=\"1\">\n\t\t<f a=\"numDice:tn:?rs\" v=\"::1\">\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Float\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{rs:1}</e></m></meta>\n\t</getChanceToSucceed>\n\t<getAllXSuccessesProb public=\"1\" set=\"method\" line=\"147\" static=\"1\"><f a=\"numDice:tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<c path=\"Array\"><x path=\"Float\"/></c>\n</f></getAllXSuccessesProb>\n\t<getTabulatedRollData public=\"1\" set=\"method\" line=\"155\" static=\"1\"><f a=\"numDice:tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<c path=\"Array\"><d/></c>\n</f></getTabulatedRollData>\n\t<maxPrecision public=\"1\" get=\"inline\" set=\"null\" line=\"178\" static=\"1\"><f a=\"x:precision\">\n\t<x path=\"Float\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></maxPrecision>\n\t<roundTo public=\"1\" set=\"method\" line=\"182\" static=\"1\"><f a=\"x:y\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></roundTo>\n\t<displayAsPercentage public=\"1\" get=\"inline\" set=\"null\" line=\"202\" static=\"1\"><f a=\"probability\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></displayAsPercentage>\n\t<new public=\"1\" set=\"method\" line=\"14\"><f a=\"\"><x path=\"Void\"/></f></new>\n\t<meta>\n\t\t<m n=\":directlyUsed\"/>\n\t\t<m n=\":expose\"/>\n\t\t<m n=\":rtti\"/>\n\t</meta>\n</class>";
+troshx_tros_ai_TROSAiBot.__meta__ = { statics : { AVAIL_bash : { bind : null}, COST_bash : { bind : null}, AVAIL_spike : { bind : null}, COST_spike : { bind : null}, AVAIL_cut : { bind : null}, COST_cut : { bind : null}, AVAIL_thrust : { bind : null}, COST_thrust : { bind : null}, AVAIL_beat : { bind : null}, COST_beat : { bind : null}, AVAIL_bindstrike : { bind : null}, COST_bindstrike : { bind : null}, AVAIL_block : { bind : null}, COST_block : { bind : null}, AVAIL_parry : { bind : null}, COST_parry : { bind : null}, AVAIL_duckweave : { bind : null}, COST_duckweave : { bind : null}, AVAIL_partialevasion : { bind : null}, COST_partialevasion : { bind : null}, AVAIL_fullevasion : { bind : null}, COST_fullevasion : { bind : null}, AVAIL_blockopenstrike : { bind : null}, COST_blockopenstrike : { bind : null}, AVAIL_counter : { bind : null}, COST_counter : { bind : null}, AVAIL_rota : { bind : null}, COST_rota : { bind : null}, AVAIL_expulsion : { bind : null}, COST_expulsion : { bind : null}, AVAIL_disarm : { bind : null}, COST_disarm : { bind : null}}, fields : { body : { link : null}, cp : { bind : ["_cp"]}, id : { bind : ["_id"]}, initiative : { bind : ["_fight_initiative"]}, stance : { bind : ["_fight_stance"]}}};
+troshx_tros_ai_TROSAiBot.AVAIL_bash = 0;
+troshx_tros_ai_TROSAiBot.COST_bash = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_spike = 0;
+troshx_tros_ai_TROSAiBot.COST_spike = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_cut = 0;
+troshx_tros_ai_TROSAiBot.COST_cut = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_thrust = 0;
+troshx_tros_ai_TROSAiBot.COST_thrust = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_beat = 0;
+troshx_tros_ai_TROSAiBot.COST_beat = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_bindstrike = 0;
+troshx_tros_ai_TROSAiBot.COST_bindstrike = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_block = 0;
+troshx_tros_ai_TROSAiBot.COST_block = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_parry = 0;
+troshx_tros_ai_TROSAiBot.COST_parry = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_duckweave = 0;
+troshx_tros_ai_TROSAiBot.COST_duckweave = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_partialevasion = 0;
+troshx_tros_ai_TROSAiBot.COST_partialevasion = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_fullevasion = 0;
+troshx_tros_ai_TROSAiBot.COST_fullevasion = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_blockopenstrike = 0;
+troshx_tros_ai_TROSAiBot.COST_blockopenstrike = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_counter = 0;
+troshx_tros_ai_TROSAiBot.COST_counter = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_rota = 0;
+troshx_tros_ai_TROSAiBot.COST_rota = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_expulsion = 0;
+troshx_tros_ai_TROSAiBot.COST_expulsion = 0;
+troshx_tros_ai_TROSAiBot.AVAIL_disarm = 0;
+troshx_tros_ai_TROSAiBot.COST_disarm = 0;
+troshx_tros_ai_TROSAiBot.COMBO_PureMeanStrikes = 1;
+troshx_tros_ai_TROSAiBot.COMBO_HeavyFirstStrikes = 2;
+troshx_tros_ai_TROSAiBot.COMBO_AlphaDisarm = 3;
+troshx_tros_ai_TROSAiBot.COMBO_AlphaHookStrike = 4;
+troshx_tros_ai_TROSAiBot.COMBO_AlphaStrike = 5;
+troshx_tros_ai_TROSAiBot.COMBO_BeatStrike = 6;
+troshx_tros_ai_TROSAiBot.COMBO_BindAndStrike = 7;
+troshx_tros_ai_TROSAiBot.COMBO_FeintStrike = 8;
+troshx_tros_ai_TROSAiBot.COMBO_DoubleAttack = 9;
+troshx_tros_ai_TROSAiBot.COMBO_SimulatenousBlockStrike = 10;
+troshx_tros_ai_TROSAiBot.COMBO_DefensiveFirst = -1;
+troshx_tros_ai_TROSAiBot.COMBO_AlphaInitiativeStealer = -2;
+troshx_tros_ai_TROSAiBot.COMBO_AlphaDisarmDef = -3;
+troshx_tros_ai_TROSAiBot.COMBO_SimulatenousBlockStrikeStealer = -4;
+troshx_tros_ai_TROSAiBot.MANUEVER_CHOICE = new troshx_util_AIManueverChoice();
+troshx_util_TROSAI.__rtti = "<class path=\"troshx.util.TROSAI\" params=\"\">\n\t<factorial public=\"1\" get=\"inline\" set=\"null\" line=\"25\" static=\"1\"><f a=\"val\">\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></factorial>\n\t<binomialCoef public=\"1\" get=\"inline\" set=\"null\" line=\"39\" static=\"1\"><f a=\"n:r\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></binomialCoef>\n\t<getTNSuccessProbForDie public=\"1\" get=\"inline\" set=\"null\" line=\"49\" static=\"1\"><f a=\"tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getTNSuccessProbForDie>\n\t<getXSuccessesProb public=\"1\" get=\"inline\" set=\"null\" line=\"53\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getXSuccessesProb>\n\t<getAtLeastXSuccessesProb public=\"1\" set=\"method\" line=\"58\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getAtLeastXSuccessesProb>\n\t<probabilityAOrB public=\"1\" get=\"inline\" set=\"null\" line=\"68\" static=\"1\"><f a=\"a:b\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></probabilityAOrB>\n\t<probabilityOfArrayOr public=\"1\" get=\"inline\" set=\"null\" line=\"72\" static=\"1\"><f a=\"arr\">\n\t<c path=\"Array\"><x path=\"Float\"/></c>\n\t<x path=\"Float\"/>\n</f></probabilityOfArrayOr>\n\t<getBelowOrEqualXSuccessesProb public=\"1\" set=\"method\" line=\"82\" static=\"1\"><f a=\"numDiceToRoll:tn:x\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></getBelowOrEqualXSuccessesProb>\n\t<getChanceToSucceedContest public=\"1\" set=\"method\" line=\"104\" static=\"1\">\n\t\t<f a=\"numDice:tn:againstNumDice:againstTN:?rs:?requireAtLeast1TS\" v=\"::::1:true\">\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Float\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{requireAtLeast1TS:true,rs:1}</e></m></meta>\n\t</getChanceToSucceedContest>\n\t<getChanceToSucceed public=\"1\" set=\"method\" line=\"141\" static=\"1\">\n\t\t<f a=\"numDice:tn:?rs\" v=\"::1\">\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Float\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{rs:1}</e></m></meta>\n\t</getChanceToSucceed>\n\t<getAllXSuccessesProb public=\"1\" set=\"method\" line=\"148\" static=\"1\"><f a=\"numDice:tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<c path=\"Array\"><x path=\"Float\"/></c>\n</f></getAllXSuccessesProb>\n\t<getTabulatedRollData public=\"1\" set=\"method\" line=\"156\" static=\"1\"><f a=\"numDice:tn\">\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<c path=\"Array\"><d/></c>\n</f></getTabulatedRollData>\n\t<maxPrecision public=\"1\" get=\"inline\" set=\"null\" line=\"179\" static=\"1\"><f a=\"x:precision\">\n\t<x path=\"Float\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Float\"/>\n</f></maxPrecision>\n\t<roundTo public=\"1\" set=\"method\" line=\"183\" static=\"1\"><f a=\"x:y\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></roundTo>\n\t<INT32_MIN public=\"1\" get=\"inline\" set=\"null\" expr=\"0x80000000\" line=\"207\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>0x80000000</e></m></meta>\n\t</INT32_MIN>\n\t<INT32_MAX public=\"1\" get=\"inline\" set=\"null\" expr=\"0x7fffffff\" line=\"213\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>0x7fffffff</e></m></meta>\n\t</INT32_MAX>\n\t<displayAsPercentage public=\"1\" get=\"inline\" set=\"null\" line=\"216\" static=\"1\"><f a=\"probability\">\n\t<x path=\"Float\"/>\n\t<x path=\"Float\"/>\n</f></displayAsPercentage>\n\t<new public=\"1\" set=\"method\" line=\"15\"><f a=\"\"><x path=\"Void\"/></f></new>\n\t<meta>\n\t\t<m n=\":directlyUsed\"/>\n\t\t<m n=\":expose\"/>\n\t\t<m n=\":rtti\"/>\n\t</meta>\n</class>";
+troshx_util_TROSAI.INT32_MIN = -2147483648;
+troshx_util_TROSAI.INT32_MAX = 2147483647;
 Main.main();
 })(typeof console != "undefined" ? console : {log:function(){}}, typeof window != "undefined" ? window : exports);
