@@ -1,5 +1,6 @@
 package troshx.tros.ai;
 import troshx.BodyChar;
+import troshx.tros.Weapon;
 import troshx.util.TROSAI;
 
 /**
@@ -10,7 +11,6 @@ import troshx.util.TROSAI;
 //@:rtti
 class TROSAiBot
 {
-	
 	// Opponents that are targeting you...for choosing manuever 1,2,and 3 respectively
 	private var opponents:Array<TROSAiBot> = [];
 	private var opponentLen:Int = 0;
@@ -19,11 +19,14 @@ class TROSAiBot
 	private var plannedCombos:Array<Int>  = [0, 0, 0, 0];
 	private var currentExchange:Int = 0;
 	
-	
+	// Character sheet ?
 	@link public var body:BodyChar;
 	//@link public var armorValues::Dynamic<Float>
-	
 	@bind("_cp") public var cp:Int;
+	@bind("_equipMasterhand") public var equipMasterhand:String;
+	@bind("_equipOffhand") public var equipOffhand:String;
+	
+	// Combat related
 	@bind("_id") public var id:Int;
 	@bind("_fight_initiative") public var initiative:Bool;
 	@bind("_fight_stance") public var stance:Int;
@@ -43,44 +46,28 @@ class TROSAiBot
 		return decidedManuevers[slot] != null ? decidedManuevers[slot].targetZone : 0;
 	}
 	
-	//public var health:Int;
-	
-	// all recorded attack action availabilities
+	// all recorded attack action availabilities as  (cost - 1) for actual cost
 	@bind public static var AVAIL_bash = 0; 
-	@bind public static var COST_bash = 0;
 	@bind public static var AVAIL_spike = 0;  
-	@bind public static var COST_spike = 0;
 	@bind public static var AVAIL_cut = 0;	
-	@bind public static var COST_cut = 0;
 	@bind public static var AVAIL_thrust = 0;
-	@bind public static var COST_thrust = 0;
 	@bind public static var AVAIL_beat = 0;
-	@bind public static var COST_beat = 0;
 	@bind public static var AVAIL_bindstrike = 0;
-	@bind public static var COST_bindstrike = 0;
 
-	// all recorded defend actoin availabilities
+	// all recorded defend actoin availabilities  as  (cost - 1) for actual cost
 	@bind public static var AVAIL_block = 0;
-	@bind public static var COST_block = 0;
 	@bind public static var AVAIL_parry = 0;
-	@bind public static var COST_parry = 0;
 	@bind public static var AVAIL_duckweave = 0;
-	@bind public static var COST_duckweave = 0;
 	@bind public static var AVAIL_partialevasion = 0;
-	@bind public static var COST_partialevasion = 0;
 	@bind public static var AVAIL_fullevasion = 0;
-	@bind public static var COST_fullevasion = 0;
 	@bind public static var AVAIL_blockopenstrike = 0;
-	@bind public static var COST_blockopenstrike = 0;
 	@bind public static var AVAIL_counter = 0;
-	@bind public static var COST_counter = 0;
 	@bind public static var AVAIL_rota = 0;
-	@bind public static var COST_rota = 0;
 	@bind public static var AVAIL_expulsion = 0;
-	@bind public static var COST_expulsion = 0;
 	@bind public static var AVAIL_disarm = 0;
-	@bind public static var COST_disarm = 0;
-
+	
+	@bind public static var B_EQUIP:String = "";  // master/off-hand offense in context
+	@bind public static var D_EQUIP:String = "";  // offhand defense in context
 	
 	// basic ai combos with initiative:
 	private static inline var COMBO_PureMeanStrikes:Int = 1; // Pure Mean Strikes
@@ -100,13 +87,136 @@ class TROSAiBot
 	private static inline var COMBO_AlphaDisarmDef:Int = -3;  // Alpha Disarm
 	private static inline var COMBO_SimulatenousBlockStrikeStealer:Int = -4;  // Simultaneous Block-Strike Initiative Stealer 
 	
-	private static function getBestRegularAttack():Bool {
-		// best tn, lowest cost
-		return false;
+	
+	
+	private static var B_CANDIDATES:Array<String> = [];
+	private static var B_CANDIDATE_COUNT:Int = 0;
+	
+	// Naive AI regular attack
+	private static function getRegularAttack(availableCP:Int, roll:Int = 0):String {
+	
+		B_CANDIDATE_COUNT = 0;
+		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
+		var tn:Int = weapon != null ? weapon.atn : 888;
+		var tn2:Int = weapon != null ?  weapon.atn2 : 888;
+		var cost:Int;
+		var aggr:Float;
+		
+		if ( roll == 0) roll = availableCP;
+		
+		var tnP:Float = TROSAI.getTNSuccessProbForDie(tn);
+		var tn2P:Float = TROSAI.getTNSuccessProbForDie(tn2);
+		
+		
+		var aggrCur:Float = -999; 	// best tn, lowest cost
+
+		if ( AVAIL_bash != 0) {
+			
+			cost = AVAIL_bash - 1;
+			if (cost < availableCP) {
+				aggr = tnP*(roll-cost);
+			
+				if ( aggr >= aggrCur) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "bash";
+				}
+	
+			}
+		}
+		if ( AVAIL_cut != 0) {
+			cost = AVAIL_cut - 1;
+			 if (cost < availableCP) {
+				aggr = tnP*(roll-cost);
+			
+				if ( aggr >= aggrCur ) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "cut";
+				}
+			
+			
+			}
+		}
+		if ( AVAIL_spike != 0) { 
+			cost = AVAIL_spike - 1;
+			if (cost < availableCP) {
+				aggr = tn2P*(roll-cost);
+				
+				if ( aggr >= aggrCur ) {
+						B_CANDIDATES[B_CANDIDATE_COUNT++] = "spike";
+				}
+				
+			}
+		}
+		
+		if ( AVAIL_thrust != 0) {
+			cost = AVAIL_thrust - 1;
+			if (cost < availableCP) {
+				aggr = tn2P*(roll-cost);
+				
+				if (aggr >= aggrCur ) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "thrust";
+				}
+				
+			}
+		}
+		
+		if (B_CANDIDATE_COUNT == 0) return null;
+		
+		return B_CANDIDATES[Std.int(Math.random()*B_CANDIDATE_COUNT)];
 	}
-	private static function getBestRegularDefense():Bool {
-		// best tn, lowest cost
-		return false;
+	
+	// Naive AI regular defense
+	private static function getNaiveRegularDefense(availableCP:Int, roll:Int = 0):String {
+		
+		B_CANDIDATE_COUNT = 0;
+			
+		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
+		var offhand:Weapon = WeaponSheet.getWeaponByName(D_EQUIP);
+		
+		var tn:Int = weapon != null ? weapon.dtn : 888;
+		var tnOff:Int = offhand != null ? offhand.dtn : 888;
+			
+		var aggr:Float; 
+		var aggrCur:Float = 9999999; 	// best tn, lowest cost
+		
+		
+		if ( roll == 0) roll = availableCP;
+		
+		var cost:Int;
+		
+		
+		if (AVAIL_block != 0) {
+			cost = AVAIL_block - 1;
+			if (cost < roll) {
+				aggr = tnOff + cost / 10;
+				if (aggr <= aggrCur) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "block";
+				}
+			}
+		}
+		
+		if (AVAIL_parry != 0) {
+			cost = AVAIL_parry - 1;
+			if (cost < availableCP) {
+				aggr = tn + cost / 10;
+				if (aggr <= aggrCur) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "parry";
+				}
+			}
+		}
+		
+		if (AVAIL_partialevasion != 0) {
+			cost = AVAIL_partialevasion - 1;
+			if (cost < availableCP) {
+				aggr = 7 + (cost + 2) / 10;
+				if (aggr <= aggrCur) {
+					B_CANDIDATES[B_CANDIDATE_COUNT++] = "partialevasion";
+				}
+			}
+		}
+		
+		if (B_CANDIDATE_COUNT == 0) return null;
+		
+		return B_CANDIDATES[Std.int(Math.random()*B_CANDIDATE_COUNT)];
+	
 	}
 	
 	// basic ai individual manuever actions:
@@ -121,34 +231,35 @@ class TROSAiBot
 	// Hook
 	private static var MANUEVER_CHOICE:AIManueverChoice  = new AIManueverChoice();
 
-	public static function getFavorableAttack(availableCP:Int, againstCP:Int, againstRoll:Int=0, secondExchange:Bool = false):Bool {
+	public static function getFavorableAttack(availableCP:Int, againstCP:Int, againstRoll:Int = 0, againstTN:Int=1, secondExchange:Bool = false):Bool {
+		
 		return false;
 	}
-	public static function getFavorableDefense(availableCP:Int, againstCP:Int,  againstRoll:Int=0, secondExchange:Bool=false):Bool {
+	public static function getFavorableDefense(availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getBorderlineAttack(availableCP:Int, againstCP:Int,  againstRoll:Int=0, secondExchange:Bool=false):Bool {
+	public static function getBorderlineAttack(availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getBorderlineDefense(availableCP:Int, againstCP:Int,  againstRoll:Int=0, secondExchange:Bool=false):Bool {
+	public static function getBorderlineDefense(availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getBlockOpenAndStrike(availableCP:Int, againstCP:Int, againstRoll:Int=0,  secondExchange:Bool=false):Bool {
+	public static function getBlockOpenAndStrike(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getRotaOrCounter(availableCP:Int, againstCP:Int, againstRoll:Int=0,  secondExchange:Bool=false):Bool {
+	public static function getRotaOrCounter(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getDisarm(availableCP:Int, againstCP:Int, againstRoll:Int=0, secondExchange:Bool=false):Bool {
+	public static function getDisarm(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getHook(availableCP:Int, againstCP:Int, againstRoll:Int=0,  secondExchange:Bool=false):Bool {
+	public static function getHook(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getBeat(availableCP:Int, againstCP:Int, againstRoll:Int=0,  secondExchange:Bool=false):Bool {
+	public static function getBeat(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
-	public static function getBindStrike(availableCP:Int, againstCP:Int,  againstRoll:Int=0, secondExchange:Bool=false):Bool {
+	public static function getBindStrike(availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1, secondExchange:Bool=false):Bool {
 		return false;
 	}
 	

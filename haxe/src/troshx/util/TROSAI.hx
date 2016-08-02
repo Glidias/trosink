@@ -224,18 +224,27 @@ class AIManueverChoice {
 	public var manuever:String;
 	public var manueverCP:Int; 
 	public var targetZone:Int;
-	public var attacking:Bool;
+	public var manueverType:Int;
+	public var offhand:Bool;
 	public var againstID:Int;
 	
 	public function new() 
 	{
 		
 	}
-}
-
-
-interface AITrosImpl {
 	
-
-
+	public function setAttack(manuever:String, manueverCP:Int, targetZone:Int, offhand:Bool=false):Void {
+		this.manuever = manuever;
+		this.manueverCP = manueverCP;
+		this.targetZone  = targetZone;
+		this.offhand = offhand;
+	}
+	
+	public function setDefend(manuever:String, manueverCP:Int, offhand:Bool=false):Void {
+		this.manuever = manuever;
+		this.manueverCP = manueverCP;
+		this.targetZone  = 0;
+		this.offhand = offhand;
+	}
 }
+
