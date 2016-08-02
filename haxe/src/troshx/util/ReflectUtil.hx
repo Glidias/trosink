@@ -4,7 +4,7 @@ import haxe.rtti.CType;
 import haxe.rtti.Meta;
 
 /**
- * Useful utility to reflect properties/methods, etc. of Haxe classes/instances to VueJS and other ViewModel implementations
+ * Useful utility to reflect properties/methods, etc. of Haxe classes/instances to VueJS and other ViewModel/Model implementations
  * @author Glenn Ko
  */
 @:expose

@@ -188,8 +188,8 @@ class TROSAI
 		return t * y;
 		#else
 		var t = x / y;
-		if (t < Limits.INT32_MAX && t > Limits.INT32_MIN)
-			return round(t) * y;
+		if (t < INT32_MAX && t > INT32_MIN)
+			return Math.round(t) * y;
 		else
 		{
 			t = (t > 0 ? t + .5 : (t < 0 ? t - .5 : t));
@@ -197,6 +197,19 @@ class TROSAI
 		}
 		#end
 	}
+	
+	inline public static var INT32_MIN =
+	#if cpp
+	//warning: this decimal constant is unsigned only in ISO C90
+	-0x7fffffff;
+	#else
+	0x80000000;
+	#end
+	
+	/**
+	 * Max value, signed integer.
+	 */
+	inline public static var INT32_MAX = 0x7fffffff;
 	
 	
 	public static inline function displayAsPercentage(probability:Float):Float {

@@ -1,0 +1,6 @@
+-cs troscs
+-main Main
+-D haxe3
+-D no-root
+-D net-ver=40
+-D dll
