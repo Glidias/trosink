@@ -92,8 +92,15 @@ class TROSAiBot
 	private static var B_CANDIDATES:Array<String> = [];
 	private static var B_CANDIDATE_COUNT:Int = 0;
 	
-	// Naive AI regular attack
-	private static function getRegularAttack(availableCP:Int, roll:Int = 0):String {
+	/**
+	 * Tries to heuristically choose "best" regular attack manuever
+	 * @param	availableCP	Your available CP for use
+	 * @param	roll	 (Optional) Indicates number of dice (likely) to roll. If left blank, uses entire availableCP.
+	 * @param	againstRoll (Optional)  Indicates number of enemy dice (likely) to roll against.
+	 * @param	againstTN (Optional)  Indicates (likely) enemy TN to roll against
+	 * @return	The manuever id string
+	 */
+	public static function getRegularAttack(availableCP:Int, roll:Int = 0,  againstRoll:Int = -1, againstTN:Int=1):String {
 	
 		B_CANDIDATE_COUNT = 0;
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
@@ -107,26 +114,29 @@ class TROSAiBot
 		var tnP:Float = TROSAI.getTNSuccessProbForDie(tn);
 		var tn2P:Float = TROSAI.getTNSuccessProbForDie(tn2);
 		
+		var dmg:Float = weapon != null && againstRoll >= 0 ? weapon.damage : 0;
+		var dmgT:Float = weapon != null && againstRoll >= 0 ? weapon.damageT : 0;
+		var probabilityToHitSlash:Float =  againstRoll >= 0 ? TROSAI.getChanceToSucceedContest(roll, tn, againstRoll, againstTN, 1) : 0;
+		var probabilityToHitThrust:Float =  againstRoll >= 0 ? TROSAI.getChanceToSucceedContest(roll, tn2, againstRoll, againstTN, 1) : 0;
 		
-		var aggrCur:Float = -999; 	// best tn, lowest cost
+		var aggrCur:Float = -999; 	// current rough aggregate considering TN, activation cost, and weapon damage in relation to dices being rolled
 
 		if ( AVAIL_bash != 0) {
 			
 			cost = AVAIL_bash - 1;
 			if (cost < availableCP) {
-				aggr = tnP*(roll-cost);
+				aggr = tnP * (roll - cost) + probabilityToHitSlash*dmg;
 			
 				if ( aggr >= aggrCur) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "bash";
 				}
-	
+
 			}
 		}
 		if ( AVAIL_cut != 0) {
 			cost = AVAIL_cut - 1;
 			 if (cost < availableCP) {
-				aggr = tnP*(roll-cost);
-			
+				aggr = tnP*(roll-cost) + probabilityToHitSlash*dmg;
 				if ( aggr >= aggrCur ) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "cut";
 				}
@@ -137,8 +147,7 @@ class TROSAiBot
 		if ( AVAIL_spike != 0) { 
 			cost = AVAIL_spike - 1;
 			if (cost < availableCP) {
-				aggr = tn2P*(roll-cost);
-				
+				aggr = tn2P*(roll-cost) + probabilityToHitThrust*dmgT;
 				if ( aggr >= aggrCur ) {
 						B_CANDIDATES[B_CANDIDATE_COUNT++] = "spike";
 				}
@@ -149,7 +158,7 @@ class TROSAiBot
 		if ( AVAIL_thrust != 0) {
 			cost = AVAIL_thrust - 1;
 			if (cost < availableCP) {
-				aggr = tn2P*(roll-cost);
+				aggr = tn2P*(roll-cost) + probabilityToHitThrust*dmgT;
 				
 				if (aggr >= aggrCur ) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "thrust";
@@ -158,13 +167,24 @@ class TROSAiBot
 			}
 		}
 		
+		
+		
+		
 		if (B_CANDIDATE_COUNT == 0) return null;
+		
+		
 		
 		return B_CANDIDATES[Std.int(Math.random()*B_CANDIDATE_COUNT)];
 	}
 	
-	// Naive AI regular defense
-	private static function getNaiveRegularDefense(availableCP:Int, roll:Int = 0):String {
+	/**
+	 * Tries to heuristically choose "best" regular defense manuever
+	 * @param	availableCP	 Your available CP for use
+	 * @param	roll (Optional) Indicates number of dice (likely) to roll. If left blank, uses entire availableCP.
+	 * @param   enforceMustRegainInitiative  (Optional) If set to true, defensive manuevers that have no means of regaining back initiative would be omitted. 
+	 * @return	The manuever id string
+	 */
+	public static function getNaiveRegularDefense(availableCP:Int, roll:Int = 0, enforceMustRegainInitiative:Bool=false):String {
 		
 		B_CANDIDATE_COUNT = 0;
 			
@@ -173,9 +193,11 @@ class TROSAiBot
 		
 		var tn:Int = weapon != null ? weapon.dtn : 888;
 		var tnOff:Int = offhand != null ? offhand.dtn : 888;
+		var tnP:Float = TROSAI.getTNSuccessProbForDie(tn);
+		var tnPOff:Float = TROSAI.getTNSuccessProbForDie(tnOff);
 			
 		var aggr:Float; 
-		var aggrCur:Float = 9999999; 	// best tn, lowest cost
+		var aggrCur:Float = -999; 	// current rough aggregate considering TN, activation cost, in relation to dices being rolled
 		
 		
 		if ( roll == 0) roll = availableCP;
@@ -186,8 +208,8 @@ class TROSAiBot
 		if (AVAIL_block != 0) {
 			cost = AVAIL_block - 1;
 			if (cost < roll) {
-				aggr = tnOff + cost / 10;
-				if (aggr <= aggrCur) {
+				aggr = tnPOff * (roll - cost);
+				if (aggr >= aggrCur) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "block";
 				}
 			}
@@ -196,18 +218,18 @@ class TROSAiBot
 		if (AVAIL_parry != 0) {
 			cost = AVAIL_parry - 1;
 			if (cost < availableCP) {
-				aggr = tn + cost / 10;
-				if (aggr <= aggrCur) {
+				aggr = tnP * (roll - cost);
+				if (aggr >= aggrCur) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "parry";
 				}
 			}
 		}
 		
-		if (AVAIL_partialevasion != 0) {
+		if (AVAIL_partialevasion != 0) { 
 			cost = AVAIL_partialevasion - 1;
-			if (cost < availableCP) {
-				aggr = 7 + (cost + 2) / 10;
-				if (aggr <= aggrCur) {
+			if (cost  + (enforceMustRegainInitiative ? 2 : 0) < availableCP) {
+				aggr = tnP * (roll - cost);
+				if (aggr >= aggrCur) {
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "partialevasion";
 				}
 			}
