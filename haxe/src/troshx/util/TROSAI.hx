@@ -227,24 +227,53 @@ class AIManueverChoice {
 	public var manueverType:Int;
 	public var offhand:Bool;
 	public var againstID:Int;
+	public var manueverTN:Int;
+
+	
+	public static inline var TYPE_ATTACKING:Int =2;
+	public static inline var TYPE_DEFENDING:Int = 1;
 	
 	public function new() 
 	{
 		
 	}
 	
-	public function setAttack(manuever:String, manueverCP:Int, targetZone:Int, offhand:Bool=false):Void {
+	public inline function nothing():Void {
+		manuever = "";
+		manueverCP = 0;
+		targetZone = 0;
+		manueverType  = 0;
+		offhand = false;
+		againstID = 0;
+	}
+	
+	public inline function copyTo(newChoice:AIManueverChoice, newAgainstID:Int=-1):Void {
+		newChoice.manuever = manuever;
+		newChoice.manueverCP = manueverCP;
+		newChoice.targetZone = targetZone;
+		newChoice.manueverType = manueverType;
+		newChoice.offhand = offhand;
+		newChoice.manueverTN = manueverTN;
+		newChoice.againstID = newAgainstID  >= 0 ? newAgainstID : againstID;
+
+	}
+	
+	public function setAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, offhand:Bool=false):Void {
 		this.manuever = manuever;
 		this.manueverCP = manueverCP;
 		this.targetZone  = targetZone;
 		this.offhand = offhand;
+		this.manueverType = TYPE_ATTACKING;
+		this.manueverTN = manueverTN;
 	}
 	
-	public function setDefend(manuever:String, manueverCP:Int, offhand:Bool=false):Void {
+	public function setDefend(manuever:String, manueverCP:Int, manueverTN:Int, offhand:Bool=false):Void {
 		this.manuever = manuever;
 		this.manueverCP = manueverCP;
 		this.targetZone  = 0;
 		this.offhand = offhand;
+		this.manueverType = TYPE_DEFENDING;
+		this.manueverTN = manueverTN;
 	}
 }
 

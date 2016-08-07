@@ -126,5 +126,9 @@ class BodyChar
 		zones[1] = null;
 	}
 	
+	public function getTargetZoneCost(index:Int):Int {
+		return 0;
+	}
+	
 }
 

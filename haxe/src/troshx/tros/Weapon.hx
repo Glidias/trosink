@@ -13,6 +13,9 @@ class Weapon
 	public var damage:Int;
 	public var damageT:Int;
 	
+	public var offhand:Bool;
+	public var shield:Bool;
+	
 	public function new() 
 	{
 		
