@@ -220,14 +220,16 @@ class TROSAI
 }
 
 
+@:rtti
+@:expose
 class AIManueverChoice {
-	public var manuever:String;
-	public var manueverCP:Int; 
-	public var targetZone:Int;
-	public var manueverType:Int;
-	public var offhand:Bool;
-	public var againstID:Int;
-	public var manueverTN:Int;
+	@inspect public var manuever:String;
+	@inspect public var manueverCP:Int; 
+	@inspect public var targetZone:Int;
+	@inspect public var manueverType:Int;
+	@inspect public var offhand:Bool;
+	@inspect public var againstID:Int;
+	@inspect public var manueverTN:Int;
 
 	
 	public static inline var TYPE_ATTACKING:Int =2;

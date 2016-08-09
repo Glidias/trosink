@@ -4,6 +4,7 @@ package troshx.tros;
  * ...
  * @author Glidias
  */
+@:expose
 class ManueverSheet
 {
 
