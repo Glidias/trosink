@@ -164,6 +164,7 @@ class TROSAiBot
 	private static inline var COMBO_SimulatenousBlockStrikeStealer:Int = -4;  // Simultaneous Block-Strike Initiative Stealer 
 	private static inline var COMBOS_LEN_NO_INITAITIVE:Int = 4;
 	
+	public static var P_THRESHOLD_BEYOND_FAVORABLE:Float = 0.9;
 	public static var P_THRESHOLD_FAVORABLE:Float = 0.75;
 	public static var P_THRESHOLD_BORDERLINE:Float = 0.5;
 	
