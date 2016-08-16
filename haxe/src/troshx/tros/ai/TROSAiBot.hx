@@ -30,12 +30,14 @@ class TROSAiBot
 	@bind("_cp") public var cp:Int;
 	@bind("_equipMasterhand") public var equipMasterhand:String;
 	@bind("_equipOffhand") public var equipOffhand:String;
+	@bind("_mobility") public var mobility:Int = 6;
 	
 	// Combat related
 	@bind("_id") public var id:Int;
 	@bind("_fight_initiative") public var initiative:Bool;
 	@bind("_fight_stance") public var stance:Int;
 	@bind("_manueverUsingHands") public var manueverUsingHands:Int = 0;
+	
 
 	private var handsUsedUp:Int = 0;
 	
@@ -142,6 +144,7 @@ class TROSAiBot
 	
 	@inject private static var CURRENT_OPPONENT:TROSAiBot;
 	// equipment, body link
+	
 	
 	
 	// basic ai combos with initiative:
@@ -923,11 +926,11 @@ class TROSAiBot
 	}
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
-	public static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0):Bool {
+	public static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
 		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
 		var spend:Int;
 		if (AVAIL_fullevasion > 0) {
-			var cpToUseForFleeing:Int = availableCP < 6 ? availableCP : 6;
+			var cpToUseForFleeing:Int = GameRules.FLEE_CAP == GameRules.FLEE_CAP_NONE || (GameRules.FLEE_CAP == GameRules.FLEE_CAP_BY_MOBILITY_EXCHANGE1 && secondExchange) ? availableCP : (availableCP > 6  ? 6 : availableCP);
 			if (favorable) {
 				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
@@ -936,7 +939,7 @@ class TROSAiBot
 				}
 			}
 			else {
-				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
+				spend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
 					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
 					return true;
@@ -1225,6 +1228,15 @@ class TROSAiBot
 					case COMBO_DefensiveFirst:
 						if (threatManuever != null) {
 							if (!secondExchange) {
+								/*
+								if ( getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0 ) ) {
+									cp -= MANUEVER_CHOICE.manueverCP;
+									if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
+										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
+									}
+								}
+								*/
+								
 								if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
 										cp -= MANUEVER_CHOICE.manueverCP;
 										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
@@ -1240,7 +1252,9 @@ class TROSAiBot
 					case COMBO_DefensiveBorderline:
 						if (threatManuever != null) {
 							if (!secondExchange) {
-								if (getFleeOrDefend(false, cp, cp2 - threatManuever.manueverCP, getPredictedOpponentATN(), false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST)) {
+								
+								
+								if (getFleeOrDefend(false, cp, cp2 - threatManuever.manueverCP, getPredictedOpponentATN(), false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0, true)) {
 									cp -= MANUEVER_CHOICE.manueverCP;
 									return getFBDefense( false, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
 								}

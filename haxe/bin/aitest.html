@@ -34,6 +34,9 @@
 function exposeHxMappingClassesToGlobalNamespace() {
 	var p;
 	var arr = [];
+	for (p in troshx) {
+		window[p] = troshx[p];
+	}
 	for (p in troshx.tros.ai) {
 		window[p] = troshx.tros.ai[p];
 	}
@@ -49,6 +52,9 @@ var TJSON = tjson.TJSON;
 var DatUtil = dat.gui.DatUtil;
 	
 window.onload = function() {
+
+	GameRules.FLEE_CAP = GameRules.FLEE_CAP_BY_MOBILITY_ALL; 
+	
 
 	// vue datamodel directive
 	var PROPERTY_CHAIN_SETTER  =  new PropertyChainHolder();
