@@ -368,14 +368,15 @@ class TROSAiBot
 	// considerTODO: this should be factored out into ManuverSheet method
 	private static function getATNOfManuever(manuever:String):Int {
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
-		var tn:Int = weapon != null ? weapon.atn : 888;
-		var tn2:Int = weapon != null ?  weapon.atn2 : 888;
+		var tn:Int = weapon != null ? weapon.atn : IMPOSSIBLE_TN;
+		var tn2:Int = weapon != null ?  weapon.atn2 : IMPOSSIBLE_TN;
 		var cost:Int;
 		var aggr:Float;
 	
 		switch(manuever) {
 			case "bash": return tn;
 			case "cut": return tn;
+			case "disarm": return tn;
 			case "spike": return tn2;
 			case "thrust": return tn2;
 		}
@@ -387,12 +388,13 @@ class TROSAiBot
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
 		var offhand:Weapon = WeaponSheet.getWeaponByName(D_EQUIP);
 		
-		var tn:Int = weapon != null ? weapon.dtn : 888;
-		var tnOff:Int = offhand != null ? offhand.dtn : 888;
+		var tn:Int = weapon != null ? weapon.dtn : IMPOSSIBLE_TN;
+		var tnOff:Int = offhand != null ? offhand.dtn : IMPOSSIBLE_TN;
 		
 		switch(manuever) {
 			case "block": return tnOff;
 			case "parry": return tn;
+			case "disarm": return tn;
 			case "partialevasion": return 7;
 		}
 		
@@ -452,7 +454,7 @@ class TROSAiBot
 		for (c in min...(availableCP+1)) {
 			accum = precisionPerc( TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, B_BS_REQUIRED, true) );
 			if (accum >= threshold) {
-				B_VIABLE_PROBABILITY = accum;
+				B_VIABLE_PROBABILITY = B_BS_REQUIRED == 1 ? accum :  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, 1, true);
 				return c;
 			}
 		}
@@ -965,7 +967,30 @@ class TROSAiBot
 		return false;
 	}
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getDisarm(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1):Bool {
+	public static function getDisarm(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1, defensive:Bool=false):Bool {
+		var threshold:Float = customThreshold!= 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
+		if (AVAIL_disarm > 0) {
+			availableCP -= getCostOfManuever("disarm");
+			if (availableCP > 0) {
+				B_BS_REQUIRED = preferedRS;
+				var tn:Int = defensive ? getDTNOfManuever("disarm") : getATNOfManuever("disarm");
+				if (tn == 0 || tn == IMPOSSIBLE_TN) return false;
+				var costing:Int = favorable ? checkCostViability(availableCP, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) : checkCostViabilityBorderline(availableCP, getDTNOfManuever("disarm"), threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) ;
+				B_BS_REQUIRED = B_BS_REQUIRED_DEFAULT;
+			
+				
+				if (costing > 0) {
+					if (defensive) {
+						MANUEVER_CHOICE.setDefend("disarm", costing, tn, B_IS_OFFHAND);
+					}
+					else {
+						MANUEVER_CHOICE.setAttack("disarm", costing, tn, 0, B_IS_OFFHAND);
+					}
+					return true;
+				}
+			}
+		
+		}
 		return false;
 	}
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
@@ -1252,8 +1277,6 @@ class TROSAiBot
 					case COMBO_DefensiveBorderline:
 						if (threatManuever != null) {
 							if (!secondExchange) {
-								
-								
 								if (getFleeOrDefend(false, cp, cp2 - threatManuever.manueverCP, getPredictedOpponentATN(), false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0, true)) {
 									cp -= MANUEVER_CHOICE.manueverCP;
 									return getFBDefense( false, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
@@ -1261,10 +1284,13 @@ class TROSAiBot
 							}
 						}
 					case COMBO_AlphaDisarmDef:
-					
-						
+						if (threatManuever != null) {
+							//if (!secondExchange) {
+								return getDisarm(true, cp, threatManuever.manueverCP, threatManuever.manueverTN, 0, 0, 2, true );
+							//}
+						}
 					case COMBO_AlphaInitiativeStealer:
-					
+						
 					
 					case COMBO_SimulatenousBlockStrikeStealer:  // if rules allow so under TROS TFOB stealing inintiatiive peanlty to be able to do this
 					
@@ -1362,7 +1388,8 @@ class TROSAiBot
 	 * @return
 	 */
 	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET")
-	private function setBestComboActionWithoutInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
+	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
+	public static function setBestComboActionWithoutInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
 		
 		B_COMBO_CANDIDATE_COUNT = 0;
 		
@@ -1386,13 +1413,14 @@ class TROSAiBot
 		while ( i < len) {
 			if ( getComboAction( -i, cp, cp2, threatManuever, false, false) ) {
 				probabilityCheck  = B_VIABLE_PROBABILITY_GET;
-				if ( probabilityCheck >= curProbability) {
-					if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;
+				MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_1);
+				//if ( probabilityCheck >= curProbability) {
+					//if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;
 					B_COMBO_CANDIDATES[B_COMBO_CANDIDATE_COUNT] = -i;
 					addPossibleComboManueverChoice(B_COMBO_CANDIDATE_COUNT, MANUEVER_CHOICE_1);
 					curProbability = probabilityCheck;
 					B_COMBO_CANDIDATE_COUNT++;
-				}
+				//}
 			}
 			i++;
 		}
