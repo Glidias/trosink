@@ -96,10 +96,12 @@ Vue.directive('vuedatgui', {
 Vue.directive('dat-instance', {  // Binds to Dat.gui folders's domElement.firstChild => UL element
 	bind: function(val) {
 		var self = this;
+		
 		this._datGui = $(this.el).data("dat-gui");
 		 this._datGui.onClosedChange( function(isClosed) {
 			self.vm.$set( self.expression, (isClosed ? null : self._datGui._guiGlueParams ) );
 		 });
+		 self.vm.$set( self.expression, (this._datGui.closed ? null : self._datGui._guiGlueParams ) );
 	},
 	update: function(val, lastVal) {
 

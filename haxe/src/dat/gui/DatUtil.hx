@@ -348,7 +348,7 @@ class DatUtil
 							}
 							Reflect.setField(funcDep.meta, funcArg.name, newObj );
 							
-							Reflect.setField(funcDep.instance, funcArg.name, funcArg.opt ? parseStringParam(funcArg.value, CTypeTools.toString(funcArg.t), classe) : null);
+							Reflect.setField(funcDep.instance, funcArg.name, funcArg.opt ? parseOptStringParam(funcArg.value, CTypeTools.toString(funcArg.t), classe) : null);
 							count++;
 						}
 						Reflect.setField(funcFolder, f.name, funcDep);
@@ -370,7 +370,7 @@ class DatUtil
 		return fieldHash;
 	}
 	
-	private static function parseStringParam(str:String, type:String, classe:Dynamic):Dynamic {
+	private static function parseOptStringParam(str:String, type:String, classe:Dynamic):Dynamic {
 		switch (type) {
 			case "Int":
 				return !Math.isNaN( Std.parseFloat(str) ) ?  Std.int(Std.parseFloat(str)) : Reflect.field(classe,str);
@@ -384,7 +384,8 @@ class DatUtil
 				return str == "true" ? true : str ==  "false" ? false : Reflect.field(classe, str);
 			default:
 				//trace("Could not resolve type: " + type);
-				return type;
+				// assumed non-primitive  optional object reference that is nullable
+				return null;
 		}
 	}
 	
