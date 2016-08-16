@@ -98,6 +98,9 @@ window.onload = function() {
 	$("#staticGUI .cr.number .property-name").each( function(index, item) {
 		item = $(item);
 		var propName = item.html();
+		if (propName.split("_")[0] != "AVAIL") {
+			return;
+		}
 		item.html( propName + " (cost: {{ getCostFromAVAIL(TROSAiBot."+propName+")  }})");
 	});
 	

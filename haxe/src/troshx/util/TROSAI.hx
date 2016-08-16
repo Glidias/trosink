@@ -225,12 +225,11 @@ class TROSAI
 class AIManueverChoice {
 	@inspect public var manuever:String;
 	@inspect public var manueverCP:Int; 
+	@inspect public var manueverTN:Int;
 	@inspect public var targetZone:Int;
-	@inspect public var manueverType:Int;
+	@inspect({display:"selector"}) @choices("TYPE")  public var manueverType:Int;
 	@inspect public var offhand:Bool;
 	@inspect public var againstID:Int;
-	@inspect public var manueverTN:Int;
-
 	
 	public static inline var TYPE_ATTACKING:Int =2;
 	public static inline var TYPE_DEFENDING:Int = 1;

@@ -159,15 +159,16 @@ class TROSAiBot
 	
 	// basic ai combos without initiative
 	private static inline var COMBO_DefensiveFirst:Int = -1;  // Defensive-first
-	private static inline var COMBO_AlphaInitiativeStealer:Int = -2;  // Alpha Initiative Stealer
-	private static inline var COMBO_AlphaDisarmDef:Int = -3;  // Alpha Disarm
-	private static inline var COMBO_SimulatenousBlockStrikeStealer:Int = -4;  // Simultaneous Block-Strike Initiative Stealer 
-	private static inline var COMBOS_LEN_NO_INITAITIVE:Int = 4;
+	private static inline var COMBO_DefensiveBorderline:Int = -2;  // Defensive-borderline
+	private static inline var COMBO_AlphaInitiativeStealer:Int = -3;  // Alpha Initiative Stealer
+	private static inline var COMBO_AlphaDisarmDef:Int = -4;  // Alpha Disarm
+	private static inline var COMBO_SimulatenousBlockStrikeStealer:Int = -5;  // Simultaneous Block-Strike Initiative Stealer 
+	private static inline var COMBOS_LEN_NO_INITAITIVE:Int = 5;
 	
 	public static var P_THRESHOLD_BEYOND_FAVORABLE:Float = 0.9;
-	public static var P_THRESHOLD_FAVORABLE:Float = 0.75;
-	public static var P_THRESHOLD_BORDERLINE:Float = 0.5;
-	
+	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_FAVORABLE:Float = 0.75;
+	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_BORDERLINE:Float = 0.5;
+	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_RECKLESS:Float = 0.2;  // less reckless will usually be at 0.15 instead of 0.2. least recklesss at 0.1
 	
 	
 	private static var B_CANDIDATES:Array<String> = [];
@@ -474,8 +475,10 @@ class TROSAiBot
 		return 0;
 	}
 	
+	
+	
 	@return("B_VIABLE_PROBABILITY_GET")
-	private static function checkCostAntiFavorability( availableCP:Int, tn:Int, threshold:Float, againstCP:Int, againstTN:Int = 1, useAllCP:Bool=false, offset:Int=0):Int {
+	private static function checkCostAntiFavorability( availableCP:Int, tn:Int, threshold:Float, againstCP:Int, againstTN:Int = 1, useAllCP:Bool=false, offset:Int=0, requiredBS:Int=1):Int {
 		var min:Int;
 		var accum:Float;
 		
@@ -483,7 +486,7 @@ class TROSAiBot
 		var cpToUse:Int = 0;
 	
 		for (c in min...(availableCP+1)) {
-			accum = precisionPerc( TROSAI.getChanceToSucceedContest(againstCP, againstTN, c, tn, 1, true) );
+			accum = precisionPerc( TROSAI.getChanceToSucceedContest(againstCP, againstTN, c, tn, requiredBS, true) );
 				
 			if (accum < threshold) {
 				cpToUse = c;
@@ -629,6 +632,7 @@ class TROSAiBot
 	
 	public static inline var FLAG_GET_CHEAPEST:Int = 1;
 	public static inline var FLAG_USE_ALL_CP:Int = 2;
+	public static inline var FLAG_BORDERLINE_DEF_SAFETY:Int = 4;
 
 	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" } ]) 
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
@@ -768,12 +772,28 @@ class TROSAiBot
 	}
 	
 	private static function getFBDefense(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float=0):Bool {
-		var threshold:Float = customThreshold!= 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
+		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
+		var safetyCost:Int;
 			B_VIABLE_HEURISTIC = false;
-		var result:Bool = heuristic ? getASuitableDefense(threshold,availableCP,  againstRoll, againstTN, false, favorable,  (flags & FLAG_USE_ALL_CP)!=0) : false;
+		var result:Bool = heuristic ? getASuitableDefense(threshold, availableCP,  againstRoll, againstTN, false, favorable,  (flags & FLAG_USE_ALL_CP) != 0) : false;
+		
+		if ( result && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
+			safetyCost = checkCostAntiFavorability(availableCP, MANUEVER_CHOICE.manueverTN, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  // todo later: may not be 2, depends on  yr armour usuaully and mannuver of target weapon
+			if (safetyCost > 0) {
+				if (MANUEVER_CHOICE.manueverCP < safetyCost ) {
+					MANUEVER_CHOICE.manueverCP = safetyCost;
+				}
+			}
+			else {
+				result = false;
+			}
+		}
+		
 		if (result) {
 			B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
 			B_VIABLE_HEURISTIC = true;
+			
+			
 			return true;		
 		}
 		
@@ -794,6 +814,18 @@ class TROSAiBot
 			if ( cp > 0 ) {
 				tn = getDTNOfManuever("block");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
+				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					if (safetyCost > 0) {
+						if (cpToUse < safetyCost ) {
+							cpToUse = safetyCost;
+						}
+					}
+					else {
+						cpToUse = 0;
+					}
+				}
+				
 				if (cpToUse > 0) {
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
@@ -812,6 +844,18 @@ class TROSAiBot
 			if ( cp > 0 ) {
 				tn = getDTNOfManuever("parry");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
+				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					if (safetyCost > 0) {
+						if (cpToUse < safetyCost ) {
+							cpToUse = safetyCost;
+						}
+					}
+					else {
+						cpToUse = 0;
+					}
+				}
+				
 				if (cpToUse > 0) {
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
@@ -830,6 +874,18 @@ class TROSAiBot
 			if ( cp > 0 ) {
 				tn = getDTNOfManuever("partialevasion");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
+				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					if (safetyCost > 0) {
+						if (cpToUse < safetyCost ) {
+							cpToUse = safetyCost;
+						}
+					}
+					else {
+						cpToUse = 0;
+					}
+				}
+				
 				if (cpToUse > 0) {
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
@@ -861,6 +917,31 @@ class TROSAiBot
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
 	public static inline function getBorderlineDefense(availableCP:Int, againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool=true, flags:Int=0):Bool {
 		return getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
+	public static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0):Bool {
+		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
+		var spend:Int;
+		if (AVAIL_fullevasion > 0) {
+			var cpToUseForFleeing:Int = availableCP < 6 ? availableCP : 6;
+			if (favorable) {
+				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
+				if ( spend > 0 ) {
+					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					return true;
+				}
+			}
+			else {
+				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
+				if ( spend > 0 ) {
+					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					return true;
+				}
+			}
+			
+		}
+		return getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags);	
 	}
 	
 	private static inline function addPossibleRegularManueverChoice(index:Int):Void {
@@ -899,6 +980,11 @@ class TROSAiBot
 		return CURRENT_OPPONENT.getPredictedDTN();
 	}
 	
+	@inspect
+	public static inline function getPredictedOpponentATN():Int {
+		return CURRENT_OPPONENT.getPredictedATN();
+	}
+	
 	private function getPredictedDTN():Int {
 		var weapon:Weapon;
 		var dtn:Int = 7;
@@ -919,11 +1005,41 @@ class TROSAiBot
 		return dtn;
 	}
 	
+		private function getPredictedATN():Int {
+		var weapon:Weapon;
+		var atn:Int = 10;
+		
+		weapon = WeaponSheet.getWeaponByName(equipMasterhand);
+		if (weapon != null ) {
+			if (weapon.atn < atn && weapon.atn > 0) {
+				atn = weapon.atn;
+			}
+			if (weapon.atn2 < atn && weapon.atn2> 0) {
+				atn = weapon.atn2;
+			}
+		}
+		
+		weapon = WeaponSheet.getWeaponByName(equipOffhand);
+		if (weapon != null) {
+			if (weapon.atn < atn && weapon.atn > 0) {
+				atn = weapon.atn;
+			}
+			if (weapon.atn2 < atn && weapon.atn2 > 0) {
+				atn = weapon.atn2;
+			}
+		}
+		
+		
+		return atn;
+	}
+	
 	private static inline function fluctuateLower(val:Float,lowerBy:Float):Float {
 		lowerBy = lowerBy >= val ? val*.5 : lowerBy;
 		val -= Math.random() * lowerBy;
 		return val;
 	}
+	
+	
 	
 	@inspect([ { inspect:{display:"selector"}, choices:"COMBO" }, { inspect:{min:0} }, { inspect:{min:0} } ]) 
 	private static function getComboExchangeBudgetingWithInitiative(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice):Vector<Int> {
@@ -936,7 +1052,7 @@ class TROSAiBot
 				// ai combos typically with initiative:
 				case COMBO_PureMeanStrikes:	
 					stipulateRemaining = Math.floor(cp2 * .5);
-					if ( getBorderlineAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) ) {
+					if ( ( getFavorableAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) && (cp-MANUEVER_CHOICE.manueverCP) >=Math.ceil(cp*.5) )  ||  getBorderlineAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) ) {
 						cp -= MANUEVER_CHOICE.manueverCP;
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1] = cp;  
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1_ENEMY] =  Math.ceil(cp2*.5);
@@ -1087,12 +1203,29 @@ class TROSAiBot
 					
 					// ai combos without initiative: Whether 1st or second exchange, he'll continue to be onthe defensive!
 					case COMBO_DefensiveFirst:
+						if (threatManuever != null) {
+							if (!secondExchange) {
+								if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
+										cp -= MANUEVER_CHOICE.manueverCP;
+										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
+								}
+							}
+						}
 						// Determine which of these manuevers are to be used as overwritable viables
 						//getFavorableDefense(cp, threatManuever.manueverCP, threatManuever., true, false);  // if secondExchange, make sure still having remaining dice dice for at least borderline attack  for 2nd exchange in order to be viable
 						// getRotaOrCounter   //  is it viable/availalble? use it instead
 						// getBlockOpenAndStrike //  is it viable/availalble? use it instead
 						// if got any valids above, return true, else return false
 						// if secondExchange, maybe can opt to go for borderline defense.....
+					case COMBO_DefensiveBorderline:
+						if (threatManuever != null) {
+							if (!secondExchange) {
+								if (getFleeOrDefend(false, cp, cp2 - threatManuever.manueverCP, getPredictedOpponentATN(), false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST)) {
+									cp -= MANUEVER_CHOICE.manueverCP;
+									return getFBDefense( false, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
+								}
+							}
+						}
 					case COMBO_AlphaDisarmDef:
 					
 						
