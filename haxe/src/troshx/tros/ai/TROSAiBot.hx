@@ -465,7 +465,7 @@ class TROSAiBot
 		for (c in min...(availableCP+1)) {
 			accum = precisionPerc( TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, B_BS_REQUIRED, true) );
 			if (accum >= threshold) {
-				B_VIABLE_PROBABILITY = B_BS_REQUIRED == 1 ? accum :  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, 1, true);
+				B_VIABLE_PROBABILITY = accum;// B_BS_REQUIRED == 1 ? accum :  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, 1, true);
 				return c;
 			}
 		}
@@ -480,14 +480,15 @@ class TROSAiBot
 	private static function checkCostViabilityBorderline( availableCP:Int, tn:Int, threshold:Float, againstRoll:Int, againstTN:Int = 1, useAllCP:Bool=false):Int {
 		var min:Int;
 		var accum:Float;
-		var min:Int = useAllCP ? availableCP : 1;
-	
+		var bsRequired:Int = B_BS_REQUIRED > 1 ? B_BS_REQUIRED : 1;
+		var min:Int =  useAllCP ? availableCP :   bsRequired;
+		
 		for (c in min...(availableCP + 1)) {
-			var successProbabilitWith1BS =  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, 1, true);
-			accum = precisionPerc ( (successProbabilitWith1BS +  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, 0, false) ) * 0.5 );
+			var successProbabilitWithBS =  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, bsRequired, true);
+			accum = precisionPerc ( (successProbabilitWithBS +  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, bsRequired-1, false) ) * 0.5 );
 			
 			if (accum >= threshold) {
-				B_VIABLE_PROBABILITY = successProbabilitWith1BS;
+				B_VIABLE_PROBABILITY = successProbabilitWithBS;
 				return useAllCP ? availableCP : c;
 			}
 		}
