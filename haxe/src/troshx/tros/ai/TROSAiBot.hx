@@ -1050,7 +1050,7 @@ class TROSAiBot
 	}
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  {inspect:null}, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:0, display:"range", step:0.01, max:1} } ]) 
+	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  { inspect:null, bitmask:"FLAG" }, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:0, display:"range", step:0.01, max:1} } ]) 
 	public static function getRotaOrCounter(favorable:Bool, availableCP:Int, againstManuever:AIManueverChoice, flags:Int = 0, customThreshold:Float = 0,  preferedRS:Int = 1, preferedCounterRSFav:Int = 0, counterFavProbThreshold:Float=0.75):Bool {
 		
 		// assumes both rota and counter have the exact same DTN, since they are parryign type manuevers
@@ -1079,7 +1079,7 @@ class TROSAiBot
 	}
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  {inspect:null}, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} } ]) 
+	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  { inspect:null, bitmask:"FLAG" }, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} } ]) 
 	public static function getBlockOpenOrExpulsion(favorable:Bool, availableCP:Int, againstManuever:AIManueverChoice, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int = 0):Bool {
 		if (AVAIL_blockopenstrike <= 0 && AVAIL_expulsion <= 0) return false;
 		if (AVAIL_blockopenstrike <= 0 || AVAIL_expulsion <= 0) return AVAIL_expulsion <= 0 ? getBlockOpenAndStrike(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_blockopenstrike) ) ) 
