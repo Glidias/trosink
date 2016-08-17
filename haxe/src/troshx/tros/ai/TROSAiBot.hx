@@ -77,7 +77,7 @@ class TROSAiBot
 	@inspect({min:0}) @bind public static var AVAIL_rota = 0;
 	@inspect({min:0}) @bind public static var AVAIL_expulsion = 0;
 	@inspect({min:0}) @bind public static var AVAIL_disarm = 0;
-	@inspect({min:0}) @bind public static var AVAIL_StealInitiative = 5;
+	@inspect({min:0}) @bind public static var AVAIL_StealInitiative = 0;
 	
 	private static function setTypicalAVAILCostsForTesting():Void {
 		AVAIL_bash = 1;
@@ -98,6 +98,7 @@ class TROSAiBot
 		AVAIL_rota = 3;
 		AVAIL_expulsion = 2;
 		AVAIL_disarm = 3;
+		AVAIL_StealInitiative = 5;
 	}
 	
 	private static inline function getCostOfAVAIL(avail:Int):Int {
