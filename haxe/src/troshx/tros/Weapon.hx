@@ -20,7 +20,6 @@ class Weapon
 	public var damage2:Int;
 	public var damage3:Int;
 
-
 	public var shield:Bool; // does this function as a shield for Block manuever?
 	public var profeciencies:Array<String>;
 
@@ -39,6 +38,10 @@ class Weapon
 	public static inline var ATTR_BASE_NONE:Int = -1;
 	public static inline var ATTR_BASE_STRENGTH:Int = 0;
 	
+	private static inline var HOOK_STRIKE:Int = 1;
+	private static inline var HOOK_THRUST:Int = 2;
+	public var hooking:Int;
+	
 	public function getDamageTo(body:BodyChar, manuever:Manuever, targetZone:Int, margin:Int, strength:Int):Int {
 		var dmg:Int;
 		if (damage3 != 0 && (blunt || manuever.damageType == Manuever.DAMAGE_TYPE_BLUDGEONING) ) {
@@ -51,6 +54,33 @@ class Weapon
 		dmg += margin;
 		if (attrBaseIndex == ATTR_BASE_STRENGTH) dmg += strength;
 		return dmg;
+	}
+	
+	/**
+	 * 
+	 * @param	tieBiasToThrust	In case of draw of TN, prefer thrusts over striking?
+	 * @return 	Positive TN value, depending on which TN is absolutely lower. 
+	 */
+	public function getHookingATN(tieBiasToThrust:Bool=false):Int {
+		var strikeATN:Int = (hooking & HOOK_STRIKE) != 0  ? atn : 0;
+		var thrustATN:Int = (hooking & HOOK_THRUST) != 0  ? atn2 : 0;
+			return strikeATN != 0 && thrustATN != 0 ? 
+				!tieBiasToThrust ? (thrustATN < strikeATN  ? -thrustATN : strikeATN) : (strikeATN < thrustATN  ? strikeATN : -thrustATN) : 
+			(strikeATN == 0 ? -thrustATN : strikeATN);
+	}
+	
+	
+	/**
+	 * 
+	 * @param	tieBiasToThrust	In case of draw of TN, prefer thrusts over striking?
+	 * @return 	TN in either negative or positive value, depending on which TN is absolutely lower. Negative values indicate thrusting motion instead.
+	 */
+	public function getHookingATNType(tieBiasToThrust:Bool=false):Int {
+		var strikeATN:Int = (hooking & HOOK_STRIKE) != 0  ? atn : 0;
+		var thrustATN:Int = (hooking & HOOK_THRUST) != 0  ? atn2 : 0;
+		return strikeATN != 0 && thrustATN != 0 ? 
+				!tieBiasToThrust ? (thrustATN < strikeATN  ? -thrustATN : strikeATN) : (strikeATN < thrustATN  ? strikeATN : -thrustATN) : 
+			(strikeATN == 0 ? -thrustATN : strikeATN);
 	}
 	
 	
@@ -75,6 +105,7 @@ class Weapon
 		cpPenalty = 0;
 		movePenalty = 0;
 		blunt = false;
+		hooking = 0;
 	}
 	
 	public static function createDyn(name:String, profGroups:Array<String>, properties:Dynamic):Weapon {

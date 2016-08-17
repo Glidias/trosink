@@ -234,6 +234,9 @@ class AIManueverChoice {
 	public static inline var TYPE_ATTACKING:Int =2;
 	public static inline var TYPE_DEFENDING:Int = 1;
 	
+	public static inline var TARGET_WEAPON:Int = 0;
+	public static inline var TARGET_SHIELD:Int  = 1;
+	
 	public function new() 
 	{
 		

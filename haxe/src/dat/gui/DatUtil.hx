@@ -348,7 +348,7 @@ class DatUtil
 							}
 							Reflect.setField(funcDep.meta, funcArg.name, newObj );
 							
-							Reflect.setField(funcDep.instance, funcArg.name, funcArg.opt ? parseOptStringParam(funcArg.value, CTypeTools.toString(funcArg.t), classe) : null);
+							Reflect.setField(funcDep.instance, funcArg.name, funcArg.opt ? parseOptStringParam(funcArg.value, CTypeTools.toString(funcArg.t), classe) : parseDefaultTypeParamValue(CTypeTools.toString(funcArg.t), classe) );
 							count++;
 						}
 						Reflect.setField(funcFolder, f.name, funcDep);
@@ -386,6 +386,25 @@ class DatUtil
 				//trace("Could not resolve type: " + type);
 				// assumed non-primitive  optional object reference that is nullable
 				return null;
+		}
+	}
+	
+	private static function parseDefaultTypeParamValue(type:String, classe:Dynamic):Dynamic {
+		switch (type) {
+			case "Int":
+				return 0;
+			case "UInt":
+				return 0;
+			case "Float":
+				return 0;
+			case "String":
+				return "";
+			case "Bool":
+				return false;
+			default:
+				//trace("Could not resolve type: " + type);
+				// assumed non-primitive  optional object reference that is nullable
+				return Type.createEmptyInstance(classe);
 		}
 	}
 	

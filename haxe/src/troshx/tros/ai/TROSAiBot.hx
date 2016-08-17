@@ -64,6 +64,7 @@ class TROSAiBot
 	@inspect({min:0}) @bind public static var AVAIL_thrust = 0;
 	@inspect({min:0}) @bind public static var AVAIL_beat = 0;
 	@inspect({min:0}) @bind public static var AVAIL_bindstrike = 0;
+	@inspect({min:0}) @bind public static var AVAIL_hook = 0;
 
 	// all recorded defend actoin availabilities  as  (cost - 1) for actual cost
 	@inspect({min:0}) @bind public static var AVAIL_block = 0;
@@ -85,6 +86,7 @@ class TROSAiBot
 		AVAIL_thrust = 1;
 		AVAIL_beat = 1;
 		AVAIL_bindstrike = 3;
+		AVAIL_hook = 3;
 		
 		AVAIL_block = 1;
 		AVAIL_parry = 1;
@@ -111,6 +113,7 @@ class TROSAiBot
 			case "thrust": return AVAIL_thrust -1; 
 			case "beat": return AVAIL_beat -1; 
 			case "bindstrike": return AVAIL_bindstrike-1; 
+			case "hook": return AVAIL_hook - 1; 
 
 			// all recorded defend actoin availabilities  as  (cost - 1) for actual cost
 			case "block": return AVAIL_block -1; 
@@ -123,6 +126,7 @@ class TROSAiBot
 			case "rota": return AVAIL_rota-1; 
 			case "expulsion": return AVAIL_expulsion-1; 
 			case "disarm": return AVAIL_disarm - 1; 
+			
 		}
 		return 0;
 	
@@ -377,13 +381,14 @@ class TROSAiBot
 			case "bash": return tn;
 			case "cut": return tn;
 			case "disarm": return tn;
+			case "hook": return (weapon != null ? weapon.getHookingATN() : IMPOSSIBLE_TN);
+			case "beat": return tn;
+			case "bindstrike": return (tn2< tn ? tn2 : tn);
 			case "spike": return tn2;
 			case "thrust": return tn2;
 		}
 		return 0;
 	}
-	
-	
 	private static function getDTNOfManuever(manuever:String):Int {
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
 		var offhand:Weapon = WeaponSheet.getWeaponByName(D_EQUIP);
@@ -394,10 +399,15 @@ class TROSAiBot
 		switch(manuever) {
 			case "block": return tnOff;
 			case "parry": return tn;
+			case "rota": return tn;
+			case "counter": return tn;
 			case "disarm": return tn;
+			case "blockopenstrike": return tn; 
+			case "expulsion": return tn; 
 			case "partialevasion": return 7;
-		}
-		
+			case "duckweave": return 9;
+			case "fullevasion": return 4;
+		}	
 		return 0;
 	}
 	
@@ -927,7 +937,7 @@ class TROSAiBot
 		return getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
 	}
 	
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
 	public static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
 		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
 		var spend:Int;
@@ -937,6 +947,7 @@ class TROSAiBot
 				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
 					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
 					return true;
 				}
 			}
@@ -944,6 +955,7 @@ class TROSAiBot
 				spend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
 					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
 					return true;
 				}
 			}
@@ -957,53 +969,157 @@ class TROSAiBot
 	}
 	
 
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getBlockOpenAndStrike(availableCP:Int, againstCP:Int, againstRoll:Int = 0,  againstTN:Int = 1):Bool {
-		
-		return false;
-	}
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getRotaOrCounter(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1):Bool {
-		return false;
-	}
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getDisarm(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1, defensive:Bool=false):Bool {
+
+
+	
+	private static function getAdvantageManuever(manueverName:String, favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int = 1, defensive:Bool = false):Bool {
 		var threshold:Float = customThreshold!= 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
-		if (AVAIL_disarm > 0) {
-			availableCP -= getCostOfManuever("disarm");
+		//if (AVAIL_disarm > 0) {
+			availableCP -= getCostOfManuever(manueverName);
 			if (availableCP > 0) {
 				B_BS_REQUIRED = preferedRS;
-				var tn:Int = defensive ? getDTNOfManuever("disarm") : getATNOfManuever("disarm");
+				var tn:Int = defensive ? getDTNOfManuever(manueverName) : getATNOfManuever(manueverName);
 				if (tn == 0 || tn == IMPOSSIBLE_TN) return false;
-				var costing:Int = favorable ? checkCostViability(availableCP, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) : checkCostViabilityBorderline(availableCP, getDTNOfManuever("disarm"), threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) ;
+				var costing:Int = favorable ? checkCostViability(availableCP, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) : checkCostViabilityBorderline(availableCP, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0) ;
 				B_BS_REQUIRED = B_BS_REQUIRED_DEFAULT;
 			
 				
 				if (costing > 0) {
 					if (defensive) {
-						MANUEVER_CHOICE.setDefend("disarm", costing, tn, B_IS_OFFHAND);
+						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
+						MANUEVER_CHOICE.setDefend(manueverName, costing, tn, B_IS_OFFHAND);
 					}
 					else {
-						MANUEVER_CHOICE.setAttack("disarm", costing, tn, 0, B_IS_OFFHAND);
+						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
+						MANUEVER_CHOICE.setAttack(manueverName, costing, tn, 0, B_IS_OFFHAND);
 					}
 					return true;
 				}
 			}
-		
+		//}
+		return false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static function getBlockOpenAndStrike(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_blockopenstrike > 0 ? getAdvantageManuever("blockopenstrike", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, true) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getRota(favorable:Bool, availableCP:Int,  againstRoll:Int ,  againstTN:Int , flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_rota > 0 ? getAdvantageManuever("rota", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, true) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getCounter(favorable:Bool, availableCP:Int,  againstRoll:Int,  againstTN:Int, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_counter > 0 ?  getAdvantageManuever("counter", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, true) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getExpulsion(favorable:Bool, availableCP:Int,  againstRoll:Int,  againstTN:Int, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_expulsion > 0 ? getAdvantageManuever("expulsion", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, true) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getDisarm(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1, defensive:Bool=false):Bool {
+		return AVAIL_disarm > 0 ? getAdvantageManuever("disarm", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, defensive) : false;
+	}
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getHook(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_hook > 0  ? getAdvantageManuever("hook", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static inline function getBindStrike(favorable:Bool, availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1,flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
+		return AVAIL_bindstrike > 0 ? getAdvantageManuever("bindstrike", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false) : false;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	public static function getBeat(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1, preferTargetMaster:Int=0):Bool {
+		if ( AVAIL_bindstrike > 0 ) {
+			var result:Bool =  getAdvantageManuever("beat", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false);
+			if (result) {
+				var master:Int = CURRENT_OPPONENT.getMasterDTN();
+				var shield:Int =  CURRENT_OPPONENT.getShieldDTN();
+				MANUEVER_CHOICE.targetZone =  master == 0 || shield == 0 ? (shield == 0 ? AIManueverChoice.TARGET_WEAPON :  AIManueverChoice.TARGET_SHIELD)  :  (shield < master-preferTargetMaster ? AIManueverChoice.TARGET_SHIELD :  AIManueverChoice.TARGET_WEAPON);
+			}
+			return result;
 		}
 		return false;
 	}
+	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getHook(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1):Bool {
+	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  {inspect:null}, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:0, display:"range", step:0.01, max:1} } ]) 
+	public static function getRotaOrCounter(favorable:Bool, availableCP:Int, againstManuever:AIManueverChoice, flags:Int = 0, customThreshold:Float = 0,  preferedRS:Int = 1, preferedCounterRSFav:Int = 0, counterFavProbThreshold:Float=0.75):Bool {
+		
+		// assumes both rota and counter have the exact same DTN, since they are parryign type manuevers
+		if (preferedCounterRSFav > 0 && TROSAI.getAtLeastXSuccessesProb( againstManuever.manueverCP, againstManuever.manueverTN, preferedCounterRSFav) < counterFavProbThreshold) {
+			return false;
+		}
+		
+		if (AVAIL_rota <= 0 && AVAIL_counter <= 0) return false;
+		if (AVAIL_rota <= 0 || AVAIL_counter <= 0) return AVAIL_rota <= 0 ? getCounter(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, preferedRS ) 
+		: getRota(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, preferedRS ) ;
+		
+		var rotaBarrier:Float = IMPOSSIBLE_TN;
+		var counterBarrier:Float = IMPOSSIBLE_TN;
+		var rotaAVOffset:Float = IMPOSSIBLE_TN;
+		
+		// naive "illogical" approach. AV  offset is equated to manuever cost
+		if (AVAIL_rota > 0) { 
+			rotaBarrier = AVAIL_rota - 1;
+			rotaBarrier += (rotaAVOffset = getTargetZoneAverageAVOffset(againstManuever.targetZone, B_EQUIP));
+		}
+		if (AVAIL_counter > 0) {  
+			counterBarrier = AVAIL_counter - 1;
+		}
+		
+		return rotaBarrier < counterBarrier ? getRota(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, preferedRS )  : getCounter(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, preferedRS )  ;
+	}
+	
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	@inspect([  {inspect:{value:true}},  {inspect:{min:0}},  {inspect:{min:0}},  {inspect:null}, { inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0} } ]) 
+	public static function getBlockOpenOrExpulsion(favorable:Bool, availableCP:Int, againstManuever:AIManueverChoice, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int = 0):Bool {
+		if (AVAIL_blockopenstrike <= 0 && AVAIL_expulsion <= 0) return false;
+		if (AVAIL_blockopenstrike <= 0 || AVAIL_expulsion <= 0) return AVAIL_expulsion <= 0 ? getBlockOpenAndStrike(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_blockopenstrike) ) ) 
+		: getExpulsion(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_expulsion) ) ) ;
+		
+		var bosProbability:Float = 0;
+		var considerExpul:Bool = CURRENT_OPPONENT.isThruster() && AVAIL_expulsion > 0;
+		if (AVAIL_blockopenstrike > 0) {
+			if (!considerExpul || getBlockOpenAndStrike(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, FLAG_USE_ALL_CP, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_blockopenstrike) ) ) ) {
+				if (!considerExpul) {
+					return getBlockOpenAndStrike(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_blockopenstrike) ) );
+				}
+				else {
+					bosProbability = B_VIABLE_PROBABILITY;
+				}
+			}
+			else {
+				return getExpulsion(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_expulsion) ) ); 
+			}
+		}
+		
+		if (considerExpul) {	
+			if (  getExpulsion(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, FLAG_USE_ALL_CP, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_expulsion) ) ) ) {
+				if (B_VIABLE_PROBABILITY > bosProbability ) {
+					return getExpulsion(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_expulsion) ) );
+				}
+			}
+			
+			if (bosProbability != 0) {
+				return getBlockOpenAndStrike(favorable, availableCP, againstManuever.manueverCP, againstManuever.manueverTN, flags, customThreshold, (preferedRS > 0 ?  preferedRS :  getCostOfAVAIL(AVAIL_blockopenstrike) ) );
+				
+			}
+		}
 		return false;
 	}
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getBeat(availableCP:Int, againstCP:Int, againstRoll:Int=0,  againstTN:Int=1):Bool {
-		return false;
-	}
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getBindStrike(availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1):Bool {
-		return false;
+	
+	
+		
+	public function isThruster():Bool {
+		
+		return false; 
 	}
 	
 	@inspect
@@ -1063,6 +1179,21 @@ class TROSAiBot
 		
 		return atn;
 	}
+	
+	private inline function getOffhandDTN():Int {
+		var weapon:Weapon = WeaponSheet.getWeaponByName(equipOffhand);
+		return weapon != null ? weapon.dtn : 0;
+	}
+	
+	private inline function getShieldDTN():Int {
+		var weapon:Weapon = WeaponSheet.getWeaponByName(equipOffhand);
+		return weapon != null && weapon.shield ? weapon.dtn : 0;
+	}
+	private inline  function getMasterDTN():Int {
+		var weapon:Weapon = WeaponSheet.getWeaponByName(equipMasterhand);
+		return weapon != null ? weapon.dtn : 0;
+	}
+	
 	
 	private function getHighestATNOrDTN():Int {
 		var atn:Int = getPredictedATN();
