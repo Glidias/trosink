@@ -1119,7 +1119,7 @@ class TROSAiBot
 	
 		
 	public function isThruster():Bool {
-		
+		// todo last:
 		return false; 
 	}
 	
