@@ -44,6 +44,7 @@ class WeaponSheet
 	//	,Weapon.createDyn("Punch", ["pugilism"], { "range":0, "atn":5, "dtn":6, "shieldLimit":1,  "damage":-2, "blunt":true  } )
 		
 		,Weapon.createDyn("Gladius", ["swordshield"], { "range":1, "atn":6, "atn2":6, "dtn":7,   "damage":0, "damage2":1, "drawCutModifier":0  } )
+		,Weapon.createDyn("Blunted Sword", ["swordshield", "cutthrust"], { "range":2, "atn":6, "atn2":6, "dtn":6,   "damage":0, "damage2":0, "drawCutModifier":0  } )
 		,Weapon.createDyn("Arming Sword", ["swordshield", "cutthrust"], { "range":2, "atn":6, "atn2":7, "dtn":6,   "damage":1, "damage2":0, "drawCutModifier":0  } )
 		,Weapon.createDyn("Rapier", ["rapier", "caserapiers"], { "range":3, "atn":7, "atn2":5, "dtn":8, "dtnT":6,  "damage": -3, "damage2":2, "drawCutModifier":1  } )
 		

@@ -322,7 +322,7 @@ window.onload = function() {
 	<div id="apptest">
 		<section>
 			<h2>Static function testing:</h2>
-			<h3>"You"<br/>(ie. current person declaring):</h3>
+			<h3>Current person turn (declaring):</h3>
 			<div>
 				<label>Left hand (offhand):</label>
 				<select v-model="you.equipLeft" v-on:change="updateYourEquipment()">
@@ -340,7 +340,7 @@ window.onload = function() {
 			<div>
 				<label for="youoffhand">Prefer offhand if possible:</label><input  v-on:change="updateYourEquipment()" v-model="you.preferOffhand" id="youoffhand" type="checkbox" />
 			</div>
-			<h3>Opponent:</h3>
+			<h3>Against Opponent:</h3>
 			<div>
 				<label>Left hand (offhand):</label>
 				<select v-sync-instance="target.equipOffhand" v-model="target.equipOffhand">
