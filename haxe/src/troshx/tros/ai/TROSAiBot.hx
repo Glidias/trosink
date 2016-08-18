@@ -28,6 +28,7 @@ class TROSAiBot
 	@inject public var body:BodyChar;
 	//@link public var armorValues::Dynamic<Float>
 	@bind("_cp") public var cp:Int;
+	@bind("_perception") public var perception:Int=4;
 	@bind("_equipMasterhand") public var equipMasterhand:String;
 	@bind("_equipOffhand") public var equipOffhand:String;
 	@bind("_mobility") public var mobility:Int = 6;
@@ -37,7 +38,12 @@ class TROSAiBot
 	@bind("_fight_initiative") public var initiative:Bool;
 	@bind("_fight_stance") public var stance:Int;
 	@bind("_manueverUsingHands") public var manueverUsingHands:Int = 0;
-	
+
+	private static var ENEMY_STEAL_COST:Int = 4;
+	private static var MIN_EXPOSED_AV:Int = 0;
+	private static inline function getTargetAlphaStrikeCPThreshold():Int {
+		return ENEMY_STEAL_COST + 1 + MIN_EXPOSED_AV;
+	}
 
 	private var handsUsedUp:Int = 0;
 	
@@ -162,7 +168,9 @@ class TROSAiBot
 	private static inline var COMBO_FeintStrike:Int = 6;  // Feint Strike
 	private static inline var COMBO_DoubleAttack:Int = 7;  // Double Attack	
 	private static inline var COMBO_SimulatenousBlockStrike:Int = 8;  // Simulatenous Block and Strike
-	private static inline var COMBOS_LEN_INITIATIVE:Int = 8;
+	private static inline var COMBOS_LEN_INITIATIVE:Int = 9;
+	private static inline var COMBO_CoupDeGrace:Int = 9;	// A killing blow attempt. If fully favorable, top priority.
+	private static inline var COMBOS_LEN_INITIATIVE_FINAL:Int = 10;
 	
 	// basic ai combos without initiative
 	private static inline var COMBO_DefensiveFirst:Int = -1;  // Defensive-first
@@ -184,8 +192,10 @@ class TROSAiBot
 	
 	
 	 private static var B_BS_REQUIRED_DEFAULT:Int = 1;
+	 private static inline var COUP_BS_MODIFIER:Int = 1;
 
 	@inspect({min:1}) private static var B_BS_REQUIRED_DMG_DEFAULT:Int = 1;
+	
 	
 	private static var B_VIABLE_PROBABILITY:Float;
 	private static var B_VIABLE_PROBABILITY_GET:Float;
@@ -771,18 +781,18 @@ class TROSAiBot
 	public static inline var FLAG_USE_ALL_CP:Int = 2;
 	public static inline var FLAG_BORDERLINE_DEF_SAFETY:Int = 4;
 
-	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" } ]) 
+	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" },  { inspect:{min:0, display:"range", step:0.01, max:1} } ]) 
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
-	public static inline function getFavorableAttack(availableCP:Int, againstRoll:Int = 0, againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0):Bool {
-		return getFBAttack(true, availableCP, againstRoll, againstTN, heuristic, flags);
+	public static inline function getFavorableAttack(availableCP:Int, againstRoll:Int = 0, againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float=0):Bool {
+		return getFBAttack(true, availableCP, againstRoll, againstTN, heuristic, flags, customThreshold);
 	}
 	
 
 	
-	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" } ]) 
+	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" },  { inspect:{min:0, display:"range", step:0.01, max:1}} ]) 
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
-	public static function getBorderlineAttack(availableCP:Int, againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool=true, flags:Int=0):Bool {
-		return getFBAttack(false, availableCP, againstRoll, againstTN, heuristic, flags);
+	public static function getBorderlineAttack(availableCP:Int, againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool=true, flags:Int=0, customThreshold:Float=0):Bool {
+		return getFBAttack(false, availableCP, againstRoll, againstTN, heuristic, flags, customThreshold);
 	}
 	
 	
@@ -1417,6 +1427,19 @@ class TROSAiBot
 				case COMBO_FeintStrike:
 				case COMBO_DoubleAttack:
 				case COMBO_SimulatenousBlockStrike:	
+					
+				case COMBO_CoupDeGrace:
+					lastDefault = B_BS_REQUIRED_DMG_DEFAULT;
+					B_BS_REQUIRED_DMG_DEFAULT += COUP_BS_MODIFIER;
+					if (cp2 < getTargetAlphaStrikeCPThreshold() && getFavorableAttack(cp, cp2, dtn, true, FLAG_USE_ALL_CP, getCoupThreshold(cp2) ) ) {
+						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_2] =  0;
+						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_2_ENEMY] = BUDGET_SKIP;
+						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1] = cp;
+						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1_ENEMY] = cp2;
+						B_BS_REQUIRED_DMG_DEFAULT = lastDefault;
+						return B_COMBO_EXCHANGE_BUDGET;
+					}
+					B_BS_REQUIRED_DMG_DEFAULT = lastDefault;
 			}
 		}
 		return null;
@@ -1437,6 +1460,9 @@ class TROSAiBot
 	@inspect([ { inspect: { display:"selector" }, choices:"COMBO" }, { inspect: { min:0 } }, { inspect: { min:0 }}  ]) 
 	private static function getComboAction(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice=null, hasInitiative:Bool = true, secondExchange:Bool = false):Bool {
 		var flags:Int = FLAG_USE_ALL_CP;// secondExchange ? FLAG_USE_ALL_CP : 0;
+		var lastInt:Int;
+		var result:Bool;
+		
 		if (hasInitiative) {  // proceed with ideal combo after gaining initiative
 			switch( combo) {
 					// ai combos with initiative:
@@ -1489,8 +1515,12 @@ class TROSAiBot
 						else {
 									return getFavorableAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags) || getBorderlineAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags);
 						}
-						
-						
+					case COMBO_CoupDeGrace:
+						lastInt = B_BS_REQUIRED_DMG_DEFAULT;
+						B_BS_REQUIRED_DMG_DEFAULT += COUP_BS_MODIFIER;
+						result =cp2 < getTargetAlphaStrikeCPThreshold() && getFavorableAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags, getCoupThreshold(cp2) );
+						B_BS_REQUIRED_DMG_DEFAULT = lastInt;
+						return result;
 					// ai combos without initiative:  This branch should only happen on second exchange!
 					case COMBO_DefensiveFirst:
 								return getFavorableAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags) || getBorderlineAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags);
@@ -1500,6 +1530,7 @@ class TROSAiBot
 								return getFavorableAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags) || getBorderlineAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags);
 					case COMBO_SimulatenousBlockStrikeStealer:
 								return getFavorableAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags) || getBorderlineAttack(cp, cp2, CURRENT_OPPONENT.getPredictedDTN(),  true, flags);
+								
 			}
 		}
 		else {
@@ -1513,6 +1544,8 @@ class TROSAiBot
 					case COMBO_FeintStrike:
 					case COMBO_DoubleAttack:
 					case COMBO_SimulatenousBlockStrike:
+					case COMBO_CoupDeGrace:
+						// consider: stealing initiatiive "to finish what I started"
 					
 					// ai combos without initiative: Whether 1st or second exchange, he'll continue to be onthe defensive!
 					case COMBO_DefensiveFirst:
@@ -1565,13 +1598,20 @@ class TROSAiBot
 		return false;
 	}
 	
+	static private inline function getCoupThreshold(cp2:Int):Float
+	{
+		return cp2 >= 2 ? 0 : cp2 == 0 ? 0.00001 : 0.5;
+	}
+	
 	
 	private static inline function addPossibleComboManueverChoice(index:Int, theChoice:AIManueverChoice):Void {
 		theChoice.copyTo( index >= B_COMBO_CANDIDATE_MANUEVER.length ? (B_COMBO_CANDIDATE_MANUEVER[index] = new AIManueverChoice()) : B_COMBO_CANDIDATE_MANUEVER[index] );
 	}
 	
 	
-	
+
+	private static inline var BUDGET_SKIP:Int = -1;
+	private static var MANUEVER_CHOICE_CONSIDER_MASTER:AIManueverChoice = new AIManueverChoice();
 	/**
 	 * 
 	 * @param	cp
@@ -1593,6 +1633,22 @@ class TROSAiBot
 				// with known enemy attack manuever declared
 			}
 		}
+		var budget:Vector<Int>;
+		
+		for (i in COMBOS_LEN_INITIATIVE...COMBOS_LEN_INITIATIVE_FINAL) {
+			budget = getComboExchangeBudgetingWithInitiative(i, cp, cp2, threatManuever);
+			if (budget != null) {
+				if ( getComboAction(i, budget[BUDGET_EXCHANGE_1], budget[BUDGET_EXCHANGE_1_ENEMY], threatManuever, true, false) ) {
+					MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_CONSIDER_MASTER);
+					if ( budget[BUDGET_EXCHANGE_2_ENEMY] == BUDGET_SKIP || getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {	
+						MANUEVER_COMBO_SET = i;
+						MANUEVER_CHOICE_SET = MANUEVER_CHOICE_CONSIDER_MASTER;
+						return true;
+					}
+				}
+			}
+		}
+		
 		
 		// consider all conventional combos for attacking with initiative
 		// COMBO_PureMeanStrikes:	
@@ -1607,7 +1663,7 @@ class TROSAiBot
 		// COMBO_SimulatenousBlockStrike:
 		var i:Int = 1;
 		var curProbability:Float = 0;
-		var budget:Vector<Int>;
+		
 		var probabilityCheck:Float;
 		var len:Int = COMBOS_LEN_INITIATIVE;
 		while (i < COMBOS_LEN_INITIATIVE) {
@@ -1616,7 +1672,7 @@ class TROSAiBot
 				if ( getComboAction(i, budget[BUDGET_EXCHANGE_1], budget[BUDGET_EXCHANGE_1_ENEMY], threatManuever, true, false) ) {
 					probabilityCheck = B_VIABLE_PROBABILITY_GET;
 					MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_1);
-					if ( getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {	
+					if ( budget[BUDGET_EXCHANGE_2_ENEMY] == BUDGET_SKIP || getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {	
 						//probabilityCheck  += B_VIABLE_PROBABILITY_GET;
 						//if (probabilityCheck >= curProbability ) {
 							if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;	
