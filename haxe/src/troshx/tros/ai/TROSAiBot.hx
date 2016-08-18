@@ -182,7 +182,7 @@ class TROSAiBot
 	private static var B_CANDIDATES:Array<String> = [];
 	private static var B_CANDIDATE_COUNT:Int = 0;
 	private static var B_BS_REQUIRED:Int = 1; // required BS required in current context
-	private static var B_BS_REQUIRED_DEFAULT:Int = 1;
+	@inspect({min:1}) private static var B_BS_REQUIRED_DEFAULT:Int = 1;
 	private static var B_BS_REQUIRED_LOCK:Bool = false;
 	
 	private static var B_VIABLE_PROBABILITY:Float;
@@ -488,6 +488,7 @@ class TROSAiBot
 			accum = precisionPerc ( (successProbabilitWithBS +  TROSAI.getChanceToSucceedContest(c, tn, againstRoll, againstTN, bsRequired-1, false) ) * 0.5 );
 			
 			if (accum >= threshold) {
+				if (successProbabilitWithBS == 0) return 0;
 				B_VIABLE_PROBABILITY = successProbabilitWithBS;
 				return useAllCP ? availableCP : c;
 			}
@@ -576,7 +577,7 @@ class TROSAiBot
 	private static function getTheSuitableAttack(manuever:String, tn:Int, tarZone:Int, threshold:Float, availableCP:Int, againstRoll:Int = 0, againstTN:Int = 1, favorable:Bool = true, useAllCP:Bool = false):Bool {
 		var cpToUse:Int = favorable ?  checkCostViability( availableCP, tn, threshold, againstRoll, againstTN, useAllCP) : checkCostViabilityBorderline( availableCP, tn, threshold, againstRoll, againstTN, useAllCP);
 		if (cpToUse > 0) {
-			MANUEVER_CHOICE.setAttack(manuever, cpToUse, tn, tarZone, B_IS_OFFHAND);
+			MANUEVER_CHOICE.setAttack(manuever, cpToUse, tn, tarZone, getCostOfManuever(manuever), B_IS_OFFHAND);
 			return true;
 		}
 		return false;
@@ -586,7 +587,7 @@ class TROSAiBot
 	private static function getTheSuitableDefense(manuever:String, tn:Int,  threshold:Float, availableCP:Int, againstRoll:Int = 0, againstTN:Int = 1, favorable:Bool = true, useAllCP:Bool = false):Bool {
 		var cpToUse:Int =   favorable ? checkCostViability( availableCP, tn, threshold,  againstRoll, againstTN, useAllCP) : checkCostViabilityBorderline( availableCP, tn, threshold, againstRoll, againstTN, useAllCP);
 		if (cpToUse > 0) {
-			MANUEVER_CHOICE.setDefend(manuever, cpToUse, tn, B_IS_OFFHAND);
+			MANUEVER_CHOICE.setDefend(manuever, cpToUse, tn, getCostOfManuever(manuever), B_IS_OFFHAND);
 			return true;
 		}
 		return false;
@@ -595,7 +596,7 @@ class TROSAiBot
 	private static function getTheForcefulInitiativeAttack(manuever:String, tn:Int, tarZone:Int, threshold:Float, availableCP:Int, againstCP:Int = 0, againstTN:Int = 1, favorable:Bool=true, useAllCP:Bool=false, offset:Int=0):Bool {
 		var cpToUse:Int = favorable ?  checkCostAntiFavorability( availableCP, tn, threshold, againstCP, againstTN, useAllCP, offset) : checkCostAntiBorderline( availableCP, tn, threshold, againstCP, againstTN, useAllCP, offset);
 		if (cpToUse > 0) {
-			MANUEVER_CHOICE.setAttack(manuever, cpToUse, tn, tarZone, B_IS_OFFHAND);
+			MANUEVER_CHOICE.setAttack(manuever, cpToUse, tn, tarZone,  getCostOfManuever(manuever), B_IS_OFFHAND);
 			return true;
 		}
 		return false;
@@ -702,7 +703,7 @@ class TROSAiBot
 						aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 						if (aggr <= curAggr) {
 							if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-							MANUEVER_CHOICE.setAttack("bash", cpToUse, tn, i, B_IS_OFFHAND);
+							MANUEVER_CHOICE.setAttack("bash", cpToUse, tn, i, getCostOfAVAIL(AVAIL_bash),  B_IS_OFFHAND);
 							addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 							B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 							B_MANUEVER_CHOICE_COUNT++;
@@ -725,7 +726,7 @@ class TROSAiBot
 						aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 						if (aggr <= curAggr) {
 							if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-							MANUEVER_CHOICE.setAttack("spike", cpToUse, tn, i, B_IS_OFFHAND);
+							MANUEVER_CHOICE.setAttack("spike", cpToUse, tn, i, getCostOfAVAIL(AVAIL_spike), B_IS_OFFHAND);
 							addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 							B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 							B_MANUEVER_CHOICE_COUNT++;
@@ -747,7 +748,7 @@ class TROSAiBot
 						aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 						if (aggr <= curAggr) {
 							if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-							MANUEVER_CHOICE.setAttack("cut", cpToUse, tn, i, B_IS_OFFHAND);
+							MANUEVER_CHOICE.setAttack("cut", cpToUse, tn, i, getCostOfAVAIL(AVAIL_cut), B_IS_OFFHAND);
 							addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 							B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 							B_MANUEVER_CHOICE_COUNT++;
@@ -769,7 +770,7 @@ class TROSAiBot
 						aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 						if (aggr <= curAggr) {
 							if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-							MANUEVER_CHOICE.setAttack("thrust", cpToUse, tn, i, B_IS_OFFHAND);
+							MANUEVER_CHOICE.setAttack("thrust", cpToUse, tn, i, getCostOfAVAIL(AVAIL_thrust), B_IS_OFFHAND);
 							addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 							B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 							B_MANUEVER_CHOICE_COUNT++;
@@ -850,7 +851,7 @@ class TROSAiBot
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
 						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-						MANUEVER_CHOICE.setDefend("block", cpToUse, tn, true);
+						MANUEVER_CHOICE.setDefend("block", cpToUse, tn, getCostOfAVAIL(AVAIL_block), true);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 						B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 						B_MANUEVER_CHOICE_COUNT++;
@@ -880,7 +881,7 @@ class TROSAiBot
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
 						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-						MANUEVER_CHOICE.setDefend("parry", cpToUse, tn, B_IS_OFFHAND);
+						MANUEVER_CHOICE.setDefend("parry", cpToUse, tn, getCostOfAVAIL(AVAIL_parry), B_IS_OFFHAND);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 						B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 						B_MANUEVER_CHOICE_COUNT++;
@@ -910,7 +911,7 @@ class TROSAiBot
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
 					if (aggr <= curAggr) {
 						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
-						MANUEVER_CHOICE.setDefend("partialevasion", cpToUse, tn, false);
+						MANUEVER_CHOICE.setDefend("partialevasion", cpToUse, tn, getCostOfAVAIL(AVAIL_partialevasion), false);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 						B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
 						B_MANUEVER_CHOICE_COUNT++;
@@ -948,7 +949,7 @@ class TROSAiBot
 			if (favorable) {
 				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
 					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
 					return true;
 				}
@@ -956,7 +957,7 @@ class TROSAiBot
 			else {
 				spend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
 				if ( spend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, false);
+					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
 					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
 					return true;
 				}
@@ -989,11 +990,11 @@ class TROSAiBot
 				if (costing > 0) {
 					if (defensive) {
 						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
-						MANUEVER_CHOICE.setDefend(manueverName, costing, tn, B_IS_OFFHAND);
+						MANUEVER_CHOICE.setDefend(manueverName, costing, tn, getCostOfManuever(manueverName), B_IS_OFFHAND);
 					}
 					else {
 						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
-						MANUEVER_CHOICE.setAttack(manueverName, costing, tn, 0, B_IS_OFFHAND);
+						MANUEVER_CHOICE.setAttack(manueverName, costing, tn, 0, getCostOfManuever(manueverName), B_IS_OFFHAND);
 					}
 					return true;
 				}
@@ -1216,7 +1217,8 @@ class TROSAiBot
 	
 	
 	@inspect([ { inspect:{display:"selector"}, choices:"COMBO" }, { inspect:{min:0} }, { inspect:{min:0} } ]) 
-	private static function getComboExchangeBudgetingWithInitiative(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice):Vector<Int> {
+	private static function getComboExchangeBudgetingWithInitiative(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice=null):Vector<Int> {
+		var lastDefault:Int;
 		if (threatManuever!= null && threatManuever.manuever == "") threatManuever  = null;
 		var dtn:Int = getPredictedOpponentDTN();
 		var stipulateRemaining:Int;
@@ -1227,11 +1229,11 @@ class TROSAiBot
 				case COMBO_PureMeanStrikes:	
 					stipulateRemaining = Math.floor(cp2 * .5);
 					
-					if ( ( getFavorableAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) && (cp-MANUEVER_CHOICE.manueverCP) >=Math.ceil(cp*.5) )  ||  getBorderlineAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) ) {
-						cp -= MANUEVER_CHOICE.manueverCP;
+					if ( ( getFavorableAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) && (cp-MANUEVER_CHOICE.getManueverCPSpent()) >=Math.ceil(cp*.5) )  ||  getBorderlineAttack(Math.floor(cp*.5), stipulateRemaining, dtn, false, FLAG_GET_CHEAPEST) ) {
+						cp -= MANUEVER_CHOICE.getManueverCPSpent();
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1] = cp;  
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1_ENEMY] =  Math.ceil(cp2*.5);
-						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_2] = MANUEVER_CHOICE.manueverCP;
+						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_2] = MANUEVER_CHOICE.getManueverCPSpent();
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_2_ENEMY] = stipulateRemaining;  
 						if ( getBorderlineAttack(cp, B_COMBO_EXCHANGE_BUDGET[1], dtn, false, FLAG_USE_ALL_CP) ) {
 							return B_COMBO_EXCHANGE_BUDGET;
@@ -1241,14 +1243,15 @@ class TROSAiBot
 					if (getAForcefulInitiativeAttack(P_THRESHOLD_FAVORABLE, cp, cp2, dtn, true, false, 0) ) {
 					
 						stipulateRemaining = 0;
-						var consideredCP:Int = MANUEVER_CHOICE.manueverCP;
+						var consideredCP:Int = MANUEVER_CHOICE.getManueverCPSpent();
 						
+						lastDefault = B_BS_REQUIRED_DEFAULT;
 						B_BS_REQUIRED_DEFAULT = 0;
 						getFavorableAttack(cp,  Std.int(cp2 * .5), dtn, false, FLAG_GET_CHEAPEST);
-						if (MANUEVER_CHOICE.manueverCP > consideredCP) {
-							consideredCP = MANUEVER_CHOICE.manueverCP;
+						if (MANUEVER_CHOICE.getManueverCPSpent() > consideredCP) {
+							consideredCP = MANUEVER_CHOICE.getManueverCPSpent();
 						}
-						B_BS_REQUIRED_DEFAULT = 1;
+						B_BS_REQUIRED_DEFAULT =lastDefault;
 				
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1] =consideredCP;
 						B_COMBO_EXCHANGE_BUDGET[BUDGET_EXCHANGE_1_ENEMY] =  cp2;
@@ -1388,7 +1391,7 @@ class TROSAiBot
 							if (!secondExchange) {
 								/*
 								if ( getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0 ) ) {
-									cp -= MANUEVER_CHOICE.manueverCP;
+									cp -= MANUEVER_CHOICE.getManueverCPSpent();
 									if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
 										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
 									}
@@ -1396,7 +1399,7 @@ class TROSAiBot
 								*/
 								
 								if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
-										cp -= MANUEVER_CHOICE.manueverCP;
+										cp -= MANUEVER_CHOICE.getManueverCPSpent();
 										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
 								}
 							}
@@ -1411,7 +1414,7 @@ class TROSAiBot
 						if (threatManuever != null) {
 							if (!secondExchange) {
 								if (getFleeOrDefend(false, cp, cp2 - threatManuever.manueverCP, getPredictedOpponentATN(), false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0, true)) {
-									cp -= MANUEVER_CHOICE.manueverCP;
+									cp -= MANUEVER_CHOICE.getManueverCPSpent();
 									return getFBDefense( false, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
 								}
 							}
@@ -1450,7 +1453,7 @@ class TROSAiBot
 	//B_COMBO_CANDIDATE_COUNT, B_COMBO_CANDIDATES
 	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET")
 	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
-	private static function setBestComboActionWithInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
+	private static function setBestComboActionWithInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice=null):Bool {
 		
 		B_COMBO_CANDIDATE_COUNT = 0;
 		
@@ -1481,11 +1484,10 @@ class TROSAiBot
 		while (i < COMBOS_LEN_INITIATIVE) {
 			budget = getComboExchangeBudgetingWithInitiative(i, cp, cp2, threatManuever);
 			if (budget != null) {
-				
 				if ( getComboAction(i, budget[BUDGET_EXCHANGE_1], budget[BUDGET_EXCHANGE_1_ENEMY], threatManuever, true, false) ) {
 					probabilityCheck = B_VIABLE_PROBABILITY_GET;
 					MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_1);
-					if ( getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {				
+					if ( getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {	
 						probabilityCheck  += B_VIABLE_PROBABILITY_GET;
 						//if (probabilityCheck >= curProbability ) {
 							//if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;	

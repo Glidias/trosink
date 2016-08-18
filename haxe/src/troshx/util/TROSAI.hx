@@ -224,12 +224,17 @@ class TROSAI
 @:expose
 class AIManueverChoice {
 	@inspect public var manuever:String;
-	@inspect public var manueverCP:Int; 
-	@inspect public var manueverTN:Int;
-	@inspect public var targetZone:Int;
+	@inspect({min:0}) public var manueverCP:Int; 
+	@inspect({min:0}) public var manueverTN:Int;
+	@inspect({min:0}) public var targetZone:Int;
 	@inspect({display:"selector"}) @choices("TYPE")  public var manueverType:Int;
 	@inspect public var offhand:Bool;
 	@inspect public var againstID:Int;
+	@inspect({min:0}) public var cost:Int;
+	
+	public inline function getManueverCPSpent():Int {
+		return cost + manueverCP;
+	}
 	
 	public static inline var TYPE_ATTACKING:Int =2;
 	public static inline var TYPE_DEFENDING:Int = 1;
@@ -262,22 +267,24 @@ class AIManueverChoice {
 
 	}
 	
-	public function setAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, offhand:Bool=false):Void {
+	public function setAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, cost:Int, offhand:Bool=false):Void {
 		this.manuever = manuever;
 		this.manueverCP = manueverCP;
 		this.targetZone  = targetZone;
 		this.offhand = offhand;
 		this.manueverType = TYPE_ATTACKING;
 		this.manueverTN = manueverTN;
+		this.cost = cost;
 	}
 	
-	public function setDefend(manuever:String, manueverCP:Int, manueverTN:Int, offhand:Bool=false):Void {
+	public function setDefend(manuever:String, manueverCP:Int, manueverTN:Int, cost:Int, offhand:Bool=false):Void {
 		this.manuever = manuever;
 		this.manueverCP = manueverCP;
 		this.targetZone  = 0;
 		this.offhand = offhand;
 		this.manueverType = TYPE_DEFENDING;
 		this.manueverTN = manueverTN;
+		this.cost = cost;
 	}
 }
 
