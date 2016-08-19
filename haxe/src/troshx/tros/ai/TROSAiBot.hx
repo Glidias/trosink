@@ -187,9 +187,9 @@ class TROSAiBot
 	private static inline var COMBO_SimulatenousBlockStrikeStealer:Int = -5;  // Simultaneous Block-Strike Initiative Stealer 
 	private static inline var COMBOS_LEN_NO_INITAITIVE:Int = 5;
 	
-	public static var P_THRESHOLD_BEYOND_FAVORABLE:Float = 0.9;
-	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_FAVORABLE:Float = 0.75;
-	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_BORDERLINE:Float = 0.5;
+	//public static var P_THRESHOLD_BEYOND_FAVORABLE:Float = 0.9;
+	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_FAVORABLE:Float = 0.75;  // how willing is AI willing to gamble on a move for favorable success
+	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_THRESHOLD_BORDERLINE:Float = 0.5;  // the favoring borderline between 2 parties, anything less poses too much disadvantaged risk to AI
 	@inspect({min:0, max:1, display:"range", step:0.01}) public static var P_RECKLESS:Float = 0.2;  // less reckless will usually be at 0.15 instead of 0.2. least recklesss at 0.1
 	
 	
@@ -1703,7 +1703,7 @@ class TROSAiBot
 					if ( budget[BUDGET_EXCHANGE_2_ENEMY] == BUDGET_SKIP || getComboAction(i, budget[BUDGET_EXCHANGE_2], budget[BUDGET_EXCHANGE_2_ENEMY], threatManuever, true, true) ) {	
 						//probabilityCheck  += B_VIABLE_PROBABILITY_GET;
 						//if (probabilityCheck >= curProbability ) {
-							if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;	
+							//if (probabilityCheck != curProbability) B_COMBO_CANDIDATE_COUNT  = 0;	
 							B_COMBO_CANDIDATES[B_COMBO_CANDIDATE_COUNT] = i;
 							addPossibleComboManueverChoice(B_COMBO_CANDIDATE_COUNT, MANUEVER_CHOICE_1);
 							curProbability = probabilityCheck;
