@@ -1569,22 +1569,14 @@ class TROSAiBot
 					case COMBO_SimulatenousBlockStrike:
 					case COMBO_CoupDeGrace:
 						// consider: stealing initiatiive "to finish what I started"
-					
-					// ai combos without initiative: Whether 1st or second exchange, he'll continue to be onthe defensive!
+	
+						
 					case COMBO_DefensiveFirst:
 						if (threatManuever != null) {
 							if (!secondExchange) {
-								/*
-								if ( getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, false, FLAG_BORDERLINE_DEF_SAFETY|FLAG_GET_CHEAPEST, 0 ) ) {
-									cp -= MANUEVER_CHOICE.getManueverCPSpent();
-									if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  getPredictedOpponentDTN(), false, FLAG_GET_CHEAPEST)) {
-										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
-									}
-								}
-								*/
-								
-								if (getAdvantageGainCPOffensiveMove(false, cp, cp2-threatManuever.manueverCP, dtn, FLAG_GET_CHEAPEST) || getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  dtn, false, FLAG_GET_CHEAPEST) ) {
-										cp -= MANUEVER_CHOICE.getManueverCPSpent();
+								lastInt =  getCheapestBorderlineAtkCost(cp, cp2 - threatManuever.manueverCP, dtn);
+								if ( lastInt > 0 ) {
+										cp -=  lastInt;
 										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0 );
 								}
 							}
@@ -1593,8 +1585,6 @@ class TROSAiBot
 						//getFavorableDefense(cp, threatManuever.manueverCP, threatManuever., true, false);  // if secondExchange, make sure still having remaining dice dice for at least borderline attack  for 2nd exchange in order to be viable
 						// getRotaOrCounter   //  is it viable/availalble? use it instead
 						// getBlockOpenAndStrike //  is it viable/availalble? use it instead
-						// if got any valids above, return true, else return false
-						// if secondExchange, maybe can opt to go for borderline defense.....
 					case COMBO_DefensiveBorderline:
 						if (threatManuever != null) {
 							if (!secondExchange) {
@@ -1619,6 +1609,21 @@ class TROSAiBot
 			}
 		}
 		return false;
+	}
+	
+	static private function getCheapestBorderlineAtkCost(cp:Int, againstCP:Int, dtn:Int, customThreshold:Float=0):Int
+	{
+		var cpToSpend:Int = 0;
+		 if ( getAdvantageGainCPOffensiveMove(false, cp, againstCP, dtn, FLAG_GET_CHEAPEST, customThreshold) ) {
+			cpToSpend = MANUEVER_CHOICE.getManueverCPSpent();
+		 }
+		 
+		 if ( getFBAttack(false, cp, againstCP, dtn, false, FLAG_GET_CHEAPEST, customThreshold ) ) {
+			 if (MANUEVER_CHOICE.getManueverCPSpent() < cpToSpend) {
+				cpToSpend = MANUEVER_CHOICE.getManueverCPSpent();
+			 }
+		 }
+		 return cpToSpend;
 	}
 	
 	private inline function isDualWeilding():Bool 
