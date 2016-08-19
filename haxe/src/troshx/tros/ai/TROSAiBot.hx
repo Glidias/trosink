@@ -1583,9 +1583,9 @@ class TROSAiBot
 								}
 								*/
 								
-								if (getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  dtn, false, FLAG_GET_CHEAPEST)) {
+								if (getAdvantageGainCPOffensiveMove(false, cp, cp2-threatManuever.manueverCP, dtn, FLAG_GET_CHEAPEST) || getBorderlineAttack(cp, cp2 - threatManuever.manueverCP,  dtn, false, FLAG_GET_CHEAPEST) ) {
 										cp -= MANUEVER_CHOICE.getManueverCPSpent();
-										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_BORDERLINE_DEF_SAFETY, 0 );
+										return getFBDefense( true, cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0 );
 								}
 							}
 						}
