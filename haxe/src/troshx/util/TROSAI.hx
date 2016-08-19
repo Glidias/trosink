@@ -1,5 +1,6 @@
 package troshx.util;
 import troshx.tros.ai.TROSAiBot;
+import troshx.util.TROSAI.AIManueverChoice;
 
 /**
  * AI utility module for handling calculations/automating strategies. Can also reflect probability judgements to player. Also may contain alternative roll methods.
@@ -241,6 +242,9 @@ class AIManueverChoice {
 	
 	public static inline var TARGET_WEAPON:Int = 0;
 	public static inline var TARGET_SHIELD:Int  = 1;
+	public static inline var TARGET_OFFHAND:Int  = TARGET_SHIELD;
+	
+	public var secondary:AIManueverChoice;
 	
 	public function new() 
 	{
@@ -254,6 +258,17 @@ class AIManueverChoice {
 		manueverType  = 0;
 		offhand = false;
 		againstID = 0;
+		secondary = null;
+	}
+	
+	public function setupSecondAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, cost:Int, offhand:Bool = false):Void {
+		if (secondary == null) secondary = new AIManueverChoice();
+		secondary.setAttack(manuever, manueverCP, manueverTN, targetZone, cost, offhand);
+	}
+	
+	public function setupSecondDefend(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, cost:Int, offhand:Bool = false):Void {
+		if (secondary == null) secondary = new AIManueverChoice();
+		secondary.setDefend(manuever, manueverCP, manueverTN, cost, offhand);
 	}
 	
 	public inline function copyTo(newChoice:AIManueverChoice, newAgainstID:Int=-1):Void {
@@ -264,7 +279,7 @@ class AIManueverChoice {
 		newChoice.offhand = offhand;
 		newChoice.manueverTN = manueverTN;
 		newChoice.againstID = newAgainstID  >= 0 ? newAgainstID : againstID;
-
+		
 	}
 	
 	public function setAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, cost:Int, offhand:Bool=false):Void {
@@ -275,6 +290,8 @@ class AIManueverChoice {
 		this.manueverType = TYPE_ATTACKING;
 		this.manueverTN = manueverTN;
 		this.cost = cost;
+
+		this.secondary = null;
 	}
 	
 	public function setDefend(manuever:String, manueverCP:Int, manueverTN:Int, cost:Int, offhand:Bool=false):Void {
@@ -285,6 +302,7 @@ class AIManueverChoice {
 		this.manueverType = TYPE_DEFENDING;
 		this.manueverTN = manueverTN;
 		this.cost = cost;
+		this.secondary = null;
 	}
 }
 

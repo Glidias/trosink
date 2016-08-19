@@ -209,6 +209,23 @@ window.onload = function() {
 	
 	
 	// handlers
+	var TROSAiBot_enums = ReflectUtil.getAllEnums(TROSAiBot);
+
+	function getTROSAiBotEnumValue(val, fieldName) {
+		if ( TROSAiBot_enums._meta[fieldName] ) {
+			return TROSAiBot_enums._meta[fieldName].get(val);
+		}
+		else return val;
+	}
+	
+	function enumArray(intStrMap, arr) {
+		var i = arr.length;
+		while(--i > -1) {
+			arr[i] = intStrMap.get(arr[i]);
+		}
+	}
+	
+	
 	function executeStaticAIMethod() {
 		var result = DatUtil.callInstanceMethodWithPacket(TROSAiBot, this);
 			if (result) {
@@ -220,6 +237,7 @@ window.onload = function() {
 				var returnData = {};
 				var returnArrays = [];
 				var returnArr = null;
+				
 				var returnArrLen = -1;
 				 for (i=0; i< metaAdditionalData.length; i++) {
 					var prop = metaAdditionalData[i];
@@ -229,12 +247,17 @@ window.onload = function() {
 					}
 					if ($.isArray( TROSAiBot[prop])) {
 						returnArr =  TROSAiBot[prop].concat();
-						returnData[ prop]  =returnArr;
+						returnData[prop]  =returnArr;
+					
+						if (TROSAiBot_enums._meta[prop]) {
+							enumArray( TROSAiBot_enums._meta[prop], returnArr);
+						}
+						
 						returnArrays.push(returnArr);
 					}
 					else {
 						//if (TROSAiBot[prop] == undefined) alert("Undefined property exception found!");
-						returnData[ prop]  = TROSAiBot[prop];
+						returnData[ prop]  =getTROSAiBotEnumValue( TROSAiBot[prop], prop );
 					}
 				 }
 				 
