@@ -1465,6 +1465,9 @@ class TROSAiBot
 	}
 	
 
+	private static inline function tryFavoredElseBorderlineAttacks(cp:Int, cp2:Int, dtn:Int, heuristic:Bool, flags:Int):Bool {
+		return getFavorableAttack(cp, cp2, dtn, true, flags) || getAdvantageGainCPOffensiveMove(true, cp, cp2, dtn,flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags) || getAdvantageGainCPOffensiveMove(false, cp, cp2, dtn,flags);
+	}
 	
 	/**
 	 * 
@@ -1490,11 +1493,11 @@ class TROSAiBot
 					// ai combos with initiative:
 					// consider 2nd exchange...a disabling manuever, if regular damage attack not deemed favorable...
 					case COMBO_PureMeanStrikes:	
-						return  getFavorableAttack(cp, cp2, dtn, true, flags) || getAdvantageGainCPOffensiveMove(true, cp, cp2, dtn,flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags) || getAdvantageGainCPOffensiveMove(false, cp, cp2, dtn,flags);
+						return  tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 					case COMBO_HeavyFirstStrikes:
 						return 
 						!secondExchange ?  getAForcefulInitiativeAttack(P_THRESHOLD_FAVORABLE, cp, cp2, dtn, true, true, 0)
-						: (getFavorableAttack(cp, cp2, dtn,  true, flags) ||   getAdvantageGainCPOffensiveMove(true, cp, cp2, dtn,flags) ||  getBorderlineAttack(cp, cp2, dtn,  true, flags) ) || getAdvantageGainCPOffensiveMove(false, cp, cp2, dtn,flags);
+						: tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 					case COMBO_AlphaDisarm:	
 						if (!secondExchange) {
 							// if opponent has 2 weapons, may not bother with disarming because the potential reward isn't really good
@@ -1508,35 +1511,35 @@ class TROSAiBot
 							return getHook(true, cp, cp2, dtn, flags, 0, PREFERED_HOOK_BS);
 						}
 						else {
-							return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 						}
 					case COMBO_AlphaStrike:
 						if (!secondExchange) {
 							return getFBAttack(true, cp, cp2, dtn, true, flags, 0);
 						}
 						else {
-							return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 						}
 					case COMBO_FeintStrike:
 						if (!secondExchange) {
 							
 						}
 						else {
-							return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 						}
 					case COMBO_DoubleAttack:
 						if (!secondExchange) {
 							
 						}
 						else {
-							return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 						}
 					case COMBO_SimulatenousBlockStrike:
 						if (!secondExchange) {
 							
 						}
 						else {
-							return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 						}
 					case COMBO_CoupDeGrace:
 						lastInt = B_BS_REQUIRED_DMG_DEFAULT;
@@ -1546,13 +1549,13 @@ class TROSAiBot
 						return result;
 					// ai combos without initiative:  This branch should only happen on second exchange!
 					case COMBO_DefensiveFirst:
-								return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 					case COMBO_AlphaInitiativeStealer:
-								return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 					case COMBO_AlphaDisarmDef:
-								return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 					case COMBO_SimulatenousBlockStrikeStealer:
-								return getFavorableAttack(cp, cp2, dtn,  true, flags) || getBorderlineAttack(cp, cp2, dtn,  true, flags);
+							return tryFavoredElseBorderlineAttacks(cp, cp2, dtn, true, flags);
 								
 			}
 		}
