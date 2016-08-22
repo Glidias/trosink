@@ -1205,6 +1205,7 @@ class TROSAiBot
 		if (dtn == 0) return false;
 		
 		B_MANUEVER_CHOICE_COUNT = 0;
+		var initialCount:Int = 0;
 		var threshold:Float = customThreshold != 0 ? customThreshold : P_THRESHOLD_FAVORABLE;
 		
 		if (AVAIL_counter > 0) {
@@ -1221,7 +1222,7 @@ class TROSAiBot
 				cpToUse = availableCP > 0 ? checkCostViability(availableCP, dtn, threshold, againstRoll, againstTN, true) : 0;
 				if (cpToUse > 0) {
 					if (aggr <= curAggr) {
-						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
+						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = initialCount;
 						MANUEVER_CHOICE.setDefend("counter", cpToUse, dtn, cost,  B_IS_OFFHAND);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 						B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
@@ -1246,7 +1247,7 @@ class TROSAiBot
 				cpToUse = availableCP > 0 ? checkCostViability(availableCP, dtn, threshold, againstRoll, againstTN, true) : 0;
 				if (cpToUse > 0) {
 					if (aggr <= curAggr) {
-						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
+						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = initialCount;
 						MANUEVER_CHOICE.setDefend("rota", cpToUse, dtn, cost,  B_IS_OFFHAND);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 						B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
@@ -1257,6 +1258,11 @@ class TROSAiBot
 			}
 			B_BS_REQUIRED = B_BS_REQUIRED_DEFAULT;
 		}
+		
+		
+		// category 2 reset
+		initialCount = B_MANUEVER_CHOICE_COUNT;
+		curAggr = 99999999;
 		
 		if ( (AVAIL_blockopenstrike > 0 && blockDTN > 0)) {
 			cost = getCostOfAVAIL(AVAIL_blockopenstrike);
@@ -1270,7 +1276,7 @@ class TROSAiBot
 			cpToUse = availableCP > 0 ? checkCostViability(availableCP, blockDTN, threshold, againstRoll, againstTN, true) : 0;
 			if (cpToUse > 0) {
 				if (aggr <= curAggr) {
-					if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
+					if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = initialCount;
 					MANUEVER_CHOICE.setDefend("blockopenstrike", cpToUse, blockDTN, cost,  B_IS_OFFHAND);
 					addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 					B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
@@ -1293,7 +1299,7 @@ class TROSAiBot
 			cpToUse = availableCP > 0 ? checkCostViability(availableCP, dtn, threshold, againstRoll, againstTN, true) : 0;
 			if (cpToUse > 0) {
 				if (aggr <= curAggr) {
-					if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
+					if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = initialCount;
 					MANUEVER_CHOICE.setDefend("expulsion", cpToUse, dtn, cost,  B_IS_OFFHAND);
 					addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
 					B_MANUEVER_CHOICE_PROBABILITIES[B_MANUEVER_CHOICE_COUNT] = B_VIABLE_PROBABILITY;
