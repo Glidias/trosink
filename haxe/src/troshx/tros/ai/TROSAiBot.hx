@@ -166,6 +166,7 @@ class TROSAiBot
 	
 	
 	
+	//private static inline var COMBO_None:Int = 0;
 	// basic ai combos with initiative:
 	private static inline var COMBO_PureMeanStrikes:Int = 1; // Pure Mean Strikes
 	private static inline var COMBO_HeavyFirstStrikes:Int = 2; // Heavy-First Mean strikes
@@ -949,7 +950,7 @@ class TROSAiBot
 		var result:Bool = heuristic ? getASuitableDefense(threshold, availableCP,  againstRoll, againstTN, false, favorable,  (flags & FLAG_USE_ALL_CP) != 0) : false;
 		
 		if ( result && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
-			safetyCost = checkCostAntiFavorability(availableCP, MANUEVER_CHOICE.manueverTN, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  // todo later: may not be 2, depends on  yr armour usuaully and mannuver of target weapon
+			safetyCost = checkCostAntiFavorability(availableCP, MANUEVER_CHOICE.manueverTN, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );
 			if (safetyCost > 0) {
 				if (MANUEVER_CHOICE.manueverCP < safetyCost ) {
 					MANUEVER_CHOICE.manueverCP = safetyCost;
@@ -1090,32 +1091,124 @@ class TROSAiBot
 		return getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
 	}
 	
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	public static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
-		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
-		var spend:Int;
+
+	private static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
+		var resultFirst:Bool = getFlee(favorable, availableCP,  againstRoll,  againstTN, heuristic, flags, customThreshold, secondExchange) ;
+		if (resultFirst && (flags & FLAG_GET_CHEAPEST)!=0) {    // warning: assumes flee uses cheapest possible outlay due to lowest TN  and cost is zero!
+			return resultFirst;
+		}
+		
+		var fleeLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
+		var resultSecond:Bool = getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags);
+		return resultSecond ?  ( !resultFirst ||  TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : getDesperateFlee(availableCP, secondExchange);
+	}
+	
+
+	private static function getDesperateFleeOrDefend( availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
+		
+		var resultFirst:Bool =getDesperateFlee(availableCP, secondExchange);
+		if (resultFirst && (flags & FLAG_GET_CHEAPEST)!=0) {     // warning: assumes flee uses cheapest possible outlay due to lowest TN and cost is zero!
+			return true;
+		}
+	
+		
+		var fleeLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
+		
+		flags |= FLAG_BORDERLINE_DEF_SAFETY;
+		var resultSecond:Bool = getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
+		if (!resultSecond && !resultFirst) {  // no fleeing or favorable/borderline defense option available...
+			var def:String = getRegularDefense(availableCP, 0, false);   // force a certain defense
+			
+			if (def != null) {
+				
+				availableCP -= getCostOfManuever(def);
+				
+				if (availableCP > 0) {
+					MANUEVER_CHOICE.setDefend(def, (flags & FLAG_USE_ALL_CP) != 0 ? availableCP : Std.int(Math.ceil(availableCP * .5)), getDTNOfManuever(def), getCostOfManuever(def), B_IS_OFFHAND );
+					return true;
+				}
+			}
+			else return false;		
+		}
+		
+		if (!resultSecond) {
+			
+		}
+		//trace("GOT results econd:?" + resultSecond + ", "+favorable + ", "+availableCP + " vs " +againstRoll + ", "+againstTN);
+	//	true ||
+		return resultSecond ?  (true ||   !resultFirst || TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : getDesperateFlee(availableCP, secondExchange);
+	}
+	
+	private static function getDesperateFlee(availableCP:Int, secondExchange:Bool):Bool {
 		if (AVAIL_fullevasion > 0) {
-			var cpToUseForFleeing:Int = GameRules.FLEE_CAP == GameRules.FLEE_CAP_NONE || (GameRules.FLEE_CAP == GameRules.FLEE_CAP_BY_MOBILITY_EXCHANGE1 && secondExchange) ? availableCP : (availableCP > 6  ? 6 : availableCP);
+			var cpToUseForFleeing:Int = getCPMaxForFleeing(availableCP, secondExchange);
+			MANUEVER_CHOICE.setDefend("fullevasion", cpToUseForFleeing, getDTNOfManuever("fullevasion"), getCostOfAVAIL(AVAIL_fullevasion), false);
+
+			return true;
+		}
+		return false;
+	}
+	
+	private static function getFlee(favorable:Bool,  availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float=0, secondExchange:Bool = false):Bool {
+		var threshold:Float = customThreshold != 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
+		var cpToSpend:Int;
+		if (AVAIL_fullevasion > 0) {
+			var cpToUseForFleeing:Int = getCPMaxForFleeing(availableCP, secondExchange);
 			if (favorable) {
-				spend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
-				if ( spend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
-					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
+				cpToSpend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
+				if ( cpToSpend > 0 ) {
+					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
 					return true;
 				}
 			}
 			else {
-				spend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0);
-				if ( spend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", spend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
-					B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
+				cpToSpend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
+				if ( cpToSpend > 0 ) {
+					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
 					return true;
 				}
 			}
 			
 		}
-		return getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags);	
+		return false;
 	}
+	
+	static private inline function getCPMaxForFleeing(availableCP:Int, secondExchange:Bool):Int
+	{
+		return GameRules.FLEE_CAP == GameRules.FLEE_CAP_NONE || (GameRules.FLEE_CAP == GameRules.FLEE_CAP_BY_MOBILITY_EXCHANGE1 && secondExchange) ? availableCP : (availableCP > 6  ? 6 : availableCP);
+	}
+	
+
+	private static  function tryBestPossibleDefenseBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
+			MANUEVER_COMBO_SET = 0;
+			return getSpecialDefWithReturnAttack(cp, cp2, threatManuever.manueverCP, threatManuever.manueverTN, 0, secondExchange) ||  getFavorableDefense(cp, threatManuever.manueverCP, threatManuever.manueverTN, true, (secondExchange ? FLAG_USE_ALL_CP : 0) )  ||  getDesperateFleeOrDefend(  cp, threatManuever.manueverCP, threatManuever.manueverTN, true,  (secondExchange ? FLAG_USE_ALL_CP : 0), 0, secondExchange);
+	}
+	
+	
+	private static function tryBestPossibleAttackBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
+		MANUEVER_COMBO_SET = 0;
+		var atk:String = getRegularAttackOrAdvantageMove(cp, 0, (threatManuever != null ? threatManuever.manueverCP : -1), (threatManuever!=null ?  1 : threatManuever.manueverTN ));   // force a certain defense
+		if (atk != null) {
+			var cost:Int;
+			cp -= cost = getCostOfManuever(atk);
+			if (cp > 0) {
+				var atn:Int = getATNOfManuever(atk);
+				MANUEVER_CHOICE.setAttack(atk, secondExchange ? cp : Std.int(Math.ceil(cp * .5)), atn, getRegularTargetZone(atk, atn, cp),  cost, B_IS_OFFHAND );
+				return true;
+			}
+		}
+		return false;		
+	}
+	
+	private static var MOCK_RETURN_ATTACK:AIManueverChoice = new AIManueverChoice();
+	private static function tryBestPossibleAttackOrDefBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
+		MOCK_RETURN_ATTACK.manueverCP = cp2;
+		MOCK_RETURN_ATTACK.manueverTN = getPredictedOpponentATN();	
+		MANUEVER_COMBO_SET = 0;
+		return tryBestPossibleDefenseBoliao(cp, cp2, MOCK_RETURN_ATTACK, secondExchange) || tryBestPossibleAttackBoliao(cp, cp2, null, secondExchange);
+	}
+	
+	
 	
 	
 	
@@ -1597,8 +1690,6 @@ class TROSAiBot
 	 * @param   lastManuever	If it's a specific manuever combo that requires followup in second exchange
 	 * @return
 	 */
-	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
-	@inspect([ { inspect: { display:"selector" }, choices:"COMBO" }, { inspect: { min:0 } }, { inspect: { min:0 }}  ]) 
 	private static function getComboAction(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice=null, hasInitiative:Bool = true, secondExchange:Bool = false):Bool {
 		var flags:Int = FLAG_USE_ALL_CP;// secondExchange ? FLAG_USE_ALL_CP : 0;
 		var lastInt:Int;
@@ -1741,9 +1832,12 @@ class TROSAiBot
 		return false;
 	}
 	
-	private static inline function tryBestPossibleDefenseRemaining(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
-			return getSpecialDefWithReturnAttack(cp, cp2, threatManuever.manueverCP, threatManuever.manueverTN, 0, true) ||  getFavorableDefense(cp, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP ) || getFleeOrDefend(false, cp, cp2, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0, true);
+	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
+	@inspect([ { inspect: { display:"selector" }, choices:"COMBO" }, { inspect: { min:0 } }, { inspect: { min:0 }}  ]) 
+	private static function getComboActionTest(combo:Int, cp:Int, cp2:Int, threatManuever:AIManueverChoice = null, hasInitiative:Bool = true, secondExchange:Bool = false):Bool {
+		return getComboAction(combo, cp, cp2, threatManuever, hasInitiative, secondExchange) || ( hasInitiative ? tryBestPossibleAttackOrDefBoliao(cp, cp2, threatManuever, secondExchange) : tryBestPossibleDefenseBoliao(cp,cp2,threatManuever, secondExchange) );
 	}
+	
 	
 	
 	
@@ -1782,6 +1876,8 @@ class TROSAiBot
 	private static inline var BUDGET_SKIP:Int = -1;
 	private static var MANUEVER_CHOICE_CONSIDER_MASTER:AIManueverChoice = new AIManueverChoice();
 
+	
+	
 	/**
 	 * 
 	 * @param	cp
@@ -1789,8 +1885,6 @@ class TROSAiBot
 	 * @param	threatManuever
 	 * @return
 	 */
-	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET", "B_COMBO_CANDIDATE_COUNT", "B_COMBO_CANDIDATES")
-	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
 	private static function setBestComboActionWithInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice=null):Bool {
 		
 		B_COMBO_CANDIDATE_COUNT = 0;
@@ -1868,6 +1962,20 @@ class TROSAiBot
 
 		return false;
 	}
+	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET", "B_COMBO_CANDIDATE_COUNT", "B_COMBO_CANDIDATES")
+	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
+	private static function setBestComboActionWithInitiativePlanTest(cp:Int, cp2:Int, threatManuever:AIManueverChoice = null):Bool {
+		if ( setBestComboActionWithInitiativePlan(cp, cp2, threatManuever) ) {
+			return true;
+		}
+		else {
+			if (tryBestPossibleAttackOrDefBoliao(cp, cp2, threatManuever, false)) {
+				MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_SET);
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * 
@@ -1876,8 +1984,6 @@ class TROSAiBot
 	 * @param	threatManuever
 	 * @return
 	 */
-	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET", "B_COMBO_CANDIDATE_COUNT", "B_COMBO_CANDIDATES")
-	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
 	public static function setBestComboActionWithoutInitiativePlan(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
 		
 		B_COMBO_CANDIDATE_COUNT = 0;
@@ -1921,6 +2027,21 @@ class TROSAiBot
 			return true;
 		}
 		
+		return false;
+	}
+	
+	@return("MANUEVER_COMBO_SET", "MANUEVER_CHOICE_SET", "B_COMBO_CANDIDATE_COUNT", "B_COMBO_CANDIDATES")
+	@inspect([  { inspect:{min:0} }, { inspect:{min:0} } ]) 
+	public static function setBestComboActionWithoutInitiativePlanTest(cp:Int, cp2:Int, threatManuever:AIManueverChoice):Bool {
+		if ( setBestComboActionWithoutInitiativePlan(cp, cp2, threatManuever) ) {
+			return true;
+		}
+		else {
+			if ( tryBestPossibleDefenseBoliao(cp, cp2, threatManuever, false)) {
+				MANUEVER_CHOICE.copyTo( MANUEVER_CHOICE_SET );
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -2073,9 +2194,17 @@ class TROSAiBot
 		}
 		
 		// use fallback action here
+		if (initiative) {
+			return tryBestPossibleAttackOrDefBoliao(cp, opponent.cp, threatManuever, currentExchange == 2);
+		}
+		else {
+			return tryBestPossibleDefenseBoliao(cp, opponent.cp, threatManuever, currentExchange == 2);
+		}
 		
 		return false;
 	}
+	
+	
 	
 	
 }
