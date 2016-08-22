@@ -505,8 +505,10 @@ class TROSAiBot
 	// considerTODO: this should be factored out into ManuverSheet method
 	private static function getATNOfManuever(manuever:String):Int {
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
+		var weaponOff:Weapon = B_IS_OFFHAND ? weapon : WeaponSheet.getWeaponByName(D_EQUIP);
 		var tn:Int = weapon != null ? weapon.atn : IMPOSSIBLE_TN;
 		var tn2:Int = weapon != null ?  weapon.atn2 : IMPOSSIBLE_TN;
+		var tnOff:Int = weaponOff != null ? weaponOff.shield ? weaponOff.dtn :  weaponOff.atn : IMPOSSIBLE_TN;
 		var cost:Int;
 		var aggr:Float;
 	
@@ -516,7 +518,7 @@ class TROSAiBot
 			case "disarm": return tn;
 			case "hook": return (weapon != null ? weapon.getHookingATN() : IMPOSSIBLE_TN);
 			case "beat": return tn;
-			case "bindstrike": return (tn2< tn ? tn2 : tn);
+			case "bindstrike": return tnOff;
 			case "spike": return tn2;
 			case "thrust": return tn2;
 		}
@@ -1121,7 +1123,7 @@ class TROSAiBot
 	}
 
 	
-	private static function getAdvantageManuever(manueverName:String, favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int = 1, defensive:Bool = false):Bool {
+	private static function getAdvantageManuever(manueverName:String, favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int = 1, defensive:Bool = false, alwaysUseOffhand:Bool=false):Bool {
 		var threshold:Float = customThreshold!= 0 ? customThreshold : favorable ? P_THRESHOLD_FAVORABLE : P_THRESHOLD_BORDERLINE;
 		//if (AVAIL_disarm > 0) {
 			availableCP -= getCostOfManuever(manueverName);
@@ -1136,11 +1138,11 @@ class TROSAiBot
 				if (costing > 0) {
 					if (defensive) {
 						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
-						MANUEVER_CHOICE.setDefend(manueverName, costing, tn, getCostOfManuever(manueverName), B_IS_OFFHAND);
+						MANUEVER_CHOICE.setDefend(manueverName, costing, tn, getCostOfManuever(manueverName), alwaysUseOffhand || B_IS_OFFHAND);
 					}
 					else {
 						B_VIABLE_PROBABILITY_GET = B_VIABLE_PROBABILITY;
-						MANUEVER_CHOICE.setAttack(manueverName, costing, tn, 0, getCostOfManuever(manueverName), B_IS_OFFHAND);
+						MANUEVER_CHOICE.setAttack(manueverName, costing, tn, 0, getCostOfManuever(manueverName), alwaysUseOffhand || B_IS_OFFHAND);
 					}
 					return true;
 				}
@@ -1341,7 +1343,7 @@ class TROSAiBot
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
 	public static inline function getBindStrike(favorable:Bool, availableCP:Int, againstCP:Int,  againstRoll:Int=0,  againstTN:Int=1,flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1):Bool {
-		return AVAIL_bindstrike > 0 ? getAdvantageManuever("bindstrike", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false) : false;
+		return AVAIL_bindstrike > 0 ? getAdvantageManuever("bindstrike", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false, true) : false;
 	}
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
