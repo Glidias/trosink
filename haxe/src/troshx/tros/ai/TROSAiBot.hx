@@ -284,8 +284,9 @@ class TROSAiBot
 		if ( AVAIL_beat >0 && tn!= IMPOSSIBLE_TN) {
 			
 			cost = AVAIL_beat - 1;
-			if (cost < availableCP) {   // TODO: beat should generally have higher  reward that should somehow be factored into Aggregate...and should beat bindStrike 
-				aggr = gotEnemyRoll ? Math.round(TROSAI.getChanceToSucceedContest(roll-cost, tn, againstRoll, againstTN, 1)*BPROB_BASE)  : tnP*(roll-cost) ;
+			if (cost < availableCP) {   
+				var tn:Int =  getATNOfManuever("beat");
+				aggr = gotEnemyRoll ? Math.round(TROSAI.getChanceToSucceedContest(roll-cost,tn, againstRoll, againstTN, 1)*BPROB_BASE)  : tnP*(roll-cost) ;
 				if (aggr > 0 && aggr >= aggrCur) {
 					if (aggr != aggrCur) B_CANDIDATE_COUNT = 0;
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "beat";
@@ -298,8 +299,8 @@ class TROSAiBot
 			cost = AVAIL_bindstrike - 1;
 			 if (cost < availableCP) {
 				aggr = gotEnemyRoll ?  Math.round(TROSAI.getChanceToSucceedContest(roll-cost, getATNOfManuever("bindstrike"), againstRoll, againstTN, 1)*BPROB_BASE) : Math.min(tnP,tn2P)*(roll-cost);
-				if (aggr > 0 && aggr >= aggrCur ) {
-					if (aggr != aggrCur) B_CANDIDATE_COUNT = 0;
+				if (aggr > 0 && aggr > aggrCur ) {
+					//if (aggr != aggrCur) B_CANDIDATE_COUNT = 0;
 					B_CANDIDATES[B_CANDIDATE_COUNT++] = "bindstrike";
 					aggrCur = aggr;
 					
@@ -514,10 +515,10 @@ class TROSAiBot
 	
 		switch(manuever) {
 			case "bash": return tn;
+			case "beat": return tn;
 			case "cut": return tn;
 			case "disarm": return tn;
 			case "hook": return (weapon != null ? weapon.getHookingATN() : IMPOSSIBLE_TN);
-			case "beat": return tn;
 			case "bindstrike": return tnOff;
 			case "spike": return tn2;
 			case "thrust": return tn2;
@@ -1354,7 +1355,7 @@ class TROSAiBot
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE")
 	public static function getBeat(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int = 0, customThreshold:Float = 0, preferedRS:Int=1, preferTargetMaster:Int=0):Bool {
-		if ( AVAIL_bindstrike > 0 ) {
+		if ( AVAIL_beat > 0 ) {
 			var result:Bool =  getAdvantageManuever("beat", favorable, availableCP, againstRoll, againstTN, flags, customThreshold, preferedRS, false);
 			if (result) {
 				var master:Int = CURRENT_OPPONENT.getMasterDTN();
