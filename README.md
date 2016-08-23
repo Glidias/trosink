@@ -3,7 +3,7 @@ This is a "challenge-attempt" to script Riddle of Steel/Song of Sword's tactical
 \* Currently, everything is written as in INK script format except for AI bots which rely on external functions to execute their combat actions. Due to the limitations of INK scripts, a new  ink script has to be re-generated each time with newly set (hardcoded) variables in order to "fakely" simulate different kinds of bout setups. Also note that advanced features later on may eventually still have to rely on external functions outside of INK.
 
 https://github.com/inkle/ink
-As of now, INK doesn't have data structures, arrays, and such. So, one has to come up with other ways/workarounds outside of the regular typical dynamic OO, data composition, etc. features available in  programming languges.
+As of now, INK doesn't have data structures, arrays, and such. So, one has to come up with other ways/workarounds outside of the regular typical dynamic OO, data composition, etc. features available in  programming languages.
 
 Riddle of Steel/Song of Swords, and various other spinoff games like Blade of the Iron Throne, etc. are a category of tabletop RPGs with highly detailed realistic medieval combat combat: involving actual historical swordfighting/combat manuevers, locational damage, wounds/blood-lost, etc. running on top of a narrative (traditionally gamemastered) experience among groups of live players.
 
