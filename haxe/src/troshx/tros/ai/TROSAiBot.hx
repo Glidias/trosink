@@ -3,6 +3,7 @@ import haxe.ds.Vector;
 import haxe.ds.Vector;
 import troshx.BodyChar;
 import troshx.tros.Manuever;
+import troshx.tros.ManueverSheet;
 import troshx.tros.Weapon;
 import troshx.tros.WeaponSheet;
 import troshx.util.TROSAI;
@@ -627,6 +628,7 @@ class TROSAiBot
 	
 	private static function checkCostViabilityWithBs(availableCP:Int, tn:Int, threshold:Float, againstRoll:Int, againstTN:Int = 1, useAllCP:Bool = false, bs:Int=1):Int {
 		var lastBS:Int = B_BS_REQUIRED;
+		B_BS_REQUIRED = bs;
 		var result:Int = checkCostViability(availableCP, tn, threshold, againstRoll, againstTN, useAllCP);
 		B_BS_REQUIRED = lastBS;
 		return result;
@@ -1116,7 +1118,7 @@ class TROSAiBot
 		}
 		
 		var fleeLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
-		var resultSecond:Bool = getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags);
+		var resultSecond:Bool = getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags, customThreshold);
 		return resultSecond ?  ( !resultFirst ||  TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : (resultFirst &&  getDesperateFlee(availableCP, secondExchange) );
 	}
 	
@@ -1138,10 +1140,57 @@ class TROSAiBot
 			return getBorderlineDefense(availableCP, againstRoll, againstTN, true, flags | FLAG_BORDERLINE_DEF_SAFETY, 0.0001);
 	}
 	
+//	/*
+		private static function lastDitchFleeOrDefend(availableCP:Int, threatManuever:AIManueverChoice, secondExchange:Bool = false, enemyCPInReserve:Int = 0):Bool {
+			var cpToUse:Int;
+			var cpLeft:Int;
+			var cpRight:Int;
+			var isDamaging:Bool = ManueverSheet.isDamagingManuever(threatManuever.manuever);
+			if (!secondExchange) {  // first exchange
+				var opponentATN:Int = getPredictedOpponentATN();
+				var minCPRequired:Int = checkCostViabilityWithBs(availableCP, FLEE_TN, P_THRESHOLD_BORDERLINE, enemyCPInReserve, opponentATN, false, 0);
+				if (minCPRequired > 0) {
+					cpLeft = availableCP - minCPRequired;
+					if (isDamaging ?  minimalDefenseOnly(cpLeft, threatManuever.manueverCP, threatManuever.manueverTN, FLAG_USE_ALL_CP) :  getFBDefense(false, cpLeft, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0) ) {
+						cpToUse = MANUEVER_CHOICE.manueverCP;
+						cpRight = checkCostViabilityWithBs(availableCP, FLEE_TN, P_THRESHOLD_FAVORABLE, enemyCPInReserve, opponentATN, false, 1);
+						if (cpRight == 0) {
+							cpRight = checkCostViabilityWithBs(availableCP, FLEE_TN, P_THRESHOLD_BORDERLINE, enemyCPInReserve, opponentATN, false, 1);
+						}
+						
+						if (cpRight > 0) {
+							cpRight = availableCP - cpRight - 1;
+							if (cpToUse < cpRight) {
+								cpToUse = cpRight;
+								MANUEVER_CHOICE.manueverCP = cpToUse;
+							}
+						}
+						
+						return true;
+					}
+					else {
+						
+						// Compare cpToUse vs Flee probability
+					//	trace("What to use?:"+cpLeft);
+						return getFleeOrDefend(false, cpLeft, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0.00000001, secondExchange);
+						
+						
+					}
+				}
+		
+					return getDesperateFlee(availableCP, secondExchange) || getFleeOrDefend(false, availableCP, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0.00000001, secondExchange);
+				
+			}
+			
+			
+			return getFleeOrDefend(false, availableCP, threatManuever.manueverCP, threatManuever.manueverTN, true, FLAG_USE_ALL_CP, 0.00000001, secondExchange);
+			
+			//return false;
+		}
+	//*/
 	
 	
-	
-	
+	/*
 	private static function lastDitchFleeOrDefend(availableCP:Int, threatManuever:AIManueverChoice, secondExchange:Bool = false, enemyCPInReserve:Int = 0):Bool {
 		var cp:Int;
 		//isDamagingThreat:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1
@@ -1203,6 +1252,8 @@ class TROSAiBot
 		trace("bopian flee or defend");
 		return getDesperateFleeOrDefend(availableCP, againstRoll, againstTN, true, secondExchange ? FLAG_USE_ALL_CP : 0, 0, secondExchange, enemyCPInReserve, 0, isDamagingThreat );
 	}
+	
+	
 
 	private static function getDesperateFleeOrDefend( availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false, enemyCPInReserve:Int=0, fleeVsDefendMarginMax:Float=0, useArmor:Bool=true):Bool {
 		
@@ -1262,7 +1313,8 @@ class TROSAiBot
 		return resultSecond ?   !resultFirst || !weightedChoiceBetween2(fleeLikelihood, defLikelihood, fleeVsDefendMarginMax )   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) :
 			(resultFirst && getDesperateFlee(availableCP, secondExchange));
 	}
-
+*/
+	
 	//@inspect([	{ inspect:{min:0, display:"range", step:0.01, max:1} },	{ inspect:{min:0, display:"range", step:0.01, max:1} }  ])
 	private static function weightedChoiceBetween(trueConditionProbability:Float, falseConditionProbability:Float):Bool {
 		return Math.random()*(trueConditionProbability + falseConditionProbability)  <= trueConditionProbability;
