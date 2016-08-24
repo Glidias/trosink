@@ -148,7 +148,7 @@ class TROSAiBot
 	}
 	
 	
-
+	
 	@settable private static var B_EQUIP:String = "";  // master/offhand weapon  equip
 	@settable private static var B_IS_OFFHAND:Bool = false;	// whether above is in offhand mode or not
 	@settable private static var D_EQUIP:String = "";  // defensive offhand shield equip (if any)
@@ -160,7 +160,8 @@ class TROSAiBot
 	private static inline var BUDGET_EXCHANGE_2:Int = 2;
 	private static inline var BUDGET_EXCHANGE_2_ENEMY:Int = 3;
 
-	
+	@inspect private static var WISH_TO_REGAIN_STANCE:Bool=false;
+	@inspect private static var CURRENTLY_AGGROED:Bool=false;
 	@inject private static var CURRENT_OPPONENT:TROSAiBot;
 	// equipment, body link
 	
@@ -209,7 +210,9 @@ class TROSAiBot
 	@inspect({min:1}) private static var B_BS_REQUIRED_DMG_DEFAULT:Int = 1;  // set this to higher for AI that wishes to deal a heavier blow
 	static private var PREFERED_HOOK_BS:Int = 2;  // set this to higher  for less risk attempt  , or lower for  more risk attempt (min 1)
 	static private var PREFERED_DISARM_BS:Int=2;  // set this to higher  for less risk attempt , or lower for more risk attempt (min 1)
-	static private var PREFERED_DISARM_DEF_BS:Int=2;  // set this to higher  for less risk attempt , or lower for more risk attempt (min 1)
+	static private var PREFERED_DISARM_DEF_BS:Int = 2;  // set this to higher  for less risk attempt , or lower for more risk attempt (min 1)
+	@inspect static private var CAN_DESPERATE_ALPHASTRIKE:Bool = false;
+	@inspect({display:"range", min:0, step:0.01, max:1}) static private var DESPERATE_ALPHASTRIKE_CHANCE:Float = 0.5;
 	
 	private static var B_VIABLE_PROBABILITY:Float;
 	private static var B_VIABLE_PROBABILITY_GET:Float;
@@ -526,6 +529,10 @@ class TROSAiBot
 		}
 		return 0;
 	}
+	private static inline function isFleeingManuever(manueverName:String):Bool {
+		return manueverName == "fullevasion";
+	}
+	
 	private static function getDTNOfManuever(manuever:String):Int {
 		var weapon:Weapon = WeaponSheet.getWeaponByName(B_EQUIP);
 		var offhand:Weapon = WeaponSheet.getWeaponByName(D_EQUIP);
@@ -543,7 +550,7 @@ class TROSAiBot
 			case "expulsion": return tn; 
 			case "partialevasion": return 7;
 			case "duckweave": return 9;
-			case "fullevasion": return 4;
+			case "fullevasion": return FLEE_TN;
 		}	
 		return 0;
 	}
@@ -616,6 +623,13 @@ class TROSAiBot
 			}
 		}
 		return 0;
+	}
+	
+	private static function checkCostViabilityWithBs(availableCP:Int, tn:Int, threshold:Float, againstRoll:Int, againstTN:Int = 1, useAllCP:Bool = false, bs:Int=1):Int {
+		var lastBS:Int = B_BS_REQUIRED;
+		var result:Int = checkCostViability(availableCP, tn, threshold, againstRoll, againstTN, useAllCP);
+		B_BS_REQUIRED = lastBS;
+		return result;
 	}
 	
 	private static inline function precisionPerc(val:Float):Float {
@@ -805,6 +819,8 @@ class TROSAiBot
 	public static inline var FLAG_GET_CHEAPEST:Int = 1;
 	public static inline var FLAG_USE_ALL_CP:Int = 2;
 	public static inline var FLAG_BORDERLINE_DEF_SAFETY:Int = 4;
+	
+	static public inline var FLEE_TN:Int = 4;
 
 	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" },  { inspect:{min:0, display:"range", step:0.01, max:1} } ]) 
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
@@ -950,7 +966,7 @@ class TROSAiBot
 		var result:Bool = heuristic ? getASuitableDefense(threshold, availableCP,  againstRoll, againstTN, false, favorable,  (flags & FLAG_USE_ALL_CP) != 0) : false;
 		
 		if ( result && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
-			safetyCost = checkCostAntiFavorability(availableCP, MANUEVER_CHOICE.manueverTN, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );
+			safetyCost = checkCostAntiFavorability(availableCP, MANUEVER_CHOICE.manueverTN, P_RECKLESS, againstRoll, againstTN, false, 0, B_BS_REQUIRED_DMG_DEFAULT );
 			if (safetyCost > 0) {
 				if (MANUEVER_CHOICE.manueverCP < safetyCost ) {
 					MANUEVER_CHOICE.manueverCP = safetyCost;
@@ -987,7 +1003,7 @@ class TROSAiBot
 				tn = getDTNOfManuever("block");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
 				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
-					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, B_BS_REQUIRED_DMG_DEFAULT );  
 					if (safetyCost > 0) {
 						if (cpToUse < safetyCost ) {
 							cpToUse = safetyCost;
@@ -1017,7 +1033,7 @@ class TROSAiBot
 				tn = getDTNOfManuever("parry");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
 				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
-					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, B_BS_REQUIRED_DMG_DEFAULT );  
 					if (safetyCost > 0) {
 						if (cpToUse < safetyCost ) {
 							cpToUse = safetyCost;
@@ -1047,7 +1063,7 @@ class TROSAiBot
 				tn = getDTNOfManuever("partialevasion");
 				cpToUse  = checkCostFunc(cp, tn, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) != 0 );
 				if ((cpToUse > 0) && (flags & FLAG_BORDERLINE_DEF_SAFETY) != 0) {
-					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, 2 );  
+					safetyCost = checkCostAntiFavorability(cp, tn, P_RECKLESS, againstRoll, againstTN, false, 0, B_BS_REQUIRED_DMG_DEFAULT );  
 					if (safetyCost > 0) {
 						if (cpToUse < safetyCost ) {
 							cpToUse = safetyCost;
@@ -1060,7 +1076,7 @@ class TROSAiBot
 				
 				if (cpToUse > 0) {
 					aggr = useCheapestMult*cpToUse +  (1 - B_VIABLE_PROBABILITY);
-					if (aggr <= curAggr) {
+					if (aggr < curAggr) {
 						if (aggr != curAggr) B_MANUEVER_CHOICE_COUNT = 0;
 						MANUEVER_CHOICE.setDefend("partialevasion", cpToUse, tn, getCostOfAVAIL(AVAIL_partialevasion), false);
 						addPossibleRegularManueverChoice(B_MANUEVER_CHOICE_COUNT);
@@ -1087,11 +1103,12 @@ class TROSAiBot
 	}
 	
 	@return("B_VIABLE_PROBABILITY_GET", "MANUEVER_CHOICE", "B_VIABLE_HEURISTIC")
-	public static inline function getBorderlineDefense(availableCP:Int, againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool=true, flags:Int=0):Bool {
-		return getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
+	@inspect([ { inspect:{min:0} }, { inspect:{min:0} }, { inspect:{min:1} }, { inspect:null  }, { inspect:null, bitmask:"FLAG" },  { inspect:{min:0, display:"range", step:0.01, max:1}} ]) 
+	public static inline function getBorderlineDefense(availableCP:Int, againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool=true, flags:Int=0, customThreshold:Float=0):Bool {
+		return getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags, customThreshold);
 	}
-	
-
+		
+	//@inspect
 	private static function getFleeOrDefend(favorable:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
 		var resultFirst:Bool = getFlee(favorable, availableCP,  againstRoll,  againstTN, heuristic, flags, customThreshold, secondExchange) ;
 		if (resultFirst && (flags & FLAG_GET_CHEAPEST)!=0) {    // warning: assumes flee uses cheapest possible outlay due to lowest TN  and cost is zero!
@@ -1100,11 +1117,94 @@ class TROSAiBot
 		
 		var fleeLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
 		var resultSecond:Bool = getFBDefense(favorable, availableCP, againstRoll, againstTN, heuristic, flags);
-		return resultSecond ?  ( !resultFirst ||  TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : getDesperateFlee(availableCP, secondExchange);
+		return resultSecond ?  ( !resultFirst ||  TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : (resultFirst &&  getDesperateFlee(availableCP, secondExchange) );
 	}
 	
+	
+	public static function minimalDefenseFirst(availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, enemyCPInReserve:Int = 0):Bool {
+		var cp:Int;
+		if (   getFlee(false, availableCP, enemyCPInReserve, getPredictedOpponentATN(), false, FLAG_GET_CHEAPEST, 0, true) ) {  // simulate 2nd exchange fleeing minimal
+					cp = availableCP - MANUEVER_CHOICE.manueverCP;
+					if ( getBorderlineDefense(cp, againstRoll, againstTN, true, (FLAG_USE_ALL_CP | FLAG_BORDERLINE_DEF_SAFETY), 0.0001) ) {
+						// usually, this will only work if you've got a lot of heavy armor to protect yourself
+						return true;
+					}
+				}
+		return false;
+	}
+	
+	private static inline function minimalDefenseOnly(availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, flags:Int=0):Bool {
+	
+			return getBorderlineDefense(availableCP, againstRoll, againstTN, true, flags | FLAG_BORDERLINE_DEF_SAFETY, 0.0001);
+	}
+	
+	
+	
+	
+	
+	private static function lastDitchFleeOrDefend(availableCP:Int, threatManuever:AIManueverChoice, secondExchange:Bool = false, enemyCPInReserve:Int = 0):Bool {
+		var cp:Int;
+		//isDamagingThreat:Bool, availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1
+		var againstRoll:Int = threatManuever.manueverCP;
+		var againstTN:Int = threatManuever.manueverTN;
+		var isDamagingThreat:Bool = ManueverSheet.isDamagingManuever(threatManuever.manuever);
+		
+		if (enemyCPInReserve < 0) enemyCPInReserve = 0;
+		
+		
+		if (!secondExchange) {		// first exchange
+			if (isDamagingThreat && AVAIL_fullevasion > 0) {   
+					// no considerations here atm
+					//minimalDefenseOnly(availableCP, againstRoll, againstTN, 0) ||
+					if ( getBorderlineDefense(availableCP, againstRoll, againstTN, true,  secondExchange ? FLAG_USE_ALL_CP : 0 , 0)  ||   getDesperateFleeOrDefend(availableCP, againstRoll, againstTN, true, secondExchange ? FLAG_USE_ALL_CP : 0, 0, secondExchange,0, 0,isDamagingThreat )) {
+					
+		
+					if ( !isFleeingManuever(MANUEVER_CHOICE.manuever)  ) {  // defending with psosibly almost everything
+						// detect if too little CP left
+						cp = availableCP  - MANUEVER_CHOICE.getManueverCPSpent();
+						//&& checkCostViabilityWithBs(enemyCPInReserve, getPredictedOpponentATN(), 1-P_RECKLESS, cp, MANUEVER_CHOICE.manueverTN, true, B_BS_REQUIRED_DEFAULT)
+						var cpToUseForMinimalFlee:Int;
+						if (enemyCPInReserve >= B_BS_REQUIRED_DMG_DEFAULT  && (cpToUseForMinimalFlee=checkCostViabilityWithBs(cp, FLEE_TN, P_THRESHOLD_BORDERLINE, enemyCPInReserve, getPredictedOpponentATN(), false, 1))==0 ) {  // todo: determine if got available minimum cp required left releative to enemy's
+							if (  minimalDefenseOnly(availableCP, againstRoll, againstTN, 0))  {
+								// usually, this will only work if you've got a lot of heavy armor to protect yourself
+								// maximise chance to flee later
+								if (  (cpToUseForMinimalFlee = checkCostViabilityWithBs( availableCP - MANUEVER_CHOICE.getManueverCPSpent() , FLEE_TN, P_THRESHOLD_BORDERLINE, enemyCPInReserve, getPredictedOpponentATN(), false, B_BS_REQUIRED_DMG_DEFAULT)) > 0  ) {
+									//(cpToUseForMinimalFlee = checkCostViabilityWithBs( availableCP - MANUEVER_CHOICE.getManueverCPSpent() , FLEE_TN, P_THRESHOLD_FAVORABLE, enemyCPInReserve, getPredictedOpponentATN(), false, 1));
+									//if ( cpToUseForMinimalFlee> 0 && availableCP - MANUEVER_CHOICE.getManueverCPSpent() > cpToUseForMinimalFlee) MANUEVER_CHOICE.manueverCP = availableCP - cpToUseForMinimalFlee - MANUEVER_CHOICE.cost;
+									trace("minimal defense first with flee successful");
+									return true;
+								}
+							}
+						}
+						else {
+							trace("defending with armor ok");
+							return true;  // should be deemed ok with remaining cp left against enemy's
+						}
+					}
+					else {
+						trace("fleeing should be ok..but forced to..");
+						return true;  // fleeing ok...
+					}
+				}
+				else return false;
+				
+			}
+			else {  // Got no full evasion yet on first exchange, consider defend minimally to hopefully be able to full evade successfuly next exchange for refreshing next round
+				if ( isDamagingThreat &&  minimalDefenseFirst(availableCP, againstRoll, againstTN, enemyCPInReserve))  {
+						// usually, this will only work if you've got a lot of heavy armor to protect yourself
+						return true;
+				}
+			}
+		}
+		else {	 // second exchange
+			// no considerations here atm
+		}
+		
+		trace("bopian flee or defend");
+		return getDesperateFleeOrDefend(availableCP, againstRoll, againstTN, true, secondExchange ? FLAG_USE_ALL_CP : 0, 0, secondExchange, enemyCPInReserve, 0, isDamagingThreat );
+	}
 
-	private static function getDesperateFleeOrDefend( availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false):Bool {
+	private static function getDesperateFleeOrDefend( availableCP:Int,  againstRoll:Int = 0,  againstTN:Int = 1, heuristic:Bool = true, flags:Int = 0, customThreshold:Float = 0, secondExchange:Bool=false, enemyCPInReserve:Int=0, fleeVsDefendMarginMax:Float=0, useArmor:Bool=true):Bool {
 		
 		var resultFirst:Bool =getDesperateFlee(availableCP, secondExchange);
 		if (resultFirst && (flags & FLAG_GET_CHEAPEST)!=0) {     // warning: assumes flee uses cheapest possible outlay due to lowest TN and cost is zero!
@@ -1114,15 +1214,34 @@ class TROSAiBot
 		
 		var fleeLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
 		
-		flags |= FLAG_BORDERLINE_DEF_SAFETY;
-		var resultSecond:Bool = getFBDefense(false, availableCP, againstRoll, againstTN, heuristic, flags);
-		if (!resultSecond && !resultFirst) {  // no fleeing or favorable/borderline defense option available...
-			var def:String = getRegularDefense(availableCP, 0, false);   // force a certain defense
-			
+		//flags |= FLAG_BORDERLINE_DEF_SAFETY;
+		
+		var availableCPForRegularDef:Int = availableCP;
+		if (enemyCPInReserve > 0 ) {
+			// spam all for defense or can reserve some	
+			var reduc:Int;
+			if ( (reduc=checkCostViabilityWithBs(availableCP, FLEE_TN, P_THRESHOLD_BORDERLINE, enemyCPInReserve, getPredictedOpponentATN(), false, B_BS_REQUIRED_DMG_DEFAULT)) > 0 ) {
+				availableCPForRegularDef -= reduc;
+			}
+			else if (resultFirst) {
+				return true;
+			}
+		}
+		var dmgBarrier:Int = useArmor ? B_BS_REQUIRED_DMG_DEFAULT : 1;
+		var singleExchangeOverwrite:Bool =  false;// enemyCPInReserve < dmgBarrier  || secondExchange;
+		if (singleExchangeOverwrite) fleeVsDefendMarginMax = 0.1;
+		
+		
+		var resultSecond:Bool = !useArmor ?  getFBDefense(false, availableCPForRegularDef, againstRoll, againstTN, heuristic, flags, customThreshold ) : singleExchangeOverwrite ? getBorderlineDefense(availableCPForRegularDef, againstRoll, againstTN, true, (FLAG_USE_ALL_CP), 0.0001) :   minimalDefenseOnly(availableCPForRegularDef, againstRoll, againstTN, flags);
+		
+
+		if (!resultSecond && !resultFirst) {  // no fleeing or favorable/borderline defense option available...forced to desperately defend with whatever that is remaining
+			if ( minimalDefenseOnly(availableCP, againstRoll, againstTN, flags) ) {
+				return true;
+			}
+			var def:String = getRegularDefense(availableCP, 0, false);   // force a certain defense	
 			if (def != null) {
-				
 				availableCP -= getCostOfManuever(def);
-				
 				if (availableCP > 0) {
 					MANUEVER_CHOICE.setDefend(def, (flags & FLAG_USE_ALL_CP) != 0 ? availableCP : Std.int(Math.ceil(availableCP * .5)), getDTNOfManuever(def), getCostOfManuever(def), B_IS_OFFHAND );
 					return true;
@@ -1131,12 +1250,31 @@ class TROSAiBot
 			else return false;		
 		}
 		
-		if (!resultSecond) {
-			
+		
+		var defLikelihood:Float = TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true);
+	
+		if (WISH_TO_REGAIN_STANCE && resultFirst && fleeLikelihood > defLikelihood) {  // 3rd condition not required?
+			return getDesperateFlee(availableCP, secondExchange);
 		}
-		//trace("GOT results econd:?" + resultSecond + ", "+favorable + ", "+availableCP + " vs " +againstRoll + ", "+againstTN);
-	//	true ||
-		return resultSecond ?  (true ||   !resultFirst || TROSAI.getChanceToSucceedContest(MANUEVER_CHOICE.manueverCP, MANUEVER_CHOICE.manueverTN, againstRoll, againstTN, 1, true)  >= fleeLikelihood   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) ) : getDesperateFlee(availableCP, secondExchange);
+		
+		
+		
+		return resultSecond ?   !resultFirst || !weightedChoiceBetween2(fleeLikelihood, defLikelihood, fleeVsDefendMarginMax )   ?   resultSecond : getDesperateFlee(availableCP, secondExchange) :
+			(resultFirst && getDesperateFlee(availableCP, secondExchange));
+	}
+
+	//@inspect([	{ inspect:{min:0, display:"range", step:0.01, max:1} },	{ inspect:{min:0, display:"range", step:0.01, max:1} }  ])
+	private static function weightedChoiceBetween(trueConditionProbability:Float, falseConditionProbability:Float):Bool {
+		return Math.random()*(trueConditionProbability + falseConditionProbability)  <= trueConditionProbability;
+	}
+	
+	//@inspect([	{ inspect:{min:0, display:"range", step:0.01, max:1} },	{ inspect:{min:0, display:"range", step:0.01, max:1} }, { inspect:{min:0, display:"range", step:0.01, max:1} }   ])
+	private static function weightedChoiceBetween2(trueConditionProbability:Float, falseConditionProbability:Float, maxMarginOfDifference:Float):Bool {
+		return maxMarginOfDifference != 0 && absDiffF(trueConditionProbability, falseConditionProbability) > maxMarginOfDifference ?   trueConditionProbability >= falseConditionProbability :  Math.random()*(trueConditionProbability + falseConditionProbability)  <= trueConditionProbability;
+	}
+	
+	private static inline function absDiffF(val:Float, val2:Float):Float {
+		return val > val2 ?  val - val2 : val2 - val;
 	}
 	
 	private static function getDesperateFlee(availableCP:Int, secondExchange:Bool):Bool {
@@ -1155,16 +1293,16 @@ class TROSAiBot
 		if (AVAIL_fullevasion > 0) {
 			var cpToUseForFleeing:Int = getCPMaxForFleeing(availableCP, secondExchange);
 			if (favorable) {
-				cpToSpend = checkCostViability( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
+				cpToSpend = checkCostViability( cpToUseForFleeing, FLEE_TN, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
 				if ( cpToSpend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
+					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, FLEE_TN, getCostOfAVAIL(AVAIL_fullevasion), false);
 					return true;
 				}
 			}
 			else {
-				cpToSpend = checkCostViabilityBorderline( cpToUseForFleeing, 4, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
+				cpToSpend = checkCostViabilityBorderline( cpToUseForFleeing, FLEE_TN, threshold, againstRoll, againstTN, (flags & FLAG_USE_ALL_CP) !=0);
 				if ( cpToSpend > 0 ) {
-					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, 4, getCostOfAVAIL(AVAIL_fullevasion), false);
+					MANUEVER_CHOICE.setDefend("fullevasion", cpToSpend, FLEE_TN, getCostOfAVAIL(AVAIL_fullevasion), false);
 					return true;
 				}
 			}
@@ -1181,35 +1319,66 @@ class TROSAiBot
 
 	private static  function tryBestPossibleDefenseBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
 			MANUEVER_COMBO_SET = 0;
-			return getSpecialDefWithReturnAttack(cp, cp2, threatManuever.manueverCP, threatManuever.manueverTN, 0, secondExchange) ||  getFavorableDefense(cp, threatManuever.manueverCP, threatManuever.manueverTN, true, (secondExchange ? FLAG_USE_ALL_CP : 0) )  ||  getDesperateFleeOrDefend(  cp, threatManuever.manueverCP, threatManuever.manueverTN, true,  (secondExchange ? FLAG_USE_ALL_CP : 0), 0, secondExchange);
+			
+			return getSpecialDefWithReturnAttack(cp, cp2, threatManuever.manueverCP, threatManuever.manueverTN, 0, secondExchange) ||   lastDitchFleeOrDefend(  cp, threatManuever, secondExchange, cp2- threatManuever.manueverCP);
 	}
 	
 	
 	private static function tryBestPossibleAttackBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
 		MANUEVER_COMBO_SET = 0;
-		var atk:String = getRegularAttackOrAdvantageMove(cp, 0, (threatManuever != null ? threatManuever.manueverCP : -1), (threatManuever!=null ?  1 : threatManuever.manueverTN ));   // force a certain defense
+		var atk:String = getRegularAttackOrAdvantageMove(cp, 0, (threatManuever != null ? threatManuever.manueverCP : -1), (threatManuever!=null ?  threatManuever.manueverTN : 1 ));   // force a certain defense
 		if (atk != null) {
 			var cost:Int;
 			cp -= cost = getCostOfManuever(atk);
 			if (cp > 0) {
 				var atn:Int = getATNOfManuever(atk);
-				MANUEVER_CHOICE.setAttack(atk, secondExchange ? cp : Std.int(Math.ceil(cp * .5)), atn, getRegularTargetZone(atk, atn, cp),  cost, B_IS_OFFHAND );
+				var cpToUse:Int = checkCostViabilityBorderline(cp, cp2, P_THRESHOLD_BORDERLINE, (secondExchange ? cp2 : Std.int(Math.ceil(cp2 * .5))), getPredictedOpponentDTN(), secondExchange);
+				MANUEVER_CHOICE.setAttack(atk, secondExchange ? cp : (cpToUse > 0 ? cpToUse : ( CAN_DESPERATE_ALPHASTRIKE && Math.random() < DESPERATE_ALPHASTRIKE_CHANCE ?  cp : Std.int(Math.ceil(cp * .5))  )  ), atn, getRegularTargetZone(atk, atn, cp),  cost, B_IS_OFFHAND );
 				return true;
 			}
 		}
 		return false;		
 	}
 	
+
+	
 	private static var MOCK_RETURN_ATTACK:AIManueverChoice = new AIManueverChoice();
 	private static function tryBestPossibleAttackOrDefBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
 		MOCK_RETURN_ATTACK.manueverCP = cp2;
 		MOCK_RETURN_ATTACK.manueverTN = getPredictedOpponentATN();	
 		MANUEVER_COMBO_SET = 0;
-		return tryBestPossibleDefenseBoliao(cp, cp2, MOCK_RETURN_ATTACK, secondExchange) || tryBestPossibleAttackBoliao(cp, cp2, null, secondExchange);
+		
+		if (secondExchange) { 
+			if (WISH_TO_REGAIN_STANCE) {
+				if ( tryBestPossibleDefWithInitiativeBoliao(cp, cp2, threatManuever, secondExchange)) {
+					return true;
+				}
+			}
+		}
+		else {
+			if (!CURRENTLY_AGGROED && WISH_TO_REGAIN_STANCE) {  // if not forced to attack and wish to regain stance
+				if ( tryBestPossibleDefWithInitiativeBoliao(cp, cp2, threatManuever, secondExchange)) {
+					return true;
+				}
+				
+			}
+		}
+		return tryBestPossibleAttackBoliao(cp, cp2, null, secondExchange);
 	}
-	
-	
-	
+	private static inline function tryBestPossibleDefWithInitiativeBoliao(cp:Int, cp2:Int, threatManuever:AIManueverChoice, secondExchange:Bool):Bool {
+		var result:Bool = false;
+		if ( getFleeOrDefend(false, cp, MOCK_RETURN_ATTACK.manueverCP, MOCK_RETURN_ATTACK.manueverTN, true, 0, 0, secondExchange) ) {
+			if ( isFleeingManuever(MANUEVER_CHOICE.manuever) ) {
+				result = true;
+			}
+			else if ( cp > 2 && getBorderlineDefense(cp - 2, MOCK_RETURN_ATTACK.manueverCP, MOCK_RETURN_ATTACK.manueverTN, true, (secondExchange ? FLAG_USE_ALL_CP : 0), 0 ) )  {
+				MANUEVER_CHOICE.waitForQuickDefense();
+				result = true;
+				
+			}
+		}
+		return result;
+	}
 	
 	
 	private static inline function addPossibleRegularManueverChoice(index:Int):Void {
@@ -1875,6 +2044,7 @@ class TROSAiBot
 
 	private static inline var BUDGET_SKIP:Int = -1;
 	private static var MANUEVER_CHOICE_CONSIDER_MASTER:AIManueverChoice = new AIManueverChoice();
+
 
 	
 	

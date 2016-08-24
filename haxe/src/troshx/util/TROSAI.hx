@@ -251,6 +251,8 @@ class AIManueverChoice {
 		
 	}
 	
+	
+	
 	public inline function nothing():Void {
 		manuever = "";
 		manueverCP = 0;
@@ -259,6 +261,15 @@ class AIManueverChoice {
 		offhand = false;
 		againstID = 0;
 		secondary = null;
+	}
+	
+	
+	public static var DO_NOTHING:String = "doNothing";
+	public static var DO_NOTHING_WAIT_FOR_DEFENSE:String = "waitForQuickDefense";
+	public inline function waitForQuickDefense():Void {
+		nothing();
+		manuever = DO_NOTHING_WAIT_FOR_DEFENSE;
+		manueverType = TYPE_DEFENDING;
 	}
 	
 	public function setupSecondAttack(manuever:String, manueverCP:Int, manueverTN:Int, targetZone:Int, cost:Int, offhand:Bool = false):Void {

@@ -17,6 +17,10 @@ class ManueverSheet
 		
 	}
 	
-	
+	static public function isDamagingManuever(ms:String) 
+	{
+		// todo: proper manuever parameter
+		return ms == "cut" || ms == "spike" || ms == "thrust" || ms == "bash";
+	}	
 	
 }

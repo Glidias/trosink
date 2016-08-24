@@ -42,6 +42,7 @@ class Manuever
 	public static inline var MANUEVER_TYPE_MELEE:Int = 0;
 	public static inline var MANUEVER_TYPE_RANGED:Int = 1;
 
+	public static inline var DAMAGE_TYPE_NONE:Int = 0;
 	public static inline var DAMAGE_TYPE_CUTTING:Int =1;
 	public static inline var DAMAGE_TYPE_PUNCTURING:Int = 2;  // used to denote "true" thrusting weapons
 	public static inline var DAMAGE_TYPE_BLUDGEONING:Int = 3;

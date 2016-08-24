@@ -139,9 +139,10 @@ Vue.directive('dat-slider',{  // Binds to Dat.gui controller's domElement.firstC
 		var self = this;
 		this._datController = $(this.el).data("dat-controller");
 			this._datController.onChange( function(val) {
-			var precision = self._datController.__precision;
-			val =val.toFixed(precision);
-			//console.log("Setting val:"+val);
+			//console.log(typeof(val));
+			//var precision = self._datController.__precision;
+			//val =val.toFixed(precision);
+			//console.log("Setting val:"+val + (typeof(val)));
 			self.vm.$set( self.expression, val );
 		 });
 	},
