@@ -19,8 +19,8 @@ class ReflectUtil
 		return setItemMethodsTo(c, to, false);
 	}
 	
-	public static function getMetaDataOfField(metaName:String, t:Dynamic, fieldName:Dynamic, isStatic:Bool=false):Dynamic {
-		var meta = isStatic ? Meta.getStatics(t) : Meta.getFields(t);
+	public static function getMetaDataOfField(metaName:String, c:Class<Dynamic>, t:Dynamic, fieldName:Dynamic, isStatic:Bool=false):Dynamic {
+		var meta = isStatic ? Meta.getStatics(c) : Meta.getFields(c);
 		var fieldMeta = Reflect.field(meta, fieldName);
 		if (Reflect.hasField(fieldMeta, metaName)) {
 			return Reflect.field(fieldMeta, metaName);
@@ -70,9 +70,9 @@ class ReflectUtil
 	
 	
 	
-	public static function setItemFieldsTo<T>(c:Class<T>, to:Dynamic, isStatic:Bool=false, requireMeta:String=null):Dynamic {
+	public static function setItemFieldsTo<T>(c:Class<T>, to:Dynamic, isStatic:Bool=false, requireMeta:String=null, reference:Dynamic=null):Dynamic {
 		var rtti = Rtti.getRtti(c);
-		var reference:Dynamic = isStatic ? c : Type.createEmptyInstance(c);
+		if (reference == null) reference = isStatic ? c : Type.createEmptyInstance(c);
 		var meta = isStatic ? Meta.getStatics(c) : Meta.getFields(c);
 		for (f in (isStatic ? rtti.statics : rtti.fields ).iterator() ) {
 			var fieldMeta = Reflect.field(meta, f.name);

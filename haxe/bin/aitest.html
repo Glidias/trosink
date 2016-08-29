@@ -229,7 +229,7 @@ window.onload = function() {
 	function executeStaticAIMethod() {
 		var result = DatUtil.callInstanceMethodWithPacket(TROSAiBot, this);
 			if (result) {
-			var metaAdditionalData = ReflectUtil.getMetaDataOfField("return", TROSAiBot, this.name, true);
+			var metaAdditionalData = ReflectUtil.getMetaDataOfField("return", TROSAiBot, TROSAiBot,this.name, true);
 			
 			
 			if (metaAdditionalData!= null) {

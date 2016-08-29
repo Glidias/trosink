@@ -24,6 +24,7 @@ VAR AVAIL_counter = 0
 VAR AVAIL_rota = 0
 VAR AVAIL_expulsion = 0
 VAR AVAIL_disarm = 0
+VAR AVAIL_StealInitiative = 0
 
 === function getDamageTypeLabel(damageType) 
 { 
@@ -514,7 +515,25 @@ Blunt Weapon offhand: {_blunt2}
 isAI?:{_isAI}
 */
 
+// all recorded attack action availabilities
+~AVAIL_bash = 0
+~AVAIL_spike = 0
+~AVAIL_cut = 0
+~AVAIL_thrust = 0
+~AVAIL_beat = 0
+~AVAIL_bindstrike = 0
 
+// all recorded defend actoin availabilities
+~AVAIL_block = 0
+~AVAIL_parry = 0
+~AVAIL_duckweave = 0
+~AVAIL_partialevasion = 0
+~AVAIL_fullevasion = 0
+~AVAIL_blockopenstrike = 0
+~AVAIL_counter = 0
+~AVAIL_rota = 0
+~AVAIL_expulsion = 0
+~AVAIL_disarm = 0
 
 
 ~temp altAction
@@ -1956,7 +1975,7 @@ AttemptDefendersManuever loose-ended exception found :: Should NOT HAPPEN!!
 					// assumption made by convention... with manuever without neither damage Type or attack zone
 					~useDamageType = 0
 					~shockToInflict = 0
-				- usingWeapon && usingWeaponBlunt:
+				- usingWeapon && usingWeaponBlunt && usingWeaponDamage3:
 					~useDamageType = DAMAGE_TYPE_BLUDGEONING
 					~_weaponBonusDamage = usingWeaponDamage3
 				- _atk_targetZone >= THRUST_INDEX:

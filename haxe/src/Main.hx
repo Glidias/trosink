@@ -1,5 +1,6 @@
 package ;
 
+import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
 import troshx.BodyChar;
 import troshx.ZoneBody;
@@ -25,7 +26,8 @@ class Main
 	
 	static function main() 
 	{
-		
+		var data = ReflectUtil.getMetaDataOfField("bind", TROSAiBot, "initiative", false);
+		var b = data[0];
 	}
 	
 }

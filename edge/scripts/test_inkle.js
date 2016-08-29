@@ -34,11 +34,40 @@ function InkleSessionInstance(socket) {
 				using Ink.Runtime;
 				using System.Collections.Generic;
 				using troshx.tros.ai;
-	
 
 				public class Startup
 				{
 					Story _story;
+					
+					public static void setupBindingsForBot(Story _story, string prefixChar, TROSAiBot bot) {
+						System.Console.WriteLine("Tracing bind variables...");
+							object d = new global::haxe.lang.DynamicObject(new int[]{}, new object[]{}, new int[]{}, new double[]{});
+							global::troshx.util.ReflectUtil.setItemFieldsTo<object>(typeof(global::troshx.tros.ai.TROSAiBot), d, new global::haxe.lang.Null<bool>(false, true), "bind", null);
+							int _g = 0;
+							global::haxe.root.Array<object> _g1 = global::haxe.root.Reflect.fields(d);
+						
+							while (( _g < _g1.length )) {
+								string p = global::haxe.lang.Runtime.toString(_g1[_g]);
+								 ++ _g;
+								
+								 //(metaName:String, t:Dynamic, fieldName:Dynamic, isStatic:Bool=false
+									global::haxe.root.Array<object> metaData = (global::haxe.root.Array<object>)(global::troshx.util.ReflectUtil.getMetaDataOfField("bind", typeof(TROSAiBot), bot, p, new global::haxe.lang.Null<bool>(false, true)));
+									
+									// System.Console.WriteLine(prefixChar+metaData[0]);
+									string fullFieldName =  prefixChar+metaData[0];
+									global::haxe.root.Reflect.setField(d, fullFieldName, p);
+				
+									global::haxe.root.Reflect.setField(bot, p, _story.variablesState[fullFieldName]);
+									System.Console.WriteLine(p + " SETTING : "+_story.variablesState[fullFieldName]);
+									
+									_story.ObserveVariable(prefixChar+metaData[0],  (string varName, object newValue) => {
+										string propToSet = (string)global::haxe.root.Reflect.field(d, varName);
+										System.Console.WriteLine(prefixChar+ ":"+(bot.id) + ": "+propToSet +  "="+newValue);
+										global::haxe.root.Reflect.setField(bot,propToSet , newValue);
+									});
+								
+							}
+					}
 
 
 					public async Task<object> Invoke(string input)
@@ -46,9 +75,11 @@ function InkleSessionInstance(socket) {
 						 _story = new Story(input);
 						
 						 //TROSAiBotInkle.bindWatchesForInk<TROSAiBot>(typeof(TROSAiBot), _story, null);
-						 object d = new global::haxe.lang.DynamicObject(new int[]{}, new object[]{}, new int[]{}, new double[]{});
-						global::troshx.util.ReflectUtil.setItemFieldsTo<object>(typeof(global::troshx.tros.ai.TROSAiBot), d, new global::haxe.lang.Null<bool>(true, true), "watch");
+						
 						{
+							System.Console.WriteLine("Tracing watch variables...");
+							object d = new global::haxe.lang.DynamicObject(new int[]{}, new object[]{}, new int[]{}, new double[]{});
+						global::troshx.util.ReflectUtil.setItemFieldsTo<object>(typeof(global::troshx.tros.ai.TROSAiBot), d, new global::haxe.lang.Null<bool>(true, true), "watch", null);
 							int _g = 0;
 							global::haxe.root.Array<object> _g1 = global::haxe.root.Reflect.fields(d);
 						
@@ -56,9 +87,13 @@ function InkleSessionInstance(socket) {
 								string p = global::haxe.lang.Runtime.toString(_g1[_g]);
 								 ++ _g;
 								 _story.ObserveVariable(p,  TROSAiBotInkle.staticVarSetter);
-								global::haxe.Log.trace.__hx_invoke2_o(default(double), p, default(double), new global::haxe.lang.DynamicObject(new int[]{302979532, 1547539107, 1648581351}, new object[]{"main", "Main", "Main.hx"}, new int[]{1981972957}, new double[]{((double) (31) )}));
+								 System.Console.WriteLine(p);
 							}
 						}
+						TROSAiBot bot = new TROSAiBot();
+						TROSAiBot bot2 = new TROSAiBot();
+						setupBindingsForBot(_story, "charPersonName", bot);
+						setupBindingsForBot(_story, "charPersonName2", bot2);
 						
 						 return new {
 							helloWorld = (Func<object,Task<object>>)(

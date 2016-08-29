@@ -36,7 +36,8 @@ class TROSAiBot
 	
 	// Combat related
 	@bind("_id") public var id:Int;
-	@bind("_fight_initiative") public var initiative:Bool;
+	@bind("_fight_initiative") public var fight_initiative:Int;
+
 	@bind("_fight_stance") public var stance:Int;
 	@bind("_manueverUsingHands") public var manueverUsingHands:Int = 0;
 
@@ -2425,6 +2426,18 @@ class TROSAiBot
 		
 		return false;
 	}
+	
+	function get_initiative():Bool 
+	{
+		return fight_initiative !=0;
+	}
+	
+	function set_initiative(value:Bool):Bool 
+	{
+		return (fight_initiative = value ? 1 : 0) !=0;
+	}
+	
+	public var initiative(get_initiative, set_initiative):Bool;
 	
 	
 	

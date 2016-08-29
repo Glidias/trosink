@@ -375,7 +375,7 @@ VAR charPersonName2_picked = 0
 // CharacterSheet 
 // for each char (tag charPersonName)
 ///* utest player var
-CONST charPersonName_id = 1
+VAR charPersonName_id = 1
 VAR charPersonName_label = "CharPersonName"
 VAR charPersonName_strength = 4
 VAR charPersonName_toughness = 4
@@ -392,11 +392,11 @@ VAR charPersonName_totalPain = 0
 VAR charPersonName_totalBL = 0
 VAR charPersonName_health = 4
 VAR charPersonName_totalHealth = 4
-VAR charPersonName_equipOffhand = "shield"
-VAR charPersonName_equipMasterhand = "gladius"
+VAR charPersonName_equipOffhand = "Small Shield"
+VAR charPersonName_equipMasterhand = "Gladius"
 //*/
 ///* utest var
-CONST charPersonName2_id = 2
+VAR charPersonName2_id = 2
 VAR charPersonName2_label = "CharPersonName2"
 VAR charPersonName2_strength = 4
 VAR charPersonName2_toughness = 4
@@ -406,15 +406,15 @@ VAR charPersonName2_mobility = 6
 VAR charPersonName2_endurance = 4
 VAR charPersonName2_perception = 4
 VAR charPersonName2_usingProfeciency = "massweapons"
-VAR charPersonName2_usingProfeciencyLevel = 11
+VAR charPersonName2_usingProfeciencyLevel = 8
 VAR charPersonName2_carryOverShock = 0
 VAR charPersonName2_cp = 0
 VAR charPersonName2_totalPain = 0
 VAR charPersonName2_totalBL = 0
 VAR charPersonName2_health = 4
 VAR charPersonName2_totalHealth = 4
-VAR charPersonName2_equipOffhand = "shield"
-VAR charPersonName2_equipMasterhand = "mace"
+VAR charPersonName2_equipOffhand = "Small Shield"
+VAR charPersonName2_equipMasterhand = "Light Mace"
 //*/
 
 
