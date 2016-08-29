@@ -12,6 +12,8 @@ import troshx.tros.HumanoidBody;
 import troshx.tros.ai.TROSAiBot;
 import dat.gui.DatUtil;
 
+import troshx.tros.ai.TROSAiBotInkle;
+
 
 /**
  * Generic Haxe Codebase for all TROS-like RPGs (for targeting any platform, Javascript/C#/AS3/etc.)
@@ -23,7 +25,7 @@ class Main
 	
 	static function main() 
 	{
-	
+		
 	}
 	
 }

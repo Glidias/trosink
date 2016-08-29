@@ -73,26 +73,26 @@ class TROSAiBot
 	}
 	
 	// all recorded attack action availabilities as  (cost - 1) for actual cost
-	@inspect({min:0}) @bind public static var AVAIL_bash = 0; 
-	@inspect({min:0}) @bind public static var AVAIL_spike = 0;  
-	@inspect({min:0}) @bind public static var AVAIL_cut = 0;	
-	@inspect({min:0}) @bind public static var AVAIL_thrust = 0;
-	@inspect({min:0}) @bind public static var AVAIL_beat = 0;
-	@inspect({min:0}) @bind public static var AVAIL_bindstrike = 0;
-	@inspect({min:0}) @bind public static var AVAIL_hook = 0;
+	@inspect({min:0}) @watch public static var AVAIL_bash = 0; 
+	@inspect({min:0}) @watch public static var AVAIL_spike = 0;  
+	@inspect({min:0}) @watch public static var AVAIL_cut = 0;	
+	@inspect({min:0}) @watch public static var AVAIL_thrust = 0;
+	@inspect({min:0}) @watch public static var AVAIL_beat = 0;
+	@inspect({min:0}) @watch public static var AVAIL_bindstrike = 0;
+	@inspect({min:0}) @watch public static var AVAIL_hook = 0;
 
 	// all recorded defend actoin availabilities  as  (cost - 1) for actual cost
-	@inspect({min:0}) @bind public static var AVAIL_block = 0;
-	@inspect({min:0}) @bind public static var AVAIL_parry = 0;
-	@inspect({min:0}) @bind public static var AVAIL_duckweave = 0;
-	@inspect({min:0}) @bind public static var AVAIL_partialevasion = 0;
-	@inspect({min:0}) @bind public static var AVAIL_fullevasion = 0;
-	@inspect({min:0}) @bind public static var AVAIL_blockopenstrike = 0;
-	@inspect({min:0}) @bind public static var AVAIL_counter = 0;
-	@inspect({min:0}) @bind public static var AVAIL_rota = 0;
-	@inspect({min:0}) @bind public static var AVAIL_expulsion = 0;
-	@inspect({min:0}) @bind public static var AVAIL_disarm = 0;
-	@inspect({min:0}) @bind public static var AVAIL_StealInitiative = 0;
+	@inspect({min:0}) @watch public static var AVAIL_block = 0;
+	@inspect({min:0}) @watch public static var AVAIL_parry = 0;
+	@inspect({min:0}) @watch public static var AVAIL_duckweave = 0;
+	@inspect({min:0}) @watch public static var AVAIL_partialevasion = 0;
+	@inspect({min:0}) @watch public static var AVAIL_fullevasion = 0;
+	@inspect({min:0}) @watch public static var AVAIL_blockopenstrike = 0;
+	@inspect({min:0}) @watch public static var AVAIL_counter = 0;
+	@inspect({min:0}) @watch public static var AVAIL_rota = 0;
+	@inspect({min:0}) @watch public static var AVAIL_expulsion = 0;
+	@inspect({min:0}) @watch public static var AVAIL_disarm = 0;
+	@inspect({min:0}) @watch public static var AVAIL_StealInitiative = 0;
 	
 	private static function setTypicalAVAILCostsForTesting():Void {
 		AVAIL_bash = 1;
