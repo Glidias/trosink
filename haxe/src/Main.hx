@@ -26,8 +26,7 @@ class Main
 	
 	static function main() 
 	{
-		var data = ReflectUtil.getMetaDataOfField("bind", TROSAiBot, "initiative", false);
-		var b = data[0];
+
 	}
 	
 }

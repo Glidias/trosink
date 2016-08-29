@@ -159,8 +159,6 @@ var Main = function() { };
 $hxClasses["Main"] = Main;
 Main.__name__ = ["Main"];
 Main.main = function() {
-	var data = troshx_util_ReflectUtil.getMetaDataOfField("bind",troshx_tros_ai_TROSAiBot,"initiative",false);
-	var b = data[0];
 };
 Math.__name__ = ["Math"];
 var Reflect = function() { };
