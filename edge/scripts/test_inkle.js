@@ -33,6 +33,8 @@ function InkleSessionInstance(socket) {
 				using System.Threading.Tasks;
 				using Ink.Runtime;
 				using System.Collections.Generic;
+				using troshx.tros.ai;
+	
 
 				public class Startup
 				{
@@ -42,12 +44,34 @@ function InkleSessionInstance(socket) {
 					public async Task<object> Invoke(string input)
 					{
 						 _story = new Story(input);
-				
+						
+						 //TROSAiBotInkle.bindWatchesForInk<TROSAiBot>(typeof(TROSAiBot), _story, null);
+						 object d = new global::haxe.lang.DynamicObject(new int[]{}, new object[]{}, new int[]{}, new double[]{});
+						global::troshx.util.ReflectUtil.setItemFieldsTo<object>(typeof(global::troshx.tros.ai.TROSAiBot), d, new global::haxe.lang.Null<bool>(true, true), "watch");
+						{
+							int _g = 0;
+							global::haxe.root.Array<object> _g1 = global::haxe.root.Reflect.fields(d);
+						
+							while (( _g < _g1.length )) {
+								string p = global::haxe.lang.Runtime.toString(_g1[_g]);
+								 ++ _g;
+								 _story.ObserveVariable(p,  TROSAiBotInkle.staticVarSetter);
+								global::haxe.Log.trace.__hx_invoke2_o(default(double), p, default(double), new global::haxe.lang.DynamicObject(new int[]{302979532, 1547539107, 1648581351}, new object[]{"main", "Main", "Main.hx"}, new int[]{1981972957}, new double[]{((double) (31) )}));
+							}
+						}
+						
 						 return new {
 							helloWorld = (Func<object,Task<object>>)(
 								async (i) => 
 								{ 
 									return "Hello world: "+i;
+								}
+							)
+							,helloTest = (Func<object,Task<object>>)(
+								async (i) => 
+								{ 
+									
+									return "Hello test: "+i;
 								}
 							)
 							,helloStory = (Func<object,Task<object>>)(
@@ -141,6 +165,7 @@ function InkleSessionInstance(socket) {
 		else {
 			console.log("Successfully compiled.");
 			//var testoutput = inklePackage.helloStory(null, true);
+			//inklePackage.helloTest(null, true);
 
 		}
 	}

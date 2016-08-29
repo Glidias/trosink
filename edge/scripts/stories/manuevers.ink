@@ -5,6 +5,25 @@ CONST MANUEVER_HAND_MASTER = 1
 CONST MANUEVER_HAND_SECONDARY = 2
 CONST MANUEVER_HAND_BOTH = 3
 
+// all recorded attack action availabilities
+VAR AVAIL_bash = 0
+VAR AVAIL_spike = 0
+VAR AVAIL_cut = 0
+VAR AVAIL_thrust = 0
+VAR AVAIL_beat = 0
+VAR AVAIL_bindstrike = 0
+
+// all recorded defend actoin availabilities
+VAR AVAIL_block = 0
+VAR AVAIL_parry = 0
+VAR AVAIL_duckweave = 0
+VAR AVAIL_partialevasion = 0
+VAR AVAIL_fullevasion = 0
+VAR AVAIL_blockopenstrike = 0
+VAR AVAIL_counter = 0
+VAR AVAIL_rota = 0
+VAR AVAIL_expulsion = 0
+VAR AVAIL_disarm = 0
 
 === function getDamageTypeLabel(damageType) 
 { 
@@ -495,25 +514,7 @@ Blunt Weapon offhand: {_blunt2}
 isAI?:{_isAI}
 */
 
-// all recorded attack action availabilities
-~temp AVAIL_bash = 0
-~temp AVAIL_spike = 0
-~temp AVAIL_cut = 0
-~temp AVAIL_thrust = 0
-~temp AVAIL_beat = 0
-~temp AVAIL_bindstrike = 0
 
-// all recorded defend actoin availabilities
-~temp AVAIL_block = 0
-~temp AVAIL_parry = 0
-~temp AVAIL_duckweave = 0
-~temp AVAIL_partialevasion = 0
-~temp AVAIL_fullevasion = 0
-~temp AVAIL_blockopenstrike = 0
-~temp AVAIL_counter = 0
-~temp AVAIL_rota = 0
-~temp AVAIL_expulsion = 0
-~temp AVAIL_disarm = 0
 
 
 ~temp altAction
