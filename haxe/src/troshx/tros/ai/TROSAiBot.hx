@@ -167,6 +167,7 @@ class TROSAiBot
 	@inject private static var CURRENT_OPPONENT:TROSAiBot;
 	// equipment, body link
 	
+	public static var CP_ALREADY_PAID:Bool = true;
 	
 	
 	//private static inline var COMBO_None:Int = 0;
@@ -2306,6 +2307,8 @@ class TROSAiBot
 		
 	}
 	
+
+	
 	// step 1 setup
 	public function preDeclareManuevers(target:TROSAiBot, targetedBy:Array<TROSAiBot>):Void {
 		handsUsedUp = manueverUsingHands;
@@ -2335,12 +2338,37 @@ class TROSAiBot
 		
 	}
 	
+	public function getRemainingCPLeftIfUnpaid():Int {
+		var cpLeft:Int = cp;
+		for (i in 0...decidedManuevers.length) {
+			cpLeft -= decidedManuevers[i].getManueverCPSpent();
+		}
+		return cpLeft;
+	}
+	
+	
+	public function getTotalThreatCPAgainst(targetId:Int):Int {
+		var cpAccum:Int = CP_ALREADY_PAID ? cp : getRemainingCPLeftIfUnpaid();
+		var choice:AIManueverChoice;
+		choice = decidedManuevers[0];
+		if (choice.againstID == targetId) {
+			cpAccum += choice.getManueverCPSpent();
+		}
+		choice = decidedManuevers[1];
+		if (choice.againstID == targetId) {
+			cpAccum += choice.getManueverCPSpent();
+		}
+		return cpAccum;
+	}
+	
 	// step 2 decide
+	/* // can't work because each AVAIL context must be set up accordingly externally first
 	public function declareManuevers():Void {
 		for (i in 0...opponentLen) {
 			declareManueverAgainstOpponent(i);
 		}
 	}
+	*/
 	
 	
 	// -----
@@ -2383,13 +2411,14 @@ class TROSAiBot
 		if (threatManuever2 != null) {
 			// assign cpAvailable2 from cpAvailable
 		}
+		var opponentCP:Int = getTotalThreatCPAgainst(id);
 		
 		// Determine manuever
 		
 		if (currentExchange != 2) {  // consider a specific combo, assumed exchange 1
 			if (initiative) {
 				// decide on best combo with initiative
-				if ( setBestComboActionWithInitiativePlan(cp, opponent.cp, threatManuever) ) {
+				if ( setBestComboActionWithInitiativePlan(cp, opponentCP, threatManuever) ) {
 					plannedCombos[index] = MANUEVER_COMBO_SET; 
 					MANUEVER_CHOICE_SET.copyTo(decidedManuevers[index]);
 					return true;
@@ -2398,7 +2427,7 @@ class TROSAiBot
 			}
 			else {
 				// decide on best combo without initaitive
-				if ( setBestComboActionWithoutInitiativePlan(cp, opponent.cp, threatManuever) ) {
+				if ( setBestComboActionWithoutInitiativePlan(cp, opponentCP, threatManuever) ) {
 					plannedCombos[index] = MANUEVER_COMBO_SET; 
 					MANUEVER_CHOICE_SET.copyTo(decidedManuevers[index]);
 					return true;
@@ -2408,7 +2437,7 @@ class TROSAiBot
 		else {		// assumed exchange 2
 			// if got combo, use 2nd action for combo
 			if ( plannedCombos[index] != 0 ) {
-				if ( getComboAction( plannedCombos[index], cp, opponent.cp, threatManuever, initiative, true) ) {
+				if ( getComboAction( plannedCombos[index], cp, opponentCP, threatManuever, initiative, true) ) {
 					MANUEVER_CHOICE.copyTo(decidedManuevers[index]);
 					decidedManuevers[index].manueverCP = cpAvailable;
 					return true;
@@ -2418,10 +2447,10 @@ class TROSAiBot
 		
 		// use fallback action here
 		if (initiative) {
-			return tryBestPossibleAttackOrDefBoliao(cp, opponent.cp, threatManuever, currentExchange == 2);
+			return tryBestPossibleAttackOrDefBoliao(cp, opponentCP, threatManuever, currentExchange == 2);
 		}
 		else {
-			return tryBestPossibleDefenseBoliao(cp, opponent.cp, threatManuever, currentExchange == 2);
+			return tryBestPossibleDefenseBoliao(cp, opponentCP, threatManuever, currentExchange == 2);
 		}
 		
 		return false;
