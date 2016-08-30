@@ -2311,7 +2311,7 @@ class TROSAiBot
 	
 	// step 1 setup
 	public function preDeclareManuevers(target:TROSAiBot, targetedBy:Array<TROSAiBot>):Void {
-		handsUsedUp = manueverUsingHands;
+		
 		
 		// update
 		opponents[0] = target;
@@ -2377,6 +2377,8 @@ class TROSAiBot
 	// Main consideration against opponent
 	
 	public function declareManueverAgainstOpponent(index:Int):Bool {
+		
+		handsUsedUp = manueverUsingHands;
 		
 		B_EQUIP = (handsUsedUp & Manuever.MANUEVER_HAND_MASTER) == 0 ? equipMasterhand : null;
 		D_EQUIP = (handsUsedUp & Manuever.MANUEVER_HAND_SECONDARY) == 0 ?  equipOffhand : null;
