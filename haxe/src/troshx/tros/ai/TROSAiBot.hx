@@ -2376,6 +2376,22 @@ class TROSAiBot
 	
 	// Main consideration against opponent
 	
+	public function declareManueverAgainstOpponentId(oppId:Int):Bool {
+		var index:Int = getOpponentIndex(oppId);
+		if (index < 0) {
+			trace("Exception couldn't find opponent by id:" + oppId);
+			return false;
+		}
+		return declareManueverAgainstOpponent(index);
+	}
+	
+	public function getOpponentIndex(oppId:Int):Int {
+		for (i in 0...opponentLen) {
+			if (opponents[i].id == oppId) return i;
+		}
+		return -1;
+	}
+	
 	public function declareManueverAgainstOpponent(index:Int):Bool {
 		
 		handsUsedUp = manueverUsingHands;
