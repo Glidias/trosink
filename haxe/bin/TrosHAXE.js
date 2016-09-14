@@ -2963,38 +2963,6 @@ troshx_components_FightState.prototype = {
 	,__class__: troshx_components_FightState
 	,__properties__: {get_paused:"get_paused"}
 };
-var troshx_components_ManueverStack = function() {
-	this.stack = [];
-};
-$hxClasses["troshx.components.ManueverStack"] = troshx_components_ManueverStack;
-troshx_components_ManueverStack.__name__ = ["troshx","components","ManueverStack"];
-troshx_components_ManueverStack.prototype = {
-	stack: null
-	,reset: function() {
-		this.stack.length = 0;
-	}
-	,reverseOrder: function() {
-		this.stack.reverse();
-	}
-	,pushManuever: function(manueverObj) {
-		this.stack.push(manueverObj);
-	}
-	,sortOnLowestToHighestReflex: function() {
-		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
-			if(a.reflexScore != b.reflexScore) {
-				if(a.reflexScore > b.reflexScore) return 1; else return -1;
-			} else return 0;
-		});
-	}
-	,sortOnHighestToLowestReflex: function(property) {
-		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
-			if(a.reflexScore != b.reflexScore) {
-				if(a.reflexScore > b.reflexScore) return -1; else return 1;
-			} else return 0;
-		});
-	}
-	,__class__: troshx_components_ManueverStack
-};
 var troshx_core_BodyChar = $hx_exports.troshx.core.BodyChar = function() {
 	this.zones = [];
 	this.zones[0] = null;
@@ -3159,6 +3127,38 @@ troshx_core_Manuever.prototype = {
 	,type: null
 	,__class__: troshx_core_Manuever
 };
+var troshx_core_ManueverStack = function() {
+	this.stack = [];
+};
+$hxClasses["troshx.core.ManueverStack"] = troshx_core_ManueverStack;
+troshx_core_ManueverStack.__name__ = ["troshx","core","ManueverStack"];
+troshx_core_ManueverStack.prototype = {
+	stack: null
+	,reset: function() {
+		this.stack.length = 0;
+	}
+	,reverseOrder: function() {
+		this.stack.reverse();
+	}
+	,pushManuever: function(manueverObj) {
+		this.stack.push(manueverObj);
+	}
+	,sortOnLowestToHighestReflex: function() {
+		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
+			if(a.reflexScore != b.reflexScore) {
+				if(a.reflexScore > b.reflexScore) return 1; else return -1;
+			} else return 0;
+		});
+	}
+	,sortOnHighestToLowestReflex: function(property) {
+		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
+			if(a.reflexScore != b.reflexScore) {
+				if(a.reflexScore > b.reflexScore) return -1; else return 1;
+			} else return 0;
+		});
+	}
+	,__class__: troshx_core_ManueverStack
+};
 var troshx_core_Weapon = $hx_exports.troshx.core.Weapon = function(name,profGroups) {
 	this.name = name;
 	this.profeciencies = profGroups;
@@ -3291,8 +3291,8 @@ troshx_core_ZoneBody.prototype = {
 	,__class__: troshx_core_ZoneBody
 };
 var troshx_sos_BoutController = function() {
-	this.defManueverStack = new troshx_components_ManueverStack();
-	this.manueverStack = new troshx_components_ManueverStack();
+	this.defManueverStack = new troshx_core_ManueverStack();
+	this.manueverStack = new troshx_core_ManueverStack();
 	this._messages = [];
 	this.bout = new troshx_components_Bout();
 };

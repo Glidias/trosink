@@ -1,4 +1,4 @@
-package troshx.components;
+package troshx.core;
 import haxe.ds.ArraySort;
 import troshx.components.FightState.ManueverDeclare;
 import troshx.util.LibUtil;

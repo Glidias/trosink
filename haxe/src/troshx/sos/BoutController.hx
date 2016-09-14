@@ -1,7 +1,7 @@
 package troshx.sos;
 import troshx.components.Bout;
 import troshx.components.FightState;
-import troshx.components.ManueverStack;
+import troshx.core.ManueverStack;
 import troshx.core.BoutMessage;
 import troshx.core.IBoutController;
 
