@@ -4,6 +4,7 @@ import troshx.components.FightState;
 import troshx.core.ManueverStack;
 import troshx.core.BoutMessage;
 import troshx.core.IBoutController;
+import troshx.util.LibUtil;
 
 /**
  * A localized bout controller class using Song of Swords rules
@@ -26,6 +27,9 @@ class BoutController implements IBoutController
 	}
 	public function getMessagesCount():Int {
 		return _messages.length;
+	}
+	public function clearMessages():Void {
+		LibUtil.clearArray(_messages);
 	}
 	
 	private var _messages:Array<BoutMessage>  = [];
@@ -54,7 +58,6 @@ class BoutController implements IBoutController
 	
 	public function handleCurrentStep():Bool
 	{
-		
 		var step:Int = bout.state.s;
 		if (step == STEP_ORIENTATION_OR_RESOLVE) {
 			//  resolve manuever  stacks

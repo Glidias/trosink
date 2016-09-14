@@ -16,4 +16,5 @@ interface IBoutController
   
   function getMessages():Array<BoutMessage>;
   function getMessagesCount():Int;
+  function clearMessages():Void;
 }

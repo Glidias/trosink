@@ -3075,6 +3075,7 @@ troshx_core_IBoutController.prototype = {
 	,setBout: null
 	,getMessages: null
 	,getMessagesCount: null
+	,clearMessages: null
 	,__class__: troshx_core_IBoutController
 };
 var troshx_core_ICharacterSheet = function() { };
@@ -3312,6 +3313,9 @@ troshx_sos_BoutController.prototype = {
 	}
 	,getMessagesCount: function() {
 		return this._messages.length;
+	}
+	,clearMessages: function() {
+		this._messages.length = 0;
 	}
 	,_messages: null
 	,manueverStack: null
