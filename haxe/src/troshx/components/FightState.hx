@@ -242,6 +242,11 @@ class FightState
 		return this.side != fight.side;
 	}
 	
+	public inline function matchScheduleWith(other:FightState):Void {
+		s = other.s;
+		e = other.e;
+	}
+	
 	// this happens after a successful full disengagement, or during a battle exchange pause
 	public function reset(disengaged:Bool = false):FightState {
 		// battle exchange pause

@@ -2780,6 +2780,14 @@ troshx_components_Bout.prototype = {
 	,combatants: null
 	,__class__: troshx_components_Bout
 };
+var troshx_components_FightNode = function() { };
+$hxClasses["troshx.components.FightNode"] = troshx_components_FightNode;
+troshx_components_FightNode.__name__ = ["troshx","components","FightNode"];
+troshx_components_FightNode.prototype = {
+	fight: null
+	,charSheet: null
+	,__class__: troshx_components_FightNode
+};
 var troshx_components_FightState = function() {
 	this.lastAttacking = false;
 	this.shortRangeAdvantage = false;
@@ -2927,6 +2935,10 @@ troshx_components_FightState.prototype = {
 	,hostileTowards: function(fight) {
 		return this.side != fight.side;
 	}
+	,matchScheduleWith: function(other) {
+		this.s = other.s;
+		this.e = other.e;
+	}
 	,reset: function(disengaged) {
 		if(disengaged == null) disengaged = false;
 		this.s = 0;
@@ -3067,9 +3079,39 @@ troshx_core_BodyChar.prototype = {
 	}
 	,__class__: troshx_core_BodyChar
 };
+var troshx_core_BoutMessage = function() {
+};
+$hxClasses["troshx.core.BoutMessage"] = troshx_core_BoutMessage;
+troshx_core_BoutMessage.__name__ = ["troshx","core","BoutMessage"];
+troshx_core_BoutMessage.create = function(type,text) {
+	if(type == null) type = 0;
+	var me = new troshx_core_BoutMessage();
+	me.type = type;
+	me.text = text;
+	return me;
+};
+troshx_core_BoutMessage.prototype = {
+	text: null
+	,type: null
+	,__class__: troshx_core_BoutMessage
+};
 var troshx_core_GameRules = $hx_exports.troshx.core.GameRules = function() { };
 $hxClasses["troshx.core.GameRules"] = troshx_core_GameRules;
 troshx_core_GameRules.__name__ = ["troshx","core","GameRules"];
+var troshx_core_IBoutController = function() { };
+$hxClasses["troshx.core.IBoutController"] = troshx_core_IBoutController;
+troshx_core_IBoutController.__name__ = ["troshx","core","IBoutController"];
+troshx_core_IBoutController.prototype = {
+	step: null
+	,handleCurrentStep: null
+	,setBout: null
+	,getMessages: null
+	,getMessagesCount: null
+	,__class__: troshx_core_IBoutController
+};
+var troshx_core_ICharacterSheet = function() { };
+$hxClasses["troshx.core.ICharacterSheet"] = troshx_core_ICharacterSheet;
+troshx_core_ICharacterSheet.__name__ = ["troshx","core","ICharacterSheet"];
 var troshx_core_Manuever = $hx_exports.troshx.core.Manuever = function(id,name,cost) {
 	if(cost == null) cost = 0;
 	this.type = 0;
@@ -3251,19 +3293,49 @@ troshx_core_ZoneBody.prototype = {
 var troshx_sos_BoutController = function() {
 	this.defManueverStack = new troshx_components_ManueverStack();
 	this.manueverStack = new troshx_components_ManueverStack();
+	this._messages = [];
+	this.bout = new troshx_components_Bout();
 };
 $hxClasses["troshx.sos.BoutController"] = troshx_sos_BoutController;
 troshx_sos_BoutController.__name__ = ["troshx","sos","BoutController"];
+troshx_sos_BoutController.__interfaces__ = [troshx_core_IBoutController];
 troshx_sos_BoutController.prototype = {
 	bout: null
+	,setBout: function(val) {
+		this.bout = val;
+	}
+	,waitForPlayer: function() {
+		return null;
+	}
+	,getMessages: function() {
+		return this._messages;
+	}
+	,getMessagesCount: function() {
+		return this._messages.length;
+	}
+	,_messages: null
 	,manueverStack: null
 	,defManueverStack: null
 	,step: function() {
 		this.bout.state.step(this.bout.state.s == 2);
+		var _g_head = this.bout.combatants.h;
+		var _g_val = null;
+		while(_g_head != null) {
+			var f;
+			f = (function($this) {
+				var $r;
+				_g_val = _g_head[0];
+				_g_head = _g_head[1];
+				$r = _g_val;
+				return $r;
+			}(this));
+			f.fight.matchScheduleWith(this.bout.state);
+		}
 	}
-	,updateFightState: function(fightState) {
-		fightState.s = this.bout.state.s;
-		fightState.e = this.bout.state.e;
+	,handleCurrentStep: function() {
+		var step = this.bout.state.s;
+		if(step == 0) return true; else if(step == 1) return true; else if(step == 2) return true; else throw new js__$Boot_HaxeError("Unhandled step:" + step);
+		return false;
 	}
 	,__class__: troshx_sos_BoutController
 };
@@ -5801,6 +5873,9 @@ troshx_core_BodyChar.WOUND_TYPE_PIERCE = 2;
 troshx_core_BodyChar.WOUND_TYPE_BLUNT_TRAUMA = 4;
 troshx_core_BodyChar.WOUND_D_DESTROY = 1;
 troshx_core_BodyChar.WOUND_D_DEATH = 2;
+troshx_core_BoutMessage.TYPE_NONE = 0;
+troshx_core_BoutMessage.TYPE_PLAYERS_TURN = 1;
+troshx_core_BoutMessage.TYPE_RESOLVE_MANUEVER = 2;
 troshx_core_GameRules.__meta__ = { statics : { FLEE_CAP : { inspect : [{ display : "selector"}], choices : ["FLEE_CAP"]}}};
 troshx_core_GameRules.__rtti = "<class path=\"troshx.core.GameRules\" params=\"\">\n\t<FLEE_CAP_NONE public=\"1\" get=\"inline\" set=\"null\" expr=\"0\" line=\"13\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>0</e></m></meta>\n\t</FLEE_CAP_NONE>\n\t<FLEE_CAP_BY_MOBILITY_EXCHANGE1 public=\"1\" get=\"inline\" set=\"null\" expr=\"1\" line=\"14\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>1</e></m></meta>\n\t</FLEE_CAP_BY_MOBILITY_EXCHANGE1>\n\t<FLEE_CAP_BY_MOBILITY_ALL public=\"1\" get=\"inline\" set=\"null\" expr=\"2\" line=\"15\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>2</e></m></meta>\n\t</FLEE_CAP_BY_MOBILITY_ALL>\n\t<FLEE_CAP public=\"1\" expr=\"FLEE_CAP_NONE\" line=\"17\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta>\n\t\t\t<m n=\":value\"><e>FLEE_CAP_NONE</e></m>\n\t\t\t<m n=\"inspect\"><e>{display:\"selector\"}</e></m>\n\t\t\t<m n=\"choices\"><e>\"FLEE_CAP\"</e></m>\n\t\t</meta>\n\t</FLEE_CAP>\n\t<meta>\n\t\t<m n=\":directlyUsed\"/>\n\t\t<m n=\":expose\"/>\n\t\t<m n=\":rtti\"/>\n\t</meta>\n</class>";
 troshx_core_GameRules.FLEE_CAP_NONE = 0;
