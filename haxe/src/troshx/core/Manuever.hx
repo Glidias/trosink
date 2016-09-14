@@ -1,10 +1,11 @@
-package troshx.tros;
-import troshx.BodyChar;
+package troshx.core;
+import troshx.core.BodyChar;
 
 /**
  * ...
  * @author Glidias
  */
+ 
 @:expose
 class Manuever
 {
@@ -52,6 +53,11 @@ class Manuever
 	
 	public static inline var DEFEND_TYPE_OFFHAND:UInt = 1;
 	public static inline var DEFEND_TYPE_MASTERHAND:UInt = 2;
+	
+	public var type:Int = 0;
+	public static inline var TYPE_NONE:Int = 0;
+	public static inline var TYPE_DEFENSIVE:Int = 1;
+	public static inline var TYPE_OFFENSIVE:Int = 2;
 
 	public function new(id:String, name:String,  cost:Int = 0) {
 		this.id = id;

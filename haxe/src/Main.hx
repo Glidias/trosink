@@ -2,8 +2,11 @@ package ;
 
 import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
-import troshx.BodyChar;
-import troshx.ZoneBody;
+import troshx.core.BodyChar;
+import troshx.core.ZoneBody;
+
+import troshx.components.FightState;
+import troshx.sos.BoutController;
 
 import troshx.util.TROSAI;
 import troshx.util.ReflectUtil;
@@ -26,7 +29,7 @@ class Main
 	
 	static function main() 
 	{
-
+		
 	}
 	
 }

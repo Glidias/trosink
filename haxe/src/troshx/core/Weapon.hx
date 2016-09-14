@@ -1,5 +1,6 @@
-package troshx.tros;
-import troshx.BodyChar;
+package troshx.core;
+import troshx.core.BodyChar;
+import troshx.core.Manuever;
 
 /**
  * ...

@@ -1,4 +1,4 @@
-package troshx;
+package troshx.core;
 
 /**
  * ...

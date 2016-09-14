@@ -1,5 +1,6 @@
 package troshx.tros;
 import haxe.ds.StringMap;
+import troshx.core.Weapon;
 
 /**
  * ...

@@ -1,10 +1,11 @@
 package troshx.tros.ai;
 import haxe.ds.Vector;
 import haxe.ds.Vector;
-import troshx.BodyChar;
-import troshx.tros.Manuever;
+import troshx.core.BodyChar;
+import troshx.core.Manuever;
+import troshx.core.GameRules;
 import troshx.tros.ManueverSheet;
-import troshx.tros.Weapon;
+import troshx.core.Weapon;
 import troshx.tros.WeaponSheet;
 import troshx.util.TROSAI;
 

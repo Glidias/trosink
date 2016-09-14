@@ -1,4 +1,4 @@
-package troshx;
+package troshx.core;
 
 /**
  * Generic common/game rules for TROS-like games

@@ -46,6 +46,9 @@ function exposeHxMappingClassesToGlobalNamespace() {
 	for (p in troshx.util) {
 		window[p] = troshx.util[p];
 	}
+	for (p in troshx.core) {
+		window[p] = troshx.core[p];
+	}
 }
 exposeHxMappingClassesToGlobalNamespace();
 var TJSON = tjson.TJSON;

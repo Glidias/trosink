@@ -1,6 +1,6 @@
 package troshx.tros;
-import troshx.BodyChar;
-import troshx.ZoneBody;
+import troshx.core.BodyChar;
+import troshx.core.ZoneBody;
 
 /**
  * Humanoid Body definition for The Riddle of Steel
