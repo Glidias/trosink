@@ -84,6 +84,23 @@ class Weapon
 			(strikeATN == 0 ? -thrustATN : strikeATN);
 	}
 	
+	public inline function getInlineTest():Float {
+		var abc  = 3;
+		var weap:Weapon = weaponListInlineTest[0];
+
+		var resultant =  getInlineTest2(abc) + 99999.22222 + weap.getInlineTest2();
+		return resultant;
+	}
+	
+	public var weaponListInlineTest:Array<Weapon>;
+	
+	public inline function getInlineTest2(val:Int=0, val2:Int=5):Int {
+		var testVar =val + val2 +  Std.int( Math.random() * dtn2);
+		testVar += damage;
+		return damage2 + testVar;
+	}
+	
+	
 	
 
 	public function new(name:String, profGroups:Array<String>) {

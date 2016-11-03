@@ -13,36 +13,19 @@ import troshx.util.LibUtil;
 class BoutController implements IBoutController
 {
 	// IBoutController boilerplate
-	private var bout:Bout = new Bout();
-	public function setBout(val:Bout):Void {
-		bout = val;
-	}
+	private var model:BoutModel = new BoutModel();
 	
-	public function waitForPlayer():FightState {
-		return null;
-	}
-	
-	public function getMessages():Array<BoutMessage> {
-		return _messages;
-	}
-	public function getMessagesCount():Int {
-		return _messages.length;
-	}
-	public function clearMessages():Void {
-		LibUtil.clearArray(_messages);
-	}
-	
-	private var _messages:Array<BoutMessage>  = [];
-	
+
 	// Song of Swords implementation
-	
 	public static inline var STEP_ORIENTATION_OR_RESOLVE:Int = 0;
 	public static inline var STEP_TARGET_SELECTION:Int = 1;
 	public static inline var STEP_DECLARATION:Int = 2;
 	public static inline var TOTAL_STEPS:Int = 3;
 			
-	private var manueverStack:ManueverStack= new ManueverStack();
-	private var defManueverStack:ManueverStack = new ManueverStack();
+	public function waitForPlayer():FightState {
+		return null;
+	}
+	
 	
 	public function new() 
 	{
@@ -50,15 +33,15 @@ class BoutController implements IBoutController
 	}
 	
 	public  function step():Void {
-		bout.state.step(bout.state.s == (TOTAL_STEPS - 1));
-		for (f in bout.combatants) {
-			f.fight.matchScheduleWith(bout.state);
+		model.bout.state.step(model.bout.state.s == (TOTAL_STEPS - 1));
+		for (f in model.bout.combatants) {
+			f.fight.matchScheduleWith(model.bout.state);
 		}
 	}
 	
 	public function handleCurrentStep():Bool
 	{
-		var step:Int = bout.state.s;
+		var step:Int = model.bout.state.s;
 		if (step == STEP_ORIENTATION_OR_RESOLVE) {
 			//  resolve manuever  stacks
 			

@@ -12,9 +12,5 @@ interface IBoutController
   
   function handleCurrentStep():Bool;
   
-  function setBout(val:Bout):Void;
-  
-  function getMessages():Array<BoutMessage>;
-  function getMessagesCount():Int;
-  function clearMessages():Void;
+
 }

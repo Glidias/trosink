@@ -160,6 +160,7 @@ var Main = function() { };
 $hxClasses["Main"] = Main;
 Main.__name__ = ["Main"];
 Main.main = function() {
+	troshx_util_ReflectVueJSUtil;
 };
 Math.__name__ = ["Math"];
 var Reflect = function() { };
@@ -2799,6 +2800,7 @@ var troshx_components_FightState = function() {
 	this.flags = 0;
 	this.targetedByFlags = 0;
 	this.targetLocked = false;
+	this.target__ = null;
 	this.initiative = false;
 	this.numEnemies = 0;
 	this.side = 1;
@@ -2819,11 +2821,17 @@ troshx_components_FightState.prototype = {
 	,side: null
 	,numEnemies: null
 	,initiative: null
-	,target: null
+	,target__: null
+	,get_target: function() {
+		return this.target__;
+	}
+	,set_target: function(value) {
+		return this.target__ = value;
+	}
 	,targetLocked: null
 	,paused: null
 	,get_paused: function() {
-		if(this.target == null) return this.targetedByFlags == 0; else return this.target.target == this && !this.target.initiative && !this.initiative || this.target.target != this && !this.initiative && this.traceExceptionIsPaused();
+		if(this.get_target() == null) return this.targetedByFlags == 0; else return this.get_target().get_target() == this && !this.get_target().initiative && !this.initiative || this.get_target().get_target() != this && !this.initiative && this.traceExceptionIsPaused();
 	}
 	,targetedByFlags: null
 	,flags: null
@@ -2833,7 +2841,7 @@ troshx_components_FightState.prototype = {
 	}
 	,orientation: null
 	,hasOrientationInitiative: function(targetFight) {
-		return this.orientation == 3 || this.orientation != 1 && (this.target == targetFight && targetFight.target != this || this.orientation > targetFight.orientation);
+		return this.orientation == 3 || this.orientation != 1 && (this.get_target() == targetFight && targetFight.get_target() != this || this.orientation > targetFight.orientation);
 	}
 	,getInitiativeTowards: function(fightState) {
 		if(this.orientation == 0) if(this.initiative) {
@@ -2954,14 +2962,14 @@ troshx_components_FightState.prototype = {
 			this.numEnemies = 0;
 			this.flags = 0;
 			this.targetedByFlags = 0;
-			this.target = null;
+			this.set_target(null);
 			this.rounds = 0;
 			this.resetManuevers();
 		}
 		return this;
 	}
 	,__class__: troshx_components_FightState
-	,__properties__: {get_paused:"get_paused"}
+	,__properties__: {get_paused:"get_paused",set_target:"set_target",get_target:"get_target"}
 };
 var troshx_core_BodyChar = $hx_exports.troshx.core.BodyChar = function() {
 	this.zones = [];
@@ -3072,11 +3080,17 @@ troshx_core_IBoutController.__name__ = ["troshx","core","IBoutController"];
 troshx_core_IBoutController.prototype = {
 	step: null
 	,handleCurrentStep: null
-	,setBout: null
+	,__class__: troshx_core_IBoutController
+};
+var troshx_core_IBoutModel = function() { };
+$hxClasses["troshx.core.IBoutModel"] = troshx_core_IBoutModel;
+troshx_core_IBoutModel.__name__ = ["troshx","core","IBoutModel"];
+troshx_core_IBoutModel.prototype = {
+	setBout: null
 	,getMessages: null
 	,getMessagesCount: null
 	,clearMessages: null
-	,__class__: troshx_core_IBoutController
+	,__class__: troshx_core_IBoutModel
 };
 var troshx_core_ICharacterSheet = function() { };
 $hxClasses["troshx.core.ICharacterSheet"] = troshx_core_ICharacterSheet;
@@ -3247,6 +3261,20 @@ troshx_core_Weapon.prototype = {
 			} else if(strikeATN < thrustATN) return strikeATN; else return -thrustATN;
 		} else if(strikeATN == 0) return -thrustATN; else return strikeATN;
 	}
+	,getInlineTest: function() {
+		var abc = 3;
+		var weap = this.weaponListInlineTest[0];
+		var resultant = this.getInlineTest2(abc,null) + 99999.22222 + weap.getInlineTest2(null,null);
+		return resultant;
+	}
+	,weaponListInlineTest: null
+	,getInlineTest2: function(val,val2) {
+		if(val2 == null) val2 = 5;
+		if(val == null) val = 0;
+		var testVar = val + val2 + Std["int"](Math.random() * this.dtn2);
+		testVar += this.damage;
+		return this.damage2 + testVar;
+	}
 	,__class__: troshx_core_Weapon
 };
 var troshx_core_ZoneBody = function() {
@@ -3292,37 +3320,19 @@ troshx_core_ZoneBody.prototype = {
 	,__class__: troshx_core_ZoneBody
 };
 var troshx_sos_BoutController = function() {
-	this.defManueverStack = new troshx_core_ManueverStack();
-	this.manueverStack = new troshx_core_ManueverStack();
-	this._messages = [];
-	this.bout = new troshx_components_Bout();
+	this.model = new troshx_sos_BoutModel();
 };
 $hxClasses["troshx.sos.BoutController"] = troshx_sos_BoutController;
 troshx_sos_BoutController.__name__ = ["troshx","sos","BoutController"];
 troshx_sos_BoutController.__interfaces__ = [troshx_core_IBoutController];
 troshx_sos_BoutController.prototype = {
-	bout: null
-	,setBout: function(val) {
-		this.bout = val;
-	}
+	model: null
 	,waitForPlayer: function() {
 		return null;
 	}
-	,getMessages: function() {
-		return this._messages;
-	}
-	,getMessagesCount: function() {
-		return this._messages.length;
-	}
-	,clearMessages: function() {
-		this._messages.length = 0;
-	}
-	,_messages: null
-	,manueverStack: null
-	,defManueverStack: null
 	,step: function() {
-		this.bout.state.step(this.bout.state.s == 2);
-		var _g_head = this.bout.combatants.h;
+		this.model.bout.state.step(this.model.bout.state.s == 2);
+		var _g_head = this.model.bout.combatants.h;
 		var _g_val = null;
 		while(_g_head != null) {
 			var f;
@@ -3333,15 +3343,43 @@ troshx_sos_BoutController.prototype = {
 				$r = _g_val;
 				return $r;
 			}(this));
-			f.fight.matchScheduleWith(this.bout.state);
+			f.fight.matchScheduleWith(this.model.bout.state);
 		}
 	}
 	,handleCurrentStep: function() {
-		var step = this.bout.state.s;
+		var step = this.model.bout.state.s;
 		if(step == 0) return true; else if(step == 1) return true; else if(step == 2) return true; else throw new js__$Boot_HaxeError("Unhandled step:" + step);
 		return false;
 	}
 	,__class__: troshx_sos_BoutController
+};
+var troshx_sos_BoutModel = function() {
+	this.defManueverStack = new troshx_core_ManueverStack();
+	this.manueverStack = new troshx_core_ManueverStack();
+	this._messages = [];
+	this.bout = new troshx_components_Bout();
+};
+$hxClasses["troshx.sos.BoutModel"] = troshx_sos_BoutModel;
+troshx_sos_BoutModel.__name__ = ["troshx","sos","BoutModel"];
+troshx_sos_BoutModel.__interfaces__ = [troshx_core_IBoutModel];
+troshx_sos_BoutModel.prototype = {
+	bout: null
+	,setBout: function(val) {
+		this.bout = val;
+	}
+	,_messages: null
+	,getMessages: function() {
+		return this._messages;
+	}
+	,getMessagesCount: function() {
+		return this._messages.length;
+	}
+	,clearMessages: function() {
+		this._messages.length = 0;
+	}
+	,manueverStack: null
+	,defManueverStack: null
+	,__class__: troshx_sos_BoutModel
 };
 var troshx_tros_HumanoidBody = $hx_exports.troshx.tros.HumanoidBody = function() {
 	troshx_core_BodyChar.call(this);
@@ -5692,6 +5730,27 @@ troshx_util_ReflectUtil.setItemMethodsTo = function(c,to,isStatic,requireMeta) {
 	}
 	return to;
 };
+var troshx_util_ReflectVueJSUtil = $hx_exports.troshx.util.ReflectVueJSUtil = function() {
+};
+$hxClasses["troshx.util.ReflectVueJSUtil"] = troshx_util_ReflectVueJSUtil;
+troshx_util_ReflectVueJSUtil.__name__ = ["troshx","util","ReflectVueJSUtil"];
+troshx_util_ReflectVueJSUtil.setupClasses = function(arrOfClasses) {
+	var _g1 = 0;
+	var _g = arrOfClasses.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		arrOfClasses[i].prototype.RefClassName = arrOfClasses[i].__name__.pop();
+	}
+};
+troshx_util_ReflectVueJSUtil.getRefObjGetter = function(refClassName,prop) {
+	return function() {   return this[prop] != null ? _Ref[refClassName][this[prop]] : null } ;
+};
+troshx_util_ReflectVueJSUtil.getRefObjSetter = function(refClassName,prop) {
+	return function(val) {  if (val == null) { this[prop] = null; return; }; if (!_Ref[refClassName][val._refid]) { _Ref[refClassName][val._refid] = val }; if (_Ref[refClassName][val._refid] != val) throw new Error('ERROR non-unique id for referential instance!'+val); this[prop] = val._refid; }
+};
+troshx_util_ReflectVueJSUtil.prototype = {
+	__class__: troshx_util_ReflectVueJSUtil
+};
 var troshx_util_TROSAI = $hx_exports.troshx.util.TROSAI = function() {
 };
 $hxClasses["troshx.util.TROSAI"] = troshx_util_TROSAI;
@@ -5859,6 +5918,7 @@ haxe_xml_Parser.escapes = (function($this) {
 }(this));
 js_Boot.__toStr = {}.toString;
 tjson_TJSON.OBJECT_REFERENCE_PREFIX = "@~obRef#";
+troshx_components_FightState.__meta__ = { fields : { target : { ref : null}}};
 troshx_components_FightState.GOT_INITIATIVE = 2;
 troshx_components_FightState.CONTESTING_INITIATIVE = 1;
 troshx_components_FightState.NO_INITIATIVE = 0;
@@ -5903,7 +5963,7 @@ troshx_core_Manuever.DEFEND_TYPE_MASTERHAND = 2;
 troshx_core_Manuever.TYPE_NONE = 0;
 troshx_core_Manuever.TYPE_DEFENSIVE = 1;
 troshx_core_Manuever.TYPE_OFFENSIVE = 2;
-troshx_core_Weapon.__rtti = "<class path=\"troshx.core.Weapon\" params=\"\">\n\t<ATTR_BASE_NONE public=\"1\" get=\"inline\" set=\"null\" expr=\"-1\" line=\"39\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>-1</e></m></meta>\n\t</ATTR_BASE_NONE>\n\t<ATTR_BASE_STRENGTH public=\"1\" get=\"inline\" set=\"null\" expr=\"0\" line=\"40\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>0</e></m></meta>\n\t</ATTR_BASE_STRENGTH>\n\t<HOOK_STRIKE get=\"inline\" set=\"null\" expr=\"1\" line=\"42\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>1</e></m></meta>\n\t</HOOK_STRIKE>\n\t<HOOK_THRUST get=\"inline\" set=\"null\" expr=\"2\" line=\"43\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>2</e></m></meta>\n\t</HOOK_THRUST>\n\t<createDyn public=\"1\" set=\"method\" line=\"112\" static=\"1\"><f a=\"name:profGroups:properties\">\n\t<c path=\"String\"/>\n\t<c path=\"Array\"><c path=\"String\"/></c>\n\t<d/>\n\t<c path=\"troshx.core.Weapon\"/>\n</f></createDyn>\n\t<atn public=\"1\"><x path=\"Int\"/></atn>\n\t<atn2 public=\"1\"><x path=\"Int\"/></atn2>\n\t<dtn public=\"1\"><x path=\"Int\"/></dtn>\n\t<dntT public=\"1\"><x path=\"Int\"/></dntT>\n\t<dtn2 public=\"1\"><x path=\"Int\"/></dtn2>\n\t<damage public=\"1\"><x path=\"Int\"/></damage>\n\t<damage2 public=\"1\"><x path=\"Int\"/></damage2>\n\t<damage3 public=\"1\"><x path=\"Int\"/></damage3>\n\t<shield public=\"1\"><x path=\"Bool\"/></shield>\n\t<profeciencies public=\"1\"><c path=\"Array\"><c path=\"String\"/></c></profeciencies>\n\t<name public=\"1\"><c path=\"String\"/></name>\n\t<drawCutModifier public=\"1\"><x path=\"Int\"/></drawCutModifier>\n\t<attrBaseIndex public=\"1\"><x path=\"Int\"/></attrBaseIndex>\n\t<twoHanded public=\"1\"><x path=\"Bool\"/></twoHanded>\n\t<rangedWeapon public=\"1\"><x path=\"Bool\"/></rangedWeapon>\n\t<cpPenalty public=\"1\"><x path=\"Float\"/></cpPenalty>\n\t<movePenalty public=\"1\"><x path=\"Float\"/></movePenalty>\n\t<shieldLimit public=\"1\"><x path=\"Int\"/></shieldLimit>\n\t<blunt public=\"1\"><x path=\"Bool\"/></blunt>\n\t<range public=\"1\"><x path=\"Int\"/></range>\n\t<hooking public=\"1\"><x path=\"Int\"/></hooking>\n\t<getDamageTo public=\"1\" set=\"method\" line=\"46\"><f a=\"body:manuever:targetZone:margin:strength\">\n\t<c path=\"troshx.core.BodyChar\"/>\n\t<c path=\"troshx.core.Manuever\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n</f></getDamageTo>\n\t<getHookingATN public=\"1\" set=\"method\" line=\"65\">\n\t\t<f a=\"?tieBiasToThrust\" v=\"false\">\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{tieBiasToThrust:false}</e></m></meta>\n\t</getHookingATN>\n\t<getHookingATNType public=\"1\" set=\"method\" line=\"79\">\n\t\t<f a=\"?tieBiasToThrust\" v=\"false\">\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{tieBiasToThrust:false}</e></m></meta>\n\t</getHookingATNType>\n\t<new public=\"1\" set=\"method\" line=\"89\"><f a=\"name:profGroups\">\n\t<c path=\"String\"/>\n\t<c path=\"Array\"><c path=\"String\"/></c>\n\t<x path=\"Void\"/>\n</f></new>\n\t<meta>\n\t\t<m n=\":directlyUsed\"/>\n\t\t<m n=\":expose\"/>\n\t\t<m n=\":rtti\"/>\n\t</meta>\n</class>";
+troshx_core_Weapon.__rtti = "<class path=\"troshx.core.Weapon\" params=\"\">\n\t<ATTR_BASE_NONE public=\"1\" get=\"inline\" set=\"null\" expr=\"-1\" line=\"39\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>-1</e></m></meta>\n\t</ATTR_BASE_NONE>\n\t<ATTR_BASE_STRENGTH public=\"1\" get=\"inline\" set=\"null\" expr=\"0\" line=\"40\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>0</e></m></meta>\n\t</ATTR_BASE_STRENGTH>\n\t<HOOK_STRIKE get=\"inline\" set=\"null\" expr=\"1\" line=\"42\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>1</e></m></meta>\n\t</HOOK_STRIKE>\n\t<HOOK_THRUST get=\"inline\" set=\"null\" expr=\"2\" line=\"43\" static=\"1\">\n\t\t<x path=\"Int\"/>\n\t\t<meta><m n=\":value\"><e>2</e></m></meta>\n\t</HOOK_THRUST>\n\t<createDyn public=\"1\" set=\"method\" line=\"129\" static=\"1\"><f a=\"name:profGroups:properties\">\n\t<c path=\"String\"/>\n\t<c path=\"Array\"><c path=\"String\"/></c>\n\t<d/>\n\t<c path=\"troshx.core.Weapon\"/>\n</f></createDyn>\n\t<atn public=\"1\"><x path=\"Int\"/></atn>\n\t<atn2 public=\"1\"><x path=\"Int\"/></atn2>\n\t<dtn public=\"1\"><x path=\"Int\"/></dtn>\n\t<dntT public=\"1\"><x path=\"Int\"/></dntT>\n\t<dtn2 public=\"1\"><x path=\"Int\"/></dtn2>\n\t<damage public=\"1\"><x path=\"Int\"/></damage>\n\t<damage2 public=\"1\"><x path=\"Int\"/></damage2>\n\t<damage3 public=\"1\"><x path=\"Int\"/></damage3>\n\t<shield public=\"1\"><x path=\"Bool\"/></shield>\n\t<profeciencies public=\"1\"><c path=\"Array\"><c path=\"String\"/></c></profeciencies>\n\t<name public=\"1\"><c path=\"String\"/></name>\n\t<drawCutModifier public=\"1\"><x path=\"Int\"/></drawCutModifier>\n\t<attrBaseIndex public=\"1\"><x path=\"Int\"/></attrBaseIndex>\n\t<twoHanded public=\"1\"><x path=\"Bool\"/></twoHanded>\n\t<rangedWeapon public=\"1\"><x path=\"Bool\"/></rangedWeapon>\n\t<cpPenalty public=\"1\"><x path=\"Float\"/></cpPenalty>\n\t<movePenalty public=\"1\"><x path=\"Float\"/></movePenalty>\n\t<shieldLimit public=\"1\"><x path=\"Int\"/></shieldLimit>\n\t<blunt public=\"1\"><x path=\"Bool\"/></blunt>\n\t<range public=\"1\"><x path=\"Int\"/></range>\n\t<hooking public=\"1\"><x path=\"Int\"/></hooking>\n\t<getDamageTo public=\"1\" set=\"method\" line=\"46\"><f a=\"body:manuever:targetZone:margin:strength\">\n\t<c path=\"troshx.core.BodyChar\"/>\n\t<c path=\"troshx.core.Manuever\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n\t<x path=\"Int\"/>\n</f></getDamageTo>\n\t<getHookingATN public=\"1\" set=\"method\" line=\"65\">\n\t\t<f a=\"?tieBiasToThrust\" v=\"false\">\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{tieBiasToThrust:false}</e></m></meta>\n\t</getHookingATN>\n\t<getHookingATNType public=\"1\" set=\"method\" line=\"79\">\n\t\t<f a=\"?tieBiasToThrust\" v=\"false\">\n\t\t\t<x path=\"Bool\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{tieBiasToThrust:false}</e></m></meta>\n\t</getHookingATNType>\n\t<getInlineTest public=\"1\" get=\"inline\" set=\"null\" line=\"87\"><f a=\"\"><x path=\"Float\"/></f></getInlineTest>\n\t<weaponListInlineTest public=\"1\"><c path=\"Array\"><c path=\"troshx.core.Weapon\"/></c></weaponListInlineTest>\n\t<getInlineTest2 public=\"1\" get=\"inline\" set=\"null\" line=\"97\">\n\t\t<f a=\"?val:?val2\" v=\"0:5\">\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t\t<x path=\"Int\"/>\n\t\t</f>\n\t\t<meta><m n=\":value\"><e>{val2:5,val:0}</e></m></meta>\n\t</getInlineTest2>\n\t<new public=\"1\" set=\"method\" line=\"106\"><f a=\"name:profGroups\">\n\t<c path=\"String\"/>\n\t<c path=\"Array\"><c path=\"String\"/></c>\n\t<x path=\"Void\"/>\n</f></new>\n\t<meta>\n\t\t<m n=\":directlyUsed\"/>\n\t\t<m n=\":expose\"/>\n\t\t<m n=\":rtti\"/>\n\t</meta>\n</class>";
 troshx_core_Weapon.ATTR_BASE_NONE = -1;
 troshx_core_Weapon.ATTR_BASE_STRENGTH = 0;
 troshx_core_Weapon.HOOK_STRIKE = 1;

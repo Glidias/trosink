@@ -7,10 +7,14 @@ import troshx.util.LibUtil;
  * @author Glidias
  */
 typedef ManueverDeclare = {
-	var manuever:Manuever;
+
+	// results dumped here, not ideal, but ah well..
 	@:optional var marginSuccess:Int;
 	@:optional var reflexScore:Float;
 	@:optional var successes:Int;
+
+	// manuever declare properties
+	var manuever:Manuever;
 	var numDice:Int;
 	@:optional var from:FightState;
 	@:optional var tn:Int;
@@ -29,14 +33,28 @@ class FightState
 	
 	// side affiliiation..hmm
 	public var side:Int = 1;
-	
+
 	
 	// riddle stuff here
 	public var numEnemies:Int = 0;
 	public var initiative:Bool = false;  //  initaitive  flag. 
-	public var target:FightState; // flag to indicate if got existing target aqquired or not
+	
+	
+	var target__:FightState = null;
+	@ref public var target(get, set):FightState; 
+	public #if refer_inline inline #end function get_target():FightState 
+	{
+		return target__;
+	}
+	public #if refer_inline inline #end function set_target(value:FightState):FightState 
+	{
+		return target__ = value;
+	}
+	
+	
 	public var targetLocked:Bool = false;  // flag to indicate fighter cannot change target..
 
+	
 	
 	public var paused(get, null):Bool;
 	function get_paused():Bool 
@@ -121,6 +139,9 @@ class FightState
 	public var lastAttacking:Bool = false; // flag to indicate if was attacking on last declared move
 	public var combatPool:Int;
 	public var shock:Int;
+	
+
+	
 	
 	public function resetManueverObj(obj:ManueverDeclare):Void {
 		obj.manuever = null;
@@ -288,6 +309,9 @@ class FightState
 		
 	}
 	
+	
+	
+
 
 	
 }

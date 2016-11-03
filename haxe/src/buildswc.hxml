@@ -1,0 +1,4 @@
+-swf ../lib/troshx.swc
+-swf-version 10
+-main Main
+-dce no
