@@ -51,8 +51,8 @@ class AppMutator
 		Helpers.Move(4, 2);
 	}
 	
-	public static function doSomething<S:AppState>(payload:Int, context:Dynamic=null):S->Int->Void {
-		return function(state:S, payload:Int):Void  {
+	public static function doSomething<S:AppState, P:Int>(payload:P, context:Dynamic=null):S->P->Void {
+		return function(state:S, payload:P):Void  {
 			state.value = payload;
 		}
 	}

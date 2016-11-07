@@ -1,6 +1,7 @@
 package troshx.components;
 import troshx.core.Manuever;
 import troshx.util.LibUtil;
+import troshx.util.StringHashId;
 
 /**
  * Bare bones component state class for FightState per entity
@@ -25,6 +26,7 @@ typedef ManueverDeclare = {
 	
 }
 
+
 class FightState
 {
 	// instance schedule 
@@ -33,6 +35,10 @@ class FightState
 	
 	// side affiliiation..hmm
 	public var side:Int = 1;
+	
+	#if ref_required
+	var _refId:String = StringHashId.get();
+	#end
 
 	
 	// riddle stuff here
@@ -42,11 +48,11 @@ class FightState
 	
 	var target__:FightState = null;
 	@ref public var target(get, set):FightState; 
-	public #if refer_inline inline #end function get_target():FightState 
+	public #if !ref_required inline #end function get_target():FightState 
 	{
 		return target__;
 	}
-	public #if refer_inline inline #end function set_target(value:FightState):FightState 
+	public #if !ref_required inline #end function set_target(value:FightState):FightState 
 	{
 		return target__ = value;
 	}
@@ -302,11 +308,9 @@ class FightState
 	}
 	
 	
-	
-	
 	public function new() 
 	{
-		
+	
 	}
 	
 	

@@ -1,4 +1,10 @@
 package troshx.util;
+import troshx.components.Bout;
+import troshx.components.FightState;
+import troshx.core.BodyChar;
+import troshx.core.CharSheet;
+import troshx.core.Manuever;
+import troshx.core.Weapon;
 
 /**
  * https://bitbucket.org/yar3333/haxe-jsprop
@@ -12,6 +18,10 @@ class ReflectVueJSUtil
 
 	public function new() 
 	{
+		setupClasses([FightState, Bout,CharSheet, BodyChar,  Weapon, Manuever, ]);  // Profeciency
+		// BodyChar
+		// Manuever
+		// Weapon*
 		
 	}
 	

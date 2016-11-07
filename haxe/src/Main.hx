@@ -2,6 +2,11 @@ package ;
 
 import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
+import haxevx.vuex.examples.AppMutator;
+import haxevx.vuex.examples.AppStore;
+import haxevx.vuex.examples.ExampleComponent;
+import haxevx.vuex.util.ActionFactory;
+import haxevx.vuex.util.MutatorFactory;
 import troshx.core.BodyChar;
 import troshx.core.Weapon;
 import troshx.core.ZoneBody;
@@ -33,8 +38,12 @@ class Main
 	
 	static function main() 
 	{
-			ReflectVueJSUtil;
-	
+			trace(Meta.getFields( FightState));
+			MutatorFactory;
+			ActionFactory;
+			AppMutator;
+			AppStore;
+			trace(Rtti.getRtti(ExampleComponent).superClass.params);
 
 		
 	}

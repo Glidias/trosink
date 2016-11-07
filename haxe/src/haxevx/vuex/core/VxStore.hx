@@ -4,9 +4,11 @@ package haxevx.vuex.core;
  *  Base generic class for Vuex Store instance helpers
  * @author Glidias
  */
-class VxStore<S>
+class VxStore<T> implements IVxStoreContext<T>
 {
-	public var state:S;
+	public var state:T;
+	public function dispatch(type:String, payload:Dynamic=null):Void {}
+	public function commit(type:String, payload:Dynamic = null):Void {}
 
 	public function new() 
 	{

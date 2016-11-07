@@ -7,16 +7,17 @@ package haxevx.vuex.util;
 class MutatorFactory
 {
 	
+	// inlining macro to allow for dollar sign 
 	static var store(get, null):Dynamic;
 	static inline function get_store():Dynamic 
 	{
 		return untyped __js__("this.$store");
 	}
 	
-	public static function getMutatorCommit(type:String, context:Dynamic = null):Void->Void {
+	public static function getMutatorCommit(type:String, context:Dynamic = null):?Dynamic->Void {
 		// to test: possible to precompute context out of here??
-		return function() {		
-			(context != null ? context : store).commit(type);
+		return function(payload:Dynamic=null) {		
+			(context != null ? context : store).commit(type, payload);
 		};
 	}
 	

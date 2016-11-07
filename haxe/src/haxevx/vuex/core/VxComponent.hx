@@ -6,12 +6,17 @@ package haxevx.vuex.core;
  * This is where the view mediation (or template/virtual dom rendering) resides per view component.
  * @author Glidias
  */
-class VxComponent
+/**
+ * S (store state's data type),  Data (component state's data type, if any), P (component properties data type)
+ * If not applicable, use NoneT marker.
+ * 
+ */
+class VxComponent<S:IVxStore, D, P> extends VComponent<D,P>
 {
-
-	public function new() 
+	var store(get, null):S;
+	inline function get_store():S 
 	{
-		
+		return untyped __js__("this.$store");
 	}
 	
 }
