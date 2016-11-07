@@ -19,8 +19,8 @@ import haxevx.vuex.core.VxComponent;
  * RTTIProps Classes may provide metadata conventions to reflect optional properties or default values to reflect to VuejS environment,
  * if getNewProps() isn't implemented.
 
- * If a type isn't applicable (eg.a  Stateless component), use NoneT (eg. NoneT for D (data) attribute).
- * If a non-NoneT type is implemented for data, getNewData() must/SHOULD be implemented, else a runtime warning will be shown.
+ * If a data/prop type isn't applicable (eg. a  Stateless component where data is N/A), use NoneT (eg. NoneT for D (data) attribute).
+ * If a non-NoneT type is implemented for data, naturally getNewData() SHOULD be implemented, so a runtime warning will be shown if you don't.
  * 
  * Component classes should NOT have a constructor and have no need for one. Methods and getters are defined for VUEJS' methods and computed properties 
  * accordingly, and reflected accordingly to VueJS via the RTTI. 
