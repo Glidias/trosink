@@ -28,6 +28,7 @@ import haxevx.vuex.core.VxStore;
 	coordinates:Array<Float>
 }
 
+@:rtti
 class AppStore extends VxStore<AppState>
 {
 
@@ -35,11 +36,17 @@ class AppStore extends VxStore<AppState>
 	{
 		super();
 		
+		// necessary? constructor should be depciated in favour for hook methods? Nah....
 		state = {
 			value:2,
 			matrixAB:null,
 			coordinates:null
 		}
+		
+		// todo: methods to hook up static classes to reflect Mutator/Action methods that match the Store's state Type into current Store instance.
+		// SHould this be done within the constructor or outside it? Outside it seems more flexible with Store considering own self's data only..
+		AppMutator;
+		//AppAction;
 	}
 	
 }

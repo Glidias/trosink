@@ -15,4 +15,9 @@ class VxStore<T> implements IVxStoreContext<T>
 		
 	}
 	
+	public function _toNative():Dynamic {
+		return null;
+		// todo, convert to native VueX Store
+	}
+	
 }
