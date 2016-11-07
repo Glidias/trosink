@@ -15,19 +15,6 @@ import haxevx.vuex.core.VxStore;
  * 
  * @author Glidias
  */
- typedef AppState =  {
-	value:Int,
-	matrixAB: {
-		a:Int,
-		b:Int,
-		nested: {
-			c:Int,
-			d:Int
-		}
-	},
-	coordinates:Array<Float>
-}
-
 @:rtti
 class AppStore extends VxStore<AppState>
 {

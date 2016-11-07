@@ -1,6 +1,5 @@
 package haxevx.vuex.examples;
-import haxevx.vuex.examples.AppMutator.SomethingPayload;
-import haxevx.vuex.examples.AppStore.AppState;
+import haxevx.vuex.examples.AppState;
 
 /**
  * An attempt tryout. Example AppMutator and assosiated helper methods
