@@ -41,6 +41,7 @@ class Helpers {
 class AppMutator
 {
 	
+	// Consider, factor out handlers to seperate class
 	public static function doSomething<S:AppState, P:Int>(payload:P, context:IVxStore=null):S->P->Void {
 		return function(state:S, payload:P):Void  {
 			state.value = payload;
