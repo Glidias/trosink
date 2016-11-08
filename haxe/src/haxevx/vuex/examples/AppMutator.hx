@@ -19,14 +19,13 @@ import haxevx.vuex.examples.AppState;
  * @author Glidias
  */
 
-@:rtti
+
 typedef SomethingPayload = {
 	@:optional var count:Int;
 	var name:String;
 }
 
 
-@:rtti 
 class Helpers {
 	
 	// helper methods  may be inlined, but NEVER AppMutator methods!
@@ -38,17 +37,6 @@ class Helpers {
 @:rtti
 class AppMutator
 {
-	public var testTypeDef:SomethingPayload;
-	
-	
-	public function test():Void {
-		var mypayload:SomethingPayload = {name:"rete"};
-		doSomethingSpecial(mypayload);
-		
-		doSomething(3);
-		
-		Helpers.Move(4, 2);
-	}
 	
 	public static function doSomething<S:AppState, P:Int>(payload:P, context:Dynamic=null):S->P->Void {
 		return function(state:S, payload:P):Void  {
