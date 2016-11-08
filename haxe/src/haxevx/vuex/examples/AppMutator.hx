@@ -1,4 +1,5 @@
 package haxevx.vuex.examples;
+import haxevx.vuex.core.IVxStore;
 import haxevx.vuex.examples.AppState;
 
 /**
@@ -16,6 +17,8 @@ import haxevx.vuex.examples.AppState;
  * Just define the static Mutator/Action methods within the helper classes and call them from within VxComponents,
  * after the Vue store/components are initialized, and this will trigger the necessary operations accordingly!
  * 
+ * eg.  AppMutator.moveTo( {x:2, y:24});
+ * 
  * @author Glidias
  */
 
@@ -29,7 +32,7 @@ typedef SomethingPayload = {
 class Helpers {
 	
 	// helper methods  may be inlined, but NEVER AppMutator methods!
-	public static inline function Move(x:Int=0, y:Int=0, context:Dynamic = null):Void {
+	public static inline function Move(x:Int=0, y:Int=0, context:IVxStore = null):Void {
 		AppMutator.moveTo({x:x, y:y}, context);
 	}
 }
@@ -38,20 +41,20 @@ class Helpers {
 class AppMutator
 {
 	
-	public static function doSomething<S:AppState, P:Int>(payload:P, context:Dynamic=null):S->P->Void {
+	public static function doSomething<S:AppState, P:Int>(payload:P, context:IVxStore=null):S->P->Void {
 		return function(state:S, payload:P):Void  {
 			state.value = payload;
 		}
 	}
 	
 	
-	public static function moveTo<S:AppState, P: { x : Int,  y : Int }>(position:P, context:Dynamic = null):S-> P->Void {
+	public static function moveTo<S:AppState, P: { x : Int,  y : Int }>(position:P, context:IVxStore = null):S-> P->Void {
 		return function(state:S, payload:P):Void  {
 			state.value = position.y;
 		}
 	}
 	
-	public static function doSomethingSpecial<S:AppState, P:SomethingPayload>(payload:P, context:Dynamic=null):S->P->Void {
+	public static function doSomethingSpecial<S:AppState, P:SomethingPayload>(payload:P, context:IVxStore=null):S->P->Void {
 		return function(state:S, payload:P):Void  {
 			state.value = payload.count != null ? payload.count : 0;
 		}
