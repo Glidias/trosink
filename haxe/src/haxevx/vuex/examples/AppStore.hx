@@ -2,7 +2,7 @@ package haxevx.vuex.examples;
 import haxevx.vuex.core.VxStore;
 
 /**
- * Example Flux (Vuex) store and accompanying state.
+ * Example Flux (Vuex) store/module and accompanying state.
  * 
  * The T type (for sTore's sTate), can be a typedef or class, but normally, for VueJS and other typical JS flux frameworks, 
  * they encourage using plain objects due to ease of serialization, so a typedef defining required parameter constraints would suffice.
@@ -18,22 +18,32 @@ import haxevx.vuex.core.VxStore;
 @:rtti
 class AppStore extends VxStore<AppState>
 {
+	
+	// todo: figure out a way to implement store.getters implemetation for Vuex and Haxe...
+	
 
+	// IMPORTANT!
+	// Reflect any mutators and actions for Vuex store/module to implement. 
+	// Note the metadata below.
+	// Multiple instances of mutator/action meta data fields can be used, so long as they are non-derived classes between one another.
+			//@mutator var mutate:AppMutator; // mutate3D overwrites this! 
+	@mutator var mutate3D:AppMutator3D; 
+	@action var action:AppDispatcher;
+	
+	
 	public function new() 
 	{
 		super();
 		
-		// necessary? constructor should be depciated in favour for hook methods? Nah....
+		//TODO: constructor should be depciated in favour for hook methods, since some VxStores may exists as modules with on-demand created states.
 		state = {
 			value:2,
 			matrixAB:null,
-			coordinates:null
+			coordinates:null,
+			position: {x:20, y:20, z:0}
 		}
 		
-		// todo: methods to hook up static classes to reflect Mutator/Action methods that match the Store's state Type into current Store instance.
-		// SHould this be done within the constructor or outside it? Outside it seems more flexible with Store considering own self's data only..
-		AppMutator;
-		//AppAction;
+	
 	}
 	
 }

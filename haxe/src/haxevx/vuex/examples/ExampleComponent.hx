@@ -59,18 +59,25 @@ class ExamplePropsClass
 }
 >
 {
+	// created hook goes here, if being declared in extended component class
 	override function Created():Void {
 		
 	}
+	
+	// IMPORTANT, include any mutator/action helpers for  VueX-Haxe to inject them into the VueX component for usage!
+	@mutator var mutate:AppMutator; 
+	@action var action:AppDispatcher;
 
+	// getters will exist as computed properties
 	var exampleGetter(get, null):Float;
 	function get_exampleGetter():Float 
 	{
 		return store.state.coordinates != null ? store.state.coordinates[0] : 0;
 	}
 
-	function exampleMethod():Void {
-		
+	// methods will exist as
+	function exampleMethod(x:Int, y:Int):Void {
+		mutate.moveTo({x:Std.int(props.anonX+x) , y:Std.int(props.anonY+y)});
 	}
 	
 	

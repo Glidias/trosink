@@ -9,6 +9,12 @@ package haxevx.vuex.examples;
 			c:Int,
 			d:Int
 		}
+		
 	},
-	coordinates:Array<Float>
+	coordinates:Array<Float>,
+	position: {
+		x:Int,
+		y:Int,
+		z:Int
+	}
 }

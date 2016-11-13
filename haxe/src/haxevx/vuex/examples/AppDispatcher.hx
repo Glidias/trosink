@@ -5,6 +5,8 @@ import haxevx.vuex.core.IVxStore;
 import haxevx.vuex.core.IVxStoreContext;
 import js.Promise;
 
+
+
 /**
  * ...
  * @author Glidias
@@ -12,14 +14,15 @@ import js.Promise;
 @:rtti
 class AppDispatcher
 {
-
-
+	// mutators can be injected into action dispatchers
+	@mutator private var appMutator:AppMutator;
+	
 	// dispatch helper methods
-	public static function moveToAsync<T>(position:{ x : Int,  y : Int }, ?context:IVxStoreContext<T>):Promise<Bool>  {
+	public function moveToAsync<T>(position:{ x : Int,  y : Int }, ?context:IVxStoreContext<T>):Promise<Bool>  {
 		return moveToAsync_handler(context, position);
 	}
 	
-	public static function temporaryATM<T>(position:{ x : Int,  y : Int }, ?context:IVxStoreContext<T>):Promise<Bool>  {
+	public function temporaryATM<T>(position:{ x : Int,  y : Int }, ?context:IVxStoreContext<T>):Promise<Bool>  {
 		return EMPTY_HANDLER_PROMISE(context, position);
 	}
 	
@@ -29,10 +32,10 @@ class AppDispatcher
 	// Consider, factor out specific app handlers to seperate class fuile, put as reference in metadata
 	
 	// action handlers
-	static function moveToAsync_handler<T>(context:IVxStoreContext<T>, position:{ x : Int,  y : Int }):Promise<Bool>  {
+	function moveToAsync_handler<T>(context:IVxStoreContext<T>, position:{ x : Int,  y : Int }):Promise<Bool>  {
 		
 		return new Promise( function(resolve, reject):Void {
-			AppMutator.moveTo(position, context);
+			appMutator.moveTo(position);
 			resolve(true);
 		}
 		);  // promise
@@ -43,8 +46,8 @@ class AppDispatcher
 	// testing/ mock handlers
 	
 	//
-	static function EMPTY_HANDLER<T>(context:IVxStoreContext<T>, payload:Dynamic=null):Void  {}
-	static function EMPTY_HANDLER_PROMISE<T, R>(context:IVxStoreContext<T>, payload:Dynamic=null):Promise<Bool>  {
+	function EMPTY_HANDLER<T>(context:IVxStoreContext<T>, payload:Dynamic=null):Void  {}
+	function EMPTY_HANDLER_PROMISE<T, R>(context:IVxStoreContext<T>, payload:Dynamic=null):Promise<Bool>  {
 		return new Promise( function(resolve, reject):Void {	
 			resolve(false);
 		}
