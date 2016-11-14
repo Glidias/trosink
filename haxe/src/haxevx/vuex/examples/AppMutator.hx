@@ -8,7 +8,7 @@ import haxevx.vuex.examples.AppState;
  * By convention, all public static method declarations in AppMutator class will be retrieved
  * to relavant VueX Store mutators during runtime initialization, using a unqiue property key derived from the
  * Class_function name string of each registered app mutator class. THe string key is used as a type for MutatorFactory.getMutatorCommit(type),
- * and once the factory commit method is generated, it replaces the relavant class method declarations to use the factory method instead.
+ * and once the factory commit method is generated, it replaces the relavant class method declarations to use the factory commit/dispatch method instead.
  * Thus, AppMutator method calls during runtime (in VueJS), actually calls the matching MutatorFactory dynamically generated commit method!
  *
  * The coder need only to write appMutator.mutatorMethod(paylaod) in his application to trigger the relavant mutations accordingly for his App state.
@@ -42,8 +42,19 @@ class AppMutator
 	
 	// MUTATORS:
 	
-	// RTTI does include information of whether a method is inlined or not, and if so, gives a runtime critical warning for Mutator methods!
-	// Consider, factor out return handlers to seperate class file? 
+	
+	// APPROACH #1: using dynamic+overridable state-data types
+	
+	public function moveTo<P: { x : Int,  y : Int }>(payload:P):Dynamic-> P->Void {
+		return MOVE_TO;
+	}
+	
+	static function MOVE_TO(state:AppState, payload:{ x : Int,  y : Int }):Void  {
+		state.position.x = payload.x;
+		state.position.y = payload.y;
+	}
+	
+	// APPROACH #2: using fixed/static state-data types
 	
 	public function doSomething<S:AppState, P:Int>(payload:P):S->P->Void {
 		return function(state:S, payload:P):Void  {
@@ -51,14 +62,15 @@ class AppMutator
 		}
 	}
 	
-	public function moveTo<S:AppState, P: { x : Int,  y : Int }>(payload:P):S-> P->Void {
+	public function doSomethingSpecial<S:AppState, P:SomethingPayload>(payload:P):S->P->Void {
 		return function(state:S, payload:P):Void  {
-			state.position.x = payload.x;
-			state.position.y = payload.y;
+			state.value = payload.count != null ? payload.count : 0;
 		}
 	}
 	
-	public function doSomethingSpecial<S:AppState, P:SomethingPayload>(payload:P):S->P->Void {
+	// you can use :final metadata to ensure there is ONLY 1 exclusive mutator handler implementation allowed for a given mutator,
+	// to prevent modules from extending this.
+	@:final public function doSomethingSpecialAbs<S:AppState, P:SomethingPayload>(payload:P):S->P->Void {
 		return function(state:S, payload:P):Void  {
 			state.value = payload.count != null ? payload.count : 0;
 		}
