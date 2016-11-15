@@ -6,14 +6,12 @@ package haxevx.vuex.core;
  */
 class VxStore<T> implements IVxStoreContext<T>
 {
+	
 	public var state:T;
+	
 	public function dispatch(type:String, payload:Dynamic=null):Void {}
 	public function commit(type:String, payload:Dynamic = null):Void {}
 
-	public function new() 
-	{
-		
-	}
 	
 	public function _toNative():Dynamic {
 		return null;
