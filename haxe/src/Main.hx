@@ -2,9 +2,10 @@ package ;
 
 import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
-import haxevx.vuex.examples.AppMutator;
-import haxevx.vuex.examples.AppStore;
-import haxevx.vuex.examples.ExampleComponent;
+
+import haxevx.vuex.examples.shoppingcart.store.AppStore;
+
+import haxevx.vuex.examples.shoppingcart.components.App;
 import haxevx.vuex.util.ActionFactory;
 import haxevx.vuex.util.MutatorFactory;
 import troshx.core.BodyChar;
@@ -41,11 +42,12 @@ class Main
 			trace(Meta.getFields( FightState));
 			MutatorFactory;
 			ActionFactory;
-			AppMutator;
-			AppStore;
-			trace(Rtti.getRtti(ExampleComponent).superClass.params);
 
-		
+			
+			App;
+			
+
+		AppStore;
 	}
 	
 }
