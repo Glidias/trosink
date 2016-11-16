@@ -2,7 +2,9 @@ package haxevx.vuex.examples.shoppingcart.store;
 import haxevx.vuex.examples.shoppingcart.store.ObjTypes;
 
 /**
- * This implementation uses a barebones abstract+generic class approach to defining mutator-types.js in VueX example.
+ * port of store/mutation-types.js
+ * 
+ * This implementation uses a barebones abstract+generic class approach to defining mutator types in VueX example.
  * Store module mutator classes can extend this class as AppMutator<Dynamic>, and override the base methods to mutate state data types
  * specific to it's given module, or also define new mutators as fresh methods under that given extended mutator class's namespace.
  * 
@@ -27,11 +29,9 @@ class AppMutator<S>		// all mutators imply a "S" generic property indicating the
 	public function checkoutSuccess():S->Void {
 		return null;
 	}
-	public function checkoutFailure():S->Void {
+	public function checkoutFailure<P:ProductHistory>(payload:P):S->P->Void {
 		return null;
 	}
-
-
 	
 	public function receiveProducts<P:Array<ProductInStore>>(payload:P):S->P->Void {
 		return null;
@@ -41,7 +41,7 @@ class AppMutator<S>		// all mutators imply a "S" generic property indicating the
 	// CAVEATS
 	// 1. Module rootState overwrites.
 	//   Haxe doesn't allow overriding + overloading of the method, only overriding. 
-	//	Thus, if a module mutator needs to support root state as 3rd parameter, the method declaration must already support  a 3rd parameter to begin with
+	//	Thus, if a module mutator needs to support root state, the method declaration must already support  a 3rd parameter to begin with
 	// This isn't too ideal unless we come up with with some custom metadata approach to indicate overloading methods, albeit this will sacrifice compile time checking.
 
 

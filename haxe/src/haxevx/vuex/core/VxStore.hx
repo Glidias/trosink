@@ -11,6 +11,8 @@ class VxStore<T> implements IVxStoreContext<T>
 	
 	public function dispatch(type:String, payload:Dynamic=null):Void {}
 	public function commit(type:String, payload:Dynamic = null):Void {}
+	
+	public var strict:Bool = false;
 
 	
 	public function _toNative():Dynamic {

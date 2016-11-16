@@ -30,14 +30,14 @@ class ProductList extends VModule<ProductListModel>
 		return state.all;
 	}  
 
-	// (For the Haxe+JS proxy getter function, at runtime initialization, it uses runtime function body sniffing to determine linked static getter function)
-	
+	// (For the Haxe+JS proxy getter function, at runtime initialization, it uses runtime function body string sniffing to determine linked static getter function via return StaticClassPath.staticGetterName)
 	//  For the Static getter function, You aren't restricted to only returning static getter method references in this class. 
 	// Referencing any other class's static getter method is also possible.
 		// eg. return getAllProducts -versus- return SomeClass.genericStaticGetter(state).
 		
 	
 	// Actions
+	
 	
 	
 	// Mutations

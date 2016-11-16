@@ -1,6 +1,7 @@
 package haxevx.vuex.examples.shoppingcart.components;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VxComponent;
+import haxevx.vuex.examples.shoppingcart.store.AppGetters;
 import haxevx.vuex.examples.shoppingcart.store.AppStore;
 
 /**
@@ -13,7 +14,7 @@ class App extends VxComponent<AppStore, NoneT, NoneT>
 
 	public function new() 
 	{
-		
+		AppGetters;
 	}
 	
 	override public function Template():String {

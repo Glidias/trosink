@@ -93,5 +93,27 @@ class CartMutator<S:CartState> extends AppMutator<Dynamic> {
 			*/
 		}
 	}
+		
+	override public function checkoutRequest():S->Void {
+		return function(state:S):Void {
+			state.added = [];
+			state.checkoutStatus = null;
+		}
+	}
+	
+	override public function checkoutSuccess():S->Void {
+		return function(state:S):Void {
+			state.added = [];
+			state.checkoutStatus = 'successful';
+		}
+	}
+	
+	override public function checkoutFailure<P:ProductHistory>(payload:P):S->P->Void {
+		return function(state:S, payload:P):Void {
+			state.added = payload.savedCartItems;
+			state.checkoutStatus  =  'failed';
+		}
+	}
+	
 
 }
