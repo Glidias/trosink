@@ -3,11 +3,7 @@ package ;
 import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
 
-import haxevx.vuex.examples.shoppingcart.store.AppStore;
 
-import haxevx.vuex.examples.shoppingcart.components.App;
-import haxevx.vuex.util.ActionFactory;
-import haxevx.vuex.util.MutatorFactory;
 import troshx.core.BodyChar;
 import troshx.core.Weapon;
 import troshx.core.ZoneBody;
@@ -39,15 +35,7 @@ class Main
 	
 	static function main() 
 	{
-			trace(Meta.getFields( FightState));
-			MutatorFactory;
-			ActionFactory;
 
-			
-			App;
-			
-
-		AppStore;
 	}
 	
 }
