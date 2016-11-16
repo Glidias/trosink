@@ -1,9 +1,14 @@
 package haxevx.vuex.examples.shoppingcart.modules;
+import haxevx.vuex.core.IVxContext;
+import haxevx.vuex.core.IVxStoreContext;
 import haxevx.vuex.core.VModule;
 import haxevx.vuex.examples.shoppingcart.store.AppMutator;
 import haxevx.vuex.examples.shoppingcart.store.ObjTypes;
 
 /**
+ * 
+ * store/modules/cart.js
+ * port to Haxe
  * 
  * @author Glidias
  */
@@ -13,7 +18,7 @@ class Cart extends VModule<CartState>
 	
 	public function new() 
 	{
-		// initial state
+		// Initial State
 		state = {
 			added: [],
 			checkoutStatus:null,
@@ -22,7 +27,7 @@ class Cart extends VModule<CartState>
 	}
 	
 	
-	// getters
+	// Getters
 	public var checkoutStatus(get, null):String;
     static function getCheckoutStatus(state:CartState):String {
 		return state.checkoutStatus;
@@ -33,15 +38,15 @@ class Cart extends VModule<CartState>
 	}
 	
 	
-	// actions
+	// Actions
 	@mutator var action:CartDispatcher<CartState>;
 	
-	// mutators
+	// Mutators
 	@mutator var mutator:CartMutator<CartState>;
 }
 
-typedef CartState =  {
-	var added:Array<Product>;
+typedef CartState =  {	//eg. typedef style store module state
+	var added:Array<ProductInCart>;
 	var checkoutStatus:String;
 	var lastCheckout:String;
 }
@@ -50,9 +55,9 @@ class CartDispatcher<S:CartState> {
 	
 	@mutator var mutator:CartMutator<S>;
 	
-	 public function checkout<P:Array<Product>>(payload:P):Dynamic {  //S->P->Void
-		return function(state:S, payload:P):Void {
-			var savedCartItems:Array<Product> = state.added.concat([]);  
+	 public function checkout<P:Array<ProductInCart>>(payload:P):IVxStoreContext<S>->P->Void {  //
+		return function(context:IVxStoreContext<S>, payload:P):Void {
+			var savedCartItems:Array<ProductInCart> = context.state.added.concat([]);  
 			mutator.checkoutRequest();
 			
 		}

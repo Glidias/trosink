@@ -4,7 +4,7 @@ import haxevx.vuex.core.VxComponent;
 import haxevx.vuex.examples.shoppingcart.store.AppStore;
 
 /**
- * ...
+ * Root application component implementation
  * @author Glidias
  */
 @:rtti

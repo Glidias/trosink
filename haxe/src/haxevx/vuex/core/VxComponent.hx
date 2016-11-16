@@ -11,7 +11,7 @@ package haxevx.vuex.core;
  * If not applicable, use NoneT marker.
  * 
  */
-class VxComponent<S:IVxStore, D, P> extends VComponent<D,P>
+class VxComponent<S:IVxContext, D, P> extends VComponent<D,P>
 {
 	var store(get, null):S;
 	inline function get_store():S 

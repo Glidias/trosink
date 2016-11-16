@@ -4,44 +4,58 @@ import haxevx.vuex.examples.shoppingcart.store.AppMutator;
 import haxevx.vuex.examples.shoppingcart.store.ObjTypes;
 
 /**
- * 
+ * store/modules/products.js
+ * port to Haxe
  * @author Glidias
  */
 @:rtti
-class ProductList extends VModule<ProductListing>
+class ProductList extends VModule<ProductListModel>
 {
-	// initial state
+	// Initial State
 	public function new() 
 	{
-		state = new ProductListing();
+		state = new ProductListModel();
 	}
 
-	// getters
-	public var allProducts(get, null):Array<Dynamic>;
-	function get_allProducts():Array<Dynamic> 
+	// Getters
+	
+	// eg. A single store/module getter implementation defined as a paragraph of 3 declarations.
+	//  Admittingly, rather verbose to ensure compile type strict typing and code-hinting.
+	public var allProducts(get, null):Array<Dynamic>;	// 1. helper haxe getter property for module reference instance
+	function get_allProducts():Array<Dynamic> 		// 2. Haxe+JS proxy function to link to VueJS getter function via simple return statement
 	{
 		return getAllProducts(state);
 	}
-	static function getAllProducts(state:ProductListing):Array<Dynamic> {
+	static function getAllProducts(state:ProductListModel):Array<Dynamic> {  // 3. Static getter function to be registered under Vuex store under current class's namespace
 		return state.all;
-	}
+	}  
+
+	// (For the Haxe+JS proxy getter function, at runtime initialization, it uses runtime function body sniffing to determine linked static getter function)
 	
-	// actions
+	//  For the Static getter function, You aren't restricted to only returning static getter method references in this class. 
+	// Referencing any other class's static getter method is also possible.
+		// eg. return getAllProducts -versus- return SomeClass.genericStaticGetter(state).
+		
+	
+	// Actions
 	
 	
-	// mutations
-	@mutator var mutator:ProductListMutator<ProductListing>; 
+	// Mutations
+	@mutator var mutator:ProductListMutator<ProductListModel>; 
 	
 }
 
-class ProductListing {
+class ProductListModel {  //eg. class style store module state
+	
+	// ensure class's reactive states have all their properties initialized beforehand (even null references "=null"), in order to be reactive to VueJS.
 	public var all:Array<ProductInStore> = [];
+	
 	public function new() {
 		
 	}
 }
 
-class ProductListMutator<S:ProductListing> extends AppMutator<Dynamic> {
+class ProductListMutator<S:ProductListModel> extends AppMutator<Dynamic> {
 	override public function receiveProducts<P:Array<ProductInStore>>(payload:P):S->P->Void {
 		return function(state:S, payload:P):Void {
 			state.all = payload;
@@ -53,8 +67,8 @@ class ProductListMutator<S:ProductListing> extends AppMutator<Dynamic> {
 			var filtered = state.all.filter( function(p) { return p.id == payload.id;  } );
 			if (filtered.length > 0) {
 				filtered[0].inventory--;
+				
 			}
-			//state.all.find(p => p.id === id).inventory--
 		};
 	}
 	

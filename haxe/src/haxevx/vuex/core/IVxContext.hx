@@ -3,7 +3,7 @@ package haxevx.vuex.core;
 /**
  * @author Glidias
  */
-interface IVxStore 
+interface IVxContext 
 {
 	
 }
