@@ -26,6 +26,16 @@ class LibUtil
 		return Std.parseInt(val); // TOCHECK: across all platforms validity
 	}
 	
+	public static inline function field<T>(of:Dynamic<T>, field:String):T {
+		return Reflect.field(of, field);
+	}
+	public static inline function setField<T>(of:Dynamic<T>, field:String, value:T):Void {
+		Reflect.setField(of, field, value);
+	}
+	public static function setFieldChain<T>(of:Dynamic<T>, field:String, value:T):T {
+		Reflect.setField(of, field, value);
+		return value;
+	}
 
 	
 	public static function arrayToList<T>(arr:Array<T>):List<T> {

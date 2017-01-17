@@ -41,8 +41,8 @@ class WeaponSheet
 	public static var LIST:Array<Weapon> = [
 		//Weapon.createDyn("Akinakes", "
 		Weapon.createDyn("Short Sword", ["cutthrust", "swordshield"], { "range":1, "atn":7, "atn2":5, "dtn":7,   "damage": -1, "damage2":1  } )
-	//	,Weapon.createDyn("Kick", ["pugilism"], { "range":0, "atn":7, "dtn":8,  "shieldLimit":1, "damage":-1, "blunt":true  } )
-	//	,Weapon.createDyn("Punch", ["pugilism"], { "range":0, "atn":5, "dtn":6, "shieldLimit":1,  "damage":-2, "blunt":true  } )
+		,Weapon.createDyn("Kick", ["pugilism"], { "range":0, "atn":7, "dtn":8,  "shieldLimit":1, "damage":-1, "blunt":true  } )
+		,Weapon.createDyn("Punch", ["pugilism"], { "range":0, "atn":5, "dtn":6, "shieldLimit":1,  "damage":-2, "blunt":true  } )
 		
 		,Weapon.createDyn("Gladius", ["swordshield"], { "range":1, "atn":6, "atn2":6, "dtn":7,   "damage":0, "damage2":1, "drawCutModifier":0  } )
 		,Weapon.createDyn("Light Mace", ["mace"], { "range":1, "atn":6, "atn2":6, "dtn":7,   "damage":1, "damage2":0, "drawCutModifier":0  } )
@@ -58,6 +58,10 @@ class WeaponSheet
 	
 	];
 	
-	public static var HASH:StringMap<Weapon> = createHashLookupViaName(LIST);
+	 static var HASH:StringMap<Weapon> = createHashLookupViaName(LIST);
+	
+	public static inline function find(name:String):Weapon  {
+		return HASH.get("name");
+	}
 	
 }

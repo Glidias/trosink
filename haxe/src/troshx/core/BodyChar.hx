@@ -8,7 +8,7 @@ typedef Wound = {
 	@:optional var BL:Int;
 	@:optional var KD:Int;
 	@:optional var lev:Int;
-	@:optional  var d:Int;
+	@:optional  var d:Int;	// the effect (death, dismemberment, etc.)
 	@:optional  var ko:Int;
 	var shock:Int;
 	var shockWP:Int;
@@ -21,6 +21,15 @@ typedef WoundLocation = {
 	var cut:Array<Wound>;
 	var puncture:Array<Wound>;
 	var bludgeon:Array<Wound>;
+}
+
+typedef WoundInflict = {
+	var part:String;
+	var level:Int;
+	var type:Int;
+	var entry:Wound;
+	@:optional  var shock:Int;
+	@:optional  var d:Int;
 }
 
 
@@ -128,6 +137,46 @@ class BodyChar
 	
 	public function getTargetZoneCost(index:Int):Int {
 		return 0;
+	}
+	
+	
+	public function getWound(level:Int, manuever:Manuever, weapon:Weapon, targetZone:Int, rand:Float = -1):WoundInflict {
+		
+		level--; // indexify it
+		
+		var zs:Array<ZoneBody>;
+		var woundType:Int;
+		var damageTable:Dynamic;
+		var damageTableStr:String;
+		if ( manuever.damageType == Manuever.DAMAGE_TYPE_BLUDGEONING || weapon.blunt ) { // blunt weapon
+			zs = zonesB;
+			damageTable = partsBludgeon;	
+			woundType = WOUND_TYPE_BLUNT_TRAUMA;
+			damageTableStr = "bludgeoning";
+		}
+		else {   // else sharp weapon
+			zs = zones;
+			var isThrusting:Bool = Manuever.isThrustingMotion(targetZone, this);
+			damageTable = isThrusting ? partsPuncture : partsCut;
+			woundType = isThrusting ? WOUND_TYPE_PIERCE : WOUND_TYPE_CUT;
+			damageTableStr = isThrusting ? "puncturing" : "cutting";
+		
+		}
+		if (rand < 0) rand = Math.random();
+		
+	
+		var part:String =  zs[targetZone].getBodyPart(rand);
+		if (part == "") return null;
+		var row:Array<Dynamic> =  Reflect.field(damageTable, part); // damageTable[part];
+		if (row == null) throw "Could not find row:"+part + ", "+damageTableStr;
+		var damagePart:Dynamic = row[level];
+
+		return {
+			part:part,
+			level:level,
+			type:woundType,
+			entry:damagePart
+		}
 	}
 	
 }

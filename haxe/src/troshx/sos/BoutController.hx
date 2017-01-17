@@ -4,6 +4,7 @@ import troshx.components.FightState;
 import troshx.core.ManueverStack;
 import troshx.core.BoutMessage;
 import troshx.core.IBoutController;
+import troshx.util.DiceRoller;
 import troshx.util.LibUtil;
 
 /**
@@ -12,8 +13,8 @@ import troshx.util.LibUtil;
  */
 class BoutController implements IBoutController
 {
-	// IBoutController boilerplate
-	private var model:BoutModel = new BoutModel();
+
+	 var model:BoutModel;
 	
 
 	// Song of Swords implementation
@@ -27,8 +28,10 @@ class BoutController implements IBoutController
 	}
 	
 	
-	public function new() 
+	public function new(model:BoutModel) 
 	{
+		this.model = model;
+		DiceRoller;
 		
 	}
 	
