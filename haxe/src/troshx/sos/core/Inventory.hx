@@ -3,6 +3,7 @@ import troshx.core.IUid;
 import troshx.ds.HashedArray;
 import troshx.ds.IDMatchArray;
 import troshx.ds.IUpdateWith;
+import troshx.sos.core.Inventory.ItemQty;
 import troshx.sos.core.Weapon;
 import troshx.util.LibUtil;
 
@@ -22,65 +23,145 @@ class Inventory
 	public var shields(default,never):Array<ShieldAssign> = [];	// melee shields carried or held
 	public var weapons(default,never):Array<WeaponAssign> = [];  // melee weapons carried or held
 
-	public static inline var HELD_LEFT:Int = 1;
-	public static inline var HELD_RIGHT:Int = 2;
+	public static inline var HELD_OFF:Int = 1;
+	public static inline var HELD_MASTER:Int = 2;
 	public static inline var HELD_BOTH:Int = (1 | 2);
 	
 	public static inline var UNHELD_PACKED:Int = 1;
 	public static inline var UNHELD_DROPPED:Int = 2;
 	public static inline var UNHELD_EQUIPPED:Int = 4;
 	
-	public function holdItem(item:Item, preferOffhand:Bool=false):Void {
+	public function holdItem(item:Item, holdSetting:Int=0):Void {
 		
+		if (item.twoHanded) holdSetting = HELD_BOTH;
 		
 		if (Std.is(item, Weapon)) {
-			holdWeapon(LibUtil.as(item, Weapon), preferOffhand);
+			holdWeapon(LibUtil.as(item, Weapon), holdSetting != 0 ? holdSetting : HELD_MASTER);
 		}
 		else if (Std.is(item, Shield)) {
-			holdShield(LibUtil.as(item, Shield), true);
+			holdShield(LibUtil.as(item, Shield), holdSetting != 0 ? holdSetting : HELD_OFF);
 		}
 		else if (Std.is(item, Armor)) {
 			trace("You can't hold armor!! Equiping item instead!");
 		}
 		else {
-			holdNonMeleeItem(item, preferOffhand);
+			holdNonMeleeItem(item,  holdSetting != 0 ? holdSetting : HELD_MASTER);
 		}
 	}
+	
+
 	
 
 	public function unholdItem(item:Item, preferedUnheld:Int = 0):Int {
 		
 		if (preferedUnheld == UNHELD_EQUIPPED) {
 			equipItem(item);
-			return;
+			return 0;  
 		}
 		
+		var spliceIndex:Int = -1;
+		
+		var spliceItem:ReadyAssign = null;
+		var spliceArray:Array<ReadyAssign> = null;
+		
 		// check if item is being held within their respetive assignments, and treat them as existing held item and set held=0 for those items
+		if (weaponOffhand == item || weaponHand == item) {
+			if (weaponOffhand == item) {
+				weaponOffhand = null;
+			}
+			if (weaponHand == item) {
+				weaponHand = null;
+			}
+			//spliceIndex = weapons.indexOf(LibUtil.as(item, Weapon));
+			spliceArray = weapons;
+			//spliceIndex = -1;
+			for (i in 0...weapons.length) {
+				if (weapons[i].weapon == item) {
+					weapons[i].held = 0;
+					spliceIndex = i;
+					spliceItem = spliceArray[i];
+					break;
+				}
+			}
+			
+		}
+		
+		if (itemOffhand == item || itemHand == item) {
+			if (itemHand == item) {
+				itemHand = null;
+			}
+			if (itemOffhand == item) {
+				itemOffhand = null;
+			}
+			spliceArray = equipedNonMeleeItems;
+			//spliceIndex = -1;
+			for (i in 0...equipedNonMeleeItems.length) {
+				if (equipedNonMeleeItems[i].item == item) {
+					equipedNonMeleeItems[i].held = 0;
+					spliceIndex = i;
+					spliceItem = spliceArray[i];
+					break;
+				}
+			}
+			
+		}
+		
+		if (shieldOffhand == item || shieldHand == item) {
+			if (shieldOffhand == item) {
+				shieldOffhand = null;
+			}
+			if (shieldHand == item) {
+				shieldHand = null;
+			}
+			spliceArray = shields;
+			//spliceIndex = -1;
+			for (i in 0...shields.length) {
+				if (shields[i].shield == item) {
+					shields[i].held = 0;
+					spliceIndex = i;
+					spliceItem = spliceArray[i];
+					break;
+				}
+			}
+			
+		}
 		
 		if (preferedUnheld < 0) {  // if got existing item with unheld preference, do NOT add it back to respective array!
-			// return unheld state of existing item
+			return spliceItem != null ? spliceItem.unheld :  0; 
 		}
 	
 		// Else continue to  re-add it back to prefered unheld for UNHELD_PACKED or UNHELD_DROPPED if required...
 		
 		//preferedUnheld = preferedUnehd != 0 ? preferedUnheld : if got existing equipped held item ? existinghelditem.unheld : 0;
 		if (preferedUnheld > 0) {
-			if (preferedUnheld != UNHELD_EQUIPPED) {  // would be the case of existingHeldItem.unheld already remain requipped
+			if (preferedUnheld != UNHELD_EQUIPPED) {  // would != the case of existingHeldItem.unheld already remain requipped
 				if (preferedUnheld == UNHELD_PACKED) {
-					packed.add(item);
+					packed.add( new ItemQty(item) );
 					// if got existing held item, remove from existing held list
+					if (spliceIndex >= 0) {
+						spliceArray.splice(spliceIndex, 1);
+					}
 				}
 				else if (preferedUnheld == UNHELD_DROPPED) {
-					dropped.add(item);
+					dropped.add( new ItemQty(item) );
 					// if got existing held item, remove from existing held list
+					if (spliceIndex >= 0) {
+						spliceArray.splice(spliceIndex, 1);
+					}
 				}
 				else {
 					trace("Unaccounted prefered unheld case: " + preferedUnheld);
 				}
 			}
 		}
+		else {  // would be the case of existingHeldItem.unheld == 0
+			// no unheld state saved, item completely demolished to the void
+			if (spliceIndex >= 0) {
+					spliceArray.splice(spliceIndex, 1);
+				}
+		}
 		
-		return 0; // return unheld state of existing item (if any)
+		return spliceItem != null ? spliceItem.unheld :  0; 
 	}
 	
 	public function packItem(item:Item):Void {
@@ -95,7 +176,10 @@ class Inventory
 		var unheld:Int = 0;
 		
 		unheld = unholdItem(item, -1);  // always attempt to unhold any weapon before equiping them...
-
+		if (unheld == UNHELD_EQUIPPED) {
+			return;	// already equiped, don't need to add to list
+		}
+		
 		if (Std.is(item, Weapon)) {
 			
 			weapons.push({weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
@@ -122,36 +206,106 @@ class Inventory
 	// imperative hold cache
 	public var weaponHand(default, null):Weapon;
 	public var weaponOffhand(default, null):Weapon; 
-	function holdWeapon(weapon:Weapon, preferOffhand:Bool):Void {	// validate weilded weapon and shields
-		// may exist in: 'dropped' or 'packed'  or under 'weapons'
+	function holdWeapon(weapon:Weapon, held:Int):Void {	// validate weilded weapon and shields
+
+		var w;
+		var lastHeld:Int;
+		var alreadyEquiped:WeaponAssign = null;
+		for (i in 0...weapons.length) {
+			w = weapons[i];
+			lastHeld = w.held;
+			w.held &= ~held;
+			if (lastHeld != w.held) {
+				if ( (held & HELD_OFF) != 0 && weaponOffhand == weapon) {
+					weaponOffhand = null;
+				}
+				if ( (held & HELD_MASTER) != 0 && weaponHand == weapon) {
+					weaponHand = null;
+				}
+			}
+			if (w.weapon == weapon) {
+				alreadyEquiped = w;
+			}
+		}
 		
-		var held:Int = weapon.twoHanded ? HELD_BOTH :  preferOffhand ? HELD_LEFT : HELD_RIGHT;
+		if (alreadyEquiped !=null) {
+			alreadyEquiped.held = held;
+		}
+		else {
+			var qtyItem:ItemQty = new ItemQty(weapon);
+			weapons.push({weapon:weapon, held:held, unheld:packed.splicedAgainst(qtyItem) ? UNHELD_PACKED : dropped.splicedAgainst(qtyItem) ? UNHELD_DROPPED : 0 });
+		}
 		
-		// assign to weapons with previous exist...
+		
 	}
 	
 	// imperative hold cache
 	public var shieldHand(default, null):Shield;
 	public var shieldOffhand(default, null):Shield; 
-	function holdShield(shield:Shield, preferOffhand:Bool):Void {	// validate weilded weapon and shields
-		// may exist in: 'dropped' or 'packed'  or under 'shields'
+	function holdShield(shield:Shield, held:Int):Void {	// validate weilded weapon and shields
 		
-		var held:Int = shield.twoHanded ? HELD_BOTH :  preferOffhand ? HELD_LEFT : HELD_RIGHT;
+		var w;
+		var lastHeld:Int;
+		var alreadyEquiped:ShieldAssign = null;
+		for (i in 0...shields.length) {
+			w = shields[i];
+			lastHeld = w.held;
+			w.held &= ~held;
+			if (lastHeld != w.held) {
+				if ( (held & HELD_OFF) != 0 && shieldOffhand == shield) {
+					shieldOffhand = null;
+				}
+				if ( (held & HELD_MASTER) != 0 && shieldHand == shield) {
+					shieldHand = null;
+				}
+			}
+			if (w.shield == shield) {
+				alreadyEquiped = w;
+			}
+		}
 		
-		// assign to shield with previous exist...
+		if (alreadyEquiped !=null) {
+			alreadyEquiped.held = held;
+		}
+		else {
+			var qtyItem:ItemQty = new ItemQty(shield);
+			shields.push({shield:shield, held:held, unheld:packed.splicedAgainst(qtyItem) ? UNHELD_PACKED : dropped.splicedAgainst(qtyItem) ? UNHELD_DROPPED : 0 });
+		}
+		
 		
 	}
 	
 	// imperative hold cache
 	public var itemHand(default, null):Item;
 	public var itemOffhand(default, null):Item; 
-	function holdNonMeleeItem(item:Item, preferOffhand:Bool):Void {	
-		// may exist in: 'dropped' or 'packed'  or under 'equipedNonMeleeItems'
+	function holdNonMeleeItem(item:Item, held:Int):Void {	
+		var w;
+		var lastHeld:Int;
+		var alreadyEquiped:ItemAssign = null;
+		for (i in 0...equipedNonMeleeItems.length) {
+			w = equipedNonMeleeItems[i];
+			lastHeld = w.held;
+			w.held &= ~held;
+			if (lastHeld != w.held) {
+				if ( (held & HELD_OFF) != 0 && itemOffhand == item) {
+					itemOffhand = null;
+				}
+				if ( (held & HELD_MASTER) != 0 && itemHand == item) {
+					shieldHand = null;
+				}
+			}
+			if (w.item == item) {
+				alreadyEquiped = w;
+			}
+		}
 		
-		var held:Int = item.twoHanded ? HELD_BOTH :  preferOffhand ? HELD_LEFT : HELD_RIGHT;
-		
-		// assign to items with previous exist
-		
+		if (alreadyEquiped !=null) {
+			alreadyEquiped.held = held;
+		}
+		else {
+			var qtyItem:ItemQty = new ItemQty(item);
+			equipedNonMeleeItems.push({item:item, held:held, unheld:packed.splicedAgainst(qtyItem) ? UNHELD_PACKED : dropped.splicedAgainst(qtyItem) ? UNHELD_DROPPED : 0 });
+		}
 	}
 	
 	
@@ -169,13 +323,18 @@ class ItemQty implements IUid implements IUpdateWith<ItemQty> {
 	public var qty:Int ;
 	public var uid(get, null):String;
 	
-	public function ItemQty(item:Item = null, qty:Int = 1):Void {
+	public function new(item:Item = null, qty:Int = 1):Void {
 		this.item = item != null ? item : new Item();
 		this.qty = qty;
 	}
 	
 	public function updateAgainst(ref:ItemQty):Void {
 		qty += ref.qty;
+	}
+	
+	public function spliceAgainst(ref:ItemQty):Int {
+		qty -= ref.qty;
+		return qty;
 	}
 	
 	function get_uid():String 

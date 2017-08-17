@@ -60,6 +60,29 @@ class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		return false;
 	}
 	
+	public function splicedAgainst(item:T):Bool {
+		
+		var spliceIndex:Int =-1;
+		var spliceItem:T = null;
+		
+		for (i in 0...list.length) {
+			var a = list[i];
+			if (a.uid == item.uid) {
+				spliceItem = a;
+				spliceIndex = i;
+				break;
+			}
+		}
+		
+		if (spliceItem != null) {
+			if (  spliceItem.spliceAgainst(item) <= 0  ) {
+				list.splice(spliceIndex, 1);
+			}
+			return true;
+		}
+		return false;
+	}
+	
 	
 	function getMatchingItem(item:T):T {
 		for (i in 0...list.length) {
