@@ -9,13 +9,12 @@ import troshx.ds.IUpdateWith;
 class Wound implements IUid implements IUpdateWith<Wound>
 {
 	
-	// this uniquely identifies the wound
+	// these parameters uniquely identify the wound
 	public var location:HitLocation = null;
-	
+	public var level:Int = 0;
 	public var damageType:Int = 0;
 	
-	// applied modifiers
-	public var level:Int = 0;
+	// stateful applied damages for wound
 	public var stun:Int = 0;
 	public var pain:Int = 0;
 	public var BL:Int = 0;
@@ -41,7 +40,6 @@ class Wound implements IUid implements IUpdateWith<Wound>
 		if (ref.stun > stun) stun = ref.stun;
 		if (ref.pain > pain) pain = ref.pain;
 		if (ref.BL > BL) BL = ref.BL;
-		if (ref.level > level) level = ref.level;
 		ref.treated = false;
 	}
 	
@@ -49,16 +47,13 @@ class Wound implements IUid implements IUpdateWith<Wound>
 		if (ref.stun < stun) stun = ref.stun;
 		if (ref.pain < pain) pain = ref.pain;
 		if (ref.BL < BL) BL = ref.BL;
-		if (ref.level < level) level = ref.level;
 		ref.treated = true;
 		return -1;
 	}
 	
 	inline function get_uid():String 
 	{
-		// todo: check is level part of it???
-		//+ "_"+level
-		return location.uid  + "_"+ (damageType >= 0 ? damageType : UNIQUE_COUNT++);
+		return location.uid + "_"+ level + "_"+ (damageType >= 0 ? damageType : UNIQUE_COUNT++);
 	}
 	
 }
