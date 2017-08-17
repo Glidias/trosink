@@ -4,6 +4,7 @@ import troshx.components.FightState;
 import troshx.core.BoutMessage;
 import troshx.core.IBoutModel;
 import troshx.core.ManueverStack;
+import troshx.sos.BoutModel;
 import troshx.util.LibUtil;
 
 /**
@@ -12,6 +13,8 @@ import troshx.util.LibUtil;
  */
 class BoutModel implements IBoutModel
 {
+	
+	
 
 	// bout model
 	public var bout:Bout = new Bout();
@@ -35,8 +38,9 @@ class BoutModel implements IBoutModel
 	private var manueverStack:ManueverStack= new ManueverStack();
 	private var defManueverStack:ManueverStack = new ManueverStack();
 	
+	public static function Get_something(state:Bout, getters:{bout:Bout, x:Float, y:Float, z:Float}, rootState:Bout, rootGetters) {
 	
-	
+	}
 	
 	public function new() 
 	{

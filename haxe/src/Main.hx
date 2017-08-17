@@ -10,7 +10,6 @@ import troshx.core.ZoneBody;
 import troshx.util.ReflectVueJSUtil;
 
 import troshx.components.FightState;
-import troshx.sos.BoutController;
 
 import troshx.util.TROSAI;
 import troshx.util.ReflectUtil;
@@ -21,7 +20,6 @@ import troshx.tros.ai.TROSAiBot;
 import dat.gui.DatUtil;
 
 import troshx.tros.ai.TROSAiBotInkle;
-
 
 
 

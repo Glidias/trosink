@@ -28,11 +28,43 @@ class BoutController implements IBoutController
 	}
 	
 	
+	
 	public function new(model:BoutModel) 
 	{
 		this.model = model;
 		DiceRoller;
 		
+		var namespaceVal:String = Math.random() > 0  ? Math.random() + "aaw" : "arawb";
+		namespaceVal += "BBB";
+		testInlineConstantOptimization2("HelloWorld", true, namespaceVal);
+		
+	}
+	
+	public inline function testInlineConstantOptimization(value:String, namespace:String = null):String {
+		if (namespace != null) {
+			//handleCurrentStep();
+			return doThis(namespace + "specialthing");
+		}
+		else {
+			//step();
+			return doThis("specialthing");
+		}
+	}
+	
+		
+	public inline function testInlineConstantOptimization2(value:String, usenameSpace:Bool=false, namespace:String = ""):String {
+		if ( usenameSpace) {
+			//handleCurrentStep();
+			return doThis(namespace + "specialthing");
+		}
+		else {
+			//step();
+			return doThis("specialthing");
+		}
+	}
+	
+	public function doThis(str:String):String {
+		return str;
 	}
 	
 	public  function step():Void {
