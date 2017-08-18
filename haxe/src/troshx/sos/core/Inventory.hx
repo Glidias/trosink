@@ -31,7 +31,7 @@ class Inventory
 	public static inline var UNHELD_DROPPED:Int = 2;
 	public static inline var UNHELD_EQUIPPED:Int = 4;
 	
-	public function holdItem(item:Item, holdSetting:Int=0):Void {
+	public function holdItem(item:Item, holdSetting:Int=0):Void { // todo: use offhand if available instead of force master
 		
 		if (item.twoHanded) holdSetting = HELD_BOTH;
 		
@@ -48,11 +48,14 @@ class Inventory
 			holdNonMeleeItem(item,  holdSetting != 0 ? holdSetting : HELD_MASTER);
 		}
 	}
-	
 
-	
-
-	public function unholdItem(item:Item, preferedUnheld:Int = 0):Int {
+	/**
+	 * 
+	 * @param	item
+	 * @param	preferedUnheld  0 - Auto, >0 any prefered unheld value,  -1: ignore internal for equippng item,  -2 destroy internal
+	 * @return
+	 */
+	function unholdItem(item:Item, preferedUnheld:Int = 0):Int {
 		
 		if (preferedUnheld == UNHELD_EQUIPPED) {
 			equipItem(item);
@@ -126,12 +129,12 @@ class Inventory
 			
 		}
 		
-		if (preferedUnheld < 0) {  // if got existing item with unheld preference, do NOT add it back to respective array!
-			return spliceItem != null ? spliceItem.unheld :  0; 
+		if (preferedUnheld == -1) {  // if got existing item with unheld preference, do NOT add it back to respective array!
+			return spliceItem != null ? UNHELD_EQUIPPED :  0; 
 		}
 	
 		// Else continue to  re-add it back to prefered unheld for UNHELD_PACKED or UNHELD_DROPPED if required...
-		
+		preferedUnheld = preferedUnheld != 0 ? preferedUnheld : spliceItem != null ? spliceItem.unheld : 0;
 		//preferedUnheld = preferedUnehd != 0 ? preferedUnheld : if got existing equipped held item ? existinghelditem.unheld : 0;
 		if (preferedUnheld > 0) {
 			if (preferedUnheld != UNHELD_EQUIPPED) {  // would != the case of existingHeldItem.unheld already remain requipped
@@ -154,11 +157,11 @@ class Inventory
 				}
 			}
 		}
-		else {  // would be the case of existingHeldItem.unheld == 0
+		else {  // would be the case of existingHeldItem.unheld == 0  or preferedUnheld < 0 && != --1
 			// no unheld state saved, item completely demolished to the void
 			if (spliceIndex >= 0) {
-					spliceArray.splice(spliceIndex, 1);
-				}
+				spliceArray.splice(spliceIndex, 1);
+			}
 		}
 		
 		return spliceItem != null ? spliceItem.unheld :  0; 
@@ -170,6 +173,69 @@ class Inventory
 	
 	public function dropItem(item:Item):Void {
 		unholdItem(item, UNHELD_DROPPED);
+	}
+	
+	public function destroyItem(item:Item):Void {
+		unholdItem(item, -2);
+	}
+	
+	function _unholdAllItems(held:Int, searchItem:Item, strappedItem:Bool=false):Int {
+		var alreadyEquipedIndex:Int = -1;
+		var w;
+		var s;
+		var t;
+		
+		for (i in 0...weapons.length) {
+			w = weapons[i];
+			if (!strappedItem || w.weapon.twoHanded) {
+				w.held &= ~held;
+			}
+		
+			if (alreadyEquipedIndex < -1 && w.weapon == searchItem) {
+				alreadyEquipedIndex = i;
+			}
+		}
+		
+		for (i in 0...shields.length) {
+			s = shields[i];
+			s.held &= ~held;
+			
+			if (alreadyEquipedIndex < -1 && s.shield == searchItem) {
+				alreadyEquipedIndex = i;
+			}
+		}
+		
+		for (i in 0...equipedNonMeleeItems.length) {
+			t = equipedNonMeleeItems[i];
+			
+			if (!strappedItem || t.item.twoHanded) {
+				t.held &= ~held;
+			}
+			
+			
+			if (alreadyEquipedIndex < -1 && t.item == searchItem) {
+				alreadyEquipedIndex = i;
+			}
+		}
+		
+		if ( (held & HELD_OFF)!=0 ) {
+			if (itemOffhand != null && (!strappedItem || itemOffhand.twoHanded))  itemOffhand = null;
+			
+			shieldOffhand = null;
+			
+			if (weaponOffhand != null && (!strappedItem || weaponOffhand.twoHanded)) weaponOffhand = null;
+		}
+		
+		if ( (held & HELD_MASTER)!=0 ) {
+			
+			if (itemHand != null && (!strappedItem || itemHand.twoHanded)) itemHand = null;
+			
+			shieldHand = null;
+			
+			if (weaponHand != null && (!strappedItem || weaponHand.twoHanded)) weaponHand = null;
+		}
+		
+		return alreadyEquipedIndex;
 	}
 	
 	public function equipItem(item:Item, unheldRemark:String = null) {
@@ -208,24 +274,16 @@ class Inventory
 	public var weaponOffhand(default, null):Weapon; 
 	function holdWeapon(weapon:Weapon, held:Int):Void {	// validate weilded weapon and shields
 
-		var w;
-		var lastHeld:Int;
-		var alreadyEquiped:WeaponAssign = null;
-		for (i in 0...weapons.length) {
-			w = weapons[i];
-			lastHeld = w.held;
-			w.held &= ~held;
-			if (lastHeld != w.held) {
-				if ( (held & HELD_OFF) != 0 && weaponOffhand == weapon) {
-					weaponOffhand = null;
-				}
-				if ( (held & HELD_MASTER) != 0 && weaponHand == weapon) {
-					weaponHand = null;
-				}
-			}
-			if (w.weapon == weapon) {
-				alreadyEquiped = w;
-			}
+		var alreadyEquiped = null;
+		var index = _unholdAllItems(held, weapon);
+		if (index >= 0) {
+			alreadyEquiped = weapons[index];
+		}
+		if (held == HELD_OFF) {
+			weaponOffhand = weapon;
+		}
+		else {
+			weaponHand = weapon;
 		}
 		
 		if (alreadyEquiped !=null) {
@@ -236,32 +294,24 @@ class Inventory
 			weapons.push({weapon:weapon, held:held, unheld:packed.splicedAgainst(qtyItem) ? UNHELD_PACKED : dropped.splicedAgainst(qtyItem) ? UNHELD_DROPPED : 0 });
 		}
 		
-		
 	}
+	
+	
 	
 	// imperative hold cache
 	public var shieldHand(default, null):Shield;
 	public var shieldOffhand(default, null):Shield; 
 	function holdShield(shield:Shield, held:Int):Void {	// validate weilded weapon and shields
-		
-		var w;
-		var lastHeld:Int;
-		var alreadyEquiped:ShieldAssign = null;
-		for (i in 0...shields.length) {
-			w = shields[i];
-			lastHeld = w.held;
-			w.held &= ~held;
-			if (lastHeld != w.held) {
-				if ( (held & HELD_OFF) != 0 && shieldOffhand == shield) {
-					shieldOffhand = null;
-				}
-				if ( (held & HELD_MASTER) != 0 && shieldHand == shield) {
-					shieldHand = null;
-				}
-			}
-			if (w.shield == shield) {
-				alreadyEquiped = w;
-			}
+		var alreadyEquiped = null;
+		var index = _unholdAllItems(held, shield);
+		if (index >= 0) {
+			alreadyEquiped = shields[index];
+		}
+		if (held == HELD_OFF) {
+			shieldOffhand = shield;
+		}
+		else {
+			shieldHand = shield;
 		}
 		
 		if (alreadyEquiped !=null) {
@@ -279,24 +329,16 @@ class Inventory
 	public var itemHand(default, null):Item;
 	public var itemOffhand(default, null):Item; 
 	function holdNonMeleeItem(item:Item, held:Int):Void {	
-		var w;
-		var lastHeld:Int;
-		var alreadyEquiped:ItemAssign = null;
-		for (i in 0...equipedNonMeleeItems.length) {
-			w = equipedNonMeleeItems[i];
-			lastHeld = w.held;
-			w.held &= ~held;
-			if (lastHeld != w.held) {
-				if ( (held & HELD_OFF) != 0 && itemOffhand == item) {
-					itemOffhand = null;
-				}
-				if ( (held & HELD_MASTER) != 0 && itemHand == item) {
-					shieldHand = null;
-				}
-			}
-			if (w.item == item) {
-				alreadyEquiped = w;
-			}
+		var alreadyEquiped = null;
+		var index = _unholdAllItems(held, item);
+		if (index >= 0) {
+			alreadyEquiped = equipedNonMeleeItems[index];
+		}
+		if (held == HELD_OFF) {
+			itemOffhand = item;
+		}
+		else {
+			itemHand = item;
 		}
 		
 		if (alreadyEquiped !=null) {

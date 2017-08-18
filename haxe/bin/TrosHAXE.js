@@ -1230,6 +1230,28 @@ troshx_ds_IDMatchArray.prototype = {
 		}
 		return false;
 	}
+	,splicedAgainst: function(item) {
+		var spliceIndex = -1;
+		var spliceItem = null;
+		var _g1 = 0;
+		var _g = this.list.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var a = this.list[i];
+			if(a.get_uid() == item.get_uid()) {
+				spliceItem = a;
+				spliceIndex = i;
+				break;
+			}
+		}
+		if(spliceItem != null) {
+			if(spliceItem.spliceAgainst(item) <= 0) {
+				this.list.splice(spliceIndex,1);
+			}
+			return true;
+		}
+		return false;
+	}
 	,getMatchingItem: function(item) {
 		var _g1 = 0;
 		var _g = this.list.length;
@@ -1341,6 +1363,7 @@ var troshx_sos_core_Item = function(id,name) {
 	if(name == null) {
 		name = "";
 	}
+	this.twoHanded = false;
 	this.weight = 0;
 	this.id = id != null?id:"Item_" + troshx_sos_core_Item.UID_COUNT++;
 	this.name = name;
@@ -1392,36 +1415,184 @@ var troshx_sos_core_Inventory = function() {
 };
 troshx_sos_core_Inventory.__name__ = true;
 troshx_sos_core_Inventory.prototype = {
-	holdItem: function(item,preferOffhand) {
-		if(preferOffhand == null) {
-			preferOffhand = false;
+	holdItem: function(item,holdSetting) {
+		if(holdSetting == null) {
+			holdSetting = 0;
+		}
+		if(item.twoHanded) {
+			holdSetting = 3;
 		}
 		if(js_Boot.__instanceof(item,troshx_sos_core_Weapon)) {
-			this.holdWeapon(js_Boot.__instanceof(item,troshx_sos_core_Weapon)?item:null,preferOffhand);
+			this.holdWeapon(js_Boot.__instanceof(item,troshx_sos_core_Weapon)?item:null,holdSetting != 0?holdSetting:2);
 		} else if(js_Boot.__instanceof(item,troshx_sos_core_Shield)) {
-			this.holdShield(js_Boot.__instanceof(item,troshx_sos_core_Shield)?item:null,true);
+			this.holdShield(js_Boot.__instanceof(item,troshx_sos_core_Shield)?item:null,holdSetting != 0?holdSetting:1);
 		} else if(js_Boot.__instanceof(item,troshx_sos_core_Armor)) {
 			console.log("You can't hold armor!! Equiping item instead!");
 		} else {
-			this.holdNonMeleeItem(item,preferOffhand);
+			this.holdNonMeleeItem(item,holdSetting != 0?holdSetting:2);
 		}
 	}
-	,unholdItem: function(item) {
-		return 0;
+	,unholdItem: function(item,preferedUnheld) {
+		if(preferedUnheld == null) {
+			preferedUnheld = 0;
+		}
+		if(preferedUnheld == 4) {
+			this.equipItem(item);
+			return 0;
+		}
+		var spliceIndex = -1;
+		var spliceItem = null;
+		var spliceArray = null;
+		if(this.weaponOffhand == item || this.weaponHand == item) {
+			if(this.weaponOffhand == item) {
+				this.weaponOffhand = null;
+			}
+			if(this.weaponHand == item) {
+				this.weaponHand = null;
+			}
+			spliceArray = this.weapons;
+			var _g1 = 0;
+			var _g = this.weapons.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(this.weapons[i].weapon == item) {
+					this.weapons[i].held = 0;
+					spliceIndex = i;
+					spliceItem = spliceArray[i];
+					break;
+				}
+			}
+		}
+		if(this.itemOffhand == item || this.itemHand == item) {
+			if(this.itemHand == item) {
+				this.itemHand = null;
+			}
+			if(this.itemOffhand == item) {
+				this.itemOffhand = null;
+			}
+			spliceArray = this.equipedNonMeleeItems;
+			var _g11 = 0;
+			var _g2 = this.equipedNonMeleeItems.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(this.equipedNonMeleeItems[i1].item == item) {
+					this.equipedNonMeleeItems[i1].held = 0;
+					spliceIndex = i1;
+					spliceItem = spliceArray[i1];
+					break;
+				}
+			}
+		}
+		if(this.shieldOffhand == item || this.shieldHand == item) {
+			if(this.shieldOffhand == item) {
+				this.shieldOffhand = null;
+			}
+			if(this.shieldHand == item) {
+				this.shieldHand = null;
+			}
+			spliceArray = this.shields;
+			var _g12 = 0;
+			var _g3 = this.shields.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(this.shields[i2].shield == item) {
+					this.shields[i2].held = 0;
+					spliceIndex = i2;
+					spliceItem = spliceArray[i2];
+					break;
+				}
+			}
+		}
+		if(preferedUnheld < 0) {
+			if(spliceItem != null) {
+				return 4;
+			} else {
+				return 0;
+			}
+		}
+		if(preferedUnheld > 0) {
+			if(preferedUnheld != 4) {
+				if(preferedUnheld == 1) {
+					this.packed.add(new troshx_sos_core_ItemQty(item));
+					if(spliceIndex >= 0) {
+						spliceArray.splice(spliceIndex,1);
+					}
+				} else if(preferedUnheld == 2) {
+					this.dropped.add(new troshx_sos_core_ItemQty(item));
+					if(spliceIndex >= 0) {
+						spliceArray.splice(spliceIndex,1);
+					}
+				} else {
+					console.log("Unaccounted prefered unheld case: " + preferedUnheld);
+				}
+			}
+		} else if(spliceIndex >= 0) {
+			spliceArray.splice(spliceIndex,1);
+		}
+		if(spliceItem != null) {
+			return spliceItem.unheld;
+		} else {
+			return 0;
+		}
 	}
 	,packItem: function(item) {
-		if(this.unholdItem(item) == 1) {
-			return;
-		}
+		this.unholdItem(item,1);
 	}
 	,dropItem: function(item) {
-		if(this.unholdItem(item) == 2) {
-			return;
+		this.unholdItem(item,2);
+	}
+	,_unholdAllItems: function(held,searchItem,strappedItem) {
+		if(strappedItem == null) {
+			strappedItem = false;
 		}
+		var w;
+		var s;
+		var t;
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			w = this.weapons[_g1++];
+			if(!strappedItem || w.weapon.twoHanded) {
+				w.held &= ~held;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.shields.length;
+		while(_g11 < _g2) {
+			s = this.shields[_g11++];
+			s.held &= ~held;
+		}
+		var _g12 = 0;
+		var _g3 = this.equipedNonMeleeItems.length;
+		while(_g12 < _g3) {
+			t = this.equipedNonMeleeItems[_g12++];
+			if(!strappedItem || t.item.twoHanded) {
+				t.held &= ~held;
+			}
+		}
+		if((held & 1) != 0) {
+			if(this.itemOffhand != null && (!strappedItem || this.itemOffhand.twoHanded)) {
+				this.itemOffhand = null;
+			}
+			this.shieldOffhand = null;
+			if(this.weaponOffhand != null && (!strappedItem || this.weaponOffhand.twoHanded)) {
+				this.weaponOffhand = null;
+			}
+		}
+		if((held & 2) != 0) {
+			if(this.itemHand != null && (!strappedItem || this.itemHand.twoHanded)) {
+				this.itemHand = null;
+			}
+			this.shieldHand = null;
+			if(this.weaponHand != null && (!strappedItem || this.weaponHand.twoHanded)) {
+				this.weaponHand = null;
+			}
+		}
+		return -1;
 	}
 	,equipItem: function(item,unheldRemark) {
 		var unheld = 0;
-		unheld = this.unholdItem(item);
+		unheld = this.unholdItem(item,-1);
 		if(unheld == 4) {
 			return;
 		}
@@ -1440,29 +1611,79 @@ troshx_sos_core_Inventory.prototype = {
 			this.equipedNonMeleeItems.push({ item : item, held : 0, unheld : 4, unheldRemark : unheldRemark});
 		}
 	}
-	,holdWeapon: function(weapon,preferOffhand) {
+	,holdWeapon: function(weapon,held) {
+		var alreadyEquiped = null;
+		var index = this._unholdAllItems(held,weapon);
+		if(index >= 0) {
+			alreadyEquiped = this.weapons[index];
+		}
+		if(held == 1) {
+			this.weaponOffhand = weapon;
+		} else {
+			this.weaponHand = weapon;
+		}
+		if(alreadyEquiped != null) {
+			alreadyEquiped.held = held;
+		} else {
+			var qtyItem = new troshx_sos_core_ItemQty(weapon);
+			this.weapons.push({ weapon : weapon, held : held, unheld : this.packed.splicedAgainst(qtyItem)?1:this.dropped.splicedAgainst(qtyItem)?2:0});
+		}
 	}
-	,holdShield: function(shield,preferOffhand) {
+	,holdShield: function(shield,held) {
+		var alreadyEquiped = null;
+		var index = this._unholdAllItems(held,shield);
+		if(index >= 0) {
+			alreadyEquiped = this.shields[index];
+		}
+		if(held == 1) {
+			this.shieldOffhand = shield;
+		} else {
+			this.shieldHand = shield;
+		}
+		if(alreadyEquiped != null) {
+			alreadyEquiped.held = held;
+		} else {
+			var qtyItem = new troshx_sos_core_ItemQty(shield);
+			this.shields.push({ shield : shield, held : held, unheld : this.packed.splicedAgainst(qtyItem)?1:this.dropped.splicedAgainst(qtyItem)?2:0});
+		}
 	}
-	,holdNonMeleeItem: function(item,preferOffhand) {
+	,holdNonMeleeItem: function(item,held) {
+		var alreadyEquiped = null;
+		var index = this._unholdAllItems(held,item);
+		if(index >= 0) {
+			alreadyEquiped = this.equipedNonMeleeItems[index];
+		}
+		if(held == 1) {
+			this.itemOffhand = item;
+		} else {
+			this.itemHand = item;
+		}
+		if(alreadyEquiped != null) {
+			alreadyEquiped.held = held;
+		} else {
+			var qtyItem = new troshx_sos_core_ItemQty(item);
+			this.equipedNonMeleeItems.push({ item : item, held : held, unheld : this.packed.splicedAgainst(qtyItem)?1:this.dropped.splicedAgainst(qtyItem)?2:0});
+		}
 	}
 	,__class__: troshx_sos_core_Inventory
 };
-var troshx_sos_core_ItemQty = function() {
+var troshx_sos_core_ItemQty = function(item,qty) {
+	if(qty == null) {
+		qty = 1;
+	}
 	this.item = null;
+	this.item = item != null?item:new troshx_sos_core_Item();
+	this.qty = qty;
 };
 troshx_sos_core_ItemQty.__name__ = true;
 troshx_sos_core_ItemQty.__interfaces__ = [troshx_ds_IUpdateWith,troshx_core_IUid];
 troshx_sos_core_ItemQty.prototype = {
-	ItemQty: function(item,qty) {
-		if(qty == null) {
-			qty = 1;
-		}
-		this.item = item != null?item:new troshx_sos_core_Item();
-		this.qty = qty;
-	}
-	,updateAgainst: function(ref) {
+	updateAgainst: function(ref) {
 		this.qty += ref.qty;
+	}
+	,spliceAgainst: function(ref) {
+		this.qty -= ref.qty;
+		return this.qty;
 	}
 	,get_uid: function() {
 		return this.item.id;
@@ -1537,7 +1758,6 @@ troshx_sos_core_Talent.prototype = {
 	,__class__: troshx_sos_core_Talent
 };
 var troshx_sos_core_Weapon = function() {
-	this.twoHanded = false;
 	troshx_sos_core_Item.call(this);
 };
 troshx_sos_core_Weapon.__name__ = true;
@@ -1575,6 +1795,19 @@ troshx_sos_core_Wound.prototype = {
 			this.BL = ref.BL;
 		}
 		ref.treated = false;
+	}
+	,spliceAgainst: function(ref) {
+		if(ref.stun < this.stun) {
+			this.stun = ref.stun;
+		}
+		if(ref.pain < this.pain) {
+			this.pain = ref.pain;
+		}
+		if(ref.BL < this.BL) {
+			this.BL = ref.BL;
+		}
+		ref.treated = true;
+		return -1;
 	}
 	,get_uid: function() {
 		var _this = this.location;
@@ -1962,8 +2195,8 @@ troshx_sos_BoutController.STEP_TARGET_SELECTION = 1;
 troshx_sos_BoutController.STEP_DECLARATION = 2;
 troshx_sos_BoutController.TOTAL_STEPS = 3;
 troshx_sos_core_Item.UID_COUNT = 0;
-troshx_sos_core_Inventory.HELD_LEFT = 1;
-troshx_sos_core_Inventory.HELD_RIGHT = 2;
+troshx_sos_core_Inventory.HELD_OFF = 1;
+troshx_sos_core_Inventory.HELD_MASTER = 2;
 troshx_sos_core_Inventory.HELD_BOTH = 3;
 troshx_sos_core_Inventory.UNHELD_PACKED = 1;
 troshx_sos_core_Inventory.UNHELD_DROPPED = 2;
