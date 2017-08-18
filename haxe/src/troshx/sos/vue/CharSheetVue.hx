@@ -36,20 +36,23 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	public function loadSheet(contents:String = null):Void {
 		if (contents == null) contents = this.copyToClipboard;
-		
+		//var serializer = new Serializer();
+		//serializer.useCache = true;
+		//serializer.serialize( this.char );
+		//trace("AFTER");
 		var unserializer:Unserializer = new Unserializer(contents);
-	
 		
 		this.char = unserializer.unserialize();
 		
+
 	}
 	
 	public function saveSheet():String {
 		var serializer = new Serializer();
-		serializer.useCache = true;
+		//serializer.useCache = true;
 		//serializer.useEnumIndex = true;
+	
 		
-		//this.char
 		serializer.serialize(this.char);
 		var output:String = serializer.toString();
 		this.copyToClipboard = output;
@@ -160,7 +163,7 @@ class CharSheetVueData  {
 	
 	var copyToClipboard:String = "";
 	
-	var char:CharSheet = new CharSheet();
+	@:vueInclude var char:CharSheet = new CharSheet();
 	
 	public function new() {
 		
