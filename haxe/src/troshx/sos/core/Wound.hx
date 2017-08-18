@@ -22,7 +22,7 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	
 	public var labelLocation(get, null):String;
 	
-	public var uid(get, null):String;
+	public var uid(get, never):String;
 	
 	static  var UNIQUE_COUNT:Int = 0;
 

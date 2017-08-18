@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import js.html.svg.Number;
 import troshx.core.IUid;
 import troshx.ds.HashedArray;
 import troshx.ds.IDMatchArray;
@@ -129,6 +130,8 @@ class Inventory
 			
 		}
 		
+		
+		
 		if (preferedUnheld == -1) {  // if got existing item with unheld preference, do NOT add it back to respective array!
 			return spliceItem != null ? UNHELD_EQUIPPED :  0; 
 		}
@@ -159,13 +162,26 @@ class Inventory
 		}
 		else {  // would be the case of existingHeldItem.unheld == 0  or preferedUnheld < 0 && != --1
 			// no unheld state saved, item completely demolished to the void
+			
+			
 			if (spliceIndex >= 0) {
 				spliceArray.splice(spliceIndex, 1);
+			}
+			else {
+				var delItem = new ItemQty(item);
+				if (preferedUnheld == -2) {
+					dropped.splicedAgainst(delItem);
+				}
+				else {
+					packed.splicedAgainst( delItem );
+				}
+				//;
 			}
 		}
 		
 		return spliceItem != null ? spliceItem.unheld :  0; 
 	}
+	
 	
 	public function packItem(item:Item):Void {
 		unholdItem(item, UNHELD_PACKED);
@@ -175,9 +191,7 @@ class Inventory
 		unholdItem(item, UNHELD_DROPPED);
 	}
 	
-	public function destroyItem(item:Item):Void {
-		unholdItem(item, -2);
-	}
+	
 	
 	function _unholdAllItems(held:Int, searchItem:Item, strappedItem:Bool=false):Int {
 		var alreadyEquipedIndex:Int = -1;
@@ -361,9 +375,10 @@ class Inventory
 
 
 class ItemQty implements IUid implements IUpdateWith<ItemQty> {
-	public var item:Item = null;
-	public var qty:Int ;
-	public var uid(get, null):String;
+	public var item:Item;
+	public var qty:Int;
+
+	public var uid(get, never):String;
 	
 	public function new(item:Item = null, qty:Int = 1):Void {
 		this.item = item != null ? item : new Item();
@@ -373,6 +388,12 @@ class ItemQty implements IUid implements IUpdateWith<ItemQty> {
 	public function updateAgainst(ref:ItemQty):Void {
 		qty += ref.qty;
 	}
+	
+	/*
+	public function getTotalWeight():Int {
+		return item.weight * qty;
+	}
+	*/
 	
 	public function spliceAgainst(ref:ItemQty):Int {
 		qty -= ref.qty;

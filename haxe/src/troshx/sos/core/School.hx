@@ -9,7 +9,7 @@ class School
 	public var name:String = "";
 	public var profLimit:Int = 0;
 	
-	public var uid(get, null):String;
+	public var uid(get, never):String;
 
 	public function new() 
 	{

@@ -1,5 +1,4 @@
 package troshx.sos.sheets;
-import haxe.ds.StringMap;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Money;
@@ -12,7 +11,7 @@ import troshx.sos.core.Wound;
  * ...
  * @author Glidias
  */
-class CharSheet 
+class CharSheet
 {
 	
 	public var name:String = "";
@@ -30,34 +29,34 @@ class CharSheet
 	public var intelligence:Int = 4;
 	public var perception:Int = 4;
 	
-	public var ADR(get, null):Int;	// Adroitness
-	public var MOB(get, null):Int;	// Mobility
-	public var CAR(get, null):Int;	// Carry
-	public var CHA(get, null):Int;	// Charisma
-	public var TOU(get, null):Int;	// Toughness
+	public var ADR(get, never):Int;	// Adroitness
+	public var MOB(get, never):Int;	// Mobility
+	public var CAR(get, never):Int;	// Carry
+	public var CHA(get, never):Int;	// Charisma
+	public var TOU(get, never):Int;	// Toughness
 	
-	public var SDB(get, null):Int;	// Strength Damange Bonus
+	public var SDB(get, never):Int;	// Strength Damange Bonus
 	
-	public var GRIT(get, null):Int;
-	public var baseGrit(get, null):Int;
+	public var GRIT(get, never):Int;
+	public var baseGrit(get, never):Int;
 	public var gritAccum:Int = 0;
 	
 	public var school:School = null;
 	public var schoolLevel:Int = 0;
 	public var schoolProfeciencies:Array<Profeciency> = [];
 	
-	public var labelRace(get, null):String;
-	public var labelSex(get, null):String;
-	public var labelSchool(get, null):String;
+	public var labelRace(get, never):String;
+	public var labelSex(get, never):String;
+	public var labelSchool(get, never):String;
 	
-	public var schoolCP(get, null):Int;
-	public var meleeCP(get, null):Int;
+	public var schoolCP(get, never):Int;
+	public var meleeCP(get, never):Int;
 	
 	public var fatique:Int = 0;
 	public var miscCPBonus:Int = 0;
 	
-	public var totalPain(get, null):Int;
-	public var totalBloodLost(get, null):Int;
+	public var totalPain(get, never):Int;
+	public var totalBloodLost(get, never):Int;
 	
 	public var money:Money = new Money();
 	public var wealthAssets:Array<WealthAssetQty> = [];
@@ -66,7 +65,7 @@ class CharSheet
 	
 	public var arcPointsAccum:Int = 0;
 	var arcSpent:Int = 0;
-	public var arcPointsAvailable(get, null):Int;
+	public var arcPointsAvailable(get, never):Int;
 	
 	public var arcSaga:String = "";
 	public var arcEpic:String = "";
@@ -110,11 +109,11 @@ class CharSheet
 	
 		
 	// todo:
-	public var encumbranceLvl(get, null):Int;
-	public var recoveryRate(get, null):Int;
-	public var exhaustionRate(get, null):Int;
-	public var skillPenalty(get, null):Int;
-	public var mobWithMods(get, null):Int;
+	public var encumbranceLvl(get, never):Int;
+	public var recoveryRate(get, never):Int;
+	public var exhaustionRate(get, never):Int;
+	public var skillPenalty(get, never):Int;
+	public var mobWithMods(get, never):Int;
 	
 	
 	public function new() 
@@ -122,7 +121,7 @@ class CharSheet
 		
 	}
 	
-	public function get_totalPain():Int {
+	function get_totalPain():Int {
 		var c:Int = 0;
 		for (i in 0...wounds.length) {
 			c += wounds[i].pain;
@@ -130,7 +129,7 @@ class CharSheet
 		return c;
 	}
 	
-	public function get_totalBloodLost():Int {
+	function get_totalBloodLost():Int {
 		var c:Int = 0;
 		for (i in 0...wounds.length) {
 			c += wounds[i].BL;

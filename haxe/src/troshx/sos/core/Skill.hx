@@ -7,7 +7,7 @@ package troshx.sos.core;
 class Skill 
 {
 	public var name:String = "";
-	public var uid(get, null):String;
+	public var uid(get, never):String;
 
 	public function new() 
 	{
@@ -18,8 +18,6 @@ class Skill
 	{
 		return name;
 	}
-	
-	
-	
+
 	
 }

@@ -19,4 +19,8 @@ class Armor extends Item
 		super();
 	}
 	
+	override public function getTypeLabel():String {
+		return "Armor";
+	}
+	
 }

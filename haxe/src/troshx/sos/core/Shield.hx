@@ -18,4 +18,8 @@ class Shield extends Item
 		super();
 	}
 	
+	override public function getTypeLabel():String {
+		return "Shield";
+	}
+	
 }

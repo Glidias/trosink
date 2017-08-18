@@ -8,7 +8,7 @@ class HitLocation
 {
 	public var name:String = "";
 	public var id:String = "";
-	public var uid(get, null):String;
+	public var uid(get, never):String;
 	
 
 

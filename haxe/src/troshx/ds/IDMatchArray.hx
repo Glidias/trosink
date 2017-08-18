@@ -20,10 +20,12 @@ class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		var uid:String = item.uid;
 		
 		var matchingItem:T = getMatchingItem(item);
+		
 		if (matchingItem == null) {
-			list.push(matchingItem);
+			list.push(item);
 		}
 		else {
+			
 			matchingItem.updateAgainst(item);
 			var testIndex:Int;
 			if ( item != matchingItem && (testIndex = list.indexOf(item)) >=0) {
