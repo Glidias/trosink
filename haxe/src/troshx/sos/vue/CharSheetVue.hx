@@ -1,19 +1,26 @@
 package troshx.sos.vue;
+import haxe.Constraints.Constructible;
 import haxe.Serializer;
 import haxe.Timer;
 import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
+import js.Browser;
+import js.Lib;
 import js.html.InputElement;
-import js.html.svg.Number;
-
-import troshx.sos.core.Inventory.ItemQty;
+import troshx.ds.IDMatchArray;
+import troshx.ds.IValidable;
+import troshx.sos.vue.CharSheetVue.IFocusFlags;
+import troshx.sos.vue.CharSheetVue.RowReadyEntry;
+import troshx.util.LibUtil;
 
 import troshx.sos.sheets.CharSheet;
+import troshx.sos.core.Inventory;
+
+
 
 import troshx.sos.core.*;
-
 
 /**
  * ...
@@ -74,34 +81,51 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 	}
 	
-	function focusOutRowFieldQty(qtyEntry:QtyEntry, mask:Int):Void {
-		//qtyEntry.focusedFlags &= ~mask;
-		Timer.delay(function() { qtyEntry.focusedFlags &= ~mask; } , 0);
+	function focusOutRowField(targ:IFocusFlags, mask:Int):Void {
+		Timer.delay(function() { targ.focusedFlags &= ~mask; } , 0);
 		
 	}
 	
-	function executeQtyEntry(qtyEntry:QtyEntry):Bool {
-		if ( qtyEntry.isValidQtyEntry() )  {
-			var tarInventoryList = qtyEntry != this.packedEntry ? this.char.inventory.dropped : this.char.inventory.packed;
-			var item:Item = new Item();
-			item.name = qtyEntry.name;
-			item.weight = qtyEntry.weight;
-			
-			tarInventoryList.add( new ItemQty(  item, qtyEntry.qty ) );
+	function focusInRowField(targ:IFocusFlags, mask:Int) {
+		targ.focusedFlags = mask;
+	}
+	
+	function executeQtyEntry(qtyEntry:RowEntry<ItemQty>, tarInventoryList:IDMatchArray<Dynamic>):Bool {
+		
+		if ( qtyEntry.isValid() )  {
+			tarInventoryList.add( qtyEntry.e );
 			qtyEntry.reset();
 			return true;
 		}
-		else { 
-			//trace("invalid entry entered");
-			return false;
-		}
+		
+		return false;
 	}
 	
-	function focusInRowFieldQty(qtyEntry:QtyEntry, mask:Int) {
-		qtyEntry.focusedFlags = mask;
+	function executeEquipEntry(equipEntry:RowReadyEntry, typeId:String):Bool {
 		
+		if ( equipEntry.isValid() )  {
+			var tarList = this.char.inventory.getEquipedAssignList(typeId);
+			tarList.push( equipEntry.e );
+			equipEntry.reset( Inventory.getEmptyReadyAssign(typeId) );
+			return true;
+		}
+		return false;
 	}
-
+	
+	function executeArmorEntry():Bool {
+		
+		if ( this.armorEntry.isValid() )  {
+			this.char.inventory.wornArmor.push( armorEntry.e );
+			this.armorEntry.reset();
+			
+			return true;
+		}
+		return false;
+	}
+	
+	function holdItemHandler(itemEntry:ReadyAssign, held:Int):Void {
+		this.char.inventory.holdEquiped(itemEntry, held);
+	}
 	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");
@@ -109,55 +133,98 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	@:computed function get_isValidDroppedEntry():Bool 
 	{
-		return this.droppedEntry.isValidQtyEntry();
+		return this.droppedEntry.isValid();
 	}
 	
 	@:computed  function get_isValidPackedEntry():Bool 
 	{
-		return this.packedEntry.isValidQtyEntry();
+		return this.packedEntry.isValid();
 	}
 	
-	@:computed  function get_droppedEntryFocus():Int 
-	{
-		return this.droppedEntry.focusedFlags;
-	}
-	
-	@:computed  function get_droppedEntryGotFocus():Bool 
+	@:computed function get_droppedEntryGotFocus():Bool 
 	{
 		return this.droppedEntry.focusedFlags !=0;
-	}
-	
-	
-	@:computed  function get_packedEntryFocus():Int 
-	{
-		return this.packedEntry.focusedFlags;
 	}
 	@:computed function get_packedEntryGotFocus():Bool 
 	{
 		return this.packedEntry.focusedFlags != 0;
 	}
 	
-	@:watch(packedEntryGotFocus) function onPackedEntryFocusChanged(newValue:Bool, oldValue:Bool) {
+	@:computed function get_miscEntryGotFocus():Bool 
+	{
+		return this.miscItemEntry.focusedFlags !=0;
+	}
+	@:computed function get_weaponEntryGotFocus():Bool 
+	{
+		return this.weaponEntry.focusedFlags != 0;
+	}
+	@:computed function get_shieldEntryGotFocus():Bool 
+	{
+		return this.shieldEntry.focusedFlags != 0;
+	}
+	
+	@:computed function get_armorEntryGotFocus():Bool 
+	{
+		return this.armorEntry.focusedFlags != 0;
+	}
+	
+
+	
+	
+	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
-			executeQtyEntry(this.packedEntry);
+			executeQtyEntry(this.packedEntry, this.char.inventory.packed);
 		}
 	}
 	
-	@:watch(droppedEntryGotFocus) function onDroppedEntryFocusChanged(newValue:Bool, oldValue:Bool) {
+	@:watch function on_droppedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
-			executeQtyEntry(this.droppedEntry);
+			executeQtyEntry(this.droppedEntry, this.char.inventory.dropped);
 		}
-	
 	}
 	
+	@:watch function on_shieldEntryGotFocus(newValue:Bool, oldValue:Bool) {
+		if (!newValue) {
+			executeEquipEntry(this.shieldEntry, "shield");
+			
+		}
+		
+	}
+	@:watch function on_weaponEntryGotFocus(newValue:Bool, oldValue:Bool) {
+		if (!newValue) {
+			executeEquipEntry(this.weaponEntry, "weapon");
+		}
+	}
+	@:watch function on_miscEntryGotFocus(newValue:Bool, oldValue:Bool) {
+		if (!newValue) {
+			executeEquipEntry(this.miscItemEntry, "item");
+		}
+	}
+	
+	@:watch function on_armorEntryGotFocus(newValue:Bool, oldValue:Bool) {
+		if (!newValue) {
+			executeArmorEntry();
+		}
+	}
+
 	
 
 }
 
 class CharSheetVueData  {
-	var droppedEntry:QtyEntry = new QtyEntry();
-	var packedEntry:QtyEntry = new QtyEntry();
+	// dropped/packed item misc entry
+	var droppedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
+	var packedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
 	
+	// equiped items entry
+	var shieldEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("shield") );
+	var weaponEntry:RowReadyEntry= new RowReadyEntry( Inventory.getEmptyReadyAssign("weapon") );
+	var miscItemEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("item") );
+	
+	// worn armor
+	var armorEntry:ArmorEntry = new ArmorEntry();
+
+	// save/load copy box data
 	var copyToClipboard:String = "";
 	
 	@:vueInclude var char:CharSheet = new CharSheet();
@@ -168,32 +235,91 @@ class CharSheetVueData  {
 
 }
 
-class QtyEntry {
-	public var name:String="";
-	public var qty:Int = 1;
-	public var focusedFlags:Int = 0;// false;
-	public var weight:Int = 0;
-	
+
+interface IFocusFlags {
+	var focusedFlags:Int;
+}
+
+@:generic
+class RowEntry<E:(IValidable, Constructible<Dynamic>)> implements IValidable implements IFocusFlags {
+
+	public var e:E;
+	public var focusedFlags:Int = 0;
 	
 	public function new() {
-		
+		e = new E();
 	}
 	
 	public function reset():Void {
-		name = "";
-		qty = 1;
+		e = new E();
+	}
+	
+	public function isValid():Bool {	
+		return e.isValid();
+	}
+}
+
+class ArmorEntry implements IValidable implements IFocusFlags {
+	
+	public var e:Armor;
+	public var focusedFlags:Int = 0;
+	
+	public function new():Void {
+		e = new Armor();
+	}
+	
+	public function reset():Void {
+		e = new Armor();
+	}
+	
+	public function isValid():Bool {
+		return e.name != null && e.name != "";
 		
 	}
-	
-	public function getTotalWeight():Int {
-		return qty*weight;
-	}
-	
-	public function isValidQtyEntry():Bool {
-		
-		return qty  > 0 && name != null && name != "";
-	}
-	
 	
 }
+
+class RowReadyEntry implements IValidable implements IFocusFlags {
+
+	public var e:ReadyAssign;
+	public var focusedFlags:Int = 0;
+	
+	var itemToValidate:Item;
+	
+	public function new(e:ReadyAssign) {
+		reset(e);
+	}
+	
+	public function reset(e:ReadyAssign):Void {
+		// we assume that the type of object remains immutable
+		itemToValidate = null;
+		this.e = e;
+	}
+	
+	
+	function setupValidable():Void {
+		if ( Reflect.hasField(e, "weapon") ) {
+			itemToValidate = LibUtil.as( Reflect.field(e, "weapon"), Weapon);
+		}
+		else if ( Reflect.hasField(e, "shield") ) {
+			itemToValidate =  LibUtil.as(Reflect.field(e, "shield"), Shield);
+		}
+		else if ( Reflect.hasField(e, "item") ) {
+			itemToValidate = LibUtil.as( Reflect.field(e, "item"), Item);
+		}
+		else {
+			throw "Could not resolve RowReadyEntry reflect type!";
+		}
+		
+		if (itemToValidate == null)  throw "Could not resolve item to validate to Item type:"+e;
+	}
+	
+	public function isValid():Bool {	
+		//return e.isValid();
+		if (itemToValidate == null) setupValidable();
+
+		return itemToValidate.name != null && itemToValidate.name != "";
+	}
+}
+	
 	

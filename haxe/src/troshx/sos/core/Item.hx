@@ -14,7 +14,12 @@ class Item
 
 	static var UID_COUNT:Int = 0;
 	
-	public var twoHanded:Bool = false;
+	public var flags:Int = 0;
+	public static inline var FLAG_TWO_HANDED:Int = 1;
+	public static inline var FLAG_STRAPPED:Int = 2;
+	
+	public var twoHanded(get, never):Bool;
+	public var strapped(get, never):Bool;
 	
 	/**
 	 * 
@@ -28,6 +33,8 @@ class Item
 		
 	}
 	
+	
+	
 	public function getTypeLabel():String {
 		return "MiscItem";
 	}
@@ -35,6 +42,15 @@ class Item
 	inline function get_uid():String 
 	{
 		return id != "" ? id : name;
+	}
+	
+	inline function get_twoHanded():Bool 
+	{
+		return (flags & FLAG_TWO_HANDED) != 0;
+	}
+	inline function get_strapped():Bool 
+	{
+		return (flags & FLAG_STRAPPED) != 0;
 	}
 	
 }

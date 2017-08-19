@@ -6,16 +6,16 @@ package troshx.sos.core;
  */
 class Shield extends Item
 {
-	public var AV:Int = 0;
-	public var block:Int = 0;
+	public var AV:Int = 1;
+	public var block:Int = 7;
 	public var coverage:Dynamic<HitLocation> = {};
-	
-	public var strapped:Bool = false;
+
 	
 
 	public function new() 
 	{
 		super();
+	
 	}
 	
 	override public function getTypeLabel():String {
