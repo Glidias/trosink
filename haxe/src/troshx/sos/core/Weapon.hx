@@ -7,9 +7,13 @@ package troshx.sos.core;
 class Weapon extends Item
 {
 
-	public var reach:Int = 4;
+	public var type:String = "";
+	public var singleHandVariant:Weapon = null;
+	
 	public var atnSwing:Int = 7;
 	public var atnThrust:Int = 7;
+	
+	public var reach:Int = 4;
 	
 	public var dtn:Int = 7;
 	public var guard:Int = 0;

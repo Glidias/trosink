@@ -74,7 +74,7 @@
 			</tbody>
 		</table>
 					
-		<h3>Equiped</h3>
+		<h3>Equipment details</h3>
 		
 		
 		<h4>Shields:</h4>
@@ -86,6 +86,7 @@
 					<td style="width:35px">Block</td>
 					<td style="width:45px">Weight</td>
 					<td>Coverage</td>
+					<td>Tags</td>
 					<td style="width:130px">Kept at?</td>
 					<td>Held?</td>
 					<td><i>Actions</i></td>
@@ -98,6 +99,7 @@
 					<td><input type="number" v-model="entry.shield.block" number min="0"></input></td>
 					<td><input type="number" v-model="entry.shield.weight" number min="0"></input></td>
 					<td><input type="text" :value="entry.shield.coverage"></input></td>
+					<td><input type="text"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -120,7 +122,8 @@
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 4)" v-on:blur="focusOutRowField(shieldEntry, 4)" v-model="shieldEntry.e.shield.block" number min="0"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 8)" v-on:blur="focusOutRowField(shieldEntry, 8)" v-model="shieldEntry.e.shield.weight" number min="0"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)" :value="shieldEntry.e.shield.coverage"></input></td>
-					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 32)" v-on:blur="focusOutRowField(shieldEntry, 32)" :value="shieldEntry.e.unheldRemark"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 32)" v-on:blur="focusOutRowField(shieldEntry, 32)"></input></td>
+					<td><input type="text" v-model="shieldEntry.unheldRemark" v-on:focus="focusInRowField(shieldEntry,64)" v-on:blur="focusOutRowField(shieldEntry,64)"></input></td>	
 				</tr>
 			</tbody>
 		</table>
@@ -133,11 +136,12 @@
 					<td>Type</td>
 					<td>Hands</td>
 					<td>Reach</td>
-					<td>SwingTN</td>
-					<td>ThrustTN</td>
+					<td>ATN(S)</td>
+					<td>ATN(T)</td>
 					<td>DTN</td>
-					<td>Guard</td>
+					<td>(G)</td>
 					<td>Weight</td>
+					<td>Tags</td>
 					<td>Kept at?</td>
 					<td>Held?</td>
 					<td><i>Actions</i></td>
@@ -146,6 +150,7 @@
 			<tbody>
 				<tr v-for="entry in char.inventory.weapons">
 					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input type="text" v-model="entry.weapon.type"></input></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -171,8 +176,17 @@
 					</td>
 				</tr>
 				<tr>
-					
-	
+					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,4)" v-on:blur="focusOutRowField(weaponEntry,4)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,16)" v-on:blur="focusOutRowField(weaponEntry,16)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,32)" v-on:blur="focusOutRowField(weaponEntry,32)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,64)" v-on:blur="focusOutRowField(weaponEntry,64)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,128)" v-on:blur="focusOutRowField(weaponEntry,128)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
+					<td><input type="text" v-model="weaponEntry.e.unheldRemark" v-on:focus="focusInRowField(weaponEntry,1024)" v-on:blur="focusOutRowField(weaponEntry,1024)"></input></td>
 				</tr>
 			</tbody>
 		</table>
@@ -183,8 +197,8 @@
 			<thead>
 				<tr>
 					<td>MiscItem Name</td>
+					<td>Tags</td>
 					<td>Weight</td>
-					
 					<td>Kept At?</td>
 					<td>Held?</td>
 					<td><i>Actions</i></td>
@@ -193,8 +207,8 @@
 			<tbody>
 				<tr v-for="entry in char.inventory.equipedNonMeleeItems">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
+					<td></td>
 					<td><input type="number" number min="0" v-model="entry.item.weight"></input></td>
-					
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -211,8 +225,10 @@
 					</td>
 				</tr>
 				<tr>
-					
-	
+					<td><input type="text" v-model="miscItemEntry.e.item.name" v-on:focus="focusInRowField(miscItemEntry,1)" v-on:blur="focusOutRowField(miscItemEntry,1)"></input></td>
+					<td><input type="text" v-on:focus="focusInRowField(miscItemEntry,2)" v-on:blur="focusOutRowField(miscItemEntry,2)"></input></td>
+					<td><input type="number" number min="0" v-model="miscItemEntry.e.item.weight" v-on:focus="focusInRowField(miscItemEntry,4)" v-on:blur="focusOutRowField(miscItemEntry,4)"></input></td>
+					<td><input type="text" v-model="miscItemEntry.e.unheldRemark" v-on:focus="focusInRowField(miscItemEntry,8)" v-on:blur="focusOutRowField(miscItemEntry,8)"></input></td>	
 				</tr>
 			</tbody>
 		</table>		
@@ -227,8 +243,8 @@
 					<td>AVP</td>
 					<td>AVB</td>
 					<td>Coverage</td>
-					<td>Tags</td>
 					<td>Weight</td>
+					<td>Tags</td>
 					
 					<td><i>Actions</i></td>
 				</tr>
@@ -240,8 +256,8 @@
 					<td><input type="text" v-model="armor.AVP"></input></td>
 					<td><input type="text" v-model="armor.AVB"></input></td>
 					<td><input type="text" :value="armor.coverage"></input></td>
+					<td><input type="number" min="0" number v-model="armor.weight"></input></td>
 					<td><input type="text" v-model="armor.tags"></input></td>
-					<td><input type="text" v-model="armor.weight"></input></td>
 					
 					<td>
 						<a href="javascript:;">Pack</a>
@@ -250,8 +266,13 @@
 					</td>
 				</tr>
 				<tr>
-					
-	
+					<td><input type="text" v-model="armorEntry.e.name" v-on:focus="focusInRowField(armorEntry,1)" v-on:blur="focusOutRowField(armorEntry,1)"></input></td>
+					<td><input type="text" v-model="armorEntry.e.AVC" v-on:focus="focusInRowField(armorEntry,2)" v-on:blur="focusOutRowField(armorEntry,2)"></input></td>
+					<td><input type="text" v-model="armorEntry.e.AVP" v-on:focus="focusInRowField(armorEntry,4)" v-on:blur="focusOutRowField(armorEntry,4)"></input></td>
+					<td><input type="text" v-model="armorEntry.e.AVB" v-on:focus="focusInRowField(armorEntry,8)" v-on:blur="focusOutRowField(armorEntry,8)"></input></td>
+					<td><input type="text" :value="armorEntry.e.coverage" v-on:focus="focusInRowField(armorEntry,16)" v-on:blur="focusOutRowField(armorEntry,16)"></input></td>
+					<td><input type="number" min="0" number v-model="armorEntry.e.weight" v-on:focus="focusInRowField(armorEntry,32)" v-on:blur="focusOutRowField(armorEntry,32)"></input></td>
+					<td><input type="text" v-model="armorEntry.e.tags" v-on:focus="focusInRowField(armorEntry,64)" v-on:blur="focusOutRowField(armorEntry,64)"></input></td>
 				</tr>
 			</tbody>
 		</table>		

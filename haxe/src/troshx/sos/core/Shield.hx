@@ -1,7 +1,7 @@
 package troshx.sos.core;
 
 /**
- * ...
+ * 
  * @author Glidias
  */
 class Shield extends Item
@@ -11,7 +11,12 @@ class Shield extends Item
 	public var coverage:Dynamic<HitLocation> = {};
 
 	
+	// bob/ss
+	public var strapType:Int = 0;
+	public static inline var STRAP_ARM:Int = 0;
+	public static inline var STRAP_SHOULDER:Int = 1;
 
+	
 	public function new() 
 	{
 		super();
