@@ -1,5 +1,6 @@
 package troshx.sos.core;
 
+
 /**
  * Special flags and values for Melee weapons
  * @author Glidias
@@ -45,20 +46,27 @@ class MeleeSpecial
 		var arr:Array<String> = [];
 		
 		if (flags != 0) {
-			for (i in 0...TOTAL_FLAGS) { // todo: macro generate lines from here
-				if ( (flags & ( 1 << i )) != 0 ) {
-					
-				}
-			}
+			Item.pushFlagLabelsToArr();
 		}
 		
 		if (instance != null) { 
-			// todo: macro generate lines from here
-			
+			Item.pushVarLabelsToArr();
 		}
 		return arr;
 	}
-
+	
+	public static function getFlagVarNames():Array<String> {	
+		var arr:Array<String> = [];
+		Item.pushFlagLabelsToArr(false);
+		return arr;
+	}
+	
+	public function getIntVarNames():Array<String> {	
+		var arr:Array<String> = [];
+		Item.pushVarLabelsToArr(false);
+		return arr;
+	}
+	
 	
 	public function new() 
 	{
