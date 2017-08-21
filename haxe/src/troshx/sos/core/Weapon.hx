@@ -9,7 +9,8 @@ class Weapon extends Item
 	
 	public var customiseFlags:Int = 0;
 	
-	public var profs:Array<Profeciency> = [];
+	public var profs:Int = 0;
+	public var profsCustom:Array<Profeciency> = null;
 	
 	public var reach:Int = 4;
 	
@@ -30,12 +31,13 @@ class Weapon extends Item
 	
 	
 	// Bow
-	public var requiredStr:Int = 0;  // may be used for others?
+	public var requiredStr:Int = 0;  // may be used for others as well?
 	
 	// Crossbow
 	public var span:Int = 0;
 	public var spanningTool:Int = 0;
 	
+	// Firearm
 	
 
 	public function new(id:String= "", name:String = "" ) 

@@ -43,7 +43,8 @@ class CharSheet
 	
 	public var school:School = null;
 	public var schoolLevel:Int = 0;
-	public var schoolProfeciencies:Array<Profeciency> = [];
+	public var profs:Int = 0;	// core profiecy mask
+	public var profsCustom:Array<Profeciency> = null;  // gm-homebrews (if any)
 	
 	public var labelRace(get, never):String;
 	public var labelSex(get, never):String;
