@@ -7,9 +7,11 @@ package troshx.sos.core;
 class Shield extends Item
 {
 	public var AV:Int = 1;
-	public var block:Int = 7;
 	public var coverage:Dynamic<HitLocation> = {};
-
+	
+	public var blockTN:Int = 7;
+	public var bashTN:Int = 0;
+	
 	
 	// bob/ss
 	public var strapType:Int = 0;

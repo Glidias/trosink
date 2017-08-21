@@ -96,7 +96,7 @@
 				<tr v-for="entry in char.inventory.shields">
 					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
-					<td><input type="number" v-model="entry.shield.block" number min="0"></input></td>
+					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" v-model="entry.shield.weight" number min="0"></input></td>
 					<td><input type="text" :value="entry.shield.coverage"></input></td>
 					<td><input type="text"></input></td>
@@ -136,8 +136,8 @@
 					<td>Type</td>
 					<td>Hands</td>
 					<td>Reach</td>
-					<td>ATN(S)</td>
-					<td>ATN(T)</td>
+					<td>ATN</td>
+					<td>ATNt</td>
 					<td>DTN</td>
 					<td>(G)</td>
 					<td>Weight</td>

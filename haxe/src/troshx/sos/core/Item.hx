@@ -11,6 +11,7 @@ class Item
 	
 	public var id(default,null):String;
 	public var uid(get, never):String;
+	public var label(get, never):String;
 
 	static var UID_COUNT:Int = 0;
 	
@@ -33,15 +34,17 @@ class Item
 		
 	}
 	
-	
-	
 	public function getTypeLabel():String {
 		return "MiscItem";
 	}
 	
-	inline function get_uid():String 
+	function get_uid():String 
 	{
 		return id != "" ? id : name;
+	}
+	
+	function get_label():String {
+		return name;
 	}
 	
 	inline function get_twoHanded():Bool 
