@@ -20,7 +20,7 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	public var BL:Int = 0;
 	public var treated:Bool = false;
 	
-	public var labelLocation(get, null):String;
+	public var labelLocation(get, never):String;
 	
 	public var uid(get, never):String;
 	

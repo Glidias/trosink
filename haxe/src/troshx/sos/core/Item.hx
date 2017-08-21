@@ -9,7 +9,7 @@ class Item
 	public var weight:Float = 0;
 	public var name:String;
 	
-	public var id(default,null):String;
+	public var id(default,never):String;
 	public var uid(get, never):String;
 	public var label(get, never):String;
 
