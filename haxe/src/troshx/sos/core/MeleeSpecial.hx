@@ -55,6 +55,7 @@ class MeleeSpecial
 		return arr;
 	}
 	
+	
 	public static function getFlagVarNames():Array<String> {	
 		var arr:Array<String> = [];
 		Item.pushFlagLabelsToArr(false);
@@ -65,6 +66,12 @@ class MeleeSpecial
 		var arr:Array<String> = [];
 		Item.pushVarLabelsToArr(false);
 		return arr;
+	}
+	
+	public function getVarNameProps():Dynamic<Array<String>> {	
+		var hash:Dynamic<Array<String>> = {};
+		
+		return hash;
 	}
 	
 	

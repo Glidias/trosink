@@ -12,12 +12,15 @@ class Weapon extends Item
 	public var profs:Int = 0;
 	public var profsCustom:Array<Profeciency> = null;
 	
-	public var reach:Int = 4;
+	public var reach:Int = 4;   
 	
 	public var variant:Weapon = null;
 	
 	public var atn:Int = 0;
 	public var atnT:Int = 0;
+	
+	public var damage:Int = 0;
+	public var damageT:Int = 0;
 	
 	public var damageType:Int = DamageType.CUTTING;
 	public var damageTypeT:Int = DamageType.PIERCING;
@@ -28,16 +31,17 @@ class Weapon extends Item
 	public var specialFlags:Int = 0;
 	public var meleeSpecial:MeleeSpecial = null;
 	public var missileSpecial:MissileSpecial = null;
-	
+
+
 	
 	// Bow
-	public var requiredStr:Int = 0;  // may be used for others as well?
+	public var requiredStr:Int = 0; 
 	
-	// Crossbow
-	public var span:Int = 0;
-	public var spanningTool:Int = 0;
+	// Crossbow (if specified, overrides bow)
+	public var crossbow:Crossbow = null;
 	
-	// Firearm
+	// Firearm (if specified, may stack with crossbow for a crossbow+firearm hybrid)
+	public var firearm:Firearm = null;
 	
 
 	public function new(id:String= "", name:String = "" ) 
