@@ -82,6 +82,30 @@ class Ammunition extends Item
 		super(id, name);
 		
 	}
+	
+	static var LIST:Array<Ammunition>;  
+	public static function getDefaultList():Array<Ammunition> {
+		return LIST != null ? LIST : (LIST=getNewDefaultList());
+	}
+	
+	public static inline var BALL:Int = 0;
+	public static inline var BUCK_AND_BALL:Int = 1;
+	public static inline var HEAVY_SHOT:Int = 2;
+	public static inline var RIFLE_BALL:Int = 3;
+	public static inline var SHOT:Int = 4;
+	public static inline var SPIKE:Int = 5;
+	
+	public static function getNewDefaultList():Array<Ammunition> {
+		var a:Array<Ammunition> = [];
+		var f;
+		a[BALL] = f= new Ammunition("Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
+		a[BUCK_AND_BALL] = f= new Ammunition("Buck and Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
+		a[HEAVY_SHOT] = f= new Ammunition("Heavy Shot", 9).setWeightCost(0, 3, Item.CP).setUnit(10);
+		a[RIFLE_BALL] = f = new Ammunition("Rifle Ball", 8).setWeightCost(0, 6, Item.CP).setUnit(10);
+		a[SHOT] = f = new Ammunition("Shot", 9).setWeightCost(0, 1, Item.CP).setCostsetUnitUnit(10);
+		a[SPIKE] = f = new Ammunition("Spike", 1).setWeightCost(0, 1, Item.CP).setUnit(10);
+		return a;
+	}
 }
 	
 class LoadingMechanism

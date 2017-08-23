@@ -52,7 +52,6 @@ class Item
 	
 	public function setUnit<T>(unit:Int):T {
 		this.unit = unit;
-		
 		return cast this;
 	}
 	
