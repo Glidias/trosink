@@ -32,7 +32,7 @@ class Weapon extends Item
 	public var meleeSpecial:MeleeSpecial = null;
 	public var missileSpecial:MissileSpecial = null;
 
-
+	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
 	// Bow
 	public var requiredStr:Int = 0; 

@@ -62,6 +62,7 @@ class MeleeSpecial
 		return arr;
 	}
 	
+	
 	public function getIntVarNames():Array<String> {	
 		var arr:Array<String> = [];
 		Item.pushVarLabelsToArr(false);

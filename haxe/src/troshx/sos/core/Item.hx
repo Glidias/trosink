@@ -1,7 +1,9 @@
 package troshx.sos.core;
 
 
+
 #if macro
+import haxe.macro.ExprTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type.VarAccess;
@@ -32,6 +34,27 @@ class Item
 	
 	public var twoHanded(get, never):Bool;
 	public var strapped(get, never):Bool;
+
+	public var cost:Int = 0;
+	public var costCurrency:Int = 0;
+	public static inline var CP:Int = 0;
+	public static inline var SP:Int = 1;
+	public static inline var GP:Int = 2;
+	public var unit:Int = 1;
+	
+	public function setWeightCost<T>(weight:Int, cost:Int, costCurrency:Int):T {
+		this.weight = weight;
+		this.cost = cost;
+		this.costCurrency = costCurrency;
+		
+		return cast this;
+	}
+	
+	public function setUnit<T>(unit:Int):T {
+		this.unit = unit;
+		
+		return cast this;
+	}
 	
 	/**
 	 * 
@@ -67,6 +90,8 @@ class Item
 		return (flags & FLAG_STRAPPED) != 0;
 	}
 	
+	
+
 	
 	public static function labelizeAllCaps(name:String):String {
 		var spl = name.split("_");
@@ -105,6 +130,55 @@ class Item
 	
 	
 	// Macros to be used
+	
+	public static macro function getInstanceFlagsOf(classe:Expr, flags:Expr):Expr {
+		var cp = Context.currentPos();
+		
+		var classeStr:String;
+		switch( classe.expr) {
+			case EConst(CIdent(s)):
+				classeStr = s;
+				
+			default:
+				
+		}
+
+		var exprBuild:Expr = macro (1 << Item.FLAG_STRAPPED) | ( 1 << Item.FLAG_TWO_HANDED) | ( 1 << Item.MASK_HANDED);
+		var fieldList:Array<Expr> = [];
+		
+		switch (flags.expr) {
+			case EArrayDecl(values):
+				for (i in 0...values.length) {
+					var v = values[i];
+					switch( v.expr ) {
+						case EConst(CIdent(s)):
+							fieldList.push( { expr:EParenthesis(
+								{ expr:EBinop(Binop.OpShl,  {expr:EConst(CInt("1")), pos:cp }, { expr:EField( { expr:EConst(CIdent(classeStr)), pos:v.pos }, s), pos:classe.pos } ), pos:cp }	
+						), pos:cp } );
+						default:
+					}
+				}
+				
+				if (values.length == 0) {
+					return macro 0;
+				}
+				if (values.length == 1) {
+					return fieldList[0];
+				}
+			case EConst(CIdent(s)):
+				return  { expr:EParenthesis(
+								{ expr:EBinop(Binop.OpShl,  {expr:EConst(CInt("1")), pos:cp }, { expr:EField( { expr:EConst(CIdent(classeStr)), pos:flags.pos }, s), pos:classe.pos } ), pos:cp }	
+						), pos:cp };
+			default:
+				Context.error("Unresolved case for parameter. Either CArray or single CIdent", flags.pos);
+		}
+		
+		var combineOr:Expr = null;
+		for (i in 1...fieldList.length) {
+			combineOr = { expr:EBinop(Binop.OpOr, (combineOr != null ? combineOr : fieldList[i-1]), fieldList[i]), pos:cp };
+		}
+		return combineOr;
+	}
 	
 	public static macro function pushFlagLabelsToArr(labelize:Bool=true):Expr {
 	
