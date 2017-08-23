@@ -42,7 +42,7 @@ class Item
 	public static inline var GP:Int = 2;
 	public var unit:Int = 1;
 	
-	public function setWeightCost<T>(weight:Int, cost:Int, costCurrency:Int):T {
+	public function setWeightCost<T>(weight:Float, cost:Int, costCurrency:Int):T {
 		this.weight = weight;
 		this.cost = cost;
 		this.costCurrency = costCurrency;
