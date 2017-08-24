@@ -50,11 +50,11 @@ class Weapon extends Item
 	
 	override function get_uid():String 
 	{
-		return super.get_uid() + (customise != null ?  customise.uid : "" ); // id != "" ? id : name;
+		return super.get_uid() + (customise != null ?  "_"+customise.uid : "" ); // id != "" ? id : name;
 	}
 	
 	override function get_label():String {
-		return name + (customise != null ? "("+customise.uid+")" : "");  // todo: get labeling for customise flags
+		return name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
 	}
 	
 	override public function getTypeLabel():String {
