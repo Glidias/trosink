@@ -6,9 +6,6 @@ package troshx.sos.core;
  */
 class Weapon extends Item
 {
-	
-	public var customiseFlags:Int = 0;
-	
 	public var profs:Int = 0;
 	public var profsCustom:Array<Profeciency> = null;
 	
@@ -31,6 +28,8 @@ class Weapon extends Item
 	public var specialFlags:Int = 0;
 	public var meleeSpecial:MeleeSpecial = null;
 	public var missileSpecial:MissileSpecial = null;
+	
+	public var customise:WeaponCustomise = null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
@@ -51,11 +50,11 @@ class Weapon extends Item
 	
 	override function get_uid():String 
 	{
-		return super.get_uid() + "_" + customiseFlags; // id != "" ? id : name;
+		return super.get_uid() + (customise != null ?  customise.uid : "" ); // id != "" ? id : name;
 	}
 	
 	override function get_label():String {
-		return name + (customiseFlags != 0 ? "(_"+customiseFlags+")" : "");  // todo: get labeling for customise flags
+		return name + (customise != null ? "("+customise.uid+")" : "");  // todo: get labeling for customise flags
 	}
 	
 	override public function getTypeLabel():String {
