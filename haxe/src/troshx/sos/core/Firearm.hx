@@ -102,7 +102,7 @@ class Ammunition extends Item
 		a[BUCK_AND_BALL] = f= new Ammunition("Buck and Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
 		a[HEAVY_SHOT] = f= new Ammunition("Heavy Shot", 9).setWeightCost(0, 3, Item.CP).setUnit(10);
 		a[RIFLE_BALL] = f = new Ammunition("Rifle Ball", 8).setWeightCost(0, 6, Item.CP).setUnit(10);
-		a[SHOT] = f = new Ammunition("Shot", 9).setWeightCost(0, 1, Item.CP).setCostsetUnitUnit(10);
+		a[SHOT] = f = new Ammunition("Shot", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
 		a[SPIKE] = f = new Ammunition("Spike", 1).setWeightCost(0, 1, Item.CP);
 		return a;
 	}
