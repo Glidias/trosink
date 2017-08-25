@@ -15,8 +15,9 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr v-for="entry in char.inventory.dropped.list">
+			<tbody :name="itemTransitionName" is="transition-group">
+				
+				<tr v-for="entry in char.inventory.dropped.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
 					<td><input type="number" v-model="entry.item.weight" number min="0"></input></td>
@@ -24,10 +25,12 @@
 					<td>
 						<a href="javascript:;" v-on:click="char.inventory.packItemEntryFromGround(entry)">Pack</a>
 						<a href="javascript:;" v-on:click="char.inventory.equipItemEntryFromGround(entry)">Equip</a>
-						<a href="javascript:;" v-on:click="char.inventory.dropped.delete(entry)">Delete</a>
+						<a href="javascript:;" v-on:click="char.inventory.deleteDropped(entry)">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				
+				
+				<tr :key="-1">
 					<td><input type="text" v-model="droppedEntry.e.item.name" required v-on:focus="focusInRowField(droppedEntry, 1)" v-on:blur="focusOutRowField(droppedEntry, 1)"></input></td>
 					<td><input type="number" v-model="droppedEntry.e.qty" number min="1" v-on:focus="focusInRowField(droppedEntry, 2)" v-on:blur="focusOutRowField(droppedEntry, 2)"></input></td>
 					<td><input type="number" v-model="droppedEntry.e.weight" number min="0" v-on:focus="focusInRowField(droppedEntry, 4)" v-on:blur="focusOutRowField(droppedEntry, 4)"></input></td>
@@ -36,7 +39,7 @@
 					</td>
 					
 				</tr>
-				
+			
 				
 			</tbody>
 		</table>
@@ -49,12 +52,12 @@
 					<td>Item Name</td>
 					<td>Qty</td>
 					<td>Weight</td>
-					<td>Type</td>
+					<td>Type</td>f
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr v-for="entry in char.inventory.packed.list">
+			<tbody :name="itemTransitionName" is="transition-group">
+				<tr v-for="entry in char.inventory.packed.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
 					<td><input type="number" v-model="entry.item.weight" number min="0"></input></td>
@@ -63,10 +66,10 @@
 					<td>
 						<a href="javascript:;" v-on:click="char.inventory.dropItemEntryFromPack(entry)">Drop</a>
 						<a href="javascript:;" v-on:click="char.inventory.equipItemEntryFromPack(entry)">Equip</a>
-						<a href="javascript:;" v-on:click="char.inventory.packed.delete(entry)">Delete</a>
+						<a href="javascript:;" v-on:click="char.inventory.deletePacked(entry)">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				<tr :key="-1">
 					<td><input type="text" v-model="packedEntry.e.item.name" required v-on:focus="focusInRowField(packedEntry, 1)" v-on:blur="focusOutRowField(packedEntry, 1)"></input></td>
 					<td><input type="number" v-model="packedEntry.e.qty" number min="1" v-on:focus="focusInRowField(packedEntry, 2)" v-on:blur="focusOutRowField(packedEntry, 2)"></input></td>
 					<td><input type="number" v-model="packedEntry.e.weight" number min="0" v-on:focus="focusInRowField(packedEntry, 4)" v-on:blur="focusOutRowField(packedEntry, 4)"></input></td>
@@ -93,8 +96,8 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('shield',$event)">
-				<tr v-for="(entry,i) in char.inventory.shields">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('shield',$event)">
+				<tr :key="entry.key" v-for="(entry,i) in char.inventory.shields">
 					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
@@ -121,7 +124,7 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropEquipedShield(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				<tr :key="-1">
 					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 1)" v-on:blur="focusOutRowField(shieldEntry, 1)" v-model="shieldEntry.e.shield.name" required></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 2)" v-on:blur="focusOutRowField(shieldEntry, 2)" v-model="shieldEntry.e.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 4)" v-on:blur="focusOutRowField(shieldEntry, 4)" v-model="shieldEntry.e.shield.block" number min="0"></input></td>
@@ -144,7 +147,7 @@
 				<tr>
 					<td>Melee Weap Name</td>
 					<td>Type</td>
-					<td  style="width:30px">Hands</td>
+					<td style="width:30px">Hands</td>
 					<td style="width:20px">Reach</td>
 					<td style="width:45px">Swing</td>
 					<td style="width:45px">Thrust</td>
@@ -156,8 +159,8 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('meleeWeap', $event)">
-				<tr v-for="(entry,itemIndex) in char.inventory.weapons">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('meleeWeap', $event)">
+				<tr v-for="(entry,itemIndex) in char.inventory.weapons" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
 					<td v-on:click="stopPropagation">
 						<select number data-type="profs" :data-index="itemIndex" v-on:change="onProfSelectChange($event, entry.weapon)">
@@ -194,15 +197,15 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr v-if="!weaponEntry.e.weapon.ranged">
+				<tr v-if="!weaponEntry.e.weapon.ranged" :key="-1">
 					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-					<td  v-on:click="stopPropagation">
+					<td v-on:click="stopPropagation">
 						<select number data-type="profs" data-index="-1" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)" v-on:change="onProfSelectChange($event, weaponEntry.e.weapon)">
 							<option selected v-if="weaponEntry.e.weapon.isMultipleCoreProf() || weaponEntry.e.weapon.hasCustomProf()" :value="weaponEntry.e.weapon.profs">
 								{{ weaponEntry.e.weapon.profLabels() }}
 							</option>
-							<option v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
-							<option v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
+							<option :selected="!weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
+							<option :selected="weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
 							<option style="color:grey;" value="0" :selected="isVisibleWidget('meleeWeap','profs', -1)">select multiple...</option>
 						</select>	
 						<div class="pop-widget" v-if="isVisibleWidget('meleeWeap','profs', -1)">
@@ -234,10 +237,23 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('bow', $event)">
-				<tr v-if="weaponEntry.e.weapon.isBow()">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('bow', $event)">
+				<tr v-if="weaponEntry.e.weapon.isBow()" :key="-2">
 					<td>
 						<input type="text"></input>
+					</td>
+					<td v-on:click="stopPropagation">
+						<select number data-type="profs" data-index="-1" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)" v-on:change="onProfSelectChange($event, weaponEntry.e.weapon)">
+							<option selected v-if="weaponEntry.e.weapon.isMultipleCoreProf() || weaponEntry.e.weapon.hasCustomProf()" :value="weaponEntry.e.weapon.profs">
+								{{ weaponEntry.e.weapon.profLabels() }}
+							</option>
+							<option :selected="!weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">&gt;{{ p.name }}</option>
+							<option :selected="weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">{{ p.name != "Bow" ?  "&gt;" : "" }}{{ p.name }}</option>
+							<option style="color:grey;" value="0" :selected="isVisibleWidget('bow','profs', -1)">select multiple...</option>
+						</select>	
+						<div class="pop-widget" v-if="isVisibleWidget('bow','profs', -1)">
+							Widget goes here
+						</div>
 					</td>
 				</tr>
 			</tbody>
@@ -257,11 +273,12 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('crossbow', $event)">
-				<tr v-if="weaponEntry.e.weapon.isCrossbow()">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('crossbow', $event)">
+				<tr :key="-3" v-if="weaponEntry.e.weapon.isCrossbow()">
 					<td>
 						<input type="text"></input>
 					</td>
+					
 				</tr>
 			</tbody>
 			<thead>
@@ -280,8 +297,8 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('firearm', $event)">
-				<tr v-if="weaponEntry.e.weapon.isFirearm()">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('firearm', $event)">
+				<tr :key="-4" v-if="weaponEntry.e.weapon.isFirearm()">
 					<td>
 						<table>
 							<tr>
@@ -307,8 +324,8 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('miscItem', $event)">
-				<tr v-for="entry in char.inventory.equipedNonMeleeItems">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('miscItem', $event)">
+				<tr v-for="entry in char.inventory.equipedNonMeleeItems" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td></td>
 					<td><input type="number" number min="0" v-model="entry.item.weight"></input></td>
@@ -327,7 +344,7 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropMiscItem(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				<tr :key="-1">
 					<td><input type="text" v-model="miscItemEntry.e.item.name" v-on:focus="focusInRowField(miscItemEntry,1)" v-on:blur="focusOutRowField(miscItemEntry,1)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(miscItemEntry,2)" v-on:blur="focusOutRowField(miscItemEntry,2)"></input></td>
 					<td><input type="number" number min="0" v-model="miscItemEntry.e.item.weight" v-on:focus="focusInRowField(miscItemEntry,4)" v-on:blur="focusOutRowField(miscItemEntry,4)"></input></td>
@@ -352,8 +369,8 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody v-on:click="setCurWidgetSection('armor', $event)">
-				<tr v-for="armor in char.inventory.wornArmor">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('armor', $event)">
+				<tr v-for="armor in char.inventory.wornArmor" :key="armor.get_uid()">
 					<td><input type="text" v-model="armor.name"></input></td>
 					<td><input type="text" v-model="armor.AVC"></input></td>
 					<td><input type="text" v-model="armor.AVP"></input></td>
@@ -368,7 +385,7 @@
 						<a href="javascript:;">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				<tr :key="-1">
 					<td><input type="text" v-model="armorEntry.e.name" v-on:focus="focusInRowField(armorEntry,1)" v-on:blur="focusOutRowField(armorEntry,1)"></input></td>
 					<td><input type="text" v-model="armorEntry.e.AVC" v-on:focus="focusInRowField(armorEntry,2)" v-on:blur="focusOutRowField(armorEntry,2)"></input></td>
 					<td><input type="text" v-model="armorEntry.e.AVP" v-on:focus="focusInRowField(armorEntry,4)" v-on:blur="focusOutRowField(armorEntry,4)"></input></td>

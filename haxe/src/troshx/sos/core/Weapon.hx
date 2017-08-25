@@ -59,6 +59,11 @@ class Weapon extends Item
 		}
 	}
 	
+	public function matchesTypes(ranged:Bool, ?profs:Int):Void {
+		var thisProfs = this.profs;
+		this.ranged = ranged && (profs == null || (profs & thisProfs) != 0);
+	}
+	
 	public function isBow():Bool {
 		var a = (profs & (1<<Profeciency.R_BOW)) != 0;
 		return ranged && a;
@@ -92,14 +97,12 @@ class Weapon extends Item
 	}
 
 	public inline function isMultipleCoreProf():Bool {
-		return profs != 0 && IsPowerOfTwoOrZero(profs);
+		return profs != 0 && !IsPowerOfTwoOrZero(profs);
 	}
 	public inline function hasCustomProf():Bool {
 		return profsCustom != null && profsCustom.length > 0;
 	}
-	public inline function isSingleCoreProf():Bool {
-		return profs != 0 && !IsPowerOfTwoOrZero(profs);
-	}
+	
 	
 	
 	public function setSingleProfIndex(index:Int):Void {

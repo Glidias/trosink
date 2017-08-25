@@ -41,6 +41,24 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return new CharSheetVueData();
 	}
 	
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
+		return [
+			TDWeapProfSelect.NAME =>new TDWeapProfSelect(),
+		];
+	}
+	override public function Created():Void {
+		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+	}
+	
+	function onInventorySignalReceived(e:InventorySignal) 
+	{
+		switch(e ) {
+			case InventorySignal.DeleteItem:
+				this.itemTransitionName = "";
+			default:
+				this.itemTransitionName = "fade";
+		}
+	}
 	// standard
 	
 	public function loadSheet(contents:String = null):Void {
@@ -111,7 +129,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	function setCurWidgetSection(sectName:String,e:Event):Void {
 		e.stopPropagation();
-		this.curWidgetSection = sectName;
+		this.curWidgetRequest.section = sectName;
 		clearWidgets();
 	}
 	
@@ -120,7 +138,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		this.curWidgetRequest.index = index;
 	}
 	inline function isVisibleWidget(section:String, type:String, index:Int):Bool {
-		return this.curWidgetSection == section && this.curWidgetRequest.type == type && this.curWidgetRequest.index == index;
+		return this.curWidgetRequest.section == section && this.curWidgetRequest.type == type && this.curWidgetRequest.index == index;
 	}
 	
 	inline function openPopup(index:Int):Void {
@@ -165,6 +183,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		if ( qtyEntry.isValid() )  {
 			tarInventoryList.add( qtyEntry.e );
 			qtyEntry.reset();
+			this.itemTransitionName = "fade"; // or something else
 			return true;
 		}
 		
@@ -177,6 +196,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			var tarList = this.char.inventory.getEquipedAssignList(typeId);
 			tarList.push( equipEntry.e );
 			equipEntry.reset( Inventory.getEmptyReadyAssign(typeId) );
+			this.itemTransitionName = "fade";  // or something else?
 			return true;
 		}
 		return false;
@@ -189,7 +209,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		if ( this.armorEntry.isValid() )  {
 			this.char.inventory.wornArmor.push( armorEntry.e );
 			this.armorEntry.reset();
-			
+			this.itemTransitionName = "fade"; // or something else?
 			return true;
 		}
 		return false;
@@ -215,6 +235,16 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	@:computed  function get_isValidPackedEntry():Bool 
 	{
 		return this.packedEntry.isValid();
+	}
+	
+	@:computed function get_crossbowMask():Int {
+		return (1<<Profeciency.R_CROSSBOW);
+	}
+	@:computed function get_bowMask():Int {
+		return (1<<Profeciency.R_BOW);
+	}
+	@:computed function get_firearmMask():Int {
+		return (1<<Profeciency.R_FIREARM);
 	}
 	
 	@:computed function get_droppedEntryGotFocus():Bool 
@@ -311,11 +341,14 @@ class CharSheetVueData  {
 	
 	var popupIndex:Int = -1;
 	
-	var curWidgetSection:String = "";
+	
 	var curWidgetRequest:WidgetItemRequest = {
+		section: "",
 		type: "",
 		index: 0
 	};
+	
+	var itemTransitionName:String = "fade";
 	
 	// to factor this out later
 	@:vueInclude var char:CharSheet = new CharSheet();
@@ -326,6 +359,7 @@ class CharSheetVueData  {
 
 }
 typedef WidgetItemRequest = {
+	var section:String;
 	var type:String;
 	var index:Int;
 }

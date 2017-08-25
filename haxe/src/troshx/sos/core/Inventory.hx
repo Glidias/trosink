@@ -1,5 +1,6 @@
 package troshx.sos.core;
 import js.html.svg.Number;
+import msignal.Signal.Signal1;
 import troshx.core.IUid;
 import troshx.ds.HashedArray;
 import troshx.ds.IDMatchArray;
@@ -35,6 +36,7 @@ class Inventory
 	public static inline var UNHELD_DROPPED:Int = 2;
 	public static inline var UNHELD_EQUIPPED:Int = 4;
 	
+	public static var UID_COUNT:Int = 0;
 	
 	// imperative weapon/item state equip caches
 	public var weaponOffHand:Weapon = null;
@@ -50,6 +52,17 @@ class Inventory
 	public var strappedExtraItem:Array<Item> = null;
 	public var strappedExtraItemOff:Array<Item> = null;
 	
+	var signaler:Signal1<InventorySignal>;
+	public inline function getSignaler():Signal1<InventorySignal> {
+		return (signaler != null ? signaler : signaler=createSignaler());
+	}
+	function createSignaler():Signal1<InventorySignal> {
+		signaler = new Signal1<InventorySignal>();
+		return signaler;
+	}
+	function dispatchSignal(signal:InventorySignal):Void {
+		getSignaler().dispatch(signal);
+	}
 
 	/**
 	 * 
@@ -96,7 +109,9 @@ class Inventory
 	public function packItemEntryFromGround(itemQ:ItemQty):Void {
 		var qty:Int = itemQ.qty;
 		dropped.splicedAgainst(itemQ);
+		dispatchSignal(InventorySignal.PackItem);
 		_shiftItem(itemQ.item, UNHELD_PACKED, qty);
+		
 	}
 	
 	/*
@@ -115,61 +130,83 @@ class Inventory
 		var qty:Int = itemQ.qty;
 		packed.splicedAgainst(itemQ);
 		_shiftItem(itemQ.item, UNHELD_DROPPED, qty);
+		dispatchSignal(InventorySignal.DropItem);
 	}
 	
 	public function equipItemEntryFromGround(itemQ:ItemQty, remark:String=""):ReadyAssign {
 		dropped.splicedAgainst(new ItemQty(itemQ.item, 1));
+		dispatchSignal(InventorySignal.EquipItem);
 		return equipItem(itemQ.item, remark); 
 	} 
 	
 	public function equipItemEntryFromPack(itemQ:ItemQty, remark:String=""):ReadyAssign {
 		packed.splicedAgainst(new ItemQty(itemQ.item, 1));
+		dispatchSignal(InventorySignal.EquipItem);
 		return equipItem(itemQ.item, remark);  
 	}
 	
+
 	
 	public function holdEquiped(alreadyEquiped:ReadyAssign, held:Int):Void {
 		
 		_unholdAllItems(held, Reflect.hasField(alreadyEquiped, "shield") ); 
 		alreadyEquiped.held = held;
+		dispatchSignal(InventorySignal.HoldItem);
 	}
 	
 	public function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool=false):Void {
 		shields.splice( shields.indexOf(alreadyEquiped), 1 );
 		if (!doDestroy) _shiftItem(alreadyEquiped.shield, UNHELD_DROPPED);
+		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	public function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool=false):Void {
 		equipedNonMeleeItems.splice( equipedNonMeleeItems.indexOf(alreadyEquiped), 1 );
 		if (!doDestroy) _shiftItem(alreadyEquiped.item, UNHELD_DROPPED);
+		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	public function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool=false):Void {
 		weapons.splice( weapons.indexOf(alreadyEquiped), 1 );
 		if (!doDestroy) _shiftItem(alreadyEquiped.weapon, UNHELD_DROPPED);
+		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
 	public function dropWornArmor(armor:Armor, doDestroy:Bool=false):Void {
 		wornArmor.splice(wornArmor.indexOf(armor), 1);
 		if (!doDestroy) _shiftItem(armor, UNHELD_DROPPED);
+		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
 	public function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
 		shields.splice( shields.indexOf(alreadyEquiped), 1 );
 		_shiftItem(alreadyEquiped.shield, UNHELD_PACKED);
+		dispatchSignal(InventorySignal.PackItem);
 	}
 	public function packMiscItem(alreadyEquiped:ItemAssign):Void {
 		equipedNonMeleeItems.splice( equipedNonMeleeItems.indexOf(alreadyEquiped), 1 );
 		_shiftItem(alreadyEquiped.item, UNHELD_PACKED);
+		dispatchSignal(InventorySignal.PackItem);
 	}
 	public function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
 		weapons.splice( weapons.indexOf(alreadyEquiped), 1 );
 		_shiftItem(alreadyEquiped.weapon, UNHELD_PACKED);
+		dispatchSignal(InventorySignal.PackItem);
 	}
 	
 	public function packWornArmor(armor:Armor):Void {
 		wornArmor.splice(wornArmor.indexOf(armor), 1);
 		_shiftItem(armor, UNHELD_PACKED);
+		dispatchSignal(InventorySignal.PackItem);
+	}
+
+	public function deletePacked(itemQty:ItemQty):Void {
+		packed.delete(itemQty);
+		dispatchSignal(InventorySignal.DeleteItem);
 	}
 	
+	public function deleteDropped(itemQty:ItemQty):Void {
+		dropped.delete(itemQty);
+		dispatchSignal(InventorySignal.DeleteItem);
+	}
 	
 	function _unholdAllItems(held:Int, isForShield:Bool=false ):Void {
 		var w;
@@ -208,25 +245,22 @@ class Inventory
 		
 		if (Std.is(item, Weapon)) {
 			
-			weapons.push(readyAssign = {weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			weapons.push(readyAssign = {key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Shield)) {
 			
-			shields.push(readyAssign = {shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			shields.push(readyAssign = {key:UID_COUNT++, shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Armor)) {
 
 			wornArmor.push( LibUtil.as(item, Armor) );
 		}
 		else {
-			equipedNonMeleeItems.push(readyAssign = {item:item, held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			equipedNonMeleeItems.push(readyAssign = {key:UID_COUNT++, item:item, held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		
 		return readyAssign;
 	}
-	
-	
-
 	
 	public function new() 
 	{
@@ -249,31 +283,41 @@ class Inventory
 		if (type == "weapon") {
 			return {
 				weapon:new Weapon(),
-				held:0, unheld:0, unheldRemark:""
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++
 			};
 		}
 		else if (type == "shield") {
 			return {
 				shield:new Shield(),
-				held:0, unheld:0, unheldRemark:""
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++
 			};
 		}
 		else {
 			return {
 				item:new Item(),
-				held:0, unheld:0, unheldRemark:""
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++
 			};
 		}
 	}
 	
 }
 
-
+enum InventorySignal {
+	DeleteItem;
+	PackItem;
+	DropItem;
+	EquipItem;
+	HoldItem;
+}
 
 typedef ReadyAssign = {
 	held:Int,
 	unheld:Int,
-	?unheldRemark:String
+	?unheldRemark:String,
+	key:Int
 }
 
 
