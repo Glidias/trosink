@@ -37,7 +37,7 @@ class Weapon extends Item
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
-	// Bow
+	// Bow 
 	public var requiredStr:Int = 0; 
 	
 	// Crossbow (if specified, overrides bow)
@@ -52,11 +52,13 @@ class Weapon extends Item
 		super(id, name);
 	}
 	
+
+	
 	/**
-	 * Perform imperative sanity operation based on weapon type/matching profeciencies to normalize stats and clean up old unused values
-	 * @param	rangedVsProf  Set to true to use profeciency as priority (unless it fail inconsistently, it uses ranged boolean flag choice..)
+	 * Perform imperative sanity operation based on weapon type matching profeciencies to normalize stats and clean up old unused values
+	 *
 	 */
-	public function sanity(rangedVsProf:Bool):Void {	//
+	function sanity():Void {	//
 		
 	}
 	
