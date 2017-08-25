@@ -52,7 +52,11 @@ class Weapon extends Item
 		super(id, name);
 	}
 	
-	public function sanity():Void {	// perform imperative sanity operation based on weapon type and matching profeciencies to normalize stats and clean up old unused values
+	/**
+	 * Perform imperative sanity operation based on weapon type/matching profeciencies to normalize stats and clean up old unused values
+	 * @param	rangedVsProf  Set to true to use profeciency as priority (unless it fail inconsistently, it uses ranged boolean flag choice..)
+	 */
+	public function sanity(rangedVsProf:Bool):Void {	//
 		
 	}
 	
