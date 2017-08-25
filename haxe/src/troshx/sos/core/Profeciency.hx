@@ -66,7 +66,6 @@ class Profeciency
 		return a;
 	}
 	
-	
 	public static inline function getProfsLabelsMelee(mask:Int):Array<String> {
 		return getLabelsOfArrayProfs(getCoreMelee(), mask);
 	}

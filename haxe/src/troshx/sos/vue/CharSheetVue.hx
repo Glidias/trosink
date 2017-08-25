@@ -69,6 +69,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 
 		return testName != ""  && testName != null ? testName : backupName;
 	}
+
 	
 	function setValidNameOfInput(inputElement:InputElement, backupName:String):String {
 		if (inputElement.value != "" ) {
@@ -89,6 +90,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	function focusInRowField(targ:IFocusFlags, mask:Int) {
 		targ.focusedFlags = mask;
 	}
+	
+
 	
 	function executeQtyEntry(qtyEntry:RowEntry<ItemQty>, tarInventoryList:IDMatchArray<Dynamic>):Bool {
 		
@@ -168,9 +171,6 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return this.armorEntry.focusedFlags != 0;
 	}
 	
-
-	
-	
 	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
 			executeQtyEntry(this.packedEntry, this.char.inventory.packed);
@@ -226,6 +226,9 @@ class CharSheetVueData  {
 
 	// save/load copy box data
 	var copyToClipboard:String = "";
+	
+	var coreMeleeProfs:Array<Profeciency> = Profeciency.getCoreMelee();
+	var coreRangedProfs:Array<Profeciency> = Profeciency.getCoreRanged();
 	
 	@:vueInclude var char:CharSheet = new CharSheet();
 	

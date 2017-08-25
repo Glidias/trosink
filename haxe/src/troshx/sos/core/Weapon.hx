@@ -8,10 +8,12 @@ class Weapon extends Item
 {
 	public var profs:Int = 0;
 	public var profsCustom:Array<Profeciency> = null;
+	public var ranged:Bool = false; // to represent missile weapons and missile profeciencies
 	
-	public var reach:Int = 4;   
+	public var reach:Int = 4;   // also used to represent range for missile weapons
 	
-	public var variant:Weapon = null;
+	public var variant:Weapon = null;	// default secondary fire options
+	public var attachments:WeaponAttachments = null; // custom attachments
 	
 	public var atn:Int = 0;
 	public var atnT:Int = 0;
@@ -27,9 +29,11 @@ class Weapon extends Item
 	
 	public var specialFlags:Int = 0;
 	public var meleeSpecial:MeleeSpecial = null;
-	public var missileSpecial:MissileSpecial = null;
 	
 	public var customise:WeaponCustomise = null;
+	
+	// ranged
+	public var missileSpecial:MissileSpecial = null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
@@ -48,13 +52,51 @@ class Weapon extends Item
 		super(id, name);
 	}
 	
+	public function sanity():Void {	// perform imperative sanity operation based on weapon type and matching profeciencies to normalize stats and clean up old unused values
+		
+	}
+	
+	public function profLabels():String {
+		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);
+		if (profsCustom != null) {
+			for (i in 0...profsCustom.length) {
+				arr.push(profsCustom[i].name);
+			}
+		}
+		return arr.join(", ");
+	}
+	
+	
+	static inline function IsPowerOfTwoOrZero(x:Int)
+	{
+		return (x & (x - 1)) == 0;
+	}
+
+	public inline function isMultipleCoreProf():Bool {
+		return profs != 0 && IsPowerOfTwoOrZero(profs);
+	}
+	public inline function hasCustomProf():Bool {
+		return profsCustom != null && profsCustom.length > 0;
+	}
+	public inline function isSingleCoreProf():Bool {
+		return profs != 0 && !IsPowerOfTwoOrZero(profs);
+	}
+	
+	
+	public function setSingleProfIndex(index:Int):Void {
+		profs = (1 << index);
+	}
+	public function setMultipleProf(mask:Int):Void {
+		profs = mask;
+	}
+	
 	override function get_uid():String 
 	{
-		return super.get_uid() + (customise != null ?  "_"+customise.uid : "" ); // id != "" ? id : name;
+		return super.get_uid() + (firearm != null && firearm.firingMechanism != null ? ":"+firearm.firingMechanism.uid : "") + (customise != null ?  "_"+customise.uid : "" ) + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
 	}
 	
 	override function get_label():String {
-		return name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
+		return (firearm != null && firearm.firingMechanism != null ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
 	}
 	
 	override public function getTypeLabel():String {
