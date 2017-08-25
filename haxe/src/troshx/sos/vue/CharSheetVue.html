@@ -1,9 +1,10 @@
 <div>
 	<h1>Character Sheet</h1>
-	<div class="inventory">
+	<div class="inventory" v-on:click="onBaseInventoryClick">
+
 		<h2>Inventory</h2>
 		
-		<h4>Dropped:</h3>
+		<h4>Dropped:</h4>
 		<table border="1">
 			<thead>
 				<tr>
@@ -11,7 +12,7 @@
 					<td>Qty</td>
 					<td>Weight</td>
 					<td>Type</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
 			<tbody>
@@ -40,7 +41,7 @@
 			</tbody>
 		</table>
 		
-		<h4>Packed: <label style="font-size:10px">Drop?</label><input type="checkbox" v-model="char.inventory.dropPack"></input></h3>
+		<h4>Packed: <label style="font-size:10px">Drop?</label><input type="checkbox" v-model="char.inventory.dropPack"></input></h4>
 		
 		<table border="1">
 			<thead>
@@ -49,7 +50,7 @@
 					<td>Qty</td>
 					<td>Weight</td>
 					<td>Type</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
 			<tbody>
@@ -89,20 +90,24 @@
 					<td>Tags</td>
 					<td style="width:130px">Kept at?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr v-for="entry in char.inventory.shields">
+			<tbody v-on:click="setCurWidgetSection('shield',$event)">
+				<tr v-for="(entry,i) in char.inventory.shields">
 					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" v-model="entry.shield.weight" number min="0"></input></td>
-					<td><input type="text" :value="entry.shield.coverage"></input></td>
+					<td  v-on:click="stopPropagation" class="gotbtn focus"><input type="text" readonly :value="entry.shield.coverage"></input><button v-on:click="requestCurWidget('coverage',i)">[|]</button>
+						<div class="pop-widget" v-if="isVisibleWidget('shield','coverage', i)">
+							Widget goes here
+						</div>
+					</td>
 					<td><input type="text"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
-						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
+						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)">
 							<option value="0">No</option>
 							<option value="2" :disabled="entry.shield.get_twoHanded()">Off-hand</option>
 							<option value="1" :disabled="entry.shield.get_twoHanded()">Master-hand</option>
@@ -121,7 +126,12 @@
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 2)" v-on:blur="focusOutRowField(shieldEntry, 2)" v-model="shieldEntry.e.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 4)" v-on:blur="focusOutRowField(shieldEntry, 4)" v-model="shieldEntry.e.shield.block" number min="0"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 8)" v-on:blur="focusOutRowField(shieldEntry, 8)" v-model="shieldEntry.e.shield.weight" number min="0"></input></td>
-					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)" :value="shieldEntry.e.shield.coverage"></input></td>
+					<td v-on:click="stopPropagation"><input type="text" class="focusable" readonly v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)" :value="shieldEntry.e.shield.coverage"></input>
+						<div class="pop-widget" v-on:mousedown="focusInRowField(shieldEntry, (1<<20))"  v-if="shieldEntry.focusedFlags & (16|(1<<20))">
+							Widget goes here
+						</div>
+						
+					</td>
 					<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 32)" v-on:blur="focusOutRowField(shieldEntry, 32)"></input></td>
 					<td><input type="text" v-model="shieldEntry.unheldRemark" v-on:focus="focusInRowField(shieldEntry,64)" v-on:blur="focusOutRowField(shieldEntry,64)"></input></td>	
 				</tr>
@@ -134,21 +144,34 @@
 				<tr>
 					<td>Melee Weap Name</td>
 					<td>Type</td>
-					<td>Hands</td>
-					<td>Reach</td>
-					<td>Swing</td>
-					<td>Thrust</td>
-					<td>DTN(G)</td>
+					<td  style="width:30px">Hands</td>
+					<td style="width:20px">Reach</td>
+					<td style="width:45px">Swing</td>
+					<td style="width:45px">Thrust</td>
+					<td style="width:35px">DTN(G)</td>
 					<td>Tags</td>
 					<td>Weight</td>
 					<td>Kept at?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr v-for="entry in char.inventory.weapons">
+			<tbody v-on:click="setCurWidgetSection('meleeWeap', $event)">
+				<tr v-for="(entry,itemIndex) in char.inventory.weapons">
 					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td v-on:click="stopPropagation">
+						<select number data-type="profs" :data-index="itemIndex" v-on:change="onProfSelectChange($event, entry.weapon)">
+							<option selected v-if="entry.weapon.isMultipleCoreProf() || entry.weapon.hasCustomProf()" :value="entry.weapon.profs">
+								{{ entry.weapon.profLabels() }}
+							</option>
+							<option v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
+							<option v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
+							<option style="color:grey;" value="0" :selected="isVisibleWidget('meleeWeap','profs', itemIndex)">select multiple...</option>
+						</select>	
+						<div class="pop-widget" v-if="isVisibleWidget('meleeWeap','profs', itemIndex)">
+							Widget goes here
+						</div>
+					</td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -156,9 +179,6 @@
 					<td></td>
 					<td></td>
 					<td></td>
-					<td></td>
-					<td></td>
-					
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -174,17 +194,20 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr>
+				<tr v-if="!weaponEntry.e.weapon.ranged">
 					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-					<td>
-						<select v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)">
+					<td  v-on:click="stopPropagation">
+						<select number data-type="profs" data-index="-1" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)" v-on:change="onProfSelectChange($event, weaponEntry.e.weapon)">
 							<option selected v-if="weaponEntry.e.weapon.isMultipleCoreProf() || weaponEntry.e.weapon.hasCustomProf()" :value="weaponEntry.e.weapon.profs">
 								{{ weaponEntry.e.weapon.profLabels() }}
 							</option>
 							<option v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
-							<option v-for="(p, i) in coreRangedProfs" :value="(1 << i)">&gt;{{ p.name }}</option>
-							<option style="color:grey;">select multiple...</option>
+							<option v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
+							<option style="color:grey;" value="0" :selected="isVisibleWidget('meleeWeap','profs', -1)">select multiple...</option>
 						</select>	
+						<div class="pop-widget" v-if="isVisibleWidget('meleeWeap','profs', -1)">
+							Widget goes here
+						</div>
 					</td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,4)" v-on:blur="focusOutRowField(weaponEntry,4)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)"></input></td>
@@ -193,7 +216,6 @@
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,64)" v-on:blur="focusOutRowField(weaponEntry,64)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,128)" v-on:blur="focusOutRowField(weaponEntry,128)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
-					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark" v-on:focus="focusInRowField(weaponEntry,1024)" v-on:blur="focusOutRowField(weaponEntry,1024)"></input></td>
 				</tr>
 			</tbody>
@@ -209,11 +231,11 @@
 					<td>Weight</td>
 					<td>Kept at?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr>
+			<tbody v-on:click="setCurWidgetSection('bow', $event)">
+				<tr v-if="weaponEntry.e.weapon.isBow()">
 					<td>
 						<input type="text"></input>
 					</td>
@@ -232,11 +254,11 @@
 					<td>Weight</td>
 					<td>Kept at?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr>
+			<tbody v-on:click="setCurWidgetSection('crossbow', $event)">
+				<tr v-if="weaponEntry.e.weapon.isCrossbow()">
 					<td>
 						<input type="text"></input>
 					</td>
@@ -255,11 +277,11 @@
 					<td>Weight</td>
 					<td>Kept at?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr>
+			<tbody v-on:click="setCurWidgetSection('firearm', $event)">
+				<tr v-if="weaponEntry.e.weapon.isFirearm()">
 					<td>
 						<table>
 							<tr>
@@ -282,10 +304,10 @@
 					<td>Weight</td>
 					<td>Kept At?</td>
 					<td>Held?</td>
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody v-on:click="setCurWidgetSection('miscItem', $event)">
 				<tr v-for="entry in char.inventory.equipedNonMeleeItems">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td></td>
@@ -327,10 +349,10 @@
 					<td>Weight</td>
 					<td>Tags</td>
 					
-					<td><i>Actions</i></td>
+					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody v-on:click="setCurWidgetSection('armor', $event)">
 				<tr v-for="armor in char.inventory.wornArmor">
 					<td><input type="text" v-model="armor.name"></input></td>
 					<td><input type="text" v-model="armor.AVC"></input></td>

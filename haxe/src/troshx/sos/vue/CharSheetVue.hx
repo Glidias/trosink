@@ -8,6 +8,8 @@ import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import js.Lib;
+import js.html.Event;
+import js.html.HtmlElement;
 import js.html.InputElement;
 import troshx.ds.IDMatchArray;
 import troshx.ds.IValidable;
@@ -46,10 +48,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 		var unserializer:Unserializer = new Unserializer(contents);
 	
-		
 		this.char = unserializer.unserialize();
-		
 	}
+	
 	
 	public function saveSheet():String {
 		var serializer = new Serializer();
@@ -64,6 +65,71 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	// inventory
+	
+	function onBaseInventoryClick(e:Event):Void {
+		clearWidgets();
+	}
+	
+	inline function clearWidgets():Void {
+		this.curWidgetRequest.type = "";
+		this.curWidgetRequest.index = 0;
+	}
+	
+	inline function stopPropagation(e:Event):Void {
+		e.stopPropagation();
+	}
+	function onProfSelectChange(e:Event, weapon:Weapon):Void {
+		var dyn:Dynamic = e.target;
+		var htmlElem:HtmlElement = dyn;
+		var val:Int = dyn.value;
+		var ranged:Bool = false;
+		if (val < 0) {
+			ranged = true;
+			val = -val;
+		}
+		
+		weapon.ranged = ranged;
+		
+		if (val == 0) {
+			var index:Int = Std.parseInt(htmlElem.getAttribute("data-index"));
+			var type:String = htmlElem.getAttribute("data-type");
+			requestCurWidget(type, index);
+		}
+		else {
+			weapon.profs = val;
+			if (weapon.ranged) {
+				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW)) !=0 ) {
+					if (weapon.crossbow == null) weapon.crossbow = new Crossbow();
+				}
+				
+				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_FIREARM)) !=0 ) {
+					if (weapon.firearm == null) weapon.firearm = new Firearm();
+				}
+			}
+		}
+		
+	}
+	function setCurWidgetSection(sectName:String,e:Event):Void {
+		e.stopPropagation();
+		this.curWidgetSection = sectName;
+		clearWidgets();
+	}
+	
+	inline function requestCurWidget(type:String,index:Int):Void {
+		this.curWidgetRequest.type = type;
+		this.curWidgetRequest.index = index;
+	}
+	inline function isVisibleWidget(section:String, type:String, index:Int):Bool {
+		return this.curWidgetSection == section && this.curWidgetRequest.type == type && this.curWidgetRequest.index == index;
+	}
+	
+	inline function openPopup(index:Int):Void {
+		this.popupIndex = index;
+	}
+	
+	inline function closePopup():Void {
+		this.popupIndex = -1;
+	}
 	
 	function getValidName(testName:String, backupName:String):String {
 
@@ -89,6 +155,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	function focusInRowField(targ:IFocusFlags, mask:Int) {
 		targ.focusedFlags = mask;
+		clearWidgets();
 	}
 	
 
@@ -115,6 +182,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return false;
 	}
 	
+	
+	
 	function executeArmorEntry():Bool {
 		
 		if ( this.armorEntry.isValid() )  {
@@ -134,6 +203,10 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
 	
+	@:computed function get_hasPopup():Bool {
+		return this.popupIndex >= 0;
+	}
+	
 	@:computed function get_isValidDroppedEntry():Bool 
 	{
 		return this.droppedEntry.isValid();
@@ -146,29 +219,35 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	@:computed function get_droppedEntryGotFocus():Bool 
 	{
-		return this.droppedEntry.focusedFlags !=0;
+		var hasPopup = this.hasPopup;
+		return this.droppedEntry.focusedFlags !=0 || hasPopup;
 	}
 	@:computed function get_packedEntryGotFocus():Bool 
 	{
-		return this.packedEntry.focusedFlags != 0;
+		var hasPopup = this.hasPopup;
+		return this.packedEntry.focusedFlags != 0 || hasPopup;
 	}
 	
 	@:computed function get_miscEntryGotFocus():Bool 
 	{
-		return this.miscItemEntry.focusedFlags !=0;
+		var hasPopup = this.hasPopup;
+		return this.miscItemEntry.focusedFlags !=0 || hasPopup;
 	}
 	@:computed function get_weaponEntryGotFocus():Bool 
 	{
-		return this.weaponEntry.focusedFlags != 0;
+		var hasPopup = this.hasPopup;
+		return this.weaponEntry.focusedFlags != 0 || hasPopup;
 	}
 	@:computed function get_shieldEntryGotFocus():Bool 
 	{
-		return this.shieldEntry.focusedFlags != 0;
+		var hasPopup = this.hasPopup;
+		return this.shieldEntry.focusedFlags != 0 || hasPopup;
 	}
 	
 	@:computed function get_armorEntryGotFocus():Bool 
 	{
-		return this.armorEntry.focusedFlags != 0;
+		var hasPopup = this.hasPopup;
+		return this.armorEntry.focusedFlags != 0 || hasPopup;
 	}
 	
 	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
@@ -230,6 +309,15 @@ class CharSheetVueData  {
 	var coreMeleeProfs:Array<Profeciency> = Profeciency.getCoreMelee();
 	var coreRangedProfs:Array<Profeciency> = Profeciency.getCoreRanged();
 	
+	var popupIndex:Int = -1;
+	
+	var curWidgetSection:String = "";
+	var curWidgetRequest:WidgetItemRequest = {
+		type: "",
+		index: 0
+	};
+	
+	// to factor this out later
 	@:vueInclude var char:CharSheet = new CharSheet();
 	
 	public function new() {
@@ -237,7 +325,10 @@ class CharSheetVueData  {
 	}
 
 }
-
+typedef WidgetItemRequest = {
+	var type:String;
+	var index:Int;
+}
 
 interface IFocusFlags {
 	var focusedFlags:Int;

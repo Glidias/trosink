@@ -52,15 +52,28 @@ class Weapon extends Item
 		super(id, name);
 	}
 	
+	public function sanity():Void {
+		if (!ranged) {
+			firearm = null;
+			crossbow = null;
+		}
+	}
+	
+	public function isBow():Bool {
+		var a = (profs & (1<<Profeciency.R_BOW)) != 0;
+		return ranged && a;
+	}
+	public function isCrossbow():Bool {
+		var a = this.crossbow != null;
+		return ranged && a;
+	}
+	public function isFirearm():Bool {
+		var a = this.firearm != null;
+		return ranged && a;
+	}
 
 	
-	/**
-	 * Perform imperative sanity operation based on weapon type matching profeciencies to normalize stats and clean up old unused values
-	 *
-	 */
-	function sanity():Void {	//
-		
-	}
+
 	
 	public function profLabels():String {
 		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);

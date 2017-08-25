@@ -15,15 +15,15 @@ class Profeciency
 	public static inline var TYPE_RANGED:Int = 1;
 	
 	// melee core
-	public static inline var M_WRESTLING:Int = 0;
-	public static inline var M_PUGILISM:Int = 1;
-	public static inline var M_DAGGER:Int = 2;
-	public static inline var M_1H_SWORD:Int = 3;
-	public static inline var M_1H_BLUNT:Int = 4;
-	public static inline var M_2H_BLUNT:Int = 5;
-	public static inline var M_2H_SWORD:Int = 6;
-	public static inline var M_SPEAR:Int = 7;
-	public static inline var M_POLEARM:Int = 8;
+	public static inline var M_1H_SWORD:Int = 0;
+	public static inline var M_1H_BLUNT:Int = 1;
+	public static inline var M_2H_BLUNT:Int = 2;
+	public static inline var M_2H_SWORD:Int = 3;
+	public static inline var M_SPEAR:Int = 4;
+	public static inline var M_POLEARM:Int = 5;
+	public static inline var M_DAGGER:Int = 6;
+	public static inline var M_WRESTLING:Int = 7;
+	public static inline var M_PUGILISM:Int = 8;
 	static inline var TOTAL_M:Int = 9;
 	
 	static var CORE_MELEE:Array<Profeciency>;  
