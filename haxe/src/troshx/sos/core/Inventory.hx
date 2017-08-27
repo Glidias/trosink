@@ -1,4 +1,6 @@
 package troshx.sos.core;
+import haxe.Serializer;
+import haxe.Unserializer;
 import js.html.svg.Number;
 import msignal.Signal.Signal1;
 import troshx.core.IUid;
@@ -60,9 +62,14 @@ class Inventory
 		signaler = new Signal1<InventorySignal>();
 		return signaler;
 	}
+	public function setSignaler(val:Signal1<InventorySignal>):Void {
+		signaler = val;
+	}
 	function dispatchSignal(signal:InventorySignal):Void {
 		getSignaler().dispatch(signal);
 	}
+	
+	 
 
 	/**
 	 * 

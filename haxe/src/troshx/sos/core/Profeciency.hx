@@ -46,10 +46,10 @@ class Profeciency
 	
 	// ranged core
 	public static inline var R_BOW:Int = 0;
-	public static inline var R_CROSSBOW:Int = 1;
-	public static inline var R_FIREARM:Int = 2;
-	public static inline var R_THROWING:Int = 3;
-	public static inline var R_SLING:Int = 4;
+	public static inline var R_SLING:Int = 1;
+	public static inline var R_CROSSBOW:Int = 2;
+	public static inline var R_FIREARM:Int = 3;
+	public static inline var R_THROWING:Int = 4;
 	static inline var TOTAL_R:Int = 5;
 	
 	static var CORE_RANGED:Array<Profeciency>;  
@@ -59,10 +59,10 @@ class Profeciency
 	public static function getNewCoreRanged():Array<Profeciency> {
 		var a:Array<Profeciency> = [];
 		a[R_BOW] = new Profeciency("Bow", TYPE_RANGED);
+		a[R_SLING] = new Profeciency("Sling", TYPE_RANGED);
 		a[R_CROSSBOW] = new Profeciency("Crossbow", TYPE_RANGED);
 		a[R_FIREARM] = new Profeciency("Firearm", TYPE_RANGED);
 		a[R_THROWING] = new Profeciency("Throwing", TYPE_RANGED);
-		a[R_SLING] = new Profeciency("Sling", TYPE_RANGED);
 		return a;
 	}
 	

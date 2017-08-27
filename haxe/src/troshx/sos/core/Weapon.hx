@@ -46,6 +46,8 @@ class Weapon extends Item
 	// Firearm (if specified, may stack with crossbow for a crossbow+firearm hybrid)
 	public var firearm:Firearm = null;
 	
+	public var isAmmo:Bool = false;
+	
 
 	public function new(id:String= "", name:String = "" ) 
 	{
@@ -59,26 +61,35 @@ class Weapon extends Item
 		}
 	}
 	
-	public function matchesTypes(ranged:Bool, ?profs:Int):Void {
+	public function matchesTypes(ranged:Bool, ?profs:Int):Bool {
 		var thisProfs = this.profs;
-		this.ranged = ranged && (profs == null || (profs & thisProfs) != 0);
+		return (this.ranged == ranged) && (profs == null || (profs & thisProfs) != 0);
 	}
+
 	
 	public function isBow():Bool {
 		var a = (profs & (1<<Profeciency.R_BOW)) != 0;
-		return ranged && a;
+		return ranged && a && !isAmmo;
+	}
+	public function isSling():Bool {
+		var a = (profs & (1<<Profeciency.R_SLING)) != 0;
+		return ranged && a && !isAmmo;
 	}
 	public function isCrossbow():Bool {
-		var a = this.crossbow != null;
-		return ranged && a;
+		var a = (profs & (1<<Profeciency.R_CROSSBOW)) != 0;
+		return ranged && a && !isAmmo;
 	}
 	public function isFirearm():Bool {
-		var a = this.firearm != null;
-		return ranged && a;
+		var a = (profs & (1<<Profeciency.R_FIREARM)) != 0;
+		return ranged && a && !isAmmo;
 	}
-
-	
-
+	public function isThrowing():Bool {
+		var a = (profs & (1<<Profeciency.R_THROWING)) != 0;
+		return ranged && a && !isAmmo;
+	}
+	public function isAmmunition():Bool {
+		return isAmmo && ranged;
+	}
 	
 	public function profLabels():String {
 		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);

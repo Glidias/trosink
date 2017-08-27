@@ -15,7 +15,7 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('dropped', $event)" v-on:touchstart.native="setCurWidgetSection('dropped', $event)">
 				
 				<tr v-for="entry in char.inventory.dropped.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
@@ -52,11 +52,11 @@
 					<td>Item Name</td>
 					<td>Qty</td>
 					<td>Weight</td>
-					<td>Type</td>f
+					<td>Type</td>
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('packed', $event)" v-on:touchstart.native="setCurWidgetSection('packed', $event)">
 				<tr v-for="entry in char.inventory.packed.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
@@ -96,14 +96,14 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('shield',$event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('shield',$event)" v-on:touchstart.native="setCurWidgetSection('shield',$event)">
 				<tr :key="entry.key" v-for="(entry,i) in char.inventory.shields">
 					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" v-model="entry.shield.weight" number min="0"></input></td>
-					<td  v-on:click="stopPropagation" class="gotbtn focus"><input type="text" readonly :value="entry.shield.coverage"></input><button v-on:click="requestCurWidget('coverage',i)">[|]</button>
-						<div class="pop-widget" v-if="isVisibleWidget('shield','coverage', i)">
+					<td v-on:click.stop="" class="gotbtn focus"><input type="text" readonly :value="entry.shield.coverage"></input><button v-on:click="requestCurWidget('coverage',i)">[|]</button>
+						<div class="pop-widget" v-if="isVisibleWidget('shield','coverage', i)" v-on:click.stop="" v-on:touchstart.stop="" v-on:mousedown.stop="">
 							Widget goes here
 						</div>
 					</td>
@@ -130,7 +130,7 @@
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 4)" v-on:blur="focusOutRowField(shieldEntry, 4)" v-model="shieldEntry.e.shield.block" number min="0"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 8)" v-on:blur="focusOutRowField(shieldEntry, 8)" v-model="shieldEntry.e.shield.weight" number min="0"></input></td>
 					<td v-on:click="stopPropagation"><input type="text" class="focusable" readonly v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)" :value="shieldEntry.e.shield.coverage"></input>
-						<div class="pop-widget" v-on:mousedown="focusInRowField(shieldEntry, (1<<20))"  v-if="shieldEntry.focusedFlags & (16|(1<<20))">
+						<div class="pop-widget" v-on:mousedown.stop="focusInRowField(shieldEntry, (1<<20))" v-on:click.stop="" v-on:touchstart.stop="" v-if="shieldEntry.focusedFlags & (16|(1<<20))">
 							Widget goes here
 						</div>
 						
@@ -145,7 +145,7 @@
 		<table border="1">
 			<thead>
 				<tr>
-					<td>Melee Weap Name</td>
+					<td>Melee Weap name</td>
 					<td>Type</td>
 					<td style="width:30px">Hands</td>
 					<td style="width:20px">Reach</td>
@@ -159,22 +159,10 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('meleeWeap', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('meleeWeap', $event)" v-on:touchstart.native="setCurWidgetSection('meleeWeap', $event)">
 				<tr v-for="(entry,itemIndex) in char.inventory.weapons" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
-					<td v-on:click="stopPropagation">
-						<select number data-type="profs" :data-index="itemIndex" v-on:change="onProfSelectChange($event, entry.weapon)">
-							<option selected v-if="entry.weapon.isMultipleCoreProf() || entry.weapon.hasCustomProf()" :value="entry.weapon.profs">
-								{{ entry.weapon.profLabels() }}
-							</option>
-							<option v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
-							<option v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
-							<option style="color:grey;" value="0" :selected="isVisibleWidget('meleeWeap','profs', itemIndex)">select multiple...</option>
-						</select>	
-						<div class="pop-widget" v-if="isVisibleWidget('meleeWeap','profs', itemIndex)">
-							Widget goes here
-						</div>
-					</td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="meleeWeap" :index="itemIndex" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 					<td></td>
 					<td></td>
 					<td></td>
@@ -199,19 +187,7 @@
 				</tr>
 				<tr v-if="!weaponEntry.e.weapon.ranged" :key="-1">
 					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-					<td v-on:click="stopPropagation">
-						<select number data-type="profs" data-index="-1" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)" v-on:change="onProfSelectChange($event, weaponEntry.e.weapon)">
-							<option selected v-if="weaponEntry.e.weapon.isMultipleCoreProf() || weaponEntry.e.weapon.hasCustomProf()" :value="weaponEntry.e.weapon.profs">
-								{{ weaponEntry.e.weapon.profLabels() }}
-							</option>
-							<option :selected="!weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">{{ p.name }}</option>
-							<option :selected="weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">&gt;{{ p.name }}</option>
-							<option style="color:grey;" value="0" :selected="isVisibleWidget('meleeWeap','profs', -1)">select multiple...</option>
-						</select>	
-						<div class="pop-widget" v-if="isVisibleWidget('meleeWeap','profs', -1)">
-							Widget goes here
-						</div>
-					</td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="meleeWeap" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,4)" v-on:blur="focusOutRowField(weaponEntry,4)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)"></input></td>
 					<td><input type="text" v-on:focus="focusInRowField(weaponEntry,16)" v-on:blur="focusOutRowField(weaponEntry,16)"></input></td>
@@ -224,11 +200,11 @@
 			</tbody>
 			<thead>
 				<tr>
-					<td>Bow Name</td>
+					<td>Bow/Sling name</td>
 					<td>Type</td>
+					<td>Hands</td>
 					<td>Range</td>
-					<td>ATN</td>
-					<td>Damage</td>
+					<td>Attack</td>
 					<td>Req STR</td>
 					<td>Special</td>
 					<td>Weight</td>
@@ -237,33 +213,21 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('bow', $event)">
-				<tr v-if="weaponEntry.e.weapon.isBow()" :key="-2">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('bow', $event)" v-on:mousedown.touchstart="setCurWidgetSection('bow', $event)">
+				<tr v-if="weaponEntry.e.weapon.isBow() || weaponEntry.e.weapon.isSling()" :key="-2">
 					<td>
 						<input type="text"></input>
 					</td>
-					<td v-on:click="stopPropagation">
-						<select number data-type="profs" data-index="-1" v-on:focus="focusInRowField(weaponEntry,2)" v-on:blur="focusOutRowField(weaponEntry,2)" v-on:change="onProfSelectChange($event, weaponEntry.e.weapon)">
-							<option selected v-if="weaponEntry.e.weapon.isMultipleCoreProf() || weaponEntry.e.weapon.hasCustomProf()" :value="weaponEntry.e.weapon.profs">
-								{{ weaponEntry.e.weapon.profLabels() }}
-							</option>
-							<option :selected="!weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreMeleeProfs" :value="(1 << i)">&gt;{{ p.name }}</option>
-							<option :selected="weaponEntry.e.weapon.ranged && weaponEntry.e.weapon.profs&(1 << i)" v-for="(p, i) in coreRangedProfs" :value="-1*(1 << i)">{{ p.name != "Bow" ?  "&gt;" : "" }}{{ p.name }}</option>
-							<option style="color:grey;" value="0" :selected="isVisibleWidget('bow','profs', -1)">select multiple...</option>
-						</select>	
-						<div class="pop-widget" v-if="isVisibleWidget('bow','profs', -1)">
-							Widget goes here
-						</div>
-					</td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="bow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
 				</tr>
 			</tbody>
 			<thead>
 				<tr>
-					<td>Crossbow Name</td>
+					<td>Crossbow name</td>
 					<td>Type</td>
+					<td>Hands</td>
 					<td>Range</td>
-					<td>ATN</td>
-					<td>Damage</td>
+					<td>Attack</td>
 					<td>Span</td>
 					<td>SpanTool</td>
 					<td>Special</td>
@@ -273,21 +237,21 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('crossbow', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('crossbow', $event)" v-on:touchstart.native="setCurWidgetSection('crossbow', $event)">
 				<tr :key="-3" v-if="weaponEntry.e.weapon.isCrossbow()">
 					<td>
 						<input type="text"></input>
 					</td>
-					
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="crossbow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="crossbowMask" />
 				</tr>
 			</tbody>
 			<thead>
 				<tr>
-					<td>Firearm Name</td>
+					<td>Firearm name</td>
 					<td>Type</td>
+					<td>Hands</td>
 					<td>Range</td>
-					<td>ATN</td>
-					<td>Damage</td>
+					<td>Attack</td>
 					<td>Load</td>
 					<td>Ammunition</td>
 					<td>Tags</td>
@@ -297,7 +261,7 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('firearm', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('firearm', $event)" v-on:touchstart.native="setCurWidgetSection('firearm', $event)">
 				<tr :key="-4" v-if="weaponEntry.e.weapon.isFirearm()">
 					<td>
 						<table>
@@ -307,8 +271,50 @@
 							</tr>
 						</table>
 					</td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="firearm" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="firearmMask" />
 				</tr>
 			</tbody>
+			<thead>
+				<tr>
+					<td>Throwing Weap name</td>
+					<td>Type</td>
+					<td>Range</td>
+					<td>Attack</td>
+					<td>Catch</td>
+					<td>Tags</td>
+					<td>Weight</td>
+					<td>Kept at?</td>
+					<td>Held?</td>
+					<td class="actions"><i>Actions</i></td>
+				</tr>
+			</thead>
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('throwing', $event)" v-on:touchstart.native="setCurWidgetSection('throwing', $event)">
+				<tr :key="-5" v-if="weaponEntry.e.weapon.isThrowing()">
+					<td><input type="text"></input></td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="throwing" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
+				</tr>
+			</tbody>
+			<thead>
+				<tr>
+					<td>Ammo name</td>
+					<td>Type</td>
+					<td>Range</td>
+					<td>Attack</td>
+					<td>Catch</td>
+					<td>Tags</td>
+					<td>Weight</td>
+					<td>Kept at?</td>
+					<td>Held?</td>
+					<td class="actions"><i>Actions</i></td>
+				</tr>
+			</thead>
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('ammo', $event)" v-on:touchstart.native="setCurWidgetSection('ammo', $event)">
+				<tr :key="-6" v-if="weaponEntry.e.weapon.isAmmunition()">
+					<td><input type="text"></input></td>
+					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="throwing" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" />
+				</tr>
+			</tbody>
+				
 		</table>
 					
 					
@@ -324,7 +330,7 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('miscItem', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('miscItem', $event)" v-on:touchstart.native="setCurWidgetSection('miscItem', $event)">
 				<tr v-for="entry in char.inventory.equipedNonMeleeItems" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td></td>
@@ -365,11 +371,10 @@
 					<td>Coverage</td>
 					<td>Weight</td>
 					<td>Tags</td>
-					
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:click="setCurWidgetSection('armor', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('armor', $event)"  v-on:touchstart.native="setCurWidgetSection('armor', $event)">
 				<tr v-for="armor in char.inventory.wornArmor" :key="armor.get_uid()">
 					<td><input type="text" v-model="armor.name"></input></td>
 					<td><input type="text" v-model="armor.AVC"></input></td>

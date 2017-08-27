@@ -1,13 +1,13 @@
 <td v-on:click.stop="">
-	<select number data-type="profs" :data-index="index" v-on:focus="this.$emit('focus-in-row')" v-on:blur="this.$emit('focus-out-row')" v-on:change="onProfSelectChange($event, weapon)">
+	<select number data-type="profs" :data-index="index" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onProfSelectChange($event, weapon)">
 		<option selected v-if="weapon.isMultipleCoreProf() || weapon.hasCustomProf()" :value="weapon.profs">
 			{{ weapon.profLabels() }}
 		</option>
-		<option :selected="!weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in meleeProfs" :value="(1 << i)">{{weapon.matchesTypes(false, (1<<i) ) ? "&gt;" : "" }}{{p.name}}</option>
-		<option :selected="weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in rangedProfs" :value="-1*(1 << i)">{{ {{weapon.matchesTypes(false, (1<<i) ) ? "&gt;" : ""}}{{ p.name }}</option>
+		<option :selected="!weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in meleeProfs" :value="(1 << i)">{{weapon.ranged ? "&gt;" : ""}}{{p.name}}</option>
+		<option :selected="weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in rangedProfs" :value="-1*(1 << i)"> {{(profMask != null ? (profMask&shiftIndex(i))==0 : true) || !weapon.ranged ? "&gt;" : ""}}{{ p.name }}</option>
 		<option style="color:grey;" value="0" :selected="isVisibleWidget(section,'profs', index)">select multiple...</option>
 	</select>	
-	<div class="pop-widget" v-if="isVisibleWidget(section,'profs', index)">
+	<div class="pop-widget" v-on:click.stop="" v-on:mousedown="emit('focus-widget')" v-on:touchstart.stop=""  v-if="isVisibleWidget(section,'profs', index)">
 		Widget goes here
 	</div>
 </td>

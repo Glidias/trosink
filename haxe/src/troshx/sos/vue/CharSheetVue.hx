@@ -11,6 +11,7 @@ import js.Lib;
 import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
+import msignal.Signal.Signal1;
 import troshx.ds.IDMatchArray;
 import troshx.ds.IValidable;
 import troshx.sos.vue.CharSheetVue.IFocusFlags;
@@ -47,6 +48,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		];
 	}
 	override public function Created():Void {
+		
 		this.char.inventory.getSignaler().add(onInventorySignalReceived);
 	}
 	
@@ -64,9 +66,14 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	public function loadSheet(contents:String = null):Void {
 		if (contents == null) contents = this.copyToClipboard;
 	
+		this.char.inventory.getSignaler().removeAll();
 		var unserializer:Unserializer = new Unserializer(contents);
 	
 		this.char = unserializer.unserialize();
+		
+		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+		
+		
 	}
 	
 	
@@ -76,10 +83,17 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		//serializer.useEnumIndex = true;
 		
 		//this.char
+		var oldSignaler = this.char.inventory.getSignaler();
+		this.char.inventory.setSignaler(null);
 		serializer.serialize(this.char);
+		
+		
 		var output:String = serializer.toString();
 		this.copyToClipboard = output;
+		this.char.inventory.setSignaler(oldSignaler);
 		return output;
+		
+	
 	}
 	
 	// inventory
@@ -96,47 +110,17 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	inline function stopPropagation(e:Event):Void {
 		e.stopPropagation();
 	}
-	function onProfSelectChange(e:Event, weapon:Weapon):Void {
-		var dyn:Dynamic = e.target;
-		var htmlElem:HtmlElement = dyn;
-		var val:Int = dyn.value;
-		var ranged:Bool = false;
-		if (val < 0) {
-			ranged = true;
-			val = -val;
-		}
-		
-		weapon.ranged = ranged;
-		
-		if (val == 0) {
-			var index:Int = Std.parseInt(htmlElem.getAttribute("data-index"));
-			var type:String = htmlElem.getAttribute("data-type");
-			requestCurWidget(type, index);
-		}
-		else {
-			weapon.profs = val;
-			if (weapon.ranged) {
-				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW)) !=0 ) {
-					if (weapon.crossbow == null) weapon.crossbow = new Crossbow();
-				}
-				
-				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_FIREARM)) !=0 ) {
-					if (weapon.firearm == null) weapon.firearm = new Firearm();
-				}
-			}
-		}
-		
-	}
+	
 	function setCurWidgetSection(sectName:String,e:Event):Void {
 		e.stopPropagation();
 		this.curWidgetRequest.section = sectName;
-		clearWidgets();
 	}
 	
 	inline function requestCurWidget(type:String,index:Int):Void {
 		this.curWidgetRequest.type = type;
 		this.curWidgetRequest.index = index;
 	}
+	
 	inline function isVisibleWidget(section:String, type:String, index:Int):Bool {
 		return this.curWidgetRequest.section == section && this.curWidgetRequest.type == type && this.curWidgetRequest.index == index;
 	}
@@ -166,6 +150,10 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 	}
 	
+	function test():Void {
+		trace("TEST");
+	}
+	
 	function focusOutRowField(targ:IFocusFlags, mask:Int):Void {
 		Timer.delay(function() { targ.focusedFlags &= ~mask; } , 0);
 		
@@ -173,7 +161,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	function focusInRowField(targ:IFocusFlags, mask:Int) {
 		targ.focusedFlags = mask;
-		clearWidgets();
+		if (mask < 20) clearWidgets();
+		
+		
 	}
 	
 
@@ -224,7 +214,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed function get_hasPopup():Bool {
-		return this.popupIndex >= 0;
+		var a = this.popupIndex >= 0;
+		return this.curWidgetRequest.type != "" || a;
 	}
 	
 	@:computed function get_isValidDroppedEntry():Bool 
@@ -240,11 +231,15 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	@:computed function get_crossbowMask():Int {
 		return (1<<Profeciency.R_CROSSBOW);
 	}
-	@:computed function get_bowMask():Int {
-		return (1<<Profeciency.R_BOW);
+	@:computed function get_bowMask():Int {	// we treat bows and slings as part of the same table category
+		return (1<<Profeciency.R_BOW) | (1<<Profeciency.R_SLING);
 	}
 	@:computed function get_firearmMask():Int {
 		return (1<<Profeciency.R_FIREARM);
+	}
+	
+	@:computed function get_throwMask():Int {
+		return (1<<Profeciency.R_THROWING);
 	}
 	
 	@:computed function get_droppedEntryGotFocus():Bool 
@@ -321,6 +316,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 }
 
 class CharSheetVueData  {
+	
+
 	// dropped/packed item misc entry
 	var droppedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
 	var packedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
