@@ -11,7 +11,7 @@ td select{position:relative;width:100%;font-size:12px;}
 .fade-leave{opacity:1;}
 .fade-enter{opacity:0}
 tr.entry-row{border-color:#cc82a7;}
-thead tr{background-color:#fafafa;}
+thead tr{background-color:#f9f9f9;}
 td input.focusable[readonly]:focus{border:2px solid orange;}
 .pop-widget{position:absolute;top:100%;background-color:white;border:1px solid #aaaaaa;padding:5px;box-sizing:border-box;min-width:100%;height:auto;z-index:1;}
 td button{text-align:center;padding:0;}
