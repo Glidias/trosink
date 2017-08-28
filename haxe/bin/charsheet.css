@@ -20,6 +20,14 @@ td input {
 	width:100%;
 	font-size:12px;
 }
+td.voidna {
+	background-color:#333333;
+}
+td select {
+	position:relative;
+	width:100%;
+	font-size:12px;
+}
 .fade-enter-active, .fade-leave-active {
   transition: opacity .2s ease-out;
 }
@@ -36,6 +44,15 @@ td input {
 }
 .fade-enter  {
   opacity: 0
+}
+
+tr.entry-row {
+	border-color:#cc82a7;
+
+
+}
+thead tr {
+	background-color:#fafafa;
 }
 
 

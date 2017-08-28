@@ -69,7 +69,33 @@ class Inventory
 		getSignaler().dispatch(signal);
 	}
 	
-	 
+	
+	public function getWeildableWeaponsTypeFiltered(ranged:Bool, ?profs:Int):Array<WeaponAssign> {
+		var arr = [];
+		for (i in 0...weapons.length) {
+			var wp = weapons[i];
+			var w = wp.weapon;
+			if ( !w.isAmmunition() && w.matchesTypes(ranged, profs)) {
+				arr.push(wp);	
+			}
+		}
+		return arr;
+	}
+	
+	
+	
+	public var ammoFiltered(get, never):Array<WeaponAssign>;
+	function get_ammoFiltered():Array<WeaponAssign> {
+		var arr = [];
+		for (i in 0...weapons.length) {
+			var wp = weapons[i];
+			var w = weapons[i].weapon;
+			if (w.isAmmunition()) {
+				arr.push(wp);
+			}
+		}
+		return arr;
+	}
 
 	/**
 	 * 

@@ -6,14 +6,14 @@ package troshx.sos.core;
  */
 class DamageType 
 {
-	public static inline var CUTTING:Int = (1 << 0);
-	public static inline var PIERCING:Int = (1 << 1);
-	public static inline var BLUDGEONING:Int = (1 << 2);
+	public static inline var CUTTING:Int = 0;
+	public static inline var PIERCING:Int = 1;
+	public static inline var BLUDGEONING:Int = 2;
 
-	public static inline var FALLING:Int = ( 1 << 3);
-	public static inline var BURN:Int = ( 1 << 4);
-	public static inline var ELECTRICAL:Int = ( 1 << 5);
-	public static inline var COLD:Int = ( 1 << 6);
+	public static inline var FALLING:Int = 3;
+	public static inline var BURN:Int = 4;
+	public static inline var ELECTRICAL:Int = 5;
+	public static inline var COLD:Int = 6;
 
 	public function new() 
 	{

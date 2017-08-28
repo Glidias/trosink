@@ -15,14 +15,17 @@ class Weapon extends Item
 	public var variant:Weapon = null;	// default secondary fire options
 	public var attachments:WeaponAttachments = null; // custom attachments
 	
-	public var atn:Int = 0;
+	public var atnS:Int = 0;
 	public var atnT:Int = 0;
+	public var atnM:Int = 0;
 	
-	public var damage:Int = 0;
+	public var damageS:Int = 0;
 	public var damageT:Int = 0;
+	public var damageM:Int = 0;
 	
-	public var damageType:Int = DamageType.CUTTING;
-	public var damageTypeT:Int = DamageType.PIERCING;
+	public var damageTypeS:Int = (1 << DamageType.CUTTING);
+	public var damageTypeT:Int = (1 << DamageType.PIERCING);
+	// damageTypeM is invariably Piercing
 	
 	public var dtn:Int = 0; 
 	public var guard:Int = 0;
@@ -66,28 +69,31 @@ class Weapon extends Item
 		return (this.ranged == ranged) && (profs == null || (profs & thisProfs) != 0);
 	}
 
-	
-	public function isBow():Bool {
+	// ammo discriminant type checkers
+	public inline function isMelee():Bool {
+		return !ranged && !isAmmo;
+	}
+	public inline function isBow():Bool {
 		var a = (profs & (1<<Profeciency.R_BOW)) != 0;
 		return ranged && a && !isAmmo;
 	}
-	public function isSling():Bool {
+	public inline function isSling():Bool {
 		var a = (profs & (1<<Profeciency.R_SLING)) != 0;
 		return ranged && a && !isAmmo;
 	}
-	public function isCrossbow():Bool {
+	public inline function isCrossbow():Bool {
 		var a = (profs & (1<<Profeciency.R_CROSSBOW)) != 0;
 		return ranged && a && !isAmmo;
 	}
-	public function isFirearm():Bool {
+	public inline function isFirearm():Bool {
 		var a = (profs & (1<<Profeciency.R_FIREARM)) != 0;
 		return ranged && a && !isAmmo;
 	}
-	public function isThrowing():Bool {
+	public inline function isThrowing():Bool {
 		var a = (profs & (1<<Profeciency.R_THROWING)) != 0;
 		return ranged && a && !isAmmo;
 	}
-	public function isAmmunition():Bool {
+	public inline function isAmmunition():Bool {
 		return isAmmo && ranged;
 	}
 	

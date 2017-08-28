@@ -3,11 +3,15 @@ body{font-family:Times New Roman,Arial,sans-serif;font-size:12px;}
 td.actions{min-width:105px;}
 select{font-size:12px;}
 td input{position:relative;width:100%;font-size:12px;}
+td.voidna{background-color:#333333;}
+td select{position:relative;width:100%;font-size:12px;}
 .fade-enter-active,.fade-leave-active{transition:opacity .2s ease-out;}
 .fade-enter-active{transition-duration:.3s;transition-delay:.2s;}
 .fade-leave-active{opacity:0;}
 .fade-leave{opacity:1;}
 .fade-enter{opacity:0}
+tr.entry-row{border-color:#cc82a7;}
+thead tr{background-color:#fafafa;}
 td input.focusable[readonly]:focus{border:2px solid orange;}
 .pop-widget{position:absolute;top:100%;background-color:white;border:1px solid #aaaaaa;padding:5px;box-sizing:border-box;min-width:100%;height:auto;z-index:1;}
 td button{text-align:center;padding:0;}

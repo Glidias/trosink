@@ -52,6 +52,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		this.char.inventory.getSignaler().add(onInventorySignalReceived);
 	}
 	
+	// internal methods
+	
 	function onInventorySignalReceived(e:InventorySignal) 
 	{
 		switch(e ) {
@@ -61,7 +63,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 				this.itemTransitionName = "fade";
 		}
 	}
-	// standard
+	// standard Methods
 	
 	public function loadSheet(contents:String = null):Void {
 		if (contents == null) contents = this.copyToClipboard;
@@ -96,7 +98,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	}
 	
-	// inventory
+	// inventory Methods
 	
 	function onBaseInventoryClick(e:Event):Void {
 		clearWidgets();
@@ -166,8 +168,6 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 	}
 	
-
-	
 	function executeQtyEntry(qtyEntry:RowEntry<ItemQty>, tarInventoryList:IDMatchArray<Dynamic>):Bool {
 		
 		if ( qtyEntry.isValid() )  {
@@ -184,8 +184,19 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 		if ( equipEntry.isValid() )  {
 			var tarList = this.char.inventory.getEquipedAssignList(typeId);
+			var lastWeap = equipEntry.getWeapon();
 			tarList.push( equipEntry.e );
-			equipEntry.reset( Inventory.getEmptyReadyAssign(typeId) );
+			var newAssign = Inventory.getEmptyReadyAssign(typeId);
+			
+			equipEntry.reset( newAssign );
+			var newWeap = equipEntry.getWeapon();
+			
+			if (lastWeap != null && newWeap != null) { // sync type of weapon
+				newWeap.profs = lastWeap.profs;
+				newWeap.ranged = lastWeap.ranged;
+				newWeap.isAmmo = lastWeap.isAmmo;
+			}
+			
 			this.itemTransitionName = "fade";  // or something else?
 			return true;
 		}
@@ -212,6 +223,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
+	
+	// computed
 	
 	@:computed function get_hasPopup():Bool {
 		var a = this.popupIndex >= 0;
@@ -274,6 +287,30 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		var hasPopup = this.hasPopup;
 		return this.armorEntry.focusedFlags != 0 || hasPopup;
 	}
+	
+	// computed proxy to inventory filtered lists
+	
+	@:computed function get_filteredMelee():Array<WeaponAssign>  {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(false);
+	}
+	@:computed function get_filteredCrossbow():Array<WeaponAssign>   {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW ) );
+	}
+	@:computed function get_filteredFirearm():Array<WeaponAssign>   {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_FIREARM ) );
+	}
+	@:computed function get_filteredBowSling():Array<WeaponAssign>   {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_SLING,R_BOW] ) );
+	}
+	@:computed function get_filteredThrowing():Array<WeaponAssign>   {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_THROWING ) );
+	}
+	@:computed function get_filteredAmmo():Array<WeaponAssign>   {
+		return this.char.inventory.ammoFiltered;
+	}
+	
+	
+	// watchers
 	
 	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
@@ -438,6 +475,15 @@ class RowReadyEntry implements IValidable implements IFocusFlags {
 		
 		if (itemToValidate == null)  throw "Could not resolve item to validate to Item type:"+e;
 	}
+	
+	
+	public function getWeapon():Weapon {
+		if ( Reflect.hasField(e, "weapon") ) {
+			return LibUtil.as( Reflect.field(e, "weapon"), Weapon);
+		}
+		return null;
+	}
+	
 	
 	public function isValid():Bool {	
 		//return e.isValid();
