@@ -44,7 +44,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
 		return [
-			TDWeapProfSelect.NAME =>new TDWeapProfSelect(),
+			TDWeapProfSelect.NAME => new TDWeapProfSelect(),
+			TDHands.NAME => new TDHands()
 		];
 	}
 	override public function Created():Void {
@@ -195,6 +196,13 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 				newWeap.profs = lastWeap.profs;
 				newWeap.ranged = lastWeap.ranged;
 				newWeap.isAmmo = lastWeap.isAmmo;
+				
+				if (newWeap.ranged && (newWeap.profs &  (1 << Profeciency.R_CROSSBOW)) != 0) {
+					newWeap.crossbow = new Crossbow();
+				}
+				if (newWeap.ranged && (newWeap.profs &  (1 << Profeciency.R_FIREARM)) != 0) {
+					newWeap.firearm = new Firearm();
+				}
 			}
 			
 			this.itemTransitionName = "fade";  // or something else?

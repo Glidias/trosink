@@ -10,18 +10,27 @@ class Weapon extends Item
 	public var profsCustom:Array<Profeciency> = null;
 	public var ranged:Bool = false; // to represent missile weapons and missile profeciencies
 	
-	public var reach:Int = 4;   // also used to represent range for missile weapons
+	public var reach:Int = 4;  
+	public static inline var REACH_HA:Int = 1;
+	public static inline var REACH_H:Int = 2;
+	public static inline var REACH_S:Int = 3;
+	public static inline var REACH_M:Int = 4;
+	public static inline var REACH_L:Int = 5;
+	public static inline var REACH_VL:Int = 6;
+	public static inline var REACH_EL:Int = 7;
+	public static inline var REACH_LL:Int = 8;
+	
 	
 	public var variant:Weapon = null;	// default secondary fire options
 	public var attachments:WeaponAttachments = null; // custom attachments
 	
 	public var atnS:Int = 0;
 	public var atnT:Int = 0;
-	public var atnM:Int = 0;
+	
 	
 	public var damageS:Int = 0;
 	public var damageT:Int = 0;
-	public var damageM:Int = 0;
+	
 	
 	public var damageTypeS:Int = (1 << DamageType.CUTTING);
 	public var damageTypeT:Int = (1 << DamageType.PIERCING);
@@ -36,6 +45,10 @@ class Weapon extends Item
 	public var customise:WeaponCustomise = null;
 	
 	// ranged
+	public var range:Int = 1;
+	public var atnM:Int = 0;
+	public var damageM:Int = 0;
+	
 	public var missileSpecial:MissileSpecial = null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
@@ -69,7 +82,7 @@ class Weapon extends Item
 		return (this.ranged == ranged) && (profs == null || (profs & thisProfs) != 0);
 	}
 
-	// ammo discriminant type checkers
+	// ammo discriminant type checkers and includes required dependencies?
 	public inline function isMelee():Bool {
 		return !ranged && !isAmmo;
 	}
@@ -83,11 +96,11 @@ class Weapon extends Item
 	}
 	public inline function isCrossbow():Bool {
 		var a = (profs & (1<<Profeciency.R_CROSSBOW)) != 0;
-		return ranged && a && !isAmmo;
+		return ranged && a && !isAmmo && crossbow != null;
 	}
 	public inline function isFirearm():Bool {
 		var a = (profs & (1<<Profeciency.R_FIREARM)) != 0;
-		return ranged && a && !isAmmo;
+		return ranged && a && !isAmmo && firearm != null;
 	}
 	public inline function isThrowing():Bool {
 		var a = (profs & (1<<Profeciency.R_THROWING)) != 0;

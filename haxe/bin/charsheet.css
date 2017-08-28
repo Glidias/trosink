@@ -118,3 +118,16 @@ td.gotbtn.focus button {
 .inventory .popup-overlay .modal {
 	
 }
+
+td.weight {
+	width:40px;
+}
+td.munition-type {
+	width:100px;
+}
+td.hands, td.reach {
+	width:40px;
+}
+td.d10 {
+	width:30px;
+}

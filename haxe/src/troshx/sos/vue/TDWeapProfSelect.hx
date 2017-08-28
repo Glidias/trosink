@@ -28,8 +28,6 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 		return (1 << i);
 	}
 	function emit(str:String):Void {
-
-		
 		_vEmit(str);
 	}
 	
@@ -66,6 +64,7 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 				
 				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_FIREARM)) !=0 ) {
 					if (weapon.firearm == null) weapon.firearm = new Firearm();
+					
 				}
 			}
 		}
@@ -79,7 +78,6 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	inline function requestCurWidget(type:String,index:Int):Void {
 		this.curWidgetRequest.type = type;
 		this.curWidgetRequest.index = index;
-	
 	}
 	
 	override public function Template():String {

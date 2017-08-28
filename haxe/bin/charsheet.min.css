@@ -23,3 +23,7 @@ td.gotbtn.focus button{display:block;width:24px;height:100%;position:absolute;ri
 .inventory{position:relative;}
 .inventory .popup-overlay{position:absolute;width:100%;height:100%;top:0;left:0;z-index:50;background-color:rgba(0,0,0,.3);}
 .inventory .popup-overlay .modal{}
+td.weight{width:40px;}
+td.munition-type{width:100px;}
+td.hands,td.reach{width:40px;}
+td.d10{width:30px;}
