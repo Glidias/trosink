@@ -12,11 +12,21 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.vue.widgets.WAmmunition;
+import troshx.sos.vue.widgets.WCoverage;
+import troshx.sos.vue.widgets.WMeleeAtk;
+import troshx.sos.vue.widgets.WMeleeDef;
+import troshx.sos.vue.widgets.WMissileAtk;
+import troshx.sos.vue.widgets.WProf;
+import troshx.sos.vue.widgets.WSpanTools;
+import troshx.sos.vue.widgets.WTags;
+
 import troshx.ds.IDMatchArray;
 import troshx.ds.IValidable;
 import troshx.sos.vue.CharSheetVue.IFocusFlags;
 import troshx.sos.vue.CharSheetVue.RowReadyEntry;
 import troshx.util.LibUtil;
+import troshx.sos.core.Weapon;
 
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.Inventory;
@@ -45,7 +55,17 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
 		return [
 			TDWeapProfSelect.NAME => new TDWeapProfSelect(),
-			TDHands.NAME => new TDHands()
+			TDHands.NAME => new TDHands(),
+			TDWidgetHolder.NAME => new TDWidgetHolder(),
+			
+			WAmmunition.NAME => new WAmmunition(),
+			WCoverage.NAME => new WCoverage(),
+			WMeleeAtk.NAME => new WMeleeAtk(),
+			WMeleeDef.NAME => new WMeleeDef(),
+			WMissileAtk.NAME => new WMissileAtk(),
+			WProf.NAME => new WProf(),
+			WSpanTools.NAME => new WSpanTools(),
+			WTags.NAME => new WTags(),
 		];
 	}
 	override public function Created():Void {
@@ -104,6 +124,40 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	function onBaseInventoryClick(e:Event):Void {
 		clearWidgets();
 	}
+	
+	function getCoverage(coverage:Dynamic<HitLocation>):String {  // todo: return string representation
+		return "[Coverage]";
+	}
+	
+	function getTags(item:Item):String {
+		var arr:Array<String> = [];
+		item.addTagsToStrArr(arr);
+		return arr.join(", ");
+	}
+	
+	inline function getDefGuard(wpn:Weapon):String {
+		return wpn.dtn + "(" + wpn.guard + ")";
+	}
+	
+	inline function getSwingAtkStr(wpn:Weapon):String {
+		return wpn.atnS + "(" + wpn.damageS + this.damageTypeSuffixes[wpn.damageTypeS]+ ")";
+	}
+	inline function getThrustAtkStr(wpn:Weapon):String {
+		return wpn.atnT + "(" + wpn.damageT + this.damageTypeSuffixes[wpn.damageTypeT]+ ")";
+	}
+	
+	inline function getMissileAtkStr(wpn:Weapon):String {
+		return wpn.atnM + "(" + wpn.damageM + "p)";
+	}
+	
+	inline function getAmmunitions(firearm:Firearm):String {
+		return firearm.getAmmunitionsStrArr().join(", ");
+	}
+	
+	inline function getSpanTools(crossbow:Crossbow):String {
+		return crossbow.getSpanningToolsStrArr().join(", ");
+	}
+	
 	
 	inline function clearWidgets():Void {
 		this.curWidgetRequest.type = "";
@@ -383,6 +437,7 @@ class CharSheetVueData  {
 	
 	var popupIndex:Int = -1;
 	
+	var damageTypeSuffixes:Array<String> = DamageType.getFlagVarNames();
 	
 	var curWidgetRequest:WidgetItemRequest = {
 		section: "",

@@ -1,6 +1,6 @@
 <td>
-<select :disabled="entry.held !=0" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onSelectChange($event, entry.weapon)">
-	<option value="0" :selected="!isTwoHanded">1H</option>
-	<option value="1" :selected="isTwoHanded">2H</option>
-</select>
+	<select :disabled="entry.held !=0" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onSelectChange($event, entry.weapon)">
+		<option value="0" :selected="!isTwoHanded">1H</option>
+		<option value="1" :selected="isTwoHanded">2H</option>
+	</select>
 </td>

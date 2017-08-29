@@ -12,6 +12,13 @@ class Crossbow
 	@:flagInstances(SpanningTool) public var spanningTools:Int = 0;
 	// support custom spanning tools?
 	
+	
+	public function getSpanningToolsStrArr():Array<String> {
+		var arr:Array<String> = Item.getLabelsOfArray(SpanningTool.getDefaultList(), span);
+		//if (spanningToolsCustom != null) arr = spanningToolsCustom.concat(arr);
+		return arr;
+	}
+	
 	public function new() 
 	{
 		
@@ -53,5 +60,9 @@ class SpanningTool extends Item
 		a[CRANK] = new SpanningTool("Crank", 3, true, "").setWeightCost(0, 1, Item.SP);
 		return a;
 	}
+	
+	
+	
+	
 	
 }

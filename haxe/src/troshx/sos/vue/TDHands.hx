@@ -22,12 +22,7 @@ class TDHands extends VComponent<NoneT, TDHandsProps>
 		super();
 	}
 	
-	function shiftIndex(i:Int):Int {
-		return (1 << i);
-	}
-	function emit(str:String):Void {
-		_vEmit(str);
-	}
+	
 	
 	@:computed function get_isTwoHanded():Bool {
 		return this.entry.weapon.twoHanded;
@@ -44,6 +39,13 @@ class TDHands extends VComponent<NoneT, TDHandsProps>
 			this.entry.weapon.flags &= ~Item.FLAG_TWO_HANDED;
 		}
 
+	}
+	
+	function shiftIndex(i:Int):Int {
+		return (1 << i);
+	}
+	function emit(str:String):Void {
+		_vEmit(str);
 	}
 	
 	override public function Template():String {

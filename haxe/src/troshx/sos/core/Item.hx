@@ -1,8 +1,7 @@
 package troshx.sos.core;
 
-
-
 #if macro
+import haxe.ds.StringMap;
 import haxe.macro.ExprTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -67,6 +66,15 @@ class Item
 		
 	}
 	
+	public function addTagsToStrArr(arr:Array<String>):Void {
+		if ( (flags & FLAG_STRAPPED) != 0  ) {
+			arr.push("Strapped");
+		}
+		if (Type.getClass(this) != Weapon && (flags & FLAG_TWO_HANDED) != 0  ) {
+			arr.push("Two-Handed");
+		}
+	}
+	
 	public function getTypeLabel():String {
 		return "MiscItem";
 	}
@@ -89,6 +97,16 @@ class Item
 		return (flags & FLAG_STRAPPED) != 0;
 	}
 	
+	
+	public static function getLabelsOfArray<T:Item>(a:Array<T>, mask:Int):Array<String> {	
+		var arr:Array<String> = [];
+		for (i in 0...a.length) {
+			if ( (mask & (1 << i )) != 0 ) {
+				arr.push(a[i].name);
+ 			}
+		}
+		return arr;
+	}
 	
 
 	
@@ -179,9 +197,21 @@ class Item
 		return combineOr;
 	}
 	
-	public static macro function pushFlagLabelsToArr(labelize:Bool=true):Expr {
+	public static macro function pushFlagLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false):Expr {  // todo when needed: metadata support
 	
-		var fields = Context.getLocalClass().get().statics.get();
+		var fields = null;
+		
+		if (moduleStr != null) {
+			var cm = Context.getModule(moduleStr)[0];
+			switch(cm) {
+				case TInst(t, _):
+				fields = t.get().statics.get();
+				default:	
+				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
+			}
+		}
+		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
+		
 		var block:Array<Expr> = [];
 		
 		var count:Int = 0;
@@ -192,7 +222,63 @@ class Item
 				case FVar(VarAccess.AccInline, VarAccess.AccNever):
 					if (fieldName != "TOTAL_FLAGS") {
 						if (labelize )  block.push( macro { if ( flags & (1 << $v{count}) != 0 )  arr.push($v{ labelizeAllCaps(fieldName) }); } );
-						else block.push( macro {  arr.push($v{ fieldName }); } );
+						else block.push( macro {  arr.push($v{ (noLabelizeCapitalCase ? labelizeAllCaps(fieldName) : fieldName )  }); } );
+						count++;
+					}
+				default:
+			}
+			//trace(f.kind);
+		}
+		return macro $b{block};
+	}
+	
+	public static macro function pushFlagAbbrToArr(labelize:Bool = true, capitalize:Bool = false, moduleStr:String = null):Expr {
+		var fields = null;
+		
+		if (moduleStr != null) {
+			var cm = Context.getModule(moduleStr)[0];
+			switch(cm) {
+				case TInst(t, _):
+				fields = t.get().statics.get();
+				default:	
+				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
+			}
+		}
+		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
+		var block:Array<Expr> = [];
+		var count:Int = 0;
+
+		for ( i in 0...fields.length) {
+			var f = fields[i];
+			var fieldName:String = f.name;
+			switch(f.kind) {
+				case FVar(VarAccess.AccInline, VarAccess.AccNever):
+					if (fieldName != "TOTAL_FLAGS") {
+						var defaultValue:String; 
+						
+						var m = getMetaTagEntry(f.meta.get(), ":abbr");
+						if (m != null) {
+							if (m.params == null || m.params.length == 0) {
+								Context.error("Please specify abbreviation string as parameter.", f.pos);
+							}
+							var mp = m.params[0].expr;
+							switch( mp ) {
+								case EConst(CString(s)):
+									defaultValue = s;
+								default:
+								Context.error("Please specify abbreviation string literal as parameter.", f.pos);
+							}
+						}
+						else  {
+							defaultValue = fieldName.charAt(0);
+							if (capitalize) defaultValue.toUpperCase();
+							else defaultValue.toLowerCase();
+						}
+						
+						
+						if (labelize )  block.push( macro { if ( flags & (1 << $v{count}) != 0 )  arr.push($v{ defaultValue }); } );
+						else block.push( macro {  arr.push($v{ defaultValue  }); } );
+						
 						count++;
 					}
 				default:
@@ -203,8 +289,20 @@ class Item
 	}
 	
 	
-	public static macro function pushVarLabelsToArr(labelize:Bool=true):Expr {
-		var fields = Context.getLocalClass().get().fields.get();
+	
+	public static macro function pushVarLabelsToArr(labelize:Bool=true, moduleStr:String=null):Expr {  // todo when needed: metadata support
+		var fields = null;
+		
+		if (moduleStr != null) {
+			var cm = Context.getModule(moduleStr)[0];
+			switch(cm) {
+				case TInst(t, _):
+				fields = t.get().fields.get();
+				default:	
+				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
+			}
+		}
+		if (fields == null) fields =   Context.getLocalClass().get().fields.get();
 		var block:Array<Expr> = [];
 		
 		var count:Int = 0;
@@ -231,6 +329,36 @@ class Item
 		return macro $b{block};
 	}
 	
+	
+	
+	// misc macro helpers
+	#if macro
+	static private function hasMetaTag(metaData:Metadata, tag:String):Bool {
+		for ( m in metaData) {
+			if (m.name == tag) return true;
+		}
+		return false;
+	}
+	
+	
+	static private function getMetaTagEntry(metaData:Metadata, tag:String):MetadataEntry {
+		if (metaData == null) return null;
+		
+		for ( m in metaData) {
+			if (m.name == tag) return m;
+		}
+		return null;
+	}
+	
+	
+	
+	static private function hasMetaTags(metaData:Metadata, tags:StringMap<Bool>):Bool {
+		for ( m in metaData) {
+			if (tags.exists(m.name)) return true;
+		}
+		return false;
+	}
+	#end
 	
 
 	

@@ -31,9 +31,8 @@ class Weapon extends Item
 	public var damageS:Int = 0;
 	public var damageT:Int = 0;
 	
-	
-	public var damageTypeS:Int = (1 << DamageType.CUTTING);
-	public var damageTypeT:Int = (1 << DamageType.PIERCING);
+	public var damageTypeS:Int = DamageType.CUTTING;
+	public var damageTypeT:Int = DamageType.PIERCING;
 	// damageTypeM is invariably Piercing
 	
 	public var dtn:Int = 0; 
@@ -45,7 +44,7 @@ class Weapon extends Item
 	public var customise:WeaponCustomise = null;
 	
 	// ranged
-	public var range:Int = 1;
+	public var range:Int = 0;
 	public var atnM:Int = 0;
 	public var damageM:Int = 0;
 	

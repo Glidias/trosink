@@ -22,9 +22,17 @@ class Firearm
 	
 	public var firingMechanism:FiringMechanism = null;
 	
+	
 	public function new() 
 	{
 		
+	}
+	
+	
+	public function getAmmunitionsStrArr():Array<String> {
+		var arr:Array<String> = Item.getLabelsOfArray(Ammunition.getDefaultList(), ammunitions);
+		if (ammunitionsCustom != null) arr = ammunitionsCustom.concat(arr);
+		return arr;
 	}
 	
 }
@@ -94,6 +102,7 @@ class Ammunition extends Item
 	public static inline var RIFLE_BALL:Int = 3;
 	public static inline var SHOT:Int = 4;
 	public static inline var SPIKE:Int = 5;
+	
 	
 	public static function getNewDefaultList():Array<Ammunition> {
 		var a:Array<Ammunition> = [];

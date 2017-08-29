@@ -11,9 +11,10 @@ td select{position:relative;width:100%;font-size:12px;}
 .fade-leave{opacity:1;}
 .fade-enter{opacity:0}
 tr.entry-row{border-color:#cc82a7;}
+tr.entry-row>td>input,tr.entry-row>td>select{background-color:#fffeef;}
 thead tr{background-color:#f9f9f9;}
 td input.focusable[readonly]:focus{border:2px solid orange;}
-.pop-widget{position:absolute;top:100%;background-color:white;border:1px solid #aaaaaa;padding:5px;box-sizing:border-box;min-width:100%;height:auto;z-index:1;}
+.pop-widget{position:absolute;top:100%;background-color:white;border:1px solid orange;padding:5px;box-sizing:border-box;min-width:100%;height:auto;z-index:1;}
 td button{text-align:center;padding:0;}
 td.gotbtn input:focus{border-right:2px solid orange;box-sizing:border-box;}
 td.gotbtn button:focus{border:2px solid orange;}
@@ -27,3 +28,4 @@ td.weight{width:40px;}
 td.munition-type{width:100px;}
 td.hands,td.reach{width:40px;}
 td.d10{width:30px;}
+td.w-melee-atk .pop-widget{width:200%;}

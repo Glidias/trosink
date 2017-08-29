@@ -51,6 +51,10 @@ tr.entry-row {
 
 
 }
+tr.entry-row > td > input,  tr.entry-row > td > select {
+	background-color:#fffeef;
+}
+
 thead tr {
 	background-color:#f9f9f9;
 }
@@ -64,7 +68,7 @@ td input.focusable[readonly]:focus {
 	position:absolute;
 	top:100%;
 	background-color:white;
-	border:1px solid #aaaaaa;
+	border:1px solid orange;
 	padding:5px;
 	box-sizing:border-box;
 	min-width:100%;
@@ -130,4 +134,8 @@ td.hands, td.reach {
 }
 td.d10 {
 	width:30px;
+}
+
+td.w-melee-atk .pop-widget {
+	width:200%;
 }

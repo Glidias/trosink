@@ -1,0 +1,23 @@
+<div>
+	<div style="width:50%;display:inline-block">
+		<label>TN:<br/>
+			<input type="number" number step="1" min="0" v-if="!thrusting" v-model="item.atnS" style="width:100%"></input>
+			<input type="number" number step="1" min="0" v-if="thrusting" v-model="item.atnT" style="width:100%"></input>
+		</label>
+	</div><div style="width:50%;display:inline-block">
+		<label>Damage:<br/>
+			<input type="number" number step="1" v-if="!thrusting" v-model="item.damageS" style="width:100%"></input>
+			<input type="number" number step="1" v-if="thrusting" v-model="item.damageT" style="width:100%"></input>
+		</label>
+	</div>
+	<div>
+		<label>Damage Type:</label>
+		<select v-if="!thrusting" number v-model="item.damageTypeS">
+			<option v-for="(label, index) in damageTypeLabels" :value="index">{{ label }}</option>
+		</select>
+		<select v-if="thrusting" number v-model="item.damageTypeT">
+			<option v-for="(label, index) in damageTypeLabels" :value="index">{{ label }}</option>
+		</select>
+	</div>
+	
+</div>

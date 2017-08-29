@@ -22,6 +22,7 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	public function new() 
 	{
 		super();
+
 	}
 	
 	function shiftIndex(i:Int):Int {
