@@ -29,6 +29,7 @@ class Item
 	public var flags:Int = 0;
 	public static inline var FLAG_TWO_HANDED:Int = 1;
 	public static inline var FLAG_STRAPPED:Int = 2;
+	public static inline var FLAG_IS_ATTACHMENT:Int = 4;
 	public static inline var MASK_HANDED:Int = 1 | 2;
 	
 	public var twoHanded(get, never):Bool;

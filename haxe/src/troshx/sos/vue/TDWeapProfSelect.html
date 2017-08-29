@@ -8,6 +8,6 @@
 		<option style="color:grey;" value="0" :selected="isVisibleWidget(section,'profs', index)">select multiple...</option>
 	</select>	
 	<div class="pop-widget" v-on:click.stop="" v-on:mousedown="emit('focus-widget')" v-on:touchstart.stop=""  v-if="isVisibleWidget(section,'profs', index)">
-		Prof Widget goes here
+		<w-prof :entry="entry" :item="weapon" />
 	</div>
 </td>

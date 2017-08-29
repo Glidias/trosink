@@ -6,10 +6,12 @@ import js.html.Event;
 import js.html.HtmlElement;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
+import troshx.sos.core.Inventory.ReadyAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Weapon;
 import troshx.sos.vue.CharSheetVue.WidgetItemRequest;
+import troshx.sos.vue.widgets.WProf;
 
 /**
  * ...
@@ -23,6 +25,13 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	{
 		super();
 
+	}
+	
+		
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
+		return [
+			WProf.NAME => new WProf(),
+		];
 	}
 	
 	function shiftIndex(i:Int):Int {
@@ -90,6 +99,7 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 typedef TDWeapProfSelectProps = {
 	var curWidgetRequest:WidgetItemRequest;
 	var weapon:Weapon;
+	var entry:ReadyAssign;
 	
 	var section:String;
 	var index:Int;

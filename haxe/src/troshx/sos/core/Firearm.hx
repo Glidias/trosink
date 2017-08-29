@@ -77,18 +77,18 @@ class FiringMechanism extends Item
 	}
 }
 
-class Ammunition extends Item
+class Ammunition extends Weapon
 {
 
-	public var catchChance:Int;
-	
+
 	// todo: specials as a series of hard modifiers
 	
 	public function new(name:String="", catchChance:Int=0, id:String="") 
 	{
-		this.catchChance = catchChance;
+
 		super(id, name);
-		
+		stuckChance = catchChance;	
+		isAmmo = true;
 	}
 	
 	static var LIST:Array<Ammunition>;  

@@ -275,21 +275,25 @@ class Inventory
 	function equipItem(item:Item, unheldRemark:String = null):Dynamic {
 		var unheld:Int = 0;
 		var readyAssign:Dynamic = null;
+		var weaponAssign:WeaponAssign;
+		var shieldAssign:ShieldAssign;
+		var itemAssign:ItemAssign;
+		var armorAssign:Armor;
 		
 		if (Std.is(item, Weapon)) {
 			
-			weapons.push(readyAssign = {key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			weapons.push(readyAssign = weaponAssign = {attached:false, key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Shield)) {
 			
-			shields.push(readyAssign = {key:UID_COUNT++, shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			shields.push(readyAssign = shieldAssign = {key:UID_COUNT++, shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Armor)) {
 
-			wornArmor.push( LibUtil.as(item, Armor) );
+			wornArmor.push( armorAssign = LibUtil.as(item, Armor) );
 		}
 		else {
-			equipedNonMeleeItems.push(readyAssign = {key:UID_COUNT++, item:item, held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			equipedNonMeleeItems.push(readyAssign =  itemAssign= {key:UID_COUNT++, item:item, held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
 		}
 		
 		return readyAssign;
@@ -313,22 +317,27 @@ class Inventory
 	}
 	
 	public static function getEmptyReadyAssign(type:String):Dynamic {  // Dynamic no choice??, these types is a real pain sometimes
+		var weaponAssign:WeaponAssign;
+		var shieldAssign:ShieldAssign;
+		var itemAssign:ItemAssign;
+
 		if (type == "weapon") {
-			return {
+			return weaponAssign = {
 				weapon:new Weapon(),
 				held:0, unheld:0, unheldRemark:"",
-				key:UID_COUNT++
+				key:UID_COUNT++,
+				attached:false
 			};
 		}
 		else if (type == "shield") {
-			return {
+			return shieldAssign= {
 				shield:new Shield(),
 				held:0, unheld:0, unheldRemark:"",
 				key:UID_COUNT++
 			};
 		}
 		else {
-			return {
+			return itemAssign = {
 				item:new Item(),
 				held:0, unheld:0, unheldRemark:"",
 				key:UID_COUNT++
@@ -362,6 +371,7 @@ typedef ItemAssign = {
 typedef WeaponAssign = {
 	> ReadyAssign,
 	weapon:Weapon,
+	attached:Bool
 }
 
 typedef ShieldAssign = {

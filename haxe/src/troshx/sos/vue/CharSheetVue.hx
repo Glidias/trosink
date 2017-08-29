@@ -12,6 +12,7 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.vue.widgets.WAmmoSpawner;
 import troshx.sos.vue.widgets.WAmmunition;
 import troshx.sos.vue.widgets.WCoverage;
 import troshx.sos.vue.widgets.WMeleeAtk;
@@ -66,6 +67,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			WProf.NAME => new WProf(),
 			WSpanTools.NAME => new WSpanTools(),
 			WTags.NAME => new WTags(),
+			
+			WAmmoSpawner.NAME => new WAmmoSpawner()
 		];
 	}
 	override public function Created():Void {
@@ -95,8 +98,6 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		this.char = unserializer.unserialize();
 		
 		this.char.inventory.getSignaler().add(onInventorySignalReceived);
-		
-		
 	}
 	
 	
@@ -147,7 +148,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	inline function getMissileAtkStr(wpn:Weapon):String {
-		return wpn.atnM + "(" + wpn.damageM + "p)";
+		return wpn.atnM + "(" + wpn.damageM + this.damageTypeSuffixes[wpn.damageTypeM]+")";
 	}
 	
 	inline function getAmmunitions(firearm:Firearm):String {

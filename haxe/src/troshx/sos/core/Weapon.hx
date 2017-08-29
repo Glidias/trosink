@@ -27,18 +27,17 @@ class Weapon extends Item
 	public var atnS:Int = 0;
 	public var atnT:Int = 0;
 	
-	
 	public var damageS:Int = 0;
 	public var damageT:Int = 0;
 	
 	public var damageTypeS:Int = DamageType.CUTTING;
 	public var damageTypeT:Int = DamageType.PIERCING;
-	// damageTypeM is invariably Piercing
+
 	
 	public var dtn:Int = 0; 
 	public var guard:Int = 0;
 	
-	public var specialFlags:Int = 0;
+	public var meleeFlags:Int = 0;
 	public var meleeSpecial:MeleeSpecial = null;
 	
 	public var customise:WeaponCustomise = null;
@@ -47,7 +46,9 @@ class Weapon extends Item
 	public var range:Int = 0;
 	public var atnM:Int = 0;
 	public var damageM:Int = 0;
+	public var damageTypeM:Int = DamageType.PIERCING;
 	
+	public var missileFlags:Int = 0;
 	public var missileSpecial:MissileSpecial = null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this

@@ -1,6 +1,7 @@
 package troshx.sos.vue.widgets;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import troshx.sos.core.Inventory.ReadyAssign;
 import troshx.sos.core.Item;
 
 /**
@@ -24,6 +25,7 @@ class BaseItemWidget extends VComponent<NoneT, BaseItemWidgetProps>
 typedef BaseItemWidgetProps =
 {
 	public var item:Item;
+	public var entry:ReadyAssign;
 	@:prop({required:false})  @:optional public var parentAttr:Dynamic;
 	
 }

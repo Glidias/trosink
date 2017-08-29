@@ -24,13 +24,15 @@ class WeaponCustomise
 }
 
 class CustomMelee {
-	public var bizarreGimmickDesc:String = null;  // BIZARRE_GIMMICK must be flagged for this to be usable.
-	public var sharpened:Bool = true; //  RIDICULOUSLY_SHARP must be flagged for this to be usable.
+	@:prop public var bizarreGimmickDesc:String = null;  // BIZARRE_GIMMICK must be flagged for this to be usable.
+	@:prop public var sharpened:Bool = true; //  RIDICULOUSLY_SHARP must be flagged for this to be usable.
 	
 	@:prop({max:2}) public var customGrip:Int = 0; 
 	@:prop({max:3}) public var fineForging:Int = 0;
 	
 	@:prop({max:2}) public var integratedPistol:Int = 0;
+	
+	
 	public static inline var PISTOL:Int = 1;
 	public static inline var DRAGON:Int = 2;
 	
