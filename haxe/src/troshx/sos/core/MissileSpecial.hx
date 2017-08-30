@@ -16,11 +16,14 @@ class MissileSpecial
 	public var shock:Int = 0;
 	public var winged:Int = 0;
 	
+	public var load:Int = 0;
+	
 	public static inline var BLUDGEON:Int = (1 << 0);
 	public static inline var NARROW:Int = (1 << 1);
 	public static inline var SHIELD_STICK:Int = (1 << 2);
+	public static inline var AP_FIRST_HIT_ONLY:Int = (1 << 3);
 	
-	public static inline var TOTAL_FLAGS:Int = 3;
+	public static inline var TOTAL_FLAGS:Int = 4;
 	
 	public var custom:Array<Dynamic> = null;  // gm homebrews if any..
 	

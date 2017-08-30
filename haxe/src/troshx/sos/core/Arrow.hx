@@ -1,5 +1,5 @@
 package troshx.sos.core;
-import troshx.sos.core.Arrows.Arrow;
+
 
 /**
  * ...
@@ -30,13 +30,51 @@ class Arrow extends Weapon
 	
 	public static function getNewDefaultList():Array<Ammunition> {
 		var a:Array<Ammunition> = [];
-		var f;
-		a[BODKIN] = f= new Arrow("Bodkin", 1).setWeightCost(0, 1, Item.SP).setUnit(20);
-		a[BARBED_BROADHEAD] = f= new Arrow("Barbed Broadhead", 10).setWeightCost(0, 4, Item.SP).setUnit(20);
-		a[BLUDGEON_STUN] = f= new Arrow("Bludgeon/Stun Arrow", 0).setWeightCost(0, 10, Item.CP).setUnit(20);
+		var f:Arrow;
+		
+		a[BODKIN] = f = new Arrow("Bodkin", 1).setWeightCost(0, 1, Item.SP).setUnit(20);
+		f.range = 10;
+		f.missileFlags = MissileSpecial.NARROW;
+		
+		a[BARBED_BROADHEAD] = f = new Arrow("Barbed Broadhead", 10).setWeightCost(0, 4, Item.SP).setUnit(20);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.winged = 2;
+		
+		a[BLUDGEON_STUN] = f = new Arrow("Bludgeon/Stun Arrow", 0).setWeightCost(0, 10, Item.CP).setUnit(20);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.shock = 2;
+		f.missileFlags = MissileSpecial.BLUDGEON;
+		f.range = -5;
+		
 		a[BROADHEAD] = f = new Arrow("Broadhead", 5).setWeightCost(0, 2, Item.SP).setUnit(20);
-		//a[SHOT] = f = new Arrow("Shot", 9).setWeightCost(0, 1, Item.CP).setUnit(20);
-		//a[SPIKE] = f = new Arrow("Spike", 1).setWeightCost(0, 1, Item.CP).setUnit(20);
+		f.damageM = -1;
+		f.missileSpecial == new MissileSpecial();
+		f.missileSpecial.winged = 2;
+		
+		
+		a[FIRE_ARROW] = f = new Arrow("Fire Arrow", 5).setWeightCost(0, 2, Item.SP).setUnit(20);
+		f.damageM = -1;
+		f.atnM = 1;
+		f.range = -5;
+		f.missileSpecial = new MissileSpecial();
+		f.flaming = 1;
+		
+		a[HEAVY_BROADHEAD] = f = new Arrow("Heavy Broadhead", 5).setWeightCost(0, 3, Item.SP).setUnit(20);
+		f.damageM = -2;
+		f.range = -5;
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.winged = 2;
+		
+		a[LOZENGE_HEAD] = f = new Arrow("Lozenge-Head", 2).setWeightCost(0, 2, Item.SP).setUnit(20);
+		f.range = -5;
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.AP = 2;
+		
+		a[SWALLOWTAIL] = f = new Arrow("Swallowtail", 8).setWeightCost(0, 4, Item.SP).setUnit(20);
+		f.requiredStr = -1;
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.winged = 1;
+		
 		return a;
 	}
 }

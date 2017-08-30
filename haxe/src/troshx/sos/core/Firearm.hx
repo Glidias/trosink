@@ -106,13 +106,43 @@ class Ammunition extends Weapon
 	
 	public static function getNewDefaultList():Array<Ammunition> {
 		var a:Array<Ammunition> = [];
-		var f;
-		a[BALL] = f= new Ammunition("Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
-		a[BUCK_AND_BALL] = f= new Ammunition("Buck and Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
-		a[HEAVY_SHOT] = f= new Ammunition("Heavy Shot", 9).setWeightCost(0, 3, Item.CP).setUnit(10);
+		var f:Ammunition;
+		
+		a[BALL] = f = new Ammunition("Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.AP = 4;
+		
+		a[BUCK_AND_BALL] = f = new Ammunition("Buck and Ball", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.scatter = 3;
+		f.missileSpecial.scatter_y = 6;
+		f.missileSpecial.AP = 2;
+		f.missileFlags = MissileSpecial.AP_FIRST_HIT_ONLY;
+		
+		a[HEAVY_SHOT] = f = new Ammunition("Heavy Shot", 9).setWeightCost(0, 3, Item.CP).setUnit(10);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.scatter = 8;
+		f.missileSpecial.scatter_y = 6;
+		
 		a[RIFLE_BALL] = f = new Ammunition("Rifle Ball", 8).setWeightCost(0, 6, Item.CP).setUnit(10);
+		f.atnM = -1;
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.AP = 4;
+		f.missileSpecial.load = -10;
+		
+		
 		a[SHOT] = f = new Ammunition("Shot", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.scatter = 6;
+		f.missileSpecial.scatter_y = 6;
+		
 		a[SPIKE] = f = new Ammunition("Spike", 1).setWeightCost(0, 1, Item.CP);
+		f.damageM = 2;
+		f.atnM = -1;
+		f.range = 3;
+		f.missileSpecial = new MissileSpecial();
+		f.missileSpecial.load = 10;
+		
 		return a;
 	}
 }

@@ -9,10 +9,10 @@ import troshx.ds.IUpdateWith;
 class Wound implements IUid implements IUpdateWith<Wound>
 {
 	
-	// these parameters uniquely identify the wound
-	public var location:HitLocation = null;
-	public var level:Int = 0;
-	public var damageType:Int = 0;
+	// these parameters uniquely identify the wound and should never be changed after being set through constructor
+	public var location(default,null):HitLocation = null;
+	public var level(default,null):Int = 0;
+	public var damageType(default,null):Int = 0;
 	
 	// stateful applied damages for wound
 	public var stun:Int = 0;
@@ -26,9 +26,11 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	
 	static  var UNIQUE_COUNT:Int = 0;
 
-	public function new() 
+	public function new(location:HitLocation, level:Int, damageType:Int) 
 	{
-		
+		this.location = location;
+		this.level = level;
+		this.damageType = damageType;
 	}
 	
 	function get_labelLocation():String 
