@@ -11,14 +11,14 @@ class Firearm
 	@:flagInstances(Ammunition) public var ammunitions:Int = 0;
 	public var ammunitionsCustom:Array<String> = null;
 	
-	public var load:Int = 0;
+	@:tag4ammo() public var load:Int = 0;
 	
 	public var double:Bool = false;
-	public var multishot:Int = 0;
-	public var magazine:Int = 0;
-	public var revolver:Int = 0;
+	@:tag4ammo() public var multishot:Int = 0;
+	@:tag4ammo() public var magazine:Int = 0;
+	@:tag4ammo() public var revolver:Int = 0;
 	
-	public var highCaliber:Int = 0;
+	@:tag4ammo() public var highCaliber:Int = 0;
 	
 	public var firingMechanism:FiringMechanism = null;
 	
@@ -128,7 +128,8 @@ class Ammunition extends Weapon
 		f.atnM = -1;
 		f.missileSpecial = new MissileSpecial();
 		f.missileSpecial.AP = 4;
-		f.missileSpecial.load = -10;
+		f.firearm = new Firearm();
+		f.firearm.load = -10;
 		
 		
 		a[SHOT] = f = new Ammunition("Shot", 9).setWeightCost(0, 1, Item.CP).setUnit(10);
@@ -140,8 +141,8 @@ class Ammunition extends Weapon
 		f.damageM = 2;
 		f.atnM = -1;
 		f.range = 3;
-		f.missileSpecial = new MissileSpecial();
-		f.missileSpecial.load = 10;
+		f.firearm = new Firearm();
+		f.firearm.load = 10;
 		
 		return a;
 	}

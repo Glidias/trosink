@@ -8,7 +8,7 @@ import troshx.sos.core.Crossbow.SpanningTool;
 class Crossbow
 {
 
-	public var span:Int = 0;
+	@:tag4ammo() public var span:Int = 0;
 	@:flagInstances(SpanningTool) public var spanningTools:Int = 0;
 	// support custom spanning tools?
 	

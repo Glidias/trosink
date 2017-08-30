@@ -43,9 +43,9 @@ class Weapon extends Item
 	public var customise:WeaponCustomise = null;
 	
 	// ranged
-	public var range:Int = 0;
-	public var atnM:Int = 0;
-	public var damageM:Int = 0;
+	@:tag4ammo(1) public var range:Int = 0;
+	@:tag4ammo(1) public var atnM:Int = 0;
+	@:tag4ammo(1) public var damageM:Int = 0;
 	public var damageTypeM:Int = DamageType.PIERCING;
 	
 	public var missileFlags:Int = 0;
@@ -54,7 +54,7 @@ class Weapon extends Item
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
 	// Bow 
-	public var requiredStr:Int = 0; 
+	@:tag4ammo() public var requiredStr:Int = 0; 
 	
 	// Crossbow (if specified, overrides bow)
 	public var crossbow:Crossbow = null;
