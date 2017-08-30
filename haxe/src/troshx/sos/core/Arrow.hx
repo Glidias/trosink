@@ -21,15 +21,15 @@ class Arrow extends Weapon
 	public static inline var LOZENGE_HEAD:Int = 6;
 	public static inline var SWALLOWTAIL:Int = 7;
 	
-	public function Arrow(name:String = "", catchChance:Int = 0, id:String = "")) {
+	public function new(name:String = "", catchChance:Int = 0, id:String = "") {
 		super(id, name);
 		stuckChance = catchChance;
 		isAmmo = true;
 	}
 	
 	
-	public static function getNewDefaultList():Array<Ammunition> {
-		var a:Array<Ammunition> = [];
+	public static function getNewDefaultList():Array<Arrow> {
+		var a:Array<Arrow> = [];
 		var f:Arrow;
 		
 		a[BODKIN] = f = new Arrow("Bodkin", 1).setWeightCost(0, 1, Item.SP).setUnit(20);
@@ -57,7 +57,7 @@ class Arrow extends Weapon
 		f.atnM = 1;
 		f.range = -5;
 		f.missileSpecial = new MissileSpecial();
-		f.flaming = 1;
+		f.missileSpecial.flaming = 1;
 		
 		a[HEAVY_BROADHEAD] = f = new Arrow("Heavy Broadhead", 5).setWeightCost(0, 3, Item.SP).setUnit(20);
 		f.damageM = -2;

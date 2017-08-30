@@ -1,6 +1,7 @@
 package troshx.sos.vue.widgets;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import troshx.sos.core.Arrow;
 
 /**
  * ...
@@ -14,6 +15,7 @@ class WAmmoSpawner extends VComponent<NoneT, WAmmoSpawnerProps>
 	public function new() 
 	{
 		super();
+		Arrow;
 	}
 	
 }
