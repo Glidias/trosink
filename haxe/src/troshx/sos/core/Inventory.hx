@@ -75,7 +75,8 @@ class Inventory
 		for (i in 0...weapons.length) {
 			var wp = weapons[i];
 			var w = wp.weapon;
-			if ( !w.isAmmunition() && w.matchesTypes(ranged, profs)) {
+			var c =  w.matchesTypes(ranged, profs);
+			if ( !w.isAmmunition() && c) {
 				arr.push(wp);	
 			}
 		}

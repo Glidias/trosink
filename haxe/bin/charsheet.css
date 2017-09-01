@@ -15,7 +15,7 @@ td.actions {
 select {
 	font-size:12px;
 }
-td input {
+td input[type='text'] {
 	position:relative;
 	width:100%;
 	font-size:12px;
@@ -88,7 +88,7 @@ td.gotbtn input:focus {
 td.gotbtn button:focus {
 	border:2px solid orange;
 }
-td.gotbtn.focus input {
+td.gotbtn.focus > input {
 	width: calc(100% - 24px);
 }
 
@@ -136,6 +136,34 @@ td.d10 {
 	width:30px;
 }
 
-td.w-melee-atk .pop-widget {
+td.w-holder .pop-widget {
 	width:200%;
+}
+
+td.w-span-tools .pop-widget {
+	
+	min-width:165px;
+}
+
+
+td.w-coverage .pop-widget {
+	width:100%;
+}
+
+td.w-prof.got-custom .pop-widget {
+	min-width:400px;
+}
+
+td.w-ammo-spawner > a {
+	color:inherit;
+}
+
+.widget-prof .listitem.disabled {
+	opacity:.35;
+	pointer-events:none;
+}
+.widget-prof .columner {
+	width:50%;
+	float:left;
+	
 }

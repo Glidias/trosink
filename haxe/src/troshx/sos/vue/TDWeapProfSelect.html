@@ -1,13 +1,14 @@
-<td v-on:click.stop="">
+<td v-on:click.stop="" class="w-holder w-prof" :class="{'got-custom':gotCustom}">
 	<select number data-type="profs" :data-index="index" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onProfSelectChange($event, weapon)">
-		<option selected v-if="weapon.isMultipleCoreProf() || weapon.hasCustomProf()" :value="weapon.profs">
+		<option v-if="showSelectMultipleFirst" style="color:grey;" value="0" :selected="isSelectingMultiple">select multiple...</option>
+		<option :selected="!isSelectingMultiple" v-if="gotCustomMultiCheck" :value="weapon.profs">
 			{{ weapon.profLabels() }}
 		</option>
-		<option :selected="!weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in meleeProfs" :value="(1 << i)">{{weapon.ranged || (profMask!=null && profMask == -1) ? "&gt;" : ""}}{{p.name}}</option>
-		<option :selected="weapon.ranged && weapon.profs&(1 << i)" v-for="(p, i) in rangedProfs" :value="-1*(1 << i)"> {{(profMask != null ? (profMask&shiftIndex(i))==0 || profMask == -1 : true) || !weapon.ranged ? "&gt;" : ""}}{{ p.name }}</option>
-		<option style="color:grey;" value="0" :selected="isVisibleWidget(section,'profs', index)">select multiple...</option>
+		<option :selected="!gotCustomMultiCheck && !weapon.ranged && weapon.profs&(1 << i) && !isSelectingMultiple" v-for="(p, i) in meleeProfs" :value="(1 << i)">{{weapon.ranged || (profMask!=null && profMask == -1) || weapon.isAmmo ? "&gt;" : ""}}{{p.name}}</option>
+		<option :selected="!gotCustomMultiCheck && weapon.ranged && weapon.profs&(1 << i) && !isSelectingMultiple" v-for="(p, i) in rangedProfs" :value="-1*(1 << i)"> {{(profMask != null ? (profMask&shiftIndex(i))==0 || profMask == -1 : true) || !weapon.ranged || weapon.isAmmo ? "&gt;" : ""}}{{ p.name }}</option>
+		<option v-if="!showSelectMultipleFirst" style="color:grey;" value="0" :selected="isSelectingMultiple">select multiple...</option>
 	</select>	
-	<div class="pop-widget" v-on:click.stop="" v-on:mousedown="emit('focus-widget')" v-on:touchstart.stop=""  v-if="isVisibleWidget(section,'profs', index)">
-		<w-prof :entry="entry" :item="weapon" />
+	<div class="pop-widget"  v-on:click.stop="" v-on:mousedown="emit('focus-widget')" v-on:touchstart.stop=""  v-if="isVisibleWidget(section,'profs', index)">
+		<w-prof :entry="entry" :customWidth="gotCustom" :customProfs="this.customProfs" :curWidgetRequest="curWidgetRequest" :item="weapon" :meleeProfs="meleeProfs" :rangedProfs="rangedProfs" />
 	</div>
 </td>

@@ -1,4 +1,5 @@
 package troshx.sos.vue.widgets;
+import haxevx.vuex.util.VHTMacros;
 
 /**
  * Widget to handle melee DTN and Guard
@@ -12,5 +13,11 @@ class WMeleeDef extends BaseItemWidget
 	{
 		super();
 	}
+	
+
+	override public function Template():String {
+		return VHTMacros.getHTMLStringFromFile("", "html");
+	}
+	
 	
 }

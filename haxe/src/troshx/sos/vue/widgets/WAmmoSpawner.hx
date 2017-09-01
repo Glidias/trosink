@@ -14,8 +14,11 @@ class WAmmoSpawner extends VComponent<NoneT, WAmmoSpawnerProps>
 
 	public function new() 
 	{
-		super();
-		Arrow;
+		super();	
+	}
+	
+	override public function Template() {
+		return '<div>'+Type.getClassName(Type.getClass(this)).split(".").pop()+'</div>';
 	}
 	
 }

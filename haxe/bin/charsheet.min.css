@@ -2,7 +2,7 @@ td{position:relative;}
 body{font-family:Times New Roman,Arial,sans-serif;font-size:12px;}
 td.actions{min-width:105px;}
 select{font-size:12px;}
-td input{position:relative;width:100%;font-size:12px;}
+td input[type='text']{position:relative;width:100%;font-size:12px;}
 td.voidna{background-color:#333333;}
 td select{position:relative;width:100%;font-size:12px;}
 .fade-enter-active,.fade-leave-active{transition:opacity .2s ease-out;}
@@ -18,7 +18,7 @@ td input.focusable[readonly]:focus{border:2px solid orange;}
 td button{text-align:center;padding:0;}
 td.gotbtn input:focus{border-right:2px solid orange;box-sizing:border-box;}
 td.gotbtn button:focus{border:2px solid orange;}
-td.gotbtn.focus input{width:calc(100% - 24px);}
+td.gotbtn.focus>input{width:calc(100% - 24px);}
 td.gotbtn button{display:none;}
 td.gotbtn.focus button{display:block;width:24px;height:100%;position:absolute;right:0;top:0;}
 .inventory{position:relative;}
@@ -28,4 +28,10 @@ td.weight{width:40px;}
 td.munition-type{width:100px;}
 td.hands,td.reach{width:40px;}
 td.d10{width:30px;}
-td.w-melee-atk .pop-widget{width:200%;}
+td.w-holder .pop-widget{width:200%;}
+td.w-span-tools .pop-widget{min-width:165px;}
+td.w-coverage .pop-widget{width:100%;}
+td.w-prof.got-custom .pop-widget{min-width:400px;}
+td.w-ammo-spawner>a{color:inherit;}
+.widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
+.widget-prof .columner{width:50%;float:left;}

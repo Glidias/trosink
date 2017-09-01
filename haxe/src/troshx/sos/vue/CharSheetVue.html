@@ -20,7 +20,7 @@
 				<tr v-for="entry in char.inventory.dropped.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
-					<td><input type="number" v-model="entry.item.weight" number min="0"></input></td>
+					<td><input type="number" step="0.5" v-model="entry.item.weight" number min="0"></input></td>
 					<td>{{ entry.item.getTypeLabel() }}</td>
 					<td>
 						<a href="javascript:;" v-on:click="char.inventory.packItemEntryFromGround(entry)">Pack</a>
@@ -33,7 +33,7 @@
 				<tr class="entry-row" :key="-1">
 					<td><input type="text" v-model="droppedEntry.e.item.name" required v-on:focus="focusInRowField(droppedEntry, 1)" v-on:blur="focusOutRowField(droppedEntry, 1)"></input></td>
 					<td><input type="number" v-model="droppedEntry.e.qty" number min="1" v-on:focus="focusInRowField(droppedEntry, 2)" v-on:blur="focusOutRowField(droppedEntry, 2)"></input></td>
-					<td><input type="number" v-model="droppedEntry.e.weight" number min="0" v-on:focus="focusInRowField(droppedEntry, 4)" v-on:blur="focusOutRowField(droppedEntry, 4)"></input></td>
+					<td><input type="number" step="0.5" v-model="droppedEntry.e.weight" number min="0" v-on:focus="focusInRowField(droppedEntry, 4)" v-on:blur="focusOutRowField(droppedEntry, 4)"></input></td>
 					<td>
 						MiscItem
 					</td>
@@ -60,7 +60,7 @@
 				<tr v-for="entry in char.inventory.packed.list" :key="entry.item.get_uid()">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
-					<td><input type="number" v-model="entry.item.weight" number min="0"></input></td>
+					<td><input type="number" step="0.5" v-model="entry.item.weight" number min="0"></input></td>
 					<td>{{ entry.item.getTypeLabel() }}</td>
 	
 					<td>
@@ -72,7 +72,7 @@
 				<tr class="entry-row" :key="-1">
 					<td><input type="text" v-model="packedEntry.e.item.name" required v-on:focus="focusInRowField(packedEntry, 1)" v-on:blur="focusOutRowField(packedEntry, 1)"></input></td>
 					<td><input type="number" v-model="packedEntry.e.qty" number min="1" v-on:focus="focusInRowField(packedEntry, 2)" v-on:blur="focusOutRowField(packedEntry, 2)"></input></td>
-					<td><input type="number" v-model="packedEntry.e.weight" number min="0" v-on:focus="focusInRowField(packedEntry, 4)" v-on:blur="focusOutRowField(packedEntry, 4)"></input></td>
+					<td><input type="number" step="0.5" v-model="packedEntry.e.weight" number min="0" v-on:focus="focusInRowField(packedEntry, 4)" v-on:blur="focusOutRowField(packedEntry, 4)"></input></td>
 					<td>MiscItem</td>
 				</tr>
 			</tbody>
@@ -101,7 +101,7 @@
 					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
-					<td><input type="number" v-model="entry.shield.weight" number min="0"></input></td>
+					<td><input type="number" step="0.5" v-model="entry.shield.weight" number min="0"></input></td>
 					<td-widget widgetName="coverage" widgetTagName="w-coverage" :value="entry.shield.coverage" :index="i" :showWidget="isVisibleWidget('shield','coverage', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
@@ -173,7 +173,7 @@
 					<td-widget widgetName="melee-atk2" widgetTagName="w-melee-atk" :widgetProps="{thrusting:true}" :value="getThrustAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk2', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="melee-def" widgetTagName="w-melee-def" :value="getDefGuard(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-def', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -213,11 +213,11 @@
 						
 						<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
 							
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
-			<thead>
+			<thead v-on:mousedown="setCurWidgetSection('bowheader', $event)" v-on:touchstart="setCurWidgetSection('bowheader', $event)">
 				<tr>
 					<td>Bow/Sling name</td>
 					<td class="munition-type">Type</td>
@@ -225,7 +225,12 @@
 					<td>Range</td>
 					<td>TN(dmg)</td>
 					<td>Req STR</td>
-					<td class="voidna focus gotbtn"><button>&#8610;</button></td>
+					<td class="voidna focus gotbtn w-holder w-ammo-spawner" v-on:click.stop="">
+						<button v-on:click="requestCurWidget('ammo-spawner',-1)">&#8610;</button>
+						<div class="pop-widget"  v-if="isVisibleWidget('bowheader', 'ammo-spawner', -1)">
+							<w-ammo-spawner :mask="bowSlingAndCrossbowMask" />
+						</div>
+					</td>
 					<td class="tags">Tags</td>
 					<td class="weight">Weight</td>
 					<td class="keptat">Kept at?</td>
@@ -233,7 +238,7 @@
 					<td class="actions"><i>Actions</i></td>
 				</tr>
 			</thead>
-			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('bow', $event)" v-on:mousedown.touchstart="setCurWidgetSection('bow', $event)">
+			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('bow', $event)" v-on:touchstart.native="setCurWidgetSection('bow', $event)">
 				<tr v-for="(entry, itemIndex) in filteredBowSling" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="entry" :weapon="entry.weapon" section="bow" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
@@ -243,7 +248,7 @@
 					<td><input type="number" number step="1" v-model="entry.weapon.requiredStr"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('bow','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -268,7 +273,7 @@
 					<td><input type="number" number step="1" v-model="weaponEntry.e.weapon.requiredStr"  v-on:focus="focusInRowField(weaponEntry,32)" v-on:blur="focusOutRowField(weaponEntry,32)"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
@@ -298,7 +303,7 @@
 					<td><input type="number" number min="0" v-model="entry.weapon.crossbow.span"></input></td>
 					<td-widget widgetName="span-tools" widgetTagName="w-span-tools" :value="getSpanTools(entry.weapon.crossbow)" :index="itemIndex" :showWidget="isVisibleWidget('crossbow','span-tools', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('crossbow','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -323,11 +328,11 @@
 					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.crossbow.span"  v-on:focus="focusInRowField(weaponEntry,32)" v-on:blur="focusOutRowField(weaponEntry,32)"></input></td>
 					<td-widget widgetName="span-tools" widgetTagName="w-span-tools" :value="getSpanTools(weaponEntry.e.weapon.crossbow)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (64|(1<<22))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<22))" v-on:focus-in-row="focusInRowField(weaponEntry,64)" v-on:focus-out-row="focusOutRowField(weaponEntry,64)" />	
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
-			<thead>
+			<thead v-on:mousedown="setCurWidgetSection('firearmheader', $event)" v-on:touchstart="setCurWidgetSection('firearmheader', $event)">
 				<tr>
 					<td>Firearm name</td>
 					<td class="munition-type">Type</td>
@@ -335,7 +340,12 @@
 					<td>Range</td>
 					<td>TN(dmg)</td>
 					<td>Load</td>
-					<td>Ammunition</td>
+					<td class="w-holder w-ammo-spawner" v-on:click.stop="">
+						<a href="javascript:;" v-on:click="requestCurWidget('ammo-spawner',-1)">Ammunition</a>
+						<div class="pop-widget"  v-if="isVisibleWidget('firearmheader', 'ammo-spawner', -1)">
+							<w-ammo-spawner :mask="firearmMask" />
+						</div>
+					</td>
 					<td class="tags">Tags</td>
 					<td class="weight">Weight</td>
 					<td class="keptat">Kept at?</td>
@@ -353,7 +363,7 @@
 					<td><input type="number" number min="0" v-model="entry.weapon.firearm.load"></input></td>
 					<td-widget widgetName="ammunition" widgetTagName="w-ammunition" :value="getAmmunitions(entry.weapon.firearm)" :index="itemIndex" :showWidget="isVisibleWidget('firearm','ammunition', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('firearm','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -380,7 +390,7 @@
 					<td-widget widgetName="ammunition" widgetTagName="w-ammunition" :value="getAmmunitions(weaponEntry.e.weapon.firearm)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (64|(1<<22))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<22))" v-on:focus-in-row="focusInRowField(weaponEntry,64)" v-on:focus-out-row="focusOutRowField(weaponEntry,64)" />	
 						
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
@@ -410,7 +420,7 @@
 					<td><input type="number" number min="0" max="10" v-model="entry.weapon.stuckChance"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('throwing','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -435,7 +445,7 @@
 					<td><input type="number" number min="0" max="10" v-model="weaponEntry.e.weapon.stuckChance" v-on:focus="focusInRowField(weaponEntry,32)" v-on:blur="focusOutRowField(weaponEntry,32)"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
@@ -465,7 +475,7 @@
 					<td><input type="number" number min="0" max="10" v-model="entry.weapon.stuckChance"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('ammo','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.weapon.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td class="voidna"></td>
 					<td>
@@ -483,7 +493,7 @@
 					<td><input type="number" number min="0" max="10" v-model="weaponEntry.e.weapon.stuckChance" v-on:focus="focusInRowField(weaponEntry,32)" v-on:blur="focusOutRowField(weaponEntry,32)"></input></td>
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (128|(1<<24))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<24))" v-on:focus-in-row="focusInRowField(weaponEntry,128)" v-on:focus-out-row="focusOutRowField(weaponEntry,128)" />
-					<td><input type="number" number min="0" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="weaponEntry.e.weapon.weight" v-on:focus="focusInRowField(weaponEntry,256)" v-on:blur="focusOutRowField(weaponEntry,256)"></input></td>
 					<td><input type="text" v-model="weaponEntry.e.unheldRemark"v-on:focus="focusInRowField(weaponEntry,512)" v-on:blur="focusOutRowField(weaponEntry,512)"></input></td>
 				</tr>
 			</tbody>
@@ -507,7 +517,7 @@
 				<tr v-for="(entry,i) in char.inventory.equipedNonMeleeItems" :key="entry.key">
 					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.item)" :index="i" :showWidget="isVisibleWidget('miscItem','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" number min="0" v-model="entry.item.weight"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="entry.item.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
 					<td>
 						<select number :value="entry.held" v-on:change="holdItemHandler(entry, $event.target.value)"  >
@@ -526,7 +536,7 @@
 				<tr class="entry-row" :key="-1">
 					<td><input type="text" v-model="miscItemEntry.e.item.name" v-on:focus="focusInRowField(miscItemEntry,1)" v-on:blur="focusOutRowField(miscItemEntry,1)"></input></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(miscItemEntry.e.item)" :index="-1" :showWidget="(miscItemEntry.focusedFlags & (2|(1<<21))) !=0" :entry="miscItemEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(miscItemEntry,(1<<21))" v-on:focus-in-row="focusInRowField(miscItemEntry,2)" v-on:focus-out-row="focusOutRowField(miscItemEntry,2)" />
-					<td><input type="number" number min="0" v-model="miscItemEntry.e.item.weight" v-on:focus="focusInRowField(miscItemEntry,4)" v-on:blur="focusOutRowField(miscItemEntry,4)"></input></td>
+					<td><input type="number" number min="0" step="0.5" v-model="miscItemEntry.e.item.weight" v-on:focus="focusInRowField(miscItemEntry,4)" v-on:blur="focusOutRowField(miscItemEntry,4)"></input></td>
 					<td><input type="text" v-model="miscItemEntry.e.unheldRemark" v-on:focus="focusInRowField(miscItemEntry,8)" v-on:blur="focusOutRowField(miscItemEntry,8)"></input></td>	
 				</tr>
 			</tbody>
@@ -554,7 +564,7 @@
 					<td><input type="number" number min="0" v-model="armor.AVP"></input></td>
 					<td><input type="number" number min="0" v-model="armor.AVB"></input></td>			
 					<td-widget widgetName="coverage" widgetTagName="w-coverage" :value="getCoverage(armor.coverage)" :index="i" :showWidget="isVisibleWidget('armor','coverage', i)" :entry="armor" :requestCurWidget="requestCurWidget" />
-					<td><input type="number" min="0" number v-model="armor.weight"></input></td>
+					<td><input type="number" min="0" number step="0.5" v-model="armor.weight"></input></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(armor)" :index="i" :showWidget="isVisibleWidget('armor','tags', i)" :entry="armor" :requestCurWidget="requestCurWidget" />
 					
 					<td>
@@ -572,7 +582,7 @@
 						v-on:focus-in-row="focusInRowField(armorEntry, 16)" v-on:focus-out-row="focusOutRowField(armorEntry, 16)" v-on:focus-widget="focusInRowField(armorEntry, (1<<20))" />
 					
 					
-					<td><input type="number" min="0" number v-model="armorEntry.e.weight" v-on:focus="focusInRowField(armorEntry,32)" v-on:blur="focusOutRowField(armorEntry,32)"></input></td>
+					<td><input type="number" min="0" number step="0.5" v-model="armorEntry.e.weight" v-on:focus="focusInRowField(armorEntry,32)" v-on:blur="focusOutRowField(armorEntry,32)"></input></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(armorEntry.e)" :index="-1" :showWidget="(armorEntry.focusedFlags & (64|(1<<21))) !=0" :entry="armorEntry" :requestCurWidget="requestCurWidget"
 					v-on:focus-in-row="focusInRowField(armorEntry, 64)" v-on:focus-out-row="focusOutRowField(armorEntry, 64)" v-on:focus-widget="focusInRowField(armorEntry, (1<<21))" />
 					<td><input type="text" readonly class="focusable" v-on:focus="focusInRowField(armorEntry,64)" v-on:blur="focusOutRowField(armorEntry,64)"></input></td>

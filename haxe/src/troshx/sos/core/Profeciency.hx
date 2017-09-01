@@ -108,7 +108,9 @@ class Profeciency
 	
 	inline function get_uid():String 
 	{
-		return name;
+		return name + SEPERATOR + type;
 	}
+	
+	static var SEPERATOR:String = "_$_";
 	
 }

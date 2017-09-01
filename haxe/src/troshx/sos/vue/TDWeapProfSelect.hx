@@ -41,9 +41,35 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 		_vEmit(str);
 	}
 	
+	@:computed function get_hasNoProf():Bool {
+		return this.weapon.hasNoProf();
+	}
+	
+	@:computed function get_gotCustomMultiCheck():Bool {
+		var weap:Weapon = this.weapon;
+		var a =  weap.isMultipleCoreProf();
+		var b = weap.hasCustomProf();
+		
+		return a || b;
+	}
+	
+	@:computed function get_showSelectMultipleFirst():Bool {
+		var a =  this.gotCustomMultiCheck;
+		var b = this.weapon.isAmmo;
+		return a || b;
+	}
+	
+	@:computed function get_isSelectingMultiple():Bool {
+		return isVisibleWidget(section, 'profs', index);
+	}
+	
+	@:computed function get_gotCustom():Bool {
+		return this.customProfs != null && this.customProfs.length > 0;
+	}
+	
 	override function Mounted():Void {
-		// needed?
-		//if (this.weapon.profs == 0) this.weapon.profs = 1;
+
+		if (this.weapon.profs == 0) this.weapon.profs = 1;
 	}
 	
 	function onProfSelectChange(e:Event, weapon:Weapon):Void {
@@ -76,7 +102,13 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 					if (weapon.firearm == null) weapon.firearm = new Firearm();
 					
 				}
+				weapon.isAmmo = false;  // both cases to reset isAmmo?
 			}
+			else {
+				weapon.isAmmo = false;
+			}
+			
+			requestCurWidget("", 0);
 		}
 		
 		
@@ -109,7 +141,10 @@ typedef TDWeapProfSelectProps = {
 	var rangedProfs:Array<Profeciency>;
 	
 	@:prop({required:false, "default":0}) 
-	var profMask:Int;
+	@:optional var profMask:Int;
+	
+	@:prop({required:false}) 
+	@:optional var customProfs:Array<Profeciency>;
 	
 
 }

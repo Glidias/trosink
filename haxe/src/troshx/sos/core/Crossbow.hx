@@ -10,11 +10,11 @@ class Crossbow
 
 	@:tag4ammo() public var span:Int = 0;
 	@:flagInstances(SpanningTool) public var spanningTools:Int = 0;
-	// support custom spanning tools?
+	// support custom spanning tools or yagni?
 	
 	
 	public function getSpanningToolsStrArr():Array<String> {
-		var arr:Array<String> = Item.getLabelsOfArray(SpanningTool.getDefaultList(), span);
+		var arr:Array<String> = Item.getLabelsOfArray(SpanningTool.getDefaultList(), spanningTools);
 		//if (spanningToolsCustom != null) arr = spanningToolsCustom.concat(arr);
 		return arr;
 	}

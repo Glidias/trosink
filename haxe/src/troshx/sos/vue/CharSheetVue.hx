@@ -5,6 +5,7 @@ import haxe.Timer;
 import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import js.Lib;
@@ -83,11 +84,15 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		switch(e ) {
 			case InventorySignal.DeleteItem:
 				this.itemTransitionName = "";
+				Vue.nextTick(resetItemTransitionName);
 			default:
-				this.itemTransitionName = "fade";
+				resetItemTransitionName();
+				
 		}
 	}
 	// standard Methods
+	
+
 	
 	public function loadSheet(contents:String = null):Void {
 		if (contents == null) contents = this.copyToClipboard;
@@ -121,6 +126,10 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	// inventory Methods
+	
+	inline function resetItemTransitionName() {
+		this.itemTransitionName = "fade";
+	}
 	
 	function onBaseInventoryClick(e:Event):Void {
 		clearWidgets();
@@ -171,6 +180,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	function setCurWidgetSection(sectName:String,e:Event):Void {
 		e.stopPropagation();
+		
 		this.curWidgetRequest.section = sectName;
 	}
 	
@@ -180,6 +190,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	inline function isVisibleWidget(section:String, type:String, index:Int):Bool {
+		this.curWidgetRequest.section;
+		this.curWidgetRequest.type;
+		this.curWidgetRequest.index;
 		return this.curWidgetRequest.section == section && this.curWidgetRequest.type == type && this.curWidgetRequest.index == index;
 	}
 	
@@ -309,6 +322,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	@:computed function get_bowMask():Int {	// we treat bows and slings as part of the same table category
 		return (1<<Profeciency.R_BOW) | (1<<Profeciency.R_SLING);
+	}
+	@:computed function get_bowSlingAndCrossbowMask():Int {
+		return (1<<Profeciency.R_CROSSBOW) | (1<<Profeciency.R_BOW) | (1<<Profeciency.R_SLING);
 	}
 	@:computed function get_firearmMask():Int {
 		return (1<<Profeciency.R_FIREARM);

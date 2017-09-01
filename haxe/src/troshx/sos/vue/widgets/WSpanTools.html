@@ -1,0 +1,5 @@
+<div>
+	<span v-for="(li, i) in list" :key="i">
+		<label style="display:inline-block"><input type="checkbox" :value="shiftIndex(i)" v-on:click="checkboxHandler($event.target, i, item.crossbow, 'spanningTools')" :checked="(shiftIndex(i)&item.crossbow.spanningTools)!=0"></input>{{li.name}}<span :style="{visibility:(shiftIndex(i)&item.crossbow.spanningTools)!=0 ?'visible':'hidden'}">[<a href="javascript:;" v-on:click.prevent.stopPropagation="">+</a>]</span></label>
+	</span>
+</div>

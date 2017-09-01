@@ -1,0 +1,32 @@
+<div style="vertical-align:top" class="widget-prof">
+	<div style="width:50%;display:block;float:left">
+		<div :class="{columner:gotCustomColumn}">
+			<div><label><input type="radio" :checked="!ranged" v-on:click="ranged=false"></input><b>Melee:</b></label></div>
+			<div v-for="(li,i) in meleeProfs" :key="i" class="listitem" :class="{disabled:ranged}">
+				<label><input type="checkbox" :disabled="ranged" :checked="(shiftIndex(i) & meleeFlags) !=0" v-on:click="checkMelee($event.target,i)"></input>{{li.name}}</label>
+			</div>
+		</div>
+		<div :class="{columner:gotCustomColumn}" v-if="gotCustomColumn && meleeCustomProfs!=null">
+			
+		</div>
+		<div class="clear:both" v-if="gotCustomColumn"></div>
+	</div><div style="width:50%;display:block;float:left">
+		<div :class="{columner:gotCustomColumn}">
+			<div><label><input type="radio" :checked="ranged" v-on:click="ranged=true"></input><b>Ranged:</b></label></div>
+			<div v-for="(li,i) in rangedProfs" :key="i" class="listitem" :class="{disabled:!ranged}">
+				<label><input type="checkbox" :disabled="!ranged" :checked="(shiftIndex(i) & rangedFlags) !=0" v-on:click="checkRanged($event.target,i)"></input>{{li.name}}</label>
+			</div>
+		</div>
+		<div :class="{columner:gotCustomColumn}">
+			<div v-if="rangedCustomProfs !=null">
+				
+			</div>
+			<hr/>
+			<div class="listitem" :class="{disabled:!ranged}"><label>Is Ammo<input type="checkbox" v-model="isAmmo"></input></label></div>
+			<hr/>
+			<button v-on:click="confirm()" :disabled="confirmBtnDisabled">Confirm<span v-show="showBtnArrows"> &gt;&gt;</span></button>
+		</div>
+		<div class="clear:both" v-if="gotCustomColumn"></div>
+	</div>
+	<div style="clear:both"></div>
+</div>

@@ -77,9 +77,13 @@ class Weapon extends Item
 		}
 	}
 	
+	public inline function hasNoProf():Bool {
+		return ( profsCustom == null || profsCustom.length == 0) && profs == 0;
+	}
+	
 	public function matchesTypes(ranged:Bool, ?profs:Int):Bool {
 		var thisProfs = this.profs;
-		return (this.ranged == ranged) && (profs == null || (profs & thisProfs) != 0);
+		return (this.ranged == ranged) && (profs == null || ((profs & thisProfs) != 0));
 	}
 
 	// ammo discriminant type checkers and includes required dependencies?
