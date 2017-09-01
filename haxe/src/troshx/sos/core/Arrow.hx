@@ -25,6 +25,7 @@ class Arrow extends Weapon
 		super(id, name);
 		stuckChance = catchChance;
 		isAmmo = true;
+		profs = (1 << Profeciency.R_BOW) | (1 << Profeciency.R_CROSSBOW);
 	}
 	
 	

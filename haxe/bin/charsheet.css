@@ -14,11 +14,17 @@ td.actions {
 
 select {
 	font-size:12px;
+	font-family:Arial;
 }
 td input[type='text'] {
 	position:relative;
 	width:100%;
 	font-size:12px;
+	font-family:Arial;
+}
+td option {
+	font-size:12px;
+	font-family:Arial;
 }
 td.voidna {
 	background-color:#333333;
@@ -100,6 +106,7 @@ td.gotbtn.focus button {
 	display:block;
 	width:24px;
 	height:100%;
+	line-height:0;
 	position:absolute;
 	right:0;
 	top:0;

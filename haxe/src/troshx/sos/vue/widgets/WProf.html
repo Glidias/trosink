@@ -22,7 +22,7 @@
 				
 			</div>
 			<hr/>
-			<div class="listitem" :class="{disabled:!ranged}"><label>Is Ammo<input type="checkbox" v-model="isAmmo"></input></label></div>
+			<div class="listitem" :class="{disabled:!ranged}"><label>Is Ammo^<input type="checkbox" v-model="isAmmo"></input></label></div>
 			<hr/>
 			<button v-on:click="confirm()" :disabled="confirmBtnDisabled">Confirm<span v-show="showBtnArrows"> &gt;&gt;</span></button>
 		</div>

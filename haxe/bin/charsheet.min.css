@@ -1,8 +1,9 @@
 td{position:relative;}
 body{font-family:Times New Roman,Arial,sans-serif;font-size:12px;}
 td.actions{min-width:105px;}
-select{font-size:12px;}
-td input[type='text']{position:relative;width:100%;font-size:12px;}
+select{font-size:12px;font-family:Arial;}
+td input[type='text']{position:relative;width:100%;font-size:12px;font-family:Arial;}
+td option{font-size:12px;font-family:Arial;}
 td.voidna{background-color:#333333;}
 td select{position:relative;width:100%;font-size:12px;}
 .fade-enter-active,.fade-leave-active{transition:opacity .2s ease-out;}
@@ -20,7 +21,7 @@ td.gotbtn input:focus{border-right:2px solid orange;box-sizing:border-box;}
 td.gotbtn button:focus{border:2px solid orange;}
 td.gotbtn.focus>input{width:calc(100% - 24px);}
 td.gotbtn button{display:none;}
-td.gotbtn.focus button{display:block;width:24px;height:100%;position:absolute;right:0;top:0;}
+td.gotbtn.focus button{display:block;width:24px;height:100%;line-height:0;position:absolute;right:0;top:0;}
 .inventory{position:relative;}
 .inventory .popup-overlay{position:absolute;width:100%;height:100%;top:0;left:0;z-index:50;background-color:rgba(0,0,0,.3);}
 .inventory .popup-overlay .modal{}

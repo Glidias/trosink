@@ -89,6 +89,7 @@ class Ammunition extends Weapon
 		super(id, name);
 		stuckChance = catchChance;	
 		isAmmo = true;
+		profs = (1 << Profeciency.R_FIREARM);
 	}
 	
 	static var LIST:Array<Ammunition>;  

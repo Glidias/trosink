@@ -67,6 +67,7 @@ class WProf extends VComponent<WProfData, WProfProps>
 		return null;
 	}
 	
+	
 	@:computed function get_meleeCustomProfs():Array<Profeciency> {
 		return getProfsOfTypeIfAny(Profeciency.TYPE_MELEE);
 	}
