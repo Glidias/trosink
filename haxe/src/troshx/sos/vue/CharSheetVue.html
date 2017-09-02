@@ -18,7 +18,7 @@
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('dropped', $event)" v-on:touchstart.native="setCurWidgetSection('dropped', $event)">
 				
 				<tr v-for="entry in char.inventory.dropped.list" :key="entry.item.get_uid()">
-					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
+					<td><input-name :item="entry.item" v-on:updated="onInputNameUpdated" /></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
 					<td><input type="number" step="0.5" v-model="entry.item.weight" number min="0"></input></td>
 					<td>{{ entry.item.getTypeLabel() }}</td>
@@ -58,7 +58,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('packed', $event)" v-on:touchstart.native="setCurWidgetSection('packed', $event)">
 				<tr v-for="entry in char.inventory.packed.list" :key="entry.item.get_uid()">
-					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
+					<td><input-name :item="entry.item" v-on:updated="onInputNameUpdated" /></td>
 					<td><input type="number" v-model="entry.qty" number min="1"></input></td>
 					<td><input type="number" step="0.5" v-model="entry.item.weight" number min="0"></input></td>
 					<td>{{ entry.item.getTypeLabel() }}</td>
@@ -98,7 +98,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('shield',$event)" v-on:touchstart.native="setCurWidgetSection('shield',$event)">
 				<tr :key="entry.key" v-for="(entry,i) in char.inventory.shields">
-					<td><input type="text" v-on:blur="entry.shield.name=setValidNameOfInput($event.target, entry.shield.name)" v-bind:value="entry.shield.name"></input></td>
+					<td><input-name :item="entry.shield" v-on:updated="onInputNameUpdated" /></td>
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" step="0.5" v-model="entry.shield.weight" number min="0"></input></td>
@@ -154,7 +154,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('meleeWeap', $event)" v-on:touchstart.native="setCurWidgetSection('meleeWeap', $event)">
 				<tr v-for="(entry,itemIndex) in filteredMelee" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="meleeWeap" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 					<td-hands :entry="entry" />
 					<td>
@@ -240,7 +240,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('bow', $event)" v-on:touchstart.native="setCurWidgetSection('bow', $event)">
 				<tr v-for="(entry, itemIndex) in filteredBowSling" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="entry" :weapon="entry.weapon" section="bow" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
 					<td-hands :entry="entry" />
 					<td><input type="number" step="1" number v-model="entry.weapon.range" /></td>
@@ -295,7 +295,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('crossbow', $event)" v-on:touchstart.native="setCurWidgetSection('crossbow', $event)">
 				<tr v-for="(entry, itemIndex) in filteredCrossbow" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="entry" :weapon="entry.weapon" section="crossbow" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="crossbowMask" />
 					<td-hands :entry="entry" />
 					<td><input type="number" step="1" number min="0" v-model="entry.weapon.range" /></td>
@@ -355,7 +355,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('firearm', $event)" v-on:touchstart.native="setCurWidgetSection('firearm', $event)">
 				<tr v-for="(entry, itemIndex) in filteredFirearm" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td-widget widgetName="firearm-name" widgetTagName="w-firearm-name" :value="entry.weapon.get_label()" :index="itemIndex" :showWidget="isVisibleWidget('firearm','firearm-name', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget"  :entry="entry" :weapon="entry.weapon" section="firearm" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="firearmMask"  />
 					<td-hands :entry="entry" />
 					<td><input type="number" step="1" min="0" number v-model="entry.weapon.range" /></td>
@@ -380,7 +380,8 @@
 					</td>
 				</tr>
 				<tr class="entry-row" :key="-4" v-if="weaponEntry.e.weapon.isFirearm()">
-					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
+					<td-widget widgetName="firearm-name" widgetTagName="w-firearm-name" :value="weaponEntry.e.weapon.get_label()" :index="-1" :showWidget="(weaponEntry.focusedFlags & (1|(1<<25))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<25))" v-on:focus-in-row="focusInRowField(weaponEntry,1)" v-on:focus-out-row="focusOutRowField(weaponEntry,1)" />
+						
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="weaponEntry.e" :weapon="weaponEntry.e.weapon" section="firearm" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="firearmMask" />
 					<td-hands :entry="weaponEntry.e" v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry,4)" />
 					<td><input type="number" step="1" min="0" number v-model="weaponEntry.e.weapon.range" v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)"  /></td>
@@ -412,7 +413,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('throwing', $event)" v-on:touchstart.native="setCurWidgetSection('throwing', $event)">
 				<tr v-for="(entry, itemIndex) in filteredThrowing" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="throwing" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
 					<td-hands :entry="entry" />
 					<td><input type="number" step="1" number v-model="entry.weapon.range" /></td>
@@ -467,7 +468,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('ammo', $event)" v-on:touchstart.native="setCurWidgetSection('ammo', $event)">
 				<tr v-for="(entry, itemIndex) in filteredAmmo" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.weapon.name=setValidNameOfInput($event.target, entry.weapon.name)" v-bind:value="entry.weapon.name"></input></td>
+					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="ammo" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 					<td class="voidna"></td>
 					<td><input type="number" step="1" number v-model="entry.weapon.range" /></td>
@@ -515,7 +516,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('miscItem', $event)" v-on:touchstart.native="setCurWidgetSection('miscItem', $event)">
 				<tr v-for="(entry,i) in char.inventory.equipedNonMeleeItems" :key="entry.key">
-					<td><input type="text" v-on:blur="entry.item.name=setValidNameOfInput($event.target, entry.item.name)" v-bind:value="entry.item.name"></input></td>
+					<td><input-name :item="entry.item" v-on:updated="onInputNameUpdated" /></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.item)" :index="i" :showWidget="isVisibleWidget('miscItem','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.item.weight"></input></td>
 					<td><input type="text" v-model="entry.unheldRemark"></input></td>
@@ -559,7 +560,7 @@
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('armor', $event)"  v-on:touchstart.native="setCurWidgetSection('armor', $event)">
 				<tr v-for="(armor, i) in char.inventory.wornArmor" :key="i">
-					<td><input type="text" v-model="armor.name"></input></td>
+					<td><input-name :item="armor" v-on:updated="onInputNameUpdated" /></td>
 					<td><input type="number" number min="0" v-model="armor.AVC"></input></td>
 					<td><input type="number" number min="0" v-model="armor.AVP"></input></td>
 					<td><input type="number" number min="0" v-model="armor.AVB"></input></td>			

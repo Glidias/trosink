@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.ds.IDMatchArray;
 
 /**
  * ...
@@ -7,7 +8,7 @@ package troshx.sos.core;
 class Weapon extends Item
 {
 	public var profs:Int = 0;
-	public var profsCustom:Array<Profeciency> = null;
+	public var profsCustom:IDMatchArray<Profeciency> = null;
 	public var ranged:Bool = false; // to represent missile weapons and missile profeciencies
 	
 	public var reach:Int = 4;  
@@ -118,7 +119,7 @@ class Weapon extends Item
 		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);
 		if (profsCustom != null) {
 			for (i in 0...profsCustom.length) {
-				arr.push(profsCustom[i].name);
+				arr.push(profsCustom.list[i].name);
 			}
 		}
 		return arr.join(", ");
@@ -152,7 +153,8 @@ class Weapon extends Item
 	}
 	
 	override function get_label():String {
-		return (firearm != null && firearm.firingMechanism != null ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
+		
+		return (isFirearm() && firearm.firingMechanism != null  ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
 	}
 	
 	override public function getTypeLabel():String {

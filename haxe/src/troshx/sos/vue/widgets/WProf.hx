@@ -52,10 +52,9 @@ class WProf extends VComponent<WProfData, WProfProps>
 		return this.customWidth; // ** customProfs!=null && customProfs.length > 0
 	}
 	
-	function getProfsOfTypeIfAny(type:Int):Array<Profeciency> {
-		if (this.customProfs != null) {
+	function getProfsOfTypeIfAny(cArr:Array<Profeciency>, type:Int):Array<Profeciency> {
+		if (cArr != null) {
 			var arr:Array<Profeciency> = [];
-			var cArr:Array<Profeciency> = this.customProfs;
 			for (i in 0...cArr.length) {
 				if (cArr[i].type == type) {
 					arr.push(cArr[i]);
@@ -67,13 +66,22 @@ class WProf extends VComponent<WProfData, WProfProps>
 		return null;
 	}
 	
-	
-	@:computed function get_meleeCustomProfs():Array<Profeciency> {
-		return getProfsOfTypeIfAny(Profeciency.TYPE_MELEE);
+	@:computed inline function get_meleeCustomProfs():Array<Profeciency> {
+		return getProfsOfTypeIfAny(this.customProfs, Profeciency.TYPE_MELEE);
 	}
 	
-	@:computed function get_rangedCustomProfs():Array<Profeciency> {
-		return getProfsOfTypeIfAny(Profeciency.TYPE_RANGED);
+	@:computed inline function get_rangedCustomProfs():Array<Profeciency> {
+		return getProfsOfTypeIfAny(this.customProfs, Profeciency.TYPE_RANGED);
+	}
+	
+	@:computed inline function get_curMeleeCustomProfs():Array<Profeciency> {
+		var hasCustom:Bool = this.weapon.profsCustom != null;
+		return hasCustom ?  getProfsOfTypeIfAny(this.weapon.profsCustom.list, Profeciency.TYPE_MELEE) : null;
+	}
+	
+	@:computed inline function get_curRangedCustomProfs():Array<Profeciency> {
+		var hasCustom:Bool = this.weapon.profsCustom != null;
+		return hasCustom ? getProfsOfTypeIfAny(this.weapon.profsCustom.list, Profeciency.TYPE_RANGED) : null;
 	}
 	
 	override function Data():WProfData {
@@ -106,6 +114,12 @@ class WProf extends VComponent<WProfData, WProfProps>
 		else {
 			rangedFlags &= ~(1 << index);
 		}
+	}
+	
+	function deleteCustomProf(prof:Profeciency):Bool {
+		var w:Weapon = this.weapon;
+		if (w.profsCustom == null) return false;
+		return w.profsCustom.splicedAgainst( prof);
 	}
 	
 	function confirm():Void {

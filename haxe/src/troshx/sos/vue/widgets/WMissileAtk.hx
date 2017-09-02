@@ -14,7 +14,7 @@ class WMissileAtk extends BaseItemWidget
 	public function new() 
 	{
 		super();
-	}
+	}	
 	
 	@:computed function get_damageTypeLabels():Array<String> {
 

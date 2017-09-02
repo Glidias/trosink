@@ -1,0 +1,11 @@
+<div>
+	<div><label>Name:<input type="text" v-model="item.name"></input></label></div>
+	<div>
+		<label>Mechanism:</label>
+		<br/>
+		<select ref="domSelect" number v-model="selectedMechanismIndex">
+			<option :value="-1"></option>
+			<option v-for="(li, i) in availableFiringMechanisms" :value="i">{{ li.name }}</option>
+		</select>
+	</div>
+</div>

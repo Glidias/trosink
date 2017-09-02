@@ -13,6 +13,7 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.vue.widgets.InputName;
 import troshx.sos.vue.widgets.WAmmoSpawner;
 import troshx.sos.vue.widgets.WAmmunition;
 import troshx.sos.vue.widgets.WCoverage;
@@ -59,6 +60,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			TDWeapProfSelect.NAME => new TDWeapProfSelect(),
 			TDHands.NAME => new TDHands(),
 			TDWidgetHolder.NAME => new TDWidgetHolder(),
+			
+			InputName.NAME => new InputName(),
 			
 			WAmmunition.NAME => new WAmmunition(),
 			WCoverage.NAME => new WCoverage(),
@@ -164,6 +167,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return firearm.getAmmunitionsStrArr().join(", ");
 	}
 	
+
+	
 	inline function getSpanTools(crossbow:Crossbow):String {
 		return crossbow.getSpanningToolsStrArr().join(", ");
 	}
@@ -209,17 +214,12 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return testName != ""  && testName != null ? testName : backupName;
 	}
 
-	
-	function setValidNameOfInput(inputElement:InputElement, backupName:String):String {
-		if (inputElement.value != "" ) {
-			return inputElement.value;
-		}
-		else {
-			inputElement.value = backupName;
-			return backupName;
-		}
-		
+	function onInputNameUpdated():Void {
+		this.itemTransitionName = "";
+		Vue.nextTick( resetItemTransitionName);
 	}
+	
+	
 	
 	function test():Void {
 		trace("TEST");
@@ -515,7 +515,7 @@ class ArmorEntry implements IValidable implements IFocusFlags {
 	}
 	
 	public function isValid():Bool {
-		return e.name != null && e.name != "";
+		return e.name != null && StringTools.trim(e.name) != "";
 		
 	}
 	
@@ -569,7 +569,7 @@ class RowReadyEntry implements IValidable implements IFocusFlags {
 		//return e.isValid();
 		if (itemToValidate == null) setupValidable();
 
-		return itemToValidate.name != null && itemToValidate.name != "";
+		return itemToValidate.name != null && StringTools.trim(itemToValidate.name) != "";
 	}
 }
 	

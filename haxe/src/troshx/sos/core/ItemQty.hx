@@ -15,7 +15,7 @@ class ItemQty implements IUid implements IUpdateWith<ItemQty> implements IValida
 	
 	public function isValid():Bool {	
 
-		return qty  > 0 && item != null && item.name != null && item.name != "";
+		return qty  > 0 && item != null && item.name != null && StringTools.trim(item.name) != "";
 	}
 	
 	public function new(item:Item = null, qty:Int = 1):Void {

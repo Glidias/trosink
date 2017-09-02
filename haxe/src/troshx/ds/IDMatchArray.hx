@@ -10,7 +10,8 @@ import troshx.core.IUid;
 class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 {
 	public var list(default, null):Array<T> = [];
-
+	public var length(get, never):Int;
+	
 	public function new() 
 	{
 		
@@ -99,6 +100,11 @@ class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 	
 	inline function listContains(item:T):Bool {
 		return list.indexOf(item) >= 0;
+	}
+	
+	inline function get_length():Int 
+	{
+		return list.length;
 	}
 	
 	

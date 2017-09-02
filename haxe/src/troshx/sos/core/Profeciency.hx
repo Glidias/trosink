@@ -1,10 +1,12 @@
 package troshx.sos.core;
+import troshx.core.IUid;
+import troshx.ds.IUpdateWith;
 
 /**
  * Core profiency class for SoS
  * @author Glidias
  */
-class Profeciency 
+class Profeciency implements IUid  implements IUpdateWith<Profeciency>
 {
 	public var name:String;
 
@@ -104,6 +106,19 @@ class Profeciency
 	{
 		this.type = type;
 		this.name = name;
+	}
+	
+	
+	/* INTERFACE troshx.ds.IUpdateWith.IUpdateWith<W> */
+	
+	public function updateAgainst(ref:Profeciency):Void 
+	{
+		// do nothing, you can't really duplicate profeciencies
+	}
+	
+	public function spliceAgainst(ref:Profeciency):Int 
+	{
+		return 0;
 	}
 	
 	inline function get_uid():String 

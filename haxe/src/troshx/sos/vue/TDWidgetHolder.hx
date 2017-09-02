@@ -6,6 +6,7 @@ import troshx.sos.core.Armor;
 import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
 import troshx.sos.vue.widgets.*;
+import troshx.util.LibUtil;
 
 /**
  * A standard holder for read-only input text field widgets
@@ -20,10 +21,13 @@ class TDWidgetHolder extends VComponent<NoneT, TDWidgetHolderProps>
 		super();
 	}
 	
+	@:computed function get_itemLabel():String {
+		return LibUtil.as( entry.item, Item).label;
+	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
 		return [
-
+			WFirearmName.NAME => new WFirearmName(),
 			WAmmunition.NAME => new WAmmunition(),
 			WCoverage.NAME => new WCoverage(),
 			WMeleeAtk.NAME => new WMeleeAtk(),

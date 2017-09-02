@@ -20,6 +20,10 @@ class BaseItemWidget extends VComponent<NoneT, BaseItemWidgetProps>
 		return '<div>'+Type.getClassName(Type.getClass(this)).split(".").pop()+'</div>';
 	}
 	
+	@:computed function get_itemLabel():String {
+		return this.item.label;
+	}
+	
 }
 
 typedef BaseItemWidgetProps =
