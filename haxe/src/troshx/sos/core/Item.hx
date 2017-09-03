@@ -27,9 +27,8 @@ class Item
 	static var UID_COUNT:Int = 0;
 	
 	public var flags:Int = 0;
-	public static inline var FLAG_TWO_HANDED:Int = 1;
-	public static inline var FLAG_STRAPPED:Int = 2;
-	public static inline var FLAG_IS_ATTACHMENT:Int = 4;
+	@:flags("Two-Handed") public static inline var FLAG_TWO_HANDED:Int = 1;
+	@:flags("Strapped") public static inline var FLAG_STRAPPED:Int = 2;
 	public static inline var MASK_HANDED:Int = 1 | 2;
 	
 	public var twoHanded(get, never):Bool;
@@ -109,6 +108,9 @@ class Item
 		return arr;
 	}
 	
+	public static inline function sign(i:Int):String {
+		return (i >= 0 ? "+" : "");
+	}
 
 	
 	public static function labelizeAllCaps(name:String):String {
@@ -198,32 +200,48 @@ class Item
 		return combineOr;
 	}
 	
-	public static macro function pushFlagLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false):Expr {  // todo when needed: metadata support
+	public static macro function pushFlagLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false, metadataLbl:String=null, prefix:String=""):Expr {  // todo when needed: metadata support
 	
 		var fields = null;
-		
 		if (moduleStr != null) {
-			var cm = Context.getModule(moduleStr)[0];
-			switch(cm) {
-				case TInst(t, _):
-				fields = t.get().statics.get();
-				default:	
-				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
-			}
+			fields = getFieldsFromModule(moduleStr, true);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
 		
 		var block:Array<Expr> = [];
-		
+	
 		var count:Int = 0;
 		for ( i in 0...fields.length) {
 			var f = fields[i];
+			if (metadataLbl!=null && !hasMetaTag(f.meta.get(), metadataLbl))  {
+				continue;
+			}
+			var metaLabel:String = null;
+			
+			if (metadataLbl != null) {
+				var m = getMetaTagEntry(f.meta.get(), metadataLbl);
+				if (m != null) {
+					if (m.params == null || m.params.length == 0) {
+						//Context.error("Please specify string as parameter.", f.pos);
+						metaLabel = labelizeAllCaps(f.name);
+					}
+					else {
+						var mp = m.params[0].expr;
+						switch( mp ) {
+							case EConst(CString(s)):
+								metaLabel = s;
+							default:
+							Context.error("Please specify string literal as parameter.", f.pos);
+						}
+					}
+				}	
+			}
 			var fieldName:String = f.name;
 			switch(f.kind) {
 				case FVar(VarAccess.AccInline, VarAccess.AccNever):
 					if (fieldName != "TOTAL_FLAGS") {
-						if (labelize )  block.push( macro { if ( flags & (1 << $v{count}) != 0 )  arr.push($v{ labelizeAllCaps(fieldName) }); } );
-						else block.push( macro {  arr.push($v{ (noLabelizeCapitalCase ? labelizeAllCaps(fieldName) : fieldName )  }); } );
+						if (labelize )  block.push( macro { if ( flags & (1 << $v{count}) != 0 )  arr.push($v{ metaLabel != null ? prefix+metaLabel : prefix+labelizeAllCaps(fieldName) }); } );
+						else block.push( macro {  arr.push($v{ metaLabel!=null ? prefix+metaLabel : (noLabelizeCapitalCase ? prefix+labelizeAllCaps(fieldName) : prefix+fieldName )  }); } );
 						count++;
 					}
 				default:
@@ -233,17 +251,12 @@ class Item
 		return macro $b{block};
 	}
 	
+	
+	
 	public static macro function pushFlagAbbrToArr(labelize:Bool = true, capitalize:Bool = false, moduleStr:String = null):Expr {
 		var fields = null;
-		
 		if (moduleStr != null) {
-			var cm = Context.getModule(moduleStr)[0];
-			switch(cm) {
-				case TInst(t, _):
-				fields = t.get().statics.get();
-				default:	
-				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
-			}
+			fields =  getFieldsFromModule(moduleStr, true);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
 		var block:Array<Expr> = [];
@@ -291,17 +304,13 @@ class Item
 	
 	
 	
-	public static macro function pushVarLabelsToArr(labelize:Bool=true, moduleStr:String=null):Expr {  // todo when needed: metadata support
+	public static macro function pushVarLabelsToArr(labelize:Bool=true, moduleStr:String=null,  metadataLbl:String=null,  prefix:String=""):Expr {  // todo when needed: metadata support
 		var fields = null;
 		
+		
+		
 		if (moduleStr != null) {
-			var cm = Context.getModule(moduleStr)[0];
-			switch(cm) {
-				case TInst(t, _):
-				fields = t.get().fields.get();
-				default:	
-				Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
-			}
+			fields = getFieldsFromModule(moduleStr, false);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().fields.get();
 		var block:Array<Expr> = [];
@@ -313,14 +322,37 @@ class Item
 
 		for ( i in 0...fields.length) {
 			var f = fields[i];
+			if (metadataLbl!=null && !hasMetaTag(f.meta.get(), metadataLbl))  {
+				continue;
+			}
+			var metaLabel:String = null;
+			
+			if (metadataLbl != null) {
+				var m = getMetaTagEntry(f.meta.get(), metadataLbl);
+				if (m != null) {
+					if (m.params == null || m.params.length == 0) {
+						//Context.error("Please specify string as parameter.", f.pos);
+						metaLabel = labelizeAllCaps(f.name);
+					}
+					else {
+						var mp = m.params[0].expr;
+						switch( mp ) {
+							case EConst(CString(s)):
+								metaLabel = s;
+							default:
+							Context.error("Please specify string literal as parameter.", f.pos);
+						}
+					}
+				}	
+			}
 			var fieldName:String = f.name;
 			switch(f.kind) {
 				case FVar(VarAccess.AccNormal, VarAccess.AccNormal):
 					var ct = haxe.macro.TypeTools.toComplexType(f.type);
 					if (f.type+"" == intTypeStr) { // should be good enough to detect Int
 						if (f.name.indexOf("_") >= 0) continue;
-						if (labelize) block.push( macro { if (  instance.$fieldName != 0 )  arr.push($v{ labelizeCamelCase(fieldName) }); } );
-						else block.push( macro {  arr.push($v{ fieldName }); } );
+						if (labelize) block.push( macro { if (  instance.$fieldName != 0 )  arr.push($v{ prefix+labelizeCamelCase(fieldName)  }+ " " + instance.$fieldName); } );
+						else block.push( macro {  arr.push($v{ prefix+fieldName }); } );
 					}
 					
 				default:
@@ -339,6 +371,49 @@ class Item
 			if (m.name == tag) return true;
 		}
 		return false;
+	}
+	
+	static private function getFieldsFromModule(moduleStr:String, statics:Bool) {
+		var fields = null;
+		var subModule = null;
+		var baseModuleStr:String;
+		
+		if (moduleStr.indexOf(":") >= 0) {
+			var moduleSplit = moduleStr.split(":");
+			var baseMod = moduleSplit[0].split(".");
+			baseMod.pop();
+			baseModuleStr = baseMod.join(".");
+			moduleStr = moduleSplit[0];
+			subModule = moduleSplit[1];
+		}
+		var cm;
+		
+		if (subModule == null) {
+			cm = Context.getModule(moduleStr)[0];
+		}
+		else {
+			var moduleArr = Context.getModule(moduleStr);
+			for (i in 0...moduleArr.length) {
+				
+				switch( moduleArr[i]) {
+					case TInst(t, _): 
+						// hopefully, this toString() hack is future proof in haxe...yikes..a better way later?
+						if (t.toString() == baseModuleStr + "."+ subModule ) {
+							cm = moduleArr[i];
+							break;
+						}
+					default:
+						Context.error("Failed to resolve subModuleStr:" + moduleStr+":"+subModule, Context.currentPos());
+				}
+			}
+		}
+		switch(cm) {
+			case TInst(t, _):
+			fields = statics ? t.get().statics.get() : t.get().fields.get();
+			default:	
+			Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
+		} 
+		return fields;
 	}
 	
 	

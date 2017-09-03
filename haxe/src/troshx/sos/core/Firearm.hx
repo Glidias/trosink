@@ -14,11 +14,10 @@ class Firearm
 	@:tag4ammo() public var load:Int = 0;
 	
 	public var double:Bool = false;
-	@:tag4ammo() public var multishot:Int = 0;
-	@:tag4ammo() public var magazine:Int = 0;
-	@:tag4ammo() public var revolver:Int = 0;
-	
-	@:tag4ammo() public var highCaliber:Int = 0;
+	public var multishot:Int = 0;
+	public var magazine:Int = 0;
+	public var revolver:Int = 0;
+	public var highCaliber:Int = 0;
 	
 	public var firingMechanism:FiringMechanism = null;
 	
@@ -26,6 +25,15 @@ class Firearm
 	public function new() 
 	{
 		
+	}
+	
+	public function  addTagsToStrArr(arr:Array<String>, addSign:Bool, forAmmo:Bool):Void {
+		if (double) arr.push("Double");
+		if (multishot != 0) arr.push("Multishot " + (addSign ? Item.sign(multishot) : "") + multishot);
+		if (magazine != 0) arr.push("Magazine " + (addSign ? Item.sign(magazine) : "") +  magazine);
+		if (revolver !=0) arr.push("Revolver " + (addSign ? Item.sign(revolver) : "") +  revolver);
+		if (revolver != 0) arr.push("High Caliber " + (addSign ? Item.sign(highCaliber) : "") +  highCaliber);
+		if (forAmmo && load != 0)  arr.push("Load " + (addSign ? Item.sign(load) : "") +  load);
 	}
 	
 	

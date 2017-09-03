@@ -28,8 +28,9 @@ class BaseItemWidget extends VComponent<NoneT, BaseItemWidgetProps>
 
 typedef BaseItemWidgetProps =
 {
-	public var item:Item;
-	public var entry:ReadyAssign;
-	@:prop({required:false})  @:optional public var parentAttr:Dynamic;
+	@:prop({required:false}) @:optional var entryIndex:Int;
+	@:prop({required:true}) var item:Item;
+	@:prop({required:true}) var entry:ReadyAssign;
+	@:prop({required:false})  @:optional var parentAttr:Dynamic;
 	
 }

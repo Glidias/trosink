@@ -14,6 +14,8 @@ import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
 import troshx.sos.vue.widgets.InputName;
+import troshx.sos.vue.widgets.InputNameQty;
+import troshx.sos.vue.widgets.SelectHeld;
 import troshx.sos.vue.widgets.WAmmoSpawner;
 import troshx.sos.vue.widgets.WAmmunition;
 import troshx.sos.vue.widgets.WCoverage;
@@ -62,6 +64,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			TDWidgetHolder.NAME => new TDWidgetHolder(),
 			
 			InputName.NAME => new InputName(),
+			InputNameQty.NAME => new InputNameQty(),
+			SelectHeld.NAME => new SelectHeld(),
 			
 			WAmmunition.NAME => new WAmmunition(),
 			WCoverage.NAME => new WCoverage(),
@@ -292,9 +296,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return false;
 	}
 	
-	function holdItemHandler(itemEntry:ReadyAssign, held:Int):Void {
-		this.char.inventory.holdEquiped(itemEntry, held);
-	}
+	
 	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");

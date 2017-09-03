@@ -5,6 +5,7 @@ import haxevx.vuex.util.VHTMacros;
 import troshx.sos.core.Armor;
 import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
+import troshx.sos.core.Shield;
 import troshx.sos.vue.widgets.*;
 import troshx.util.LibUtil;
 
@@ -44,8 +45,15 @@ class TDWidgetHolder extends VComponent<NoneT, TDWidgetHolderProps>
 		if (entry.weapon != null) return entry.weapon;
 		else if (entry.shield != null) return entry.shield;
 		else if (entry.armor != null) return entry.armor;
+		else if (Std.is(entry, Shield)) return entry;
 		else if (Std.is(entry, Armor)) return entry;
-		else return entry.item;
+		else {
+			if (entry.item == null) {
+				trace(entry);
+				throw "Couldn't resolve item dependency! Check console trace above!";
+			}
+			return entry.item;
+		}
 	}
 	
 	function shiftIndex(i:Int):Int {

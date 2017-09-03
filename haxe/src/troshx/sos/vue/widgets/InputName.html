@@ -1,1 +1,1 @@
-<input type="name" v-on:blur="setValidNameOfInput($event.target)" v-on:focus="$event.target.value=item.name" ></input>
+<input type="text" v-on:blur="setValidNameOfInput($event.target)" v-on:focus="$event.target.value=item.name" :value="label" ></input>

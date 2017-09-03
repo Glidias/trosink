@@ -33,5 +33,5 @@ class WMeleeAtk extends VComponent<NoneT, MeleeAtkProps>
 
 typedef MeleeAtkProps = {
 	> BaseItemWidgetProps,
-	var thrusting:Bool;
+	@:prop({required:true}) var thrusting:Bool;
 }

@@ -1,5 +1,6 @@
 package troshx.sos.core;
 import troshx.ds.IDMatchArray;
+import troshx.sos.core.MissileSpecial;
 
 /**
  * ...
@@ -7,6 +8,10 @@ import troshx.ds.IDMatchArray;
  */
 class Weapon extends Item
 {
+	
+	//public var attachments:WeaponAttachments = null; // custom attachments
+	public var customise:WeaponCustomise = null;  // before assigning this, make sure the Weappon is deeply cloned to a unique instance to make it unique!
+	
 	public var profs:Int = 0;
 	public var profsCustom:IDMatchArray<Profeciency> = null;
 	public var ranged:Bool = false; // to represent missile weapons and missile profeciencies
@@ -23,7 +28,7 @@ class Weapon extends Item
 	
 	
 	public var variant:Weapon = null;	// default secondary fire options
-	public var attachments:WeaponAttachments = null; // custom attachments
+
 	
 	public var atnS:Int = 0;
 	public var atnT:Int = 0;
@@ -40,8 +45,6 @@ class Weapon extends Item
 	
 	public var meleeFlags:Int = 0;
 	public var meleeSpecial:MeleeSpecial = null;
-	
-	public var customise:WeaponCustomise = null;
 	
 	// ranged
 	@:tag4ammo(1) public var range:Int = 0;
@@ -78,6 +81,21 @@ class Weapon extends Item
 		}
 	}
 	
+	public inline function isAttachment():Bool {
+		var m = (meleeFlags & MeleeSpecial.WEAPON_ATTACHMENT) != 0;
+		var r = (missileFlags & MissileSpecial.CHEAT_ATTACHMENT) != 0;
+		return ranged ? r : m;
+	}
+	
+	public function isMeleeAttachmentFor(other:Weapon):Bool {
+		
+		return ranged ? false : (meleeFlags & MeleeSpecial.WEAPON_ATTACHMENT) != 0  && other.supportsMeleeAttachment();
+	}
+	public function supportsMeleeAttachment():Bool {
+		var ranged = this.ranged;
+		return (meleeFlags & (MeleeSpecial.THRUSTING_SLOT|MeleeSpecial.SWINGING_SLOT)) !=0 && !ranged;
+	}
+	
 	public inline function hasNoProf():Bool {
 		return ( profsCustom == null || profsCustom.length == 0) && profs == 0;
 	}
@@ -90,6 +108,9 @@ class Weapon extends Item
 	// ammo discriminant type checkers and includes required dependencies?
 	public inline function isMelee():Bool {
 		return !ranged && !isAmmo;
+	}
+	public inline function isRangedWeap():Bool {
+		return ranged && !isAmmo;
 	}
 	public inline function isBow():Bool {
 		var a = (profs & (1<<Profeciency.R_BOW)) != 0;
@@ -125,7 +146,45 @@ class Weapon extends Item
 		return arr.join(", ");
 	}
 	
-	
+	override public function  addTagsToStrArr(arr:Array<String>):Void {
+		var flags:Int = ranged ? this.missileFlags : this.meleeFlags;
+		var myArr:Array<String>;
+		var valCheck:Int;
+		if (ranged) {
+		
+			myArr =MissileSpecial.getLabelsOfFlags(missileSpecial, missileFlags);
+			for (i in 0...myArr.length) {
+				 arr.push(myArr[i] );
+			}
+
+			
+			if (isAmmo) {
+				if (crossbow != null && (  (profs & (1<<Profeciency.R_CROSSBOW)) != 0 ) ) {
+					crossbow.addAmmoTagsToStrArr(arr);
+				}
+				
+				if (  (profs & (1 << Profeciency.R_BOW)) != 0 ) {
+					if (requiredStr != 0) arr.push( "Required STR " + Item.sign(requiredStr)+requiredStr );
+				}
+			}
+			if ( firearm != null && (  (profs & (1<<Profeciency.R_FIREARM)) != 0 ) ) {
+				firearm.addTagsToStrArr(arr, isAmmo, isAmmo);
+			}
+			
+			
+		}
+		else {
+		
+			myArr =MeleeSpecial.getLabelsOfFlags(meleeSpecial, meleeFlags);
+			for (i in 0...myArr.length) {
+				 arr.push(myArr[i] );
+			}
+			
+			if (customise != null) {
+				customise.addMeleeTagsToStrArr(arr);
+			}
+		}
+	}
 	static inline function IsPowerOfTwoOrZero(x:Int)
 	{
 		return (x & (x - 1)) == 0;
@@ -149,12 +208,12 @@ class Weapon extends Item
 	
 	override function get_uid():String 
 	{
-		return super.get_uid() + (firearm != null && firearm.firingMechanism != null ? ":"+firearm.firingMechanism.uid : "") + (customise != null ?  "_"+customise.uid : "" ) + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
+		return super.get_uid() + (firearm != null && firearm.firingMechanism != null ? ":" + firearm.firingMechanism.uid : "") + (customise != null ?  "_" + customise.uid : "" ); // + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
 	}
 	
 	override function get_label():String {
 		
-		return (isFirearm() && firearm.firingMechanism != null  ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? "("+(customise.name != null ? customise.name : customise.uid)+")" : ""); 
+		return (isFirearm() && firearm.firingMechanism != null  ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? " *"+(customise.name != null ? customise.name : customise.uid)+"*" : ""); 
 	}
 	
 	override public function getTypeLabel():String {

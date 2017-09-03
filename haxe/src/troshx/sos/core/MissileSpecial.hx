@@ -20,8 +20,10 @@ class MissileSpecial
 	public static inline var NARROW:Int = (1 << 1);
 	public static inline var SHIELD_STICK:Int = (1 << 2);
 	public static inline var AP_FIRST_HIT_ONLY:Int = (1 << 3);
+	// by default, Sog of Swords has no attachment slots for ranged weapons. This is a cheat for GMs to abjucate forced ranged attachables for their own homebrews.
+	public static inline var CHEAT_ATTACHMENT:Int = (1 << 4);  
 	
-	public static inline var TOTAL_FLAGS:Int = 4;
+	public static inline var TOTAL_FLAGS:Int = 5;
 	
 	public var custom:Array<Dynamic> = null;  // gm homebrews if any..
 	
@@ -29,11 +31,11 @@ class MissileSpecial
 		var arr:Array<String> = [];
 		
 		if (flags != 0) {
-			Item.pushFlagLabelsToArr();
+			Item.pushFlagLabelsToArr(true, "troshx.sos.core.MissileSpecial");
 		}
 		
 		if (instance != null) { 
-			Item.pushVarLabelsToArr();
+			Item.pushVarLabelsToArr(true, "troshx.sos.core.MissileSpecial");
 		}
 		return arr;
 	}
@@ -41,22 +43,31 @@ class MissileSpecial
 	
 	public static function getFlagVarNames():Array<String> {	
 		var arr:Array<String> = [];
-		Item.pushFlagLabelsToArr(false);
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.MissileSpecial");
 		return arr;
 	}
 	
-	
-	public function getIntVarNames():Array<String> {	
+	public static function getFlagVarLabels():Array<String> {	
 		var arr:Array<String> = [];
-		Item.pushVarLabelsToArr(false);
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.MissileSpecial", true);
 		return arr;
 	}
 	
-	public function getVarNameProps():Dynamic<Array<String>> {	
+	
+	
+	public static  function getIntVarNames():Array<String> {	
+		var arr:Array<String> = [];
+		Item.pushVarLabelsToArr(false, "troshx.sos.core.MissileSpecial");
+		return arr;
+	}
+	
+	/*
+	public tatic function getVarNameProps():Dynamic<Array<String>> {	
 		var hash:Dynamic<Array<String>> = {};
 		
 		return hash;
 	}
+	*/
 	
 	public function new() 
 	{

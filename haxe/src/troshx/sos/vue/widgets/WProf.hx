@@ -162,6 +162,7 @@ class WProf extends VComponent<WProfData, WProfProps>
 		var b:Bool = this.weapon.ranged && this.weapon.isAmmo != this.isAmmo;
 		//var testRangedFlag:Int = this.(1 << Profeciency.R_BOW) | (1 << Profeciency.R_SLING);
 		var c:Bool = false;
+		var alwaysNot:Bool = this.weapon.ranged && this.isAmmo == true && this.weapon.isAmmo == this.isAmmo;
 		if (this.ranged) {
 			var flags1:Int = this.rangedFlags;
 			flags1 |= (flags1 & myBowSlingMask()) != 0 ? myBowSlingMask() : 0;
@@ -170,7 +171,7 @@ class WProf extends VComponent<WProfData, WProfProps>
 			c = (flags1^flags2) !=0;
 		}
 		//var c:Bool  = this.ranged ? ) : false;
-		return a || b || c;
+		return (a || b || c) && !alwaysNot;
 	}
 	@:computed function get_confirmBtnDisabled():Bool {
 		var meleeFlags:Int = this.meleeFlags;

@@ -36,9 +36,13 @@ class MeleeSpecial
 	public static inline var LIGHT_BLADE:Int = (1 << 10);
 	public static inline var PARRYING_TEETH:Int = (1 << 11);
 	public static inline var SWINGING_SLOT:Int = (1 << 12);
+	public static inline var THIN_BLADE:Int = (1 << 13);
+	public static inline var THRUSTING_SLOT:Int = (1 << 14);
+	public static inline var TIGHT_GRIP:Int = (1 << 15);
+	public static inline var WEAPON_ATTACHMENT:Int = (1 << 16);
 	
 	
-	public static inline var TOTAL_FLAGS:Int = 13;
+	public static inline var TOTAL_FLAGS:Int = 17;
 	
 	public var custom:Array<Dynamic> = null;  // gm homebrews if any..
 	
@@ -56,25 +60,34 @@ class MeleeSpecial
 	}
 	
 	
+	/*
 	public static function getFlagVarNames():Array<String> {	
 		var arr:Array<String> = [];
-		Item.pushFlagLabelsToArr(false);
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.MeleeSpecial");
 		return arr;
 	}
+	*/
 	
-	
-	public function getIntVarNames():Array<String> {	
+	public static function getFlagVarLabels():Array<String> {	
 		var arr:Array<String> = [];
-		Item.pushVarLabelsToArr(false);
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.MeleeSpecial", true);
 		return arr;
 	}
 	
+	
+	public static function getIntVarNames():Array<String> {	
+		var arr:Array<String> = [];
+		Item.pushVarLabelsToArr(false, "troshx.sos.core.MeleeSpecial");
+		return arr;
+	}
+	
+	/*
 	public function getVarNameProps():Dynamic<Array<String>> {	
 		var hash:Dynamic<Array<String>> = {};
 		
 		return hash;
 	}
-	
+	*/
 	
 	public function new() 
 	{

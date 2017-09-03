@@ -1,0 +1,158 @@
+<div>
+	<div v-if="firearm">
+		-Firearm-
+		<br/>
+		<span>
+			<label><input type="checkbox" v-model="firearm.double"></input>Double</label>&nbsp;&nbsp;&nbsp;
+		</span>
+		<span>
+			<label><input type="number" number v-model="firearm.multishot" style="width:40px"></input>Multishot</label>&nbsp;&nbsp;&nbsp;
+		</span>
+		<span>
+			<label><input type="number" number v-model="firearm.magazine" style="width:40px"></input>Magazine</label>&nbsp;&nbsp;&nbsp;
+		</span>
+		<span>
+			<label><input type="number" number v-model="firearm.revolver" style="width:40px"></input>Revolver</label>&nbsp;&nbsp;&nbsp;
+		</span>
+		<span>
+			<label><input type="number" number v-model="firearm.highCaliber" style="width:40px"></input>High Caliber</label>&nbsp;&nbsp;&nbsp;
+		</span>
+	</div>
+	<div>
+		-Item:-
+		<div>
+			<label>Cost:</label><br/>
+			<input type="number" number step="1" min="0" v-model="item.cost" style="width:40%;display:inline-block"></input><select number v-model="item.costCurrency" style="width:50%;display:inline-block">
+				<option value="0">cp</option>
+				<option value="1">sp</option>
+				<option value="2">gp</option>
+			</select>
+		</div>
+		
+		<div v-if="!handInteractable">
+			<i>Unhold items before you can interact with hand-related flags</i>
+		</div>
+		<div v-for="(li, i) in itemFlags" :checked="(shiftIndex(i)&item.flags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'flags')"  v-if="withinItemFlagRange(i)" :key="i" >
+			<label :class="{disabled:!handInteractable && (shiftIndex(i)&handMask)!=0}"><input type="checkbox" :value="shiftIndex(i)" :disabled="!handInteractable && (shiftIndex(i)&handMask)!=0"></input>{{li}}</label>
+		</div>
+		<hr/>
+	</div>
+			
+	
+	<div v-if="weapon">
+		-{{weapon.ranged ? 'Missile' : 'Melee'}} Flags:-
+		<div v-if="!weapon.ranged">
+			<div v-for="(li, i) in meleeFlags" :key="i" style="display:inline-block;margin-right:3px">
+				<label :class="{disabled:(meleeFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&item.meleeFlags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'meleeFlags')" :value="shiftIndex(i)" :disabled="(meleeFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
+			</div>
+			<hr/>
+			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weapon.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
+			<div v-if="item.meleeSpecial">
+				<div v-for="(li, i) in meleeVarLabels" :key="i">
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number v-model="item.meleeSpecial[meleeVarNames[i]]"></input>
+					<div style="clear:both"></div>
+				</div>
+			</div>
+			<hr/>
+		</div>
+		<div v-if="weapon.ranged">
+			<div v-for="(li, i) in missileFlags" :key="i"  style="display:inline-block;margin-right:3px">
+				<label class="{disabled:(missileFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&item.missileFlags)!=0"  v-on:click="checkboxHandler($event.target, i, item, 'missileFlags')" :value="shiftIndex(i)"  :disabled="(missileFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
+			</div>
+			<hr/>
+			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, true)" :checked="weapon.missileSpecial!=null"><i>MissileSpecial?</i></input></label>
+			<div v-if="item.missileSpecial">
+				<div v-for="(li, i) in missileVarLabels" :key="i">
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number v-model="item.missileSpecial[missileVarNames[i]]"></input>
+					<div style="clear:both"></div>
+				</div>
+			</div>
+		</div>
+		<hr/>
+	</div>
+	<div v-if="shield">
+		<div v-show="hasStrap">
+			<label>Shield Strap: </label><select number v-model="shield.strapType" style="width:auto">
+				<option value="0">Arm</option>
+				<option value="1">Shoulder</option>
+			</select>
+		</div>
+		<hr/>
+	</div>
+					
+	<div v-if="isAmmo">
+		<div v-if="firearmAmmo">
+			-Firearm Ammo Modifiers-
+			<div>
+				<label><input type="number" number v-model="weapon.firearm.load"></input>Load</label>
+			</div>
+		</div>
+		<div v-if="crossbowAmmo">
+			-Crossbow Ammo Modifiers-
+			<div>
+				<label><input type="number" number v-model="weapon.crossbow.span"></input>Span</label>
+			</div>
+		</div>
+		<hr/>
+	</div>
+					
+	<div v-if="weapon!=null && currentCustomise!=null">
+		<div v-if="!isEnteredItem">
+			<div>-Weapon Personalisation?-</div>
+			<i>Have current item inserted into list first before being able to register a new customisation.</i>
+		</div>
+		<div v-if="isEnteredItem">
+			<div>-Weapon Personalisation-</div>
+			
+			<div v-if="customise != null">
+				<label>Customisation Name:</label><input type="text" v-model="currentCustomise.name"></input>
+			</div>
+			<div v-if="customise==null">
+				<label>Name:</label><input type="text" v-on:blur="setCustomiseNameInput($event.target)" :value="currentCustomise.name"></input>
+			</div>
+			
+			<div v-if="isMeleeWeap">
+				<div>-Melee Customisations</div>
+				<div v-for="(li, i) in customMeleeFlags" :key="i"  style="display:inline-block;margin-right:3px">
+					<label><input type="checkbox" :checked="(shiftIndex(i)&currentCustomise.meleeFlags)!=0"  v-on:click="checkboxHandler($event.target, i, currentCustomise, 'meleeFlags')" :value="shiftIndex(i)"></input>{{li}}</label>
+				</div>
+				<div v-if="customise != null || currentCustomise.melee == null"><label><input type="checkbox" v-on:click="onCustomMeleeCheck($event.target)" :checked="currentCustomise.melee!=null"><i>more...</i></input></label></div>	
+					
+				<div v-if="currentCustomise.melee != null">
+					<div v-for="(li, i) in customMeleeIntVarLabels" :key="i">
+						<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number min="0" v-model="currentCustomise.melee[customMeleeIntVars[i]]"></input>
+						<div style="clear:both"></div>
+					</div>
+					<div v-show="currentCustomise.melee.integratedPistol >=1">
+						<div>Integrated Pistol: {{ currentCustomise.melee.integratedPistol == 1 ? "Pistol" : "Dragon" }}</div>
+					</div>
+					<div v-show="currentCustomise.hasBizarreGimmick()">
+						<label style="display:block;">Bizaare Gimmick: </label><input style="display:block;width:90%"  v-model="currentCustomise.melee.bizarreGimmickDesc"></input>
+					</div>
+					<div v-show="currentCustomise.hasExquisiteDecoration()">
+						<label style="display:block;">Exquisite Decoration: </label><input style="display:block;width:90%"  v-model="currentCustomise.melee.exquisiteDecorDesc"></input>
+					</div>
+					<div v-show="currentCustomise.isRidiculouslySharp()">
+						<label>Sharpened?</label>
+						<input type="checkbox" v-model="currentCustomise.melee.sharpened"></input>
+					</div>
+				</div>
+			</div>
+			
+			<div v-if="customise != null">
+				<button v-on:click="assignWeaponCustomisation()" :disabled="!canRegisterCustomisation">Register Customisation &gt;&gt;</button>
+			</div>	
+			<div v-if="customise == null">
+				<i>Weapon has been customised.</i>
+			
+				<br/>
+				<div>
+					<label><i>Restore original?</i></label><input type="checkbox" v-model="restoreOriginal"></input><br/><br/>
+				</div>
+				<div v-if="restoreOriginal" >
+					<button v-on:click="doRestoreOriginal()">Confirm Restore Original</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

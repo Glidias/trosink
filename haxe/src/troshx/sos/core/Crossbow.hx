@@ -19,6 +19,10 @@ class Crossbow
 		return arr;
 	}
 	
+	public function  addAmmoTagsToStrArr(arr:Array<String>):Void {
+		if (span != 0) arr.push("Span " +  Item.sign(span)  + span);
+	}
+	
 	public function new() 
 	{
 		

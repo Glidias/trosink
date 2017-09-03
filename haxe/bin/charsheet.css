@@ -11,7 +11,6 @@ td.actions {
 	min-width:105px;
 }
 
-
 select {
 	font-size:12px;
 	font-family:Arial;
@@ -22,6 +21,23 @@ td input[type='text'] {
 	font-size:12px;
 	font-family:Arial;
 }
+td input[type='number'] {
+	position:relative;
+	width:100%;
+	font-size:12px;
+	font-family:Arial;
+}
+
+label.disabled {
+	opacity:.5;
+}
+
+.pop-widget input[type='text'] {
+	width:auto;
+}
+.pop-widget input[type='number'] {
+	width:auto;
+}
 td option {
 	font-size:12px;
 	font-family:Arial;
@@ -29,13 +45,14 @@ td option {
 td.voidna {
 	background-color:#333333;
 }
-td select {
+td > select {
 	position:relative;
 	width:100%;
 	font-size:12px;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .2s ease-out;
+  pointer-events:none;
 }
 .fade-enter-active {
 	transition-duration:.3s;
@@ -65,6 +82,9 @@ thead tr {
 	background-color:#f9f9f9;
 }
 
+thead td.held {
+	width:90px;
+}
 
 td input.focusable[readonly]:focus {
 	border:2px solid orange;
@@ -98,11 +118,11 @@ td.gotbtn.focus > input {
 	width: calc(100% - 24px);
 }
 
-td.gotbtn button {
+td.gotbtn > button {
 	display:none;
 }
 
-td.gotbtn.focus button {
+td.gotbtn.focus > button {
 	display:block;
 	width:24px;
 	height:100%;
@@ -132,6 +152,7 @@ td.gotbtn.focus button {
 
 td.weight {
 	width:40px;
+	
 }
 td.munition-type {
 	width:100px;
@@ -164,7 +185,15 @@ td.w-prof.got-custom .pop-widget {
 td.w-ammo-spawner > a {
 	color:inherit;
 }
+td.w-firearm-name .pop-widget {
+	width:100%;
+}
 
+td.w-tags .pop-widget {
+	min-width:200px;
+	max-height:300px;
+	overflow:auto;
+}
 .widget-prof .listitem.disabled {
 	opacity:.35;
 	pointer-events:none;
