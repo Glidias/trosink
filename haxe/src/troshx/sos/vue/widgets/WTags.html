@@ -32,8 +32,8 @@
 		<div v-if="!handInteractable">
 			<i>Unhold items before you can interact with hand-related flags</i>
 		</div>
-		<div v-for="(li, i) in itemFlags" :checked="(shiftIndex(i)&item.flags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'flags')"  v-if="withinItemFlagRange(i)" :key="i" >
-			<label :class="{disabled:!handInteractable && (shiftIndex(i)&handMask)!=0}"><input type="checkbox" :value="shiftIndex(i)" :disabled="!handInteractable && (shiftIndex(i)&handMask)!=0"></input>{{li}}</label>
+		<div v-for="(li, i) in itemFlags" :key="i" >
+			<label :class="{disabled:!handInteractable && (shiftIndex(i)&handMask)!=0}"><input type="checkbox" :value="shiftIndex(i)" :disabled="!handInteractable && (shiftIndex(i)&handMask)!=0" :checked="(shiftIndex(i)&item.flags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'flags')"  v-if="withinItemFlagRange(i)"></input>{{li}}</label>
 		</div>
 		<hr/>
 	</div>
