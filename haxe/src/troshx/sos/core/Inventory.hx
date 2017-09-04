@@ -34,9 +34,21 @@ class Inventory
 	public static inline var HELD_OFF:Int = 2;
 	public static inline var HELD_BOTH:Int = (1 | 2);
 	
-	public static inline var UNHELD_PACKED:Int = 1;
-	public static inline var UNHELD_DROPPED:Int = 2;
-	public static inline var UNHELD_EQUIPPED:Int = 4;
+	@:unheld("") public static inline var UNHELD_UNSPECIFIED:Int = 0;
+	@:unheld("Sheath/Holster") public static inline var UNHELD_SHEATH_HOLSTER:Int = 1;
+	@:unheld("Strapped-Arm") public static inline var UNHELD_STRAPPED_ARM:Int = 2;
+	@:unheld("Strapped-Shoulder") public static inline var UNHELD_STRAPPED_SHOULDER:Int = 3;
+	@:unheld("Back") public static inline var UNHELD_BACK:Int = 4;
+	@:unheld("Concealed") public static inline var UNHELD_CONCEALED:Int = 5;
+	public static function getUnheldLabelsArray():Array<String> {
+		var arr:Array<String> = [];
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", false, ":unheld");
+		return arr;
+	}
+	
+	public static inline var PREFER_UNHELD_PACKED:Int = 1;
+	public static inline var PREFER_UNHELD_DROPPED:Int = 2;
+	public static inline var PREFER_UNHELD_EQUIPPED:Int = 4;
 	
 	public static var UID_COUNT:Int = 0;
 	
@@ -111,15 +123,15 @@ class Inventory
 		// Else continue to  re-add it back to prefered unheld for UNHELD_PACKED or UNHELD_DROPPED if required...
 		//preferedUnheld = preferedUnehd != 0 ? preferedUnheld : if got existing equipped held item ? existinghelditem.unheld : 0;
 		if (preferedUnheld > 0) {
-			if (preferedUnheld != UNHELD_EQUIPPED) {  // would != the case of existingHeldItem.unheld already remain requipped
+			if (preferedUnheld != PREFER_UNHELD_EQUIPPED) {  // would != the case of existingHeldItem.unheld already remain requipped
 				var q:ItemQty;
-				if (preferedUnheld == UNHELD_PACKED) {
+				if (preferedUnheld == PREFER_UNHELD_PACKED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
 					packed.add( q );
 					
 				}
-				else if (preferedUnheld == UNHELD_DROPPED) {
+				else if (preferedUnheld == PREFER_UNHELD_DROPPED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
 					dropped.add( q );
@@ -149,7 +161,7 @@ class Inventory
 		var qty:Int = itemQ.qty;
 		dropped.splicedAgainst(itemQ);
 		dispatchSignal(InventorySignal.PackItem);
-		_shiftItem(itemQ.item, UNHELD_PACKED, qty);
+		_shiftItem(itemQ.item, PREFER_UNHELD_PACKED, qty);
 		
 	}
 	
@@ -168,7 +180,7 @@ class Inventory
 	public function dropItemEntryFromPack(itemQ:ItemQty):Void {
 		var qty:Int = itemQ.qty;
 		packed.splicedAgainst(itemQ);
-		_shiftItem(itemQ.item, UNHELD_DROPPED, qty);
+		_shiftItem(itemQ.item, PREFER_UNHELD_DROPPED, qty);
 		dispatchSignal(InventorySignal.DropItem);
 	}
 	
@@ -215,50 +227,50 @@ class Inventory
 	public function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Void {  // Not applicable for shield
 		
 		shields.splice( shields.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.shield, UNHELD_DROPPED, 1);
+		if (!doDestroy) _shiftItem(alreadyEquiped.shield, PREFER_UNHELD_DROPPED, 1);
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	public function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Void {
 		var ind:Int;
 		equipedNonMeleeItems.splice( ind=equipedNonMeleeItems.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.item, UNHELD_DROPPED, 1, getAttachmentArray(equipedNonMeleeItems, ind, "item") );
+		if (!doDestroy) _shiftItem(alreadyEquiped.item, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(equipedNonMeleeItems, ind, "item") );
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	public function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Void {
 		var ind:Int;
 		weapons.splice( ind=weapons.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.weapon, UNHELD_DROPPED, 1, getAttachmentArray(weapons, ind, "weapon"));
+		if (!doDestroy) _shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(weapons, ind, "weapon"));
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
 	public function dropWornArmor(armor:Armor, doDestroy:Bool=false):Void {
 		wornArmor.splice(wornArmor.indexOf(armor), 1);
-		if (!doDestroy) _shiftItem(armor, UNHELD_DROPPED, 1);
+		if (!doDestroy) _shiftItem(armor, PREFER_UNHELD_DROPPED, 1);
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
 	public function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
 		
 		shields.splice( shields.indexOf(alreadyEquiped), 1 );
-		_shiftItem(alreadyEquiped.shield, UNHELD_PACKED, 1);
+		_shiftItem(alreadyEquiped.shield, PREFER_UNHELD_PACKED, 1);
 		dispatchSignal(InventorySignal.PackItem);
 	}
 	public function packMiscItem(alreadyEquiped:ItemAssign):Void {
 		var ind:Int;
 		equipedNonMeleeItems.splice( ind= equipedNonMeleeItems.indexOf(alreadyEquiped), 1  );
-		_shiftItem(alreadyEquiped.item, UNHELD_PACKED,  1, getAttachmentArray(equipedNonMeleeItems, ind, "item"));
+		_shiftItem(alreadyEquiped.item, PREFER_UNHELD_PACKED,  1, getAttachmentArray(equipedNonMeleeItems, ind, "item"));
 		dispatchSignal(InventorySignal.PackItem);
 	}
 	public function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
 		var ind:Int;
 		weapons.splice( ind= weapons.indexOf(alreadyEquiped), 1 );
-		_shiftItem(alreadyEquiped.weapon, UNHELD_PACKED, 1, getAttachmentArray(weapons, ind, "weapon"));
+		_shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_PACKED, 1, getAttachmentArray(weapons, ind, "weapon"));
 		dispatchSignal(InventorySignal.PackItem);
 	}
 	
 	public function packWornArmor(armor:Armor):Void {
 		wornArmor.splice(wornArmor.indexOf(armor), 1);
-		_shiftItem(armor, UNHELD_PACKED, 1);
+		_shiftItem(armor, PREFER_UNHELD_PACKED, 1);
 		dispatchSignal(InventorySignal.PackItem);
 	}
 
@@ -322,18 +334,18 @@ class Inventory
 		
 		if (Std.is(item, Weapon)) {
 			
-			weapons.push(readyAssign = weaponAssign = {attached:false,  key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			weapons.push(readyAssign = weaponAssign = {attached:false,  key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Shield)) {
 			
-			shields.push(readyAssign = shieldAssign = {key:UID_COUNT++, attached:false, shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			shields.push(readyAssign = shieldAssign = {key:UID_COUNT++, attached:false, shield:LibUtil.as(item, Shield), held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
 		}
 		else if (Std.is(item, Armor)) {
 
 			wornArmor.push( armorAssign = LibUtil.as(item, Armor) );
 		}
 		else {
-			equipedNonMeleeItems.push(readyAssign =  itemAssign= {key:UID_COUNT++, attached:false,  item:item, held:0, unheld:UNHELD_EQUIPPED, unheldRemark:unheldRemark});
+			equipedNonMeleeItems.push(readyAssign =  itemAssign= {key:UID_COUNT++, attached:false,  item:item, held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
 		}
 		
 		return readyAssign;

@@ -22,7 +22,13 @@ class Shield extends Item
 	public function new() 
 	{
 		super();
+	}
 	
+	override public function addTagsToStrArr(arr:Array<String>):Void {
+		super.addTagsToStrArr(arr);
+		if (this.strapped) {
+			arr.push(strapType == STRAP_ARM ? "Arm-strap" : "Shoulder-strap");
+		}
 	}
 	
 	override public function getTypeLabel():String {

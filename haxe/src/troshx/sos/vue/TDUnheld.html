@@ -1,0 +1,12 @@
+<td class="w-holder w-unheld gotbtn focus" v-on:click.stop="">
+	<input ref="inputText" type="text" class="focusable" v-on:focus="onFocus($event.target)" v-on:blur="onBlur($event.target)"></input>
+	<button v-if="index>=0" :class="{active:showWidget}" v-on:click="requestCurWidgetButton('td-unheld',index)">[|]</button>
+	<div class="pop-widget" v-show="showWidget"  v-on:click.stop="" v-on:touchstart.stop="emit('focus-widget')" v-on:mousedown.stop="emit('focus-widget')">
+		<label>Slot:</label>
+		<div>
+			<select ref="selectDom" v-model="entry.unheld" style="width:98%">
+				<option v-for="(li, i) in unheldLabels" :value="i">{{li}}</option>
+			</select>
+		</div>
+	</div>
+</td>

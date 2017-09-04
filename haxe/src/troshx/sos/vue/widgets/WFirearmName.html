@@ -1,5 +1,5 @@
 <div>
-	<div><label>Name:<input type="text" v-model="item.name"></input></label></div>
+	<div v-if="!excludeName"><label>Name:<input type="text" v-model="item.name"></input></label></div>
 	<div>
 		<label>Mechanism:</label>
 		<br/>

@@ -104,7 +104,7 @@
 					<td><input type="number" step="0.5" v-model="entry.shield.weight" number min="0"></input></td>
 					<td-widget widgetName="coverage" widgetTagName="w-coverage" :value="entry.shield.coverage" :index="i" :showWidget="isVisibleWidget('shield','coverage', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="i" :showWidget="isVisibleWidget('shield', 'td-unheld', i)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -169,7 +169,7 @@
 					<td-widget widgetName="melee-def" widgetTagName="w-melee-def" :value="getDefGuard(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-def', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap', 'td-unheld', itemIndex)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -209,7 +209,7 @@
 			</tbody>
 			<thead v-on:mousedown="setCurWidgetSection('bowheader', $event)" v-on:touchstart="setCurWidgetSection('bowheader', $event)">
 				<tr>
-					<td>Bow/Sling name</td>
+					<td>Bow name</td>
 					<td class="munition-type">Type</td>
 					<td class="hands">Hands</td>
 					<td>Range</td>
@@ -229,7 +229,7 @@
 				</tr>
 			</thead>
 			<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('bow', $event)" v-on:touchstart.native="setCurWidgetSection('bow', $event)">
-				<tr v-for="(entry, itemIndex) in filteredBowSling" :key="entry.key">
+				<tr v-for="(entry, itemIndex) in filteredBow" :key="entry.key">
 					<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="entry" :weapon="entry.weapon" section="bow" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
 					<td-hands :entry="entry" />
@@ -239,7 +239,7 @@
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('bow','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('bow', 'td-unheld', itemIndex)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -249,7 +249,7 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr class="entry-row" v-if="weaponEntry.e.weapon.isBow() || weaponEntry.e.weapon.isSling()" :key="-2">
+				<tr class="entry-row" v-if="weaponEntry.e.weapon.isBow()" :key="-2">
 					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="bow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
 					<td-hands :entry="weaponEntry.e"  v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry, 4)" />
@@ -289,7 +289,7 @@
 					<td-widget widgetName="span-tools" widgetTagName="w-span-tools" :value="getSpanTools(entry.weapon.crossbow)" :index="itemIndex" :showWidget="isVisibleWidget('crossbow','span-tools', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('crossbow','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('crossbow', 'td-unheld', itemIndex)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -344,7 +344,7 @@
 					<td-widget widgetName="ammunition" widgetTagName="w-ammunition" :value="getAmmunitions(entry.weapon.firearm)" :index="itemIndex" :showWidget="isVisibleWidget('firearm','ammunition', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('firearm','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('firearm', 'td-unheld', itemIndex)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -372,7 +372,7 @@
 			</tbody>
 			<thead>
 				<tr>
-					<td>Throwing Weap name</td>
+					<td>Throwing/Sling name</td>
 					<td class="munition-type">Type</td>
 					<td class="hands">Hands</td>
 					<td>Range</td>
@@ -397,7 +397,7 @@
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('throwing','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('throwing', 'td-unheld', itemIndex)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>
@@ -407,7 +407,7 @@
 						<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
 					</td>
 				</tr>
-				<tr class="entry-row" :key="-5" v-if="weaponEntry.e.weapon.isThrowing()">
+				<tr class="entry-row" :key="-5" v-if="weaponEntry.e.weapon.isThrowing() || weaponEntry.e.weapon.isSling()">
 					<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
 					<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="throwing" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
 					<td-hands :entry="weaponEntry.e" v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry,4)" />
@@ -447,7 +447,7 @@
 					<td class="voidna"></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('ammo','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.weapon.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('ammo', 'td-unheld', itemIndex)" />
 					<td class="voidna"></td>
 					<td>
 						<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
@@ -489,7 +489,7 @@
 					<td><input-name :item="entry.item" v-on:updated="onInputNameUpdated" /></td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.item)" :index="i" :showWidget="isVisibleWidget('miscItem','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 					<td><input type="number" number min="0" step="0.5" v-model="entry.item.weight"></input></td>
-					<td><input type="text" v-model="entry.unheldRemark"></input></td>
+					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="i" :showWidget="isVisibleWidget('miscItem', 'td-unheld', i)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
 					</td>

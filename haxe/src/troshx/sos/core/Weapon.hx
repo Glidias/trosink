@@ -147,6 +147,7 @@ class Weapon extends Item
 	}
 	
 	override public function  addTagsToStrArr(arr:Array<String>):Void {
+		super.addTagsToStrArr(arr);
 		var flags:Int = ranged ? this.missileFlags : this.meleeFlags;
 		var myArr:Array<String>;
 		var valCheck:Int;

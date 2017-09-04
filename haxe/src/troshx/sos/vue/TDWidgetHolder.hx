@@ -56,6 +56,11 @@ class TDWidgetHolder extends VComponent<NoneT, TDWidgetHolderProps>
 		}
 	}
 	
+	function requestCurWidgetButton(type:String, index:Int):Void {
+		if (!this.showWidget) this.requestCurWidget(type, index);
+		else this.requestCurWidget("", 0);
+	}
+	
 	function shiftIndex(i:Int):Int {
 		return (1 << i);
 	}

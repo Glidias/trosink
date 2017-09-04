@@ -72,5 +72,6 @@ typedef WFirearmNameData = {
 
 typedef WFirearmNameProps = {
 	>BaseItemWidgetProps,
+	@:optional @:prop({required:false, 'default':false}) public var excludeName:Bool;
 	@:optional @:prop({required:false}) public var customFiringMechanisms:Array<FiringMechanism>;
 }

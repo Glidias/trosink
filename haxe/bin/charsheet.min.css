@@ -23,7 +23,7 @@ td input.focusable[readonly]:focus{border:2px solid orange;}
 .pop-widget{position:absolute;top:100%;background-color:white;border:1px solid orange;padding:5px;box-sizing:border-box;min-width:100%;height:auto;z-index:1;}
 td button{text-align:center;padding:0;}
 td.gotbtn input:focus{border-right:2px solid orange;box-sizing:border-box;}
-td.gotbtn button:focus{border:2px solid orange;}
+td.gotbtn>button.active{border:2px solid orange;}
 td.gotbtn.focus>input{width:calc(100% - 24px);}
 td.gotbtn>button{display:none;}
 td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;position:absolute;right:0;top:0;}
@@ -37,6 +37,7 @@ td.d10{width:30px;}
 td.w-holder .pop-widget{width:200%;}
 td.w-span-tools .pop-widget{min-width:165px;}
 td.w-coverage .pop-widget{width:100%;}
+td.w-unheld .pop-widget{width:100%;}
 td.w-prof.got-custom .pop-widget{min-width:400px;}
 td.w-ammo-spawner>a{color:inherit;}
 td.w-firearm-name .pop-widget{width:100%;}

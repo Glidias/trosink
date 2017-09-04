@@ -63,6 +63,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			TDHands.NAME => new TDHands(),
 			TDWidgetHolder.NAME => new TDWidgetHolder(),
 			
+			TDUnheld.NAME => new TDUnheld(),
+			
 			InputName.NAME => new InputName(),
 			InputNameQty.NAME => new InputNameQty(),
 			SelectHeld.NAME => new SelectHeld(),
@@ -333,7 +335,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed function get_throwMask():Int {
-		return (1<<Profeciency.R_THROWING);
+		return (1<<Profeciency.R_THROWING) | (1<<Profeciency.R_SLING);
 	}
 	
 	@:computed function get_droppedEntryGotFocus():Bool 
@@ -380,11 +382,11 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	@:computed function get_filteredFirearm():Array<WeaponAssign>   {
 		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_FIREARM ) );
 	}
-	@:computed function get_filteredBowSling():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_SLING,R_BOW] ) );
+	@:computed function get_filteredBow():Array<WeaponAssign>   {
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_BOW] ) );
 	}
 	@:computed function get_filteredThrowing():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_THROWING ) );
+		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_THROWING, R_SLING] ) );
 	}
 	@:computed function get_filteredAmmo():Array<WeaponAssign>   {
 		return this.char.inventory.ammoFiltered;
