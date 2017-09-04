@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.core.HitLocation.WoundDef;
 
 /**
  * ...
@@ -10,7 +11,8 @@ class HitLocation
 	public var id:String = "";
 	public var uid(get, never):String;
 	
-
+	public var woundTable:Array<Array<WoundDef>>;  // damage type -> level
+	
 
 	public function new() 
 	{
@@ -23,4 +25,10 @@ class HitLocation
 		return (id != "" && id != null ? id : n);
 	}
 	
+}
+
+typedef WoundDef = {
+	var stun:Int;
+	var pain:Int;
+	var BL:Int;
 }

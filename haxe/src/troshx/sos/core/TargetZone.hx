@@ -1,17 +1,17 @@
 package troshx.sos.core;
 
 /**
- * ...
+ * Target zones cannot work in isolation but must work in relation to a BodyCHar
  * @author Glidias
  */
 class TargetZone 
 {
 	public var name:String;  // the name of the zone
-	public var parts:Array<HitLocation>;  // the parts, according to ids
+	public var parts:Array<Int>;  // the parts, according to ids
 	public var partWeights:Array<Float>;  // distribution of parts for probability
 	public var weightsTotal:Float = 0;
 	
-	public static function create(name:String, partWeights:Array<Float>, parts:Array<Dynamic>, weightsTotal:Float=0):ZoneBody {
+	public static function create(name:String, partWeights:Array<Float>, parts:Array<Int>, weightsTotal:Float=0):TargetZone {
 		var zb:TargetZone = new TargetZone();
 		zb.name = name;
 		zb.parts = parts;
@@ -36,7 +36,7 @@ class TargetZone
 	}
 	
 	
-	public function getBodyPart(floatRatio:Float):String {
+	public function getBodyPart(floatRatio:Float):Int {
 		floatRatio *= weightsTotal;
 	
 		var accum:Float = 0;

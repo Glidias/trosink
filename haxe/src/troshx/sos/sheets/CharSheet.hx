@@ -83,6 +83,7 @@ class CharSheet
 		var uid:String = w.uid;
 		if (!Reflect.hasField(woundHash, uid)) {
 			Reflect.setField(woundHash, uid, w);
+			wounds.push(w);
 		}
 		else { 
 			var fw:Wound = Reflect.field(woundHash, uid);

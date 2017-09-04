@@ -3,14 +3,15 @@ import troshx.core.IUid;
 import troshx.ds.IUpdateWith;
 
 /**
- * ...
+ * An actual live wound inflicted on a current character
  * @author Glidias
  */
 class Wound implements IUid implements IUpdateWith<Wound>
 {
 	
 	// these parameters uniquely identify the wound and should never be changed after being set through constructor
-	public var location(default,null):HitLocation = null;
+	//public var location(default,null):HitLocation = null;
+	public var locationId:String;
 	public var level(default,null):Int = 0;
 	public var damageType(default,null):Int = 0;
 	
@@ -19,24 +20,19 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	public var pain:Int = 0;
 	public var BL:Int = 0;
 	public var treated:Bool = false;
-	
-	public var labelLocation(get, never):String;
-	
+
 	public var uid(get, never):String;
 	
 	static  var UNIQUE_COUNT:Int = 0;
 
-	public function new(location:HitLocation, level:Int, damageType:Int) 
+	public function new(locationId:String, level:Int, damageType:Int) 
 	{
-		this.location = location;
+		this.locationId = locationId;
 		this.level = level;
 		this.damageType = damageType;
 	}
 	
-	function get_labelLocation():String 
-	{
-		return location != null ? location.name : "";
-	}
+	
 	
 	public function updateAgainst(ref:Wound):Void {
 		if (ref.stun > stun) stun = ref.stun;
@@ -55,7 +51,7 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	
 	inline function get_uid():String 
 	{
-		return location.uid + "_"+ level + "_"+ (damageType >= 0 ? damageType : UNIQUE_COUNT++);
+		return locationId + "_"+ level + "_"+ (damageType >= 0 ? damageType : UNIQUE_COUNT++);
 	}
 	
 }
