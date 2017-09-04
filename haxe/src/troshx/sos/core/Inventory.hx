@@ -52,19 +52,17 @@ class Inventory
 	
 	public static var UID_COUNT:Int = 0;
 	
-	// imperative weapon/item state equip caches
+	// todo: imperative weapon state equip caches
+	/*
 	public var weaponOffHand:Weapon = null;
 	public var weaponHand:Weapon = null;
-	public var strappedExtraWeapons:Array<Weapon> = null;
-	public var strappedExtraWeaponsOff:Array<Weapon> = null;
 	
-	public var shieldOffHand:Shield = null;
+	public var shieldOffHand:Shield = null; //
 	public var shield:Shield  = null;
 	
 	public var miscItemOffHand:Item = null;
 	public var miscItemHand:Item = null;
-	public var strappedExtraItem:Array<Item> = null;
-	public var strappedExtraItemOff:Array<Item> = null;
+	*/
 	
 	var signaler:Signal1<InventorySignal>;
 	public inline function getSignaler():Signal1<InventorySignal> {
