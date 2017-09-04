@@ -27,13 +27,22 @@ class LibUtil
 	}
 	
 	public static inline function field<T>(of:Dynamic<T>, field:String):T {
+		#if js
+		return untyped of[field];
+		#else
 		return Reflect.field(of, field);
+		#end
 	}
 	public static inline function setField<T>(of:Dynamic<T>, field:String, value:T):Void {
+		#if js
+		untyped of[field] = value;
+		#else
 		Reflect.setField(of, field, value);
+		#end
 	}
+	
 	public static function setFieldChain<T>(of:Dynamic<T>, field:String, value:T):T {
-		Reflect.setField(of, field, value);
+		setField(of, field, value);
 		return value;
 	}
 

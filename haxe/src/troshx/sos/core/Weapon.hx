@@ -209,7 +209,8 @@ class Weapon extends Item
 	
 	override function get_uid():String 
 	{
-		return super.get_uid() + (firearm != null && firearm.firingMechanism != null ? ":" + firearm.firingMechanism.uid : "") + (customise != null ?  "_" + customise.uid : "" ); // + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
+		//+ (firearm != null && firearm.firingMechanism != null ? ":" + firearm.firingMechanism.uid : "")
+		return super.get_uid()  + (customise != null ?  "_" + customise.uid : "" ); // + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
 	}
 	
 	override function get_label():String {
