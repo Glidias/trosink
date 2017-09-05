@@ -1,18 +1,17 @@
 package troshx.sos.core;
-import troshx.sos.core.HitLocation.WoundDef;
-
 /**
- * ...
+ * A mere hit location name entry in character sheet.
+ * Has additional properties regarding hit location such as symmetry and such
+ * 
  * @author Glidias
  */
 class HitLocation 
 {
 	public var name:String = "";
 	public var id:String = "";
+	public var twoSided:Bool = false;
+	
 	public var uid(get, never):String;
-	
-	public var woundTable:Array<Array<WoundDef>>;  // damage type -> level
-	
 
 	public function new() 
 	{
@@ -27,8 +26,3 @@ class HitLocation
 	
 }
 
-typedef WoundDef = {
-	var stun:Int;
-	var pain:Int;
-	var BL:Int;
-}

@@ -145,7 +145,7 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 		return this.item.strapped;
 	}
 	@:computed function get_handInteractable():Bool {
-		return this.entry.held == 0;
+		return this.entry.held == null || this.entry.held == 0;
 	}
 	
 	@:computed function get_firearmAmmo():Bool {

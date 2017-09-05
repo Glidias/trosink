@@ -14,6 +14,11 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 	public var list(default, null):Array<T> = [];
 	public var hash:Dynamic<T> = {};
 	
+	// if no more modifications are to be made to the array, you can bake it to nullify the hash.
+	public inline function bake():Void {
+		hash = null;
+	}
+	
 	public function new() 
 	{
 		

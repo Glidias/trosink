@@ -49,7 +49,7 @@
 			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weapon.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
 			<div v-if="item.meleeSpecial">
 				<div v-for="(li, i) in meleeVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number v-model="item.meleeSpecial[meleeVarNames[i]]"></input>
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" min="0" number v-model="item.meleeSpecial[meleeVarNames[i]]"></input>
 					<div style="clear:both"></div>
 				</div>
 			</div>
@@ -63,7 +63,7 @@
 			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, true)" :checked="weapon.missileSpecial!=null"><i>MissileSpecial?</i></input></label>
 			<div v-if="item.missileSpecial">
 				<div v-for="(li, i) in missileVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number v-model="item.missileSpecial[missileVarNames[i]]"></input>
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" min="0" number v-model="item.missileSpecial[missileVarNames[i]]"></input>
 					<div style="clear:both"></div>
 				</div>
 			</div>

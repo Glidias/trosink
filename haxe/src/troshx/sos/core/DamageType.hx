@@ -10,16 +10,21 @@ class DamageType
 	@:abbr("c") public static inline var CUTTING:Int = 0;
 	@:abbr("p") public static inline var PIERCING:Int = 1;
 	@:abbr("b") public static inline var BLUDGEONING:Int = 2;
+	@:abbr("u") public static inline var UNARMED:Int = 3;
 
-	@:abbr("fl") public static inline var FALLING:Int = 3;
-	@:abbr("br") public static inline var BURN:Int = 4;
-	@:abbr("el") public static inline var ELECTRICAL:Int = 5;
-	@:abbr("cl") public static inline var COLD:Int = 6;
+	@:abbr("fl") public static inline var FALLING:Int = 4;
+	@:abbr("br") public static inline var BURN:Int = 5;
+	@:abbr("el") public static inline var ELECTRICAL:Int = 6;
+	@:abbr("cl") public static inline var COLD:Int = 7;
 
 	public function new() 
 	{
 		
 	} 
+	
+	public static inline function isMelee(type:Int):Bool {
+		return type < FALLING;
+	}
 	
 	static function getNewFlagVarNames():Array<String> {
 		var arr:Array<String> = [];

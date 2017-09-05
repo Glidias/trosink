@@ -1,8 +1,10 @@
 package troshx.sos.core;
+//import troshx.ds.HashedArray;
+//import troshx.ds.IDMatchArray;
 import troshx.util.LibUtil;
 
 /**
- * ...
+ * Armor
  * @author Glidias
  */
 class Armor extends Item
@@ -12,8 +14,13 @@ class Armor extends Item
 	public var AVP:Int = 0;
 	public var AVB:Int = 0;
 	
-	public var coverage:Dynamic<ArmorHitLocation> = {};
-	public var tags:String = "";
+	// generic armor coverage hash by string id.
+	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
+	
+	@:coverage public static inline var HALF:Int = (1 << 0);
+	@:coverage public static inline var WEAK_SPOT:Int = (1 << 1);
+	
+	public static inline var WEAK_SPOT_SYMBOL:String = "☄";
 	
 	public var helmet:Bool = false;
 	
@@ -25,16 +32,26 @@ class Armor extends Item
 	// using this will uniquely identify the armor
 	public var customise:ArmorCustomise = null;
 	
-	
-	public function new() 
+	function new() 
 	{
 		super();
 		
+	}
+	public static function createEmptyInstance():Armor {
+		var armor:Armor = new Armor();
+		armor.coverage = {};
+		return armor;
 	}
 	
 	override function get_uid():String 
 	{
 		return super.get_uid() +(customise != null ? " *"+customise.uid+"*" : ""  );
+	}
+	
+	public function addCoverageTagsToStrArr(arr:Array<String>) 
+	{	
+		var bodyChar:BodyChar = special != null && special.otherBodyType != null ? special.otherBodyType : BodyChar.getInstance();
+		bodyChar.pushArmorCoverageLabelsTo( coverage, arr);
 	}
 	
 	override public function addTagsToStrArr(arr:Array<String>):Void {
@@ -44,20 +61,14 @@ class Armor extends Item
 		}
 		var flags:Int = specialFlags;
 		
-		
-		
 		if (flags != 0) {
 			Item.pushFlagLabelsToArr(true, "troshx.sos.core.ArmorSpecial");
 		}
 		if (special != null) {
 			special.addTagsToStrArr(arr);
 		}
-		
-		
+
 	}
-	
-	
-	
 	
 	override public function getTypeLabel():String {
 		return "Armor";

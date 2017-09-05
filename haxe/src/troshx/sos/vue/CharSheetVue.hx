@@ -511,11 +511,11 @@ class ArmorEntry implements IValidable implements IFocusFlags {
 	public var focusedFlags:Int = 0;
 	
 	public function new():Void {
-		e = new Armor();
+		e =Armor.createEmptyInstance();
 	}
 	
 	public function reset():Void {
-		e = new Armor();
+		e = Armor.createEmptyInstance();
 	}
 	
 	public function isValid():Bool {

@@ -89,7 +89,7 @@
 					<td style="width:35px">AV</td>
 					<td style="width:35px">Block</td>
 					<td style="width:45px">Weight</td>
-					<td>Coverage</td>
+					<td style="width:67px">Size</td>
 					<td class="tags">Tags</td>
 					<td style="width:130px">Kept at?</td>
 					<td class="held">Held?</td>
@@ -102,8 +102,13 @@
 					<td><input type="number" v-model="entry.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-model="entry.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" step="0.5" v-model="entry.shield.weight" number min="0"></input></td>
-					<td-widget widgetName="coverage" widgetTagName="w-coverage" :value="entry.shield.coverage" :index="i" :showWidget="isVisibleWidget('shield','coverage', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
-					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
+					<td>
+						<select v-model="entry.shield.size ">
+							<option value="0">Small</option>
+							<option value="1">Medium</option>
+							<option value="2">Large</option>
+						</select>
+					</td>
 					<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="i" :showWidget="isVisibleWidget('shield', 'td-unheld', i)" />
 					<td>
 						<select-held :entry="entry" :inventory="char.inventory" />
@@ -120,8 +125,13 @@
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 2)" v-on:blur="focusOutRowField(shieldEntry, 2)" v-model="shieldEntry.e.shield.AV" number min="1"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 4)" v-on:blur="focusOutRowField(shieldEntry, 4)" v-model="shieldEntry.e.shield.blockTN" number min="0"></input></td>
 					<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 8)" v-on:blur="focusOutRowField(shieldEntry, 8)" v-model="shieldEntry.e.shield.weight" number min="0"></input></td>
-					<td-widget widgetName="coverage" widgetTagName="w-coverage" :value="getCoverage(shieldEntry.coverage)" :index="-1" :showWidget="(shieldEntry.focusedFlags & (16|(1<<20))) !=0" :entry="shieldEntry.e" :requestCurWidget="requestCurWidget"
-						v-on:focus-in-row="focusInRowField(shieldEntry, 16)" v-on:focus-out-row="focusOutRowField(shieldEntry, 16)" v-on:focus-widget="focusInRowField(shieldEntry, (1<<20))" />
+					<td>
+						<select v-model="shieldEntry.e.shield.size" v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)">
+							<option value="0">Small</option>
+							<option value="1">Medium</option>
+							<option value="2">Large</option>
+						</select>
+					</td>
 					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(shieldEntry.e.shield)" :index="-1" :showWidget="(shieldEntry.focusedFlags & (32|(1<<21))) !=0" :entry="shieldEntry.e" :requestCurWidget="requestCurWidget"
 					v-on:focus-in-row="focusInRowField(shieldEntry, 32)" v-on:focus-out-row="focusOutRowField(shieldEntry, 32)" v-on:focus-widget="focusInRowField(shieldEntry, (1<<21))" />
 					<td><input type="text" v-model="shieldEntry.e.unheldRemark" v-on:focus="focusInRowField(shieldEntry,64)" v-on:blur="focusOutRowField(shieldEntry,64)"></input></td>	
@@ -549,7 +559,7 @@
 					
 					
 					<td><input type="number" min="0" number step="0.5" v-model="armorEntry.e.weight" v-on:focus="focusInRowField(armorEntry,32)" v-on:blur="focusOutRowField(armorEntry,32)"></input></td>
-					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(armorEntry.e)" :index="-1" :showWidget="(armorEntry.focusedFlags & (64|(1<<21))) !=0" :entry="armorEntry" :requestCurWidget="requestCurWidget"
+					<td-widget widgetName="tags" widgetTagName="w-tags" :value="getTags(armorEntry.e)" :index="-1" :showWidget="(armorEntry.focusedFlags & (64|(1<<21))) !=0" :entry="armorEntry.e" :requestCurWidget="requestCurWidget"
 					v-on:focus-in-row="focusInRowField(armorEntry, 64)" v-on:focus-out-row="focusOutRowField(armorEntry, 64)" v-on:focus-widget="focusInRowField(armorEntry, (1<<21))" />
 					<td><input type="text" readonly class="focusable" v-on:focus="focusInRowField(armorEntry,64)" v-on:blur="focusOutRowField(armorEntry,64)"></input></td>
 				</tr>

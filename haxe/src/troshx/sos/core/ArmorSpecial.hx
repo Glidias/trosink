@@ -1,14 +1,14 @@
 package troshx.sos.core;
+import troshx.sos.core.ArmorSpecial.HitModifiers;
 import troshx.sos.core.ArmorSpecial.Layering;
 import troshx.util.LibUtil;
 
 /**
- * ...
+ * ArmorSpecial is a BodyChar specific entity. 
  * @author Glidias
  */
 class ArmorSpecial 
 {
-	
 	public static inline var HARD:Int = (1 << 0);
 	public static inline var MAIL:Int = (1 << 1);
 	public static inline var TEXTILE:Int = (1 << 2);
@@ -16,45 +16,51 @@ class ArmorSpecial
 	
 	@:flag public var restrictsBreathing:Int = 0;
 	
-	public var layerings:Dynamic<Layering> = null;
+	public var layer:Layering = null;
 	
-	public var disableAVMask:Int = 0;
+	public var modifiers:Array<HitModifiers> = null;
 	
-	
-	// TODO:
-	// layerings (number, and coverage)
-	// no AV vs attack direction masks
-	
-	// modifier avs multiplier on attack direction
-	// modifier avs on adder on  attack direction
-	// above *2 for part
+	// is this armor restricted to another body type or is default?
+	// Changing this property will require imperative update/re-mapping of any modifiers/layers under this class
+	// and possibly udner the parent Armor class as well if IntIntHash is used for coverage
+	public var otherBodyType:BodyChar = null; 
+
 	
 	public function new() 
 	{
 		
 	}
 	
-	/*
-	public static function getAVWithFlags(flags:Int, av:Int):Int {
-		
-	}
-	*/
-	
 	public function addTagsToStrArr(arr:Array<String>) 
 	{
 		var instance:ArmorSpecial = this;
+		
+		var bodyChar:BodyChar = otherBodyType != null ? otherBodyType : BodyChar.getInstance();
+		if (otherBodyType != null) {
+			arr.push("For Body Type: "+bodyChar.name);
+		}
+		
 		Item.pushVarLabelsToArr(true, "troshx.sos.core.ArmorSpecial", ":flag");
 		
+		/*
 		if (layerings != null) {
-			for (f in Reflect.fields(layerings)) {
-				var layering = LibUtil.field(layerings, f);
-			
-				if (layering.value > 0) {
-					
-				}
-				
-				//arr.push( layering.coverage );
+			for (i in 0...layerings.length) {
+				var layering = layerings[i];
+				//if (layering.value > 0) {
+				layering.addTagsToStrArr(arr, bodyChar);
+				//}
 			}		
+		}
+		*/
+		if (layer != null) {
+			layer.addTagsToStrArr(arr, bodyChar);
+		}
+		
+		if (modifiers != null) {
+			for (i in 0...modifiers.length) {
+				var modifier = modifiers[i];
+				modifier.addTagsToStrArr(arr, bodyChar);
+			}
 		}
 
 	}
@@ -63,16 +69,41 @@ class ArmorSpecial
 
 class Layering {
 	
-	public var value:Int = 0;
-	public var coverage:Dynamic<HitLocation> = null;
+	public var value:Int = 1;
+	
+	// when this is set, it must imperatively mask& with it's parent armor's coverage
+	// for the sake of sanity..
+	public var coverage:Int = 0;  
 	
 	public function new() {
 		
 	}
+	
+	inline public function addTagsToStrArr(arr:Array<String>, bodyChar:BodyChar)  {
+		if (coverage != 0) {
+			var myArr:Array<String> = [];
+			bodyChar.pushHitLocationNamesToStrArrByMask(arr, coverage);	
+			arr.push( 'Layers ${value} ("+${myArr.join(", ")}+")' );
+		}
+		else {
+			arr.push('Layer ${value}');
+		}
+	}
 }
 
-class HitLocationModifiers {
+class HitModifiers {
+	
+	public var locationMask:Int = 0;
+	public var targetZoneMask:Int = 0;
+	public var multiplyAV:Float = 1;
+	public var addAV:Int = 0;
+	
 	public function new() {
+		
+	}
+	
+	inline public function addTagsToStrArr(arr:Array<String>, bodyChar:BodyChar)  {
+	
 		
 	}
 }

@@ -1,10 +1,11 @@
 package troshx.sos.core;
+import troshx.core.IUid;
 
 /**
- * ...
+ * Any stateful customisations/alterations of a given armor
  * @author Glidias
  */
-class ArmorCustomise 
+class ArmorCustomise implements IUid
 {
 	public var name:String = "";
 	
