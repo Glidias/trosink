@@ -22,8 +22,7 @@ class HitLocation
 	
 	inline function get_uid():String 
 	{
-		var n:String = name;
-		return (id != "" && id != null ? id : n);
+		return id;
 	}
 	
 }
