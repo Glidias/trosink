@@ -15,6 +15,8 @@ class Shield extends Item
 	
 	public var blockTN:Int = 7;
 	public var bashTN:Int = 0;
+	public var durability:Int = 6;
+	
 	
 	// bob/ss house strap rules
 	public var strapType:Int = 0;

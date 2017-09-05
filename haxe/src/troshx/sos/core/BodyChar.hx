@@ -24,7 +24,7 @@ class BodyChar
 	
 	//public var fallingDamages:Array<FallingDamageDef>;  // Random D10 roll index -> FallingDamageDef
 	//public var burnDamages:Array<WoundDef>;  //  Damage Level Index -> WoundDef
-	//public var coldDamages:Array<coldDamage>;  //  Damage Level Index -> WoundDef
+	//public var coldDamages:Array<WoundDef>;  //  Damage Level Index -> WoundDef
 	
 	
 	public var hitLocationHash:Dynamic<Int> = null; // JS/Vue only the hash of hit location  from uids of given wounds for quick lookup of indices to hit Locations
@@ -60,18 +60,19 @@ class BodyChar
 		var bodyChar:BodyChar = new BodyChar();
 		bodyChar.name = "Humanoid";
 		
+		// this shoudl be factored into the IBodyHitZones macro
 		bodyChar.targetZones = [];
-		//bodyChar.thrustStartIndex =
-		
 		bodyChar.hitLocations = [];
+		bodyChar.thrustStartIndex = Humanoid.thrustStartIndex;
 		
+		// todo; remaining damage tables for actual game.
 		bodyChar.missileHitLocations = [];
 		
 		bodyChar.bake();
 		return bodyChar;
 	}
 	
-	public static function createEmptyInstance():BodyChar {
+	public static function createBlankInstance():BodyChar {  // for homebrews blank forms
 		var bodyChar:BodyChar = new BodyChar();
 		bodyChar.name = "";
 		bodyChar.targetZones = [];
@@ -79,6 +80,10 @@ class BodyChar
 		bodyChar.hitLocations = [];
 		bodyChar.thrustStartIndex = 0;
 		return bodyChar;
+	}
+	
+	public static function createEmptyInstance():BodyChar { // for any instantations
+		return new BodyChar();
 	}
 	
 	
@@ -104,7 +109,58 @@ class BodyChar
 	
 }
 
-class Humanoid {
+class Humanoid implements IBodyHitZones {
+	
+	// Melee Target zones
+	
+	@:targetZone("Head", [], [], 0, "Downward swing") public static inline var SWING_DOWNWARD_HEAD = 0;
+	@:targetZone("Head", [], [], 0, "Upward swing") public static inline var SWING_UPWARD_HEAD:Int = 1;
+	@:targetZone("Neck", [], []) public static inline var SWING_NECK:Int = 2;
+	@:targetZone("Torso", [], []) public static inline var SWING_TORSO:Int = 3;
+	@:targetZone("Upper Arm", [], []) public static inline var SWING_UPPER_ARM:Int = 4;
+	@:targetZone("Lower Arm", [], []) public static inline var SWING_LOWER_ARM:Int = 5;
+	@:targetZone("Upper Leg", [], []) public static inline var SWING_UPPER_LEG:Int = 6;
+	@:targetZone("Lower Leg", [], []) public static inline var SWING_LOWER_LEG:Int = 7;
+	@:targetZone("Groin", [], []) public static inline var SWING_GROIN:Int = 8;
+	
+	public static inline var thrustStartIndex:Int = 9;
+	
+	@:targetZone("Head", [], []) public static inline var THRUST_HEAD:Int = 9;
+	@:targetZone("Neck", [], []) public static inline var THRUST_NECK:Int = 10;
+	@:targetZone("Chest", [], []) public static inline var THRUST_CHEST:Int = 11;
+	@:targetZone("Belly", [], []) public static inline var THRUST_BELLY:Int = 12;
+	@:targetZone("Upper Arm", [], []) public static inline var THRUST_UPPER_ARM:Int = 13;
+	@:targetZone("Lower Arm", [], []) public static inline var THRUST_LOWER_ARM:Int = 14;
+	@:targetZone("Groin", [], []) public static inline var THRUST_GROIN:Int = 15;
+	@:targetZone("Upper Leg", [], []) public static inline var UPPER_LEG:Int = 16;
+	@:targetZone("Lower Leg", [], []) public static inline var LOWER_LEG:Int = 17;
+	
+	// Hit locations
+	
+	@:hitLocation public static inline var UPPER_HEAD:Int = 0;
+	@:hitLocation public static inline var FACE:Int = 1;
+	@:hitLocation public static inline var LOWER_HEAD:Int = 2;
+	@:hitLocation public static inline var NECK:Int = 3;
+	@:hitLocation public static inline var SHOULDER:Int = 4;
+	@:hitLocation public static inline var CHEST:Int = 5;
+	@:hitLocation("","",true) public static inline var SIDE:Int = 6;
+	@:hitLocation public static inline var BELLY:Int = 7;
+	@:hitLocation public static inline var HIP:Int = 8;
+	@:hitLocation public static inline var GROIN:Int = 9;
+	@:hitLocation("","",true) public static inline var THIGH:Int = 10;
+	@:hitLocation("","",true) public static inline var KNEE:Int = 11;
+	@:hitLocation("","",true) public static inline var SHIN:Int = 12;
+	@:hitLocation("","",true) public static inline var FOOT:Int = 13;
+	
+	@:hitLocation("","",true) public static inline var UPPER_ARM:Int = 14;
+	@:hitLocation("","",true) public static inline var ELBOW:Int = 15;
+	@:hitLocation("","",true) public static inline var FOREARM:Int = 16;
+	@:hitLocation("","",true) public static inline var HAND:Int = 17;
+	
+	@:hitLocation public static inline var UPPER_BACK:Int = 18;
+	@:hitLocation public static inline var LOWER_BACK:Int = 19;
+	
+	
 	
 }
 

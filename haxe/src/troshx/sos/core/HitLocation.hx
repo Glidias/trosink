@@ -7,15 +7,17 @@ package troshx.sos.core;
  */
 class HitLocation 
 {
-	public var name:String = "";
-	public var id:String = "";
-	public var twoSided:Bool = false;
+	public var name:String;
+	public var id:String;
+	public var twoSided:Bool;
 	
 	public var uid(get, never):String;
 
-	public function new() 
+	public function new(name:String, id:String, twoSided:Bool=false) 
 	{
-		
+		this.name = name;
+		this.id = id;
+		this.twoSided = twoSided;
 	}
 	
 	inline function get_uid():String 

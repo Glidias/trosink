@@ -10,12 +10,14 @@ class TargetZone
 	public var parts:Array<Int>;  // the parts, according to ids
 	public var partWeights:Array<Float>;  // distribution of parts for probability
 	public var weightsTotal:Float = 0;
+	public var description:String = "";
 	
-	public static function create(name:String, partWeights:Array<Float>, parts:Array<Int>, weightsTotal:Float=0):TargetZone {
+	public static function create(name:String, partWeights:Array<Float>, parts:Array<Int>, weightsTotal:Float=0, description:String=""):TargetZone {
 		var zb:TargetZone = new TargetZone();
 		zb.name = name;
 		zb.parts = parts;
 		zb.partWeights = partWeights;
+		zb.description = description;
 		
 		zb.weightsTotal = weightsTotal;
 		if (weightsTotal == 0) {
