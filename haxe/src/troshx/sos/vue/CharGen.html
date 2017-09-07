@@ -1,6 +1,6 @@
 <div class="chargen">
 	<h1>Song of Swords: Character Creation</h1>
-	<div class="chargen__wrap">
+	<div class="chargen__body">
 		<section class="gen-campaign-type">
 			<h2>Campaign Type:</h2>
 			<div v-for="(li, i) in campaignPowerLevels">
@@ -55,7 +55,14 @@
 		<section class="social-class">
 			<h2>Social Class/Wealth/Inventory <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
 		</section>
-			
-		
 	</div>
+	
+	<hr/>
+	<div class="chargen__footer">
+		<section class="wounds" v-show="false">
+			<h2>Wounds</h2>
+		</section>
+		<button>Save Character</button>
+	</div>
+	
 </div>

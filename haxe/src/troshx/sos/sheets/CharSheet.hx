@@ -1,4 +1,5 @@
 package troshx.sos.sheets;
+import haxevx.vuex.core.IBuildListed;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Money;
@@ -11,7 +12,7 @@ import troshx.sos.core.Wound;
  * ...
  * @author Glidias
  */
-class CharSheet
+class CharSheet implements IBuildListed
 {
 	
 	public var name:String = "";
