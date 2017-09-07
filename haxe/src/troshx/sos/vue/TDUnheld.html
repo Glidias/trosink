@@ -4,7 +4,7 @@
 	<div class="pop-widget" v-show="showWidget"  v-on:click.stop="" v-on:touchstart.stop="emit('focus-widget')" v-on:mousedown.stop="emit('focus-widget')">
 		<label>Slot:</label>
 		<div>
-			<select ref="selectDom" v-model="entry.unheld" style="width:98%">
+			<select ref="selectDom" number v-model.number="entry.unheld" style="width:98%">
 				<option v-for="(li, i) in unheldLabels" :value="i">{{li}}</option>
 			</select>
 		</div>

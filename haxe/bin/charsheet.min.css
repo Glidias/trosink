@@ -44,3 +44,4 @@ td.w-firearm-name .pop-widget{width:100%;}
 td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
 .widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
 .widget-prof .columner{width:50%;float:left;}
+.chargen h2 .valuer{font-size:11px;}

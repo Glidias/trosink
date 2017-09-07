@@ -1,0 +1,61 @@
+<div class="chargen">
+	<h1>Song of Swords: Character Creation</h1>
+	<div class="chargen__wrap">
+		<section class="gen-campaign-type">
+			<h2>Campaign Type:</h2>
+			<div v-for="(li, i) in campaignPowerLevels">
+				<label><input type="radio" :checked="campaignPowLevelIndex == i">{{li.name}} (<span class="num">{{li.pcp}}</span> PCP Total) (Max <span class="num">{{li.maxCategoryPCP}}</span> PCP per category) </input></label>
+			</div>
+		</section>
+		<section class="gen-categories">
+			<h2>Categories <span class="valuer">({{ categoriesRemainingAssignable }} remaining PCP)</span></h2>
+
+			<div v-for="(li, i) in categories"><label>{{li.name}}: </label><CategoryPCPInput :obj="li" prop="pcp" :magic="li.magic" :remainingAssignable="categoriesRemainingAssignable" :maxPCPPerCategory="campaignPowLevel.maxCategoryPCP" />PCP</div>
+		</section>
+			
+			
+		<!-- for each category -->
+		<section class="gen-race">
+			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span></h2>
+			<div>
+				<label><input type="radio">Human</input></label>	
+			</div>
+		</section>
+			
+			
+		<section class="gen-attributes">
+			<h2>Attributes <span class="valuer">({{remainingAttributePoints}}  Attribute Points remaining. (Available: {{availableAttributePoints}}) ) </span></h2>
+			<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /></div>
+			<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /></div>
+			
+		</section>
+			
+			
+		<section class="bnb">
+			<h2>Boons &amp; Banes <span class="valuer">({{remainingBnBpoints}} B&amp;B Points remaining. (Available: {{availableBnBpoints}}) ) </span></h2>
+				
+		</section>
+			
+		<section class="skills">
+			<h2>Skills <span class="valuer">({{placeholder}} Skill Points remaining. (Available: {{placeholder}}) ) </span></h2>
+				
+		</section>
+			
+		<section class="schoolprofs">
+			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
+				
+		</section>
+			
+		<section class="social-class">
+			<h2>Social Class/Wealth/Inventory <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
+		</section>
+			
+		
+	</div>
+</div>

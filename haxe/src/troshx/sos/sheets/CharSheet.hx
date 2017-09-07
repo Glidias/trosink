@@ -20,15 +20,16 @@ class CharSheet
 	public var sex:String = ""; 
 	public var age:Int = -1;
 	
-	public var strength:Int= 4;
-	public var agility:Int = 4;
-	public var endurance:Int = 4;
-	public var health:Int = 4;
-	public var willpower:Int= 4;
-	public var wit:Int = 4;
-	public var intelligence:Int = 4;
-	public var perception:Int = 4;
+	public var strength:Int= 0;
+	public var agility:Int = 0;
+	public var endurance:Int = 0;
+	public var health:Int = 0;
+	public var willpower:Int= 0;
+	public var wit:Int = 0;
+	public var intelligence:Int = 0;
+	public var perception:Int = 0;
 	
+
 	public var ADR(get, never):Int;	// Adroitness
 	public var MOB(get, never):Int;	// Mobility
 	public var CAR(get, never):Int;	// Carry
