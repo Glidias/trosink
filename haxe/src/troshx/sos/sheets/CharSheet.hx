@@ -1,5 +1,7 @@
 package troshx.sos.sheets;
 import haxevx.vuex.core.IBuildListed;
+import troshx.sos.core.BoonBane.BaneAssign;
+import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Money;
@@ -17,7 +19,6 @@ class CharSheet implements IBuildListed
 	
 	public var name:String = "";
 	public var race:String = "";
-	public var socialClass:String = "";
 	public var sex:String = ""; 
 	public var age:Int = -1;
 	
@@ -43,6 +44,8 @@ class CharSheet implements IBuildListed
 	public var baseGrit(get, never):Int;
 	public var gritAccum:Int = 0;
 	
+	
+	
 	public var school:School = null;
 	public var schoolLevel:Int = 0;
 	public var profs:Int = 0;	// core profiecy mask
@@ -63,13 +66,18 @@ class CharSheet implements IBuildListed
 	
 	public var money:Money = new Money();
 	public var wealthAssets:Array<WealthAssetQty> = [];
+	public var socialClass:String = "";
+	
 	public var skills:Array<SkillAssign> = [];
+	public var boons:Array<BoonAssign> = [];
+	public var banes:Array<BaneAssign> = [];
 	public var talents:Array<Talent> = [];
 	
 	public var arcPointsAccum:Int = 0;
 	var arcSpent:Int = 0;
 	public var arcPointsAvailable(get, never):Int;
 	
+	//
 	public var arcSaga:String = "";
 	public var arcEpic:String = "";
 	public var arcBelief:String = "";
@@ -249,3 +257,4 @@ typedef SkillAssign = {
 	skill:Skill,
 	rank:Int
 }
+

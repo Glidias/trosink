@@ -24,6 +24,10 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	public var uid(get, never):String;
 	
 	static  var UNIQUE_COUNT:Int = 0;
+	
+	public inline function isNullified():Bool {
+		return stun == 0 && pain == 0 && BL == 0;
+	}
 
 	public function new(locationId:String, level:Int, damageType:Int) 
 	{

@@ -1,7 +1,7 @@
 package troshx.sos.core;
 import haxe.Serializer;
 import haxe.Unserializer;
-import js.html.svg.Number;
+
 import msignal.Signal.Signal1;
 import troshx.core.IUid;
 import troshx.ds.HashedArray;

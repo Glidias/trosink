@@ -79,8 +79,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			WTags.NAME => new WTags(),
 			
 			WAmmoSpawner.NAME => new WAmmoSpawner(),
-			
-			"test" => new TestVC()
+	
 		];
 	}
 	override public function Created():Void {

@@ -28,7 +28,6 @@ class Weapon extends Item
 	
 	
 	public var variant:Weapon = null;	// default secondary fire options
-
 	
 	public var atnS:Int = 0;
 	public var atnT:Int = 0;
