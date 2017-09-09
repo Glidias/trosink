@@ -132,8 +132,8 @@ class Humanoid implements IBodyHitZones {
 	@:targetZone("Upper Arm", [], []) public static inline var THRUST_UPPER_ARM:Int = 13;
 	@:targetZone("Lower Arm", [], []) public static inline var THRUST_LOWER_ARM:Int = 14;
 	@:targetZone("Groin", [], []) public static inline var THRUST_GROIN:Int = 15;
-	@:targetZone("Upper Leg", [], []) public static inline var UPPER_LEG:Int = 16;
-	@:targetZone("Lower Leg", [], []) public static inline var LOWER_LEG:Int = 17;
+	@:targetZone("Upper Leg", [], []) public static inline var THRUST_UPPER_LEG:Int = 16;
+	@:targetZone("Lower Leg", [], []) public static inline var THRUST_LOWER_LEG:Int = 17;
 	
 	// Hit locations
 	
@@ -159,6 +159,15 @@ class Humanoid implements IBodyHitZones {
 	
 	@:hitLocation public static inline var UPPER_BACK:Int = 18;
 	@:hitLocation public static inline var LOWER_BACK:Int = 19;
+	
+	@:hitMask("Full Arm") public static inline var FULL_ARM:Int = (1 << SHOULDER) |  (1 << UPPER_ARM) | (1 << ELBOW) | (1 << FOREARM) | (1 << HAND);	
+	@:hitMask("Full Leg") public static inline var FULL_LEG:Int = (1 << THIGH) | (1 << KNEE) | (1 << SHIN) | (1 << FOOT);
+	@:hitMask("Full Torso") public static inline var FULL_TORSO:Int = (1 << CHEST) | (1 << SIDE) | (1 << HIP) | (1 << BELLY);
+
+	@:hitMask("Lower Arm") public static inline var LOWER_ARM:Int = (1 << ELBOW) |  (1 << FOREARM) | (1 << HAND);
+	@:hitMask("Lower Leg") public static inline var LOWER_LEG:Int =  (1 << KNEE) | (1 << SHIN) | (1 << FOOT);
+
+	
 	
 	
 	

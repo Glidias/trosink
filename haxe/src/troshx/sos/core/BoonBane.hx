@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.Modifier.EventModifierBinding;
@@ -25,11 +26,29 @@ class BoonBane
 	// these modifiers are only triggered upon events
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
+	public var conditions(default, null):Array<CharSheet->Int->Bool>;
+	
 	@:channel public static inline var __GOOD_EYES__BAD_EYES:Int = (1 << 0);
-	@:channel public static inline var __RICH__POOR:Int = (1 << 1);
+	@:channel public static inline var __GOOD_EARS_BAD_EARS:Int = (1 << 1);
+	@:channel public static inline var __GOOD_EARS_BAD_NOSE:Int = (1 << 2);
+	@:channel public static inline var __RICH__POOR:Int = (1 << 3);
+	@:channel public static inline var __TRUE_GRIT:Int = (1 << 4);
+	@:channel public static inline var __ROBUST_FRAIL:Int = (1 << 5);
+	@:channel public static inline var __BLIND__ONE_EYED_BANE:Int = (1 << 6);
+	@:channel public static inline var __CRAVEN__HONORABLE:Int = (1 << 7);
+	@:channel public static inline var __SHELTERED:Int = (1 << 8);
+	@:channel public static inline var __HONORABLE__COMPLETE_MONSTER:Int = (1 << 9);
+	@:channel public static inline var __TALL__SHORT:Int = (1 << 10);
 	
 	@:flag public static inline var CHARACTER_CREATION_ONLY:Int = (1 << 0);
 	@:flag public static inline var CANNOT_BE_REMOVED:Int = (1 << 1);
+	
+	public inline function isAvailableCharaterCreation():Bool {
+		return this.costs != null;
+	}
+	
+	public static inline var TIMES_INFINITE:Int = -1;
+	public static inline var TIMES_VARYING:Int = -2;
 	
 	
 	inline function get_uid():String 
@@ -44,6 +63,8 @@ class BoonBane
 		this.flags = 0;
 		this.multipleTimes = 0;
 	}
+	
+	
 	
 }
 
@@ -92,6 +113,23 @@ class BoonBaneAssign
 {
 	public var rank:Int;
 	public var qty:Int;
+	
+	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
+	public var eventBasedModifiers:Array<EventModifierBinding>;
+	
+	public function onFurtherAdded(char:CharSheet):Void {
+		
+	}
+	public function onRemoved(char:CharSheet):Void {
+		
+	}
+	public function onInited(char:CharSheet):Void {
+		
+	}
+	
+	public function isValid():Bool {
+		return true;
+	}
 
 }
 

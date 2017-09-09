@@ -17,10 +17,22 @@ import troshx.sos.core.Wound;
 class CharSheet implements IBuildListed
 {
 	
+	
 	public var name:String = "";
 	public var race:String = "";
-	public var sex:String = ""; 
+	
+	public var gender:Int = 0; 
+	@:gender("Male") public static inline var GENDER_MALE:Int = 0;
+	@:gender("Female") public static inline var GENDER_FEMALE:Int = 1;
+	inline function get_labelGender():String 
+	{
+		return gender == GENDER_MALE ? "Male" : "Female";
+	}
+	
+	public var leftHanded:Bool = false;
+	
 	public var age:Int = -1;
+	
 	
 	public var strength:Int= 0;
 	public var agility:Int = 0;
@@ -52,7 +64,7 @@ class CharSheet implements IBuildListed
 	public var profsCustom:Array<Profeciency> = null;  // gm-homebrews (if any)
 	
 	public var labelRace(get, never):String;
-	public var labelSex(get, never):String;
+	public var labelGender(get, never):String;
 	public var labelSchool(get, never):String;
 	
 	public var schoolCP(get, never):Int;
@@ -195,10 +207,7 @@ class CharSheet implements IBuildListed
 		return race;
 	}
 	
-	inline function get_labelSex():String 
-	{
-		return sex;
-	}
+	
 	
 	inline function get_labelSchool():String 
 	{

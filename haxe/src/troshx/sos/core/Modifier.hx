@@ -3,6 +3,7 @@ package troshx.sos.core;
 
 import haxe.macro.Context;
 import troshx.sos.core.Modifier.EventModifierBinding;
+import troshx.sos.core.Modifier.StaticModifier;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.sheets.CharSheet;
 
@@ -36,11 +37,12 @@ class Modifier
 	
 	public static inline var CP:Int = 13;
 	public static inline var REACH:Int = 14;
+	public static inline var MP:Int = 15;
 	
 	// Character generation modifiers
-	public static inline var STARTING_WEALTH:Int = 15;
-	public static inline var STARTING_MONEY:Int = 16;
-	public static inline var STARTING_GRIT:Int = 17;
+	public static inline var STARTING_WEALTH:Int = 16;
+	public static inline var STARTING_MONEY:Int = 17;
+	public static inline var STARTING_GRIT:Int = 18;
 	
 	
 	// These are context-specific modifiers for per-Manuever context with CharSheet
@@ -58,30 +60,42 @@ class Modifier
 class StaticModifier
 {
 	
-	public var multiply:Float = 1;
-	public var add:Float = 0;
+	public var multiply(default,null):Float ;
+	public var add(default,null):Float;
+	public var index(default,null):Int;
 	//public var applyMax:Float = 0;
 	//public var applyMin:Float = 0;
-
+	public var next:StaticModifier;
 	
-	public function new() 
+	function new() 
 	{
 		
 	}
+	public static function create(index:Int, add:Float, multiply:Float=1):StaticModifier {
+		var me = new StaticModifier();
+		me.index = index;
+		me.multiply = multiply;
+		me.add = add;
+		return me;
+	}
 	
-	public inline function getModifiedValue(value:Int):Float {
+	public inline function getModifiedValue(value:Float):Float {
 		return value * multiply + add;
 	}
 }
 
 class SituationalCharModifier 
 {
-
-	public function new() 
+	public var next:SituationalCharModifier;
+	public var index(default, null):Int;
+	
+	function new(index:Int) 
 	{
-		
+		this.index = index;
 	}
-	public function getModifiedValue(char:CharSheet, value:Int):Int {
+	
+	
+	public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
 		return value;
 	}
 	

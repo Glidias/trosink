@@ -27,8 +27,11 @@ class Item
 	static var UID_COUNT:Int = 0;
 	
 	public var flags:Int = 0;
-	@:flags("Two-Handed") public static inline var FLAG_TWO_HANDED:Int = 1;
-	@:flags("Strapped") public static inline var FLAG_STRAPPED:Int = 2;
+	@:flags("Two-Handed") public static inline var FLAG_TWO_HANDED:Int = (1<<0);
+	@:flags("Strapped") public static inline var FLAG_STRAPPED:Int = (1<<1);
+	@:flags("Eye-Corrective") public static inline var EYE_CORRECTIVE:Int = (1 << 2);
+	@:flags("Crutch") public static inline var CRUTCH:Int = (1 << 3);
+	
 	public static inline var MASK_HANDED:Int = 1 | 2;
 	
 	public var twoHanded(get, never):Bool;

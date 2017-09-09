@@ -1,6 +1,7 @@
 package;
 import haxevx.vuex.core.VxBoot;
-import troshx.sos.bnb.Rich;
+import troshx.sos.bnb.Banes;
+import troshx.sos.bnb.Boons;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.events.SOSNotification;
 import troshx.sos.vue.CharGen;
@@ -24,7 +25,9 @@ class MainSOSCharGenTest
 		
 		SOSEvent;
 		SOSNotification;
-		new Rich();
+		Boons;
+		Banes;
+		
 		boot.startVueWithRootComponent( "#app", new CharGen());
 		VxBoot.notifyStarted();
 	}

@@ -40,6 +40,8 @@ class Inventory
 	@:unheld("Strapped-Shoulder") public static inline var UNHELD_STRAPPED_SHOULDER:Int = 3;
 	@:unheld("Back") public static inline var UNHELD_BACK:Int = 4;
 	@:unheld("Concealed") public static inline var UNHELD_CONCEALED:Int = 5;
+	@:unheld("DISABLED") public static inline var UNHELD_FORCE_DISABLED:Int = 6;
+	
 	public static function getUnheldLabelsArray():Array<String> {
 		var arr:Array<String> = [];
 		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", false, ":unheld");
@@ -395,6 +397,11 @@ class Inventory
 				key:UID_COUNT++
 			};
 		}
+	}
+	
+	static public inline function presumedActiveItem(entry:ReadyAssign):Bool
+	{
+		return entry.held != 0 || entry.unheld != Inventory.UNHELD_FORCE_DISABLED;
 	}
 	
 }
