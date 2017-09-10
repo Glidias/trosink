@@ -18,11 +18,13 @@ class BrokenLimb extends Bane
 	{
 		super("Broken Limb", null);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING; // aries, usually 4 total for eahc limb
 	}
 		
 	override function getEmptyAssignInstance():BaneAssign {
-		return new BrokenLimbAssign();
+		var b = new BrokenLimbAssign();
+		
+		return b;
 	}
 }
 

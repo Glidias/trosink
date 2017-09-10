@@ -18,7 +18,7 @@ class BoonBane
 	public var costs(default, null):Array<Int>;
 	public var multipleTimes(default, null):Int;
 	public var channels(default, null):Int;
-	
+
 	// these modifiers are for returning a specific value for hardcoded cases
 	public var staticModifiers(default, null):Array<StaticModifier>;
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
@@ -77,11 +77,11 @@ class Boon extends BoonBane {
 		return new BoonAssign();
 	}
 	
-	public function getAssign(boon:Boon, rank:Int, qty:Int):BoonAssign {
+	public function getAssign(boon:Boon, rank:Int):BoonAssign {
 		var me:BoonAssign = getEmptyAssignInstance();
 		me.boon = boon;
 		me.rank = rank;
-		me.qty = qty;
+		//me.qty = qty;
 		return me;
 	}
 }
@@ -97,11 +97,11 @@ class Bane extends BoonBane {
 		return new BaneAssign();
 	}
 	
-	public function getAssign(bane:Bane, rank:Int, qty:Int ):BaneAssign {
+	public function getAssign(bane:Bane, rank:Int):BaneAssign {
 		var me:BaneAssign =  getEmptyAssignInstance();
 		me.bane = bane;
 		me.rank = rank;
-		me.qty = qty;
+		//me.qty = qty;
 		return me;
 	}
 }
@@ -112,8 +112,8 @@ class Bane extends BoonBane {
 class BoonBaneAssign
 {
 	public var rank:Int;
-	public var qty:Int;
-	
+	//public var qty:Int;
+
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
@@ -125,6 +125,19 @@ class BoonBaneAssign
 	}
 	public function onInited(char:CharSheet):Void {
 		
+	}
+
+	/*
+	public function setQty(val:Int):Void {
+		qty = val;
+	}
+	*/
+	
+	
+
+	
+	public inline function getCosting(bb:BoonBane):Int {
+		return bb.costs[rank-1];  // assumed assigned rank is always > 0, else this method should NOT be called
 	}
 	
 	public function isValid():Bool {
@@ -141,6 +154,10 @@ class BoonAssign extends BoonBaneAssign
 		
 	}
 	
+	public function getCost():Int {
+		return getCosting(boon);
+	}
+	
 }
 
 class BaneAssign extends BoonBaneAssign
@@ -150,6 +167,10 @@ class BaneAssign extends BoonBaneAssign
 	
 	public function new() {
 		
+	}
+	
+	public function getCost():Int {
+		return getCosting(bane);
 	}
 	
 }

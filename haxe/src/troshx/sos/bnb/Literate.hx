@@ -12,7 +12,7 @@ class Literate extends Boon
 	public function new() 
 	{
 		super("Literate", [1]);
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 	
 	override function getEmptyAssignInstance():BoonAssign {
@@ -23,6 +23,8 @@ class Literate extends Boon
 
 class LiterateAssign extends BoonAssign {
 	public var scripts:Array<String> = [];
+	
+
 	
 	public function new() {
 		super();

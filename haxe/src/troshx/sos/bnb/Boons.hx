@@ -30,7 +30,7 @@ class BoonNotesAssign extends BoonAssign {  // general filler notes
 class Allies extends Boon {
 	public function new() {
 		super("Allies", [1, 5, 10]);
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 }
 class Ambidextrous extends Boon {
@@ -98,7 +98,7 @@ class Favor extends Boon {
 	
 	public function new() {
 		super("Favor", [1, 3]);
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 }
 

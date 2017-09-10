@@ -18,7 +18,7 @@ class CrippledLimb extends Bane
 	{
 		super("Crippled Limb/Appendage", [8]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING;  // varies based on humanoid or body tructure, usually 4 total for each limb
 	}
 	
 	override function getEmptyAssignInstance():BaneAssign {

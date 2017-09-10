@@ -12,7 +12,11 @@ class Language extends Boon
 	public function new() 
 	{
 		super("Language", [1, 2, 3]);
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		
+		// Language is special, can learn multiple times of level 1 at character creation only, 
+		// but never at levels 2 and 3 and never during gameplay (on all levels)
+		
+		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 	
 	override function getEmptyAssignInstance():BoonAssign {
@@ -37,13 +41,16 @@ class Language extends Boon
 }
 
 class LanguageAssign extends BoonAssign {
-	public var languages:Array<String> = [];
+	public var languages:Array<String> = [""];
 	
 	public function new() {
 		super();
 		//EventModifierBinding.build(aHandler);
 	}
 	
+	override public function getCost():Int {
+		return boon.costs[0] * languages.length;
+	}
 	// instance based modifier example under BoonAssign/BaneAssign class
 	/*
 	private function aHandler(event:SOSEvent, bus:SOSEventBus):Int {

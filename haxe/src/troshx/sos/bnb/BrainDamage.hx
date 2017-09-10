@@ -9,13 +9,13 @@ import troshx.sos.sheets.CharSheet;
  */
 class BrainDamage extends Bane {
 	public function new() {
-		super("Brain Damage", [3]);
+		super("Brain Damage", [4,8]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_INFINITE;	
+		multipleTimes = BoonBane.TIMES_VARYING;	
 	}
 	
 	override function getEmptyAssignInstance():BaneAssign {
-		return new BrainDamageAssign();
+		return  new BrainDamageAssign();
 	}
 }
 

@@ -13,7 +13,7 @@ class OldWound extends Bane
 	{
 		super("Old Wound", [1]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING;  // varies based on body
 	}
 	
 	override function getEmptyAssignInstance():OldWoundAssign {

@@ -25,6 +25,7 @@ class LastingPainAssign extends BaneAssign {
 	//public var hitLocationIndex:Int;
 	public var hitLocationId:String = "";
 	
+	
 	public function new() {
 		super();
 	}

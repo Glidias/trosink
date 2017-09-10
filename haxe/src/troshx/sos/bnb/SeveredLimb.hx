@@ -19,11 +19,16 @@ class SeveredLimb extends Bane
 	{
 		super("Severed Limb/Appendage", [10,15,18]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_INFINITE;
+		multipleTimes = BoonBane.TIMES_VARYING; // based on body structure, usually 2 for each side
+		// which side affected?
+		// Level on which side...
+		
+		// thus, need left rank, right rank...
 	}
 	
 	override function getEmptyAssignInstance():BaneAssign {
-		return new SeveredLimbAssign();
+		var b =  new SeveredLimbAssign();
+		return b;
 	}
 }
 
