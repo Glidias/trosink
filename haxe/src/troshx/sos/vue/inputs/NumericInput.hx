@@ -61,6 +61,7 @@ class NumericInput extends VComponent<NoneT, NumericInputProps>
 		checkConstraints();
 	}
 	
+	
 
 	@:computed inline function get_current():Int {
 		return LibUtil.field(obj, prop);

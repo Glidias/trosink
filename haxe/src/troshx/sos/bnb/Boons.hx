@@ -17,6 +17,8 @@ class Boons
 		ImpressiveVoice;
 		Language;
 		Literate;
+		Allies;
+		Favor;
 	}
 	
 }
@@ -27,15 +29,11 @@ class BoonNotesAssign extends BoonAssign {  // general filler notes
 	}
 }
 
-class Allies extends Boon {
-	public function new() {
-		super("Allies", [1, 5, 10]);
-		multipleTimes = BoonBane.TIMES_VARYING;
-	}
-}
+
 class Ambidextrous extends Boon {
 	public function new() {
 		super("Ambidextrous", [3]);
+		flags = BoonBane.CHARACTER_CREATION_ONLY;
 	}
 }
 class AnimalAffinity extends Boon {
@@ -89,15 +87,6 @@ class Estate extends Boon {
 	public function new() {
 		super("Estate", [10]);
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
-		multipleTimes = BoonBane.TIMES_VARYING;
-		//staticModifiers = [StaticModifier.create(Modifier.STARTING_WEALTH, 0, 2)];
-	}
-}
-
-class Favor extends Boon {
-	
-	public function new() {
-		super("Favor", [1, 3]);
 		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 }

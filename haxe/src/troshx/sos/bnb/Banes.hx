@@ -24,7 +24,7 @@ class Banes
 	}	
 }
 class BaneNotesAssign extends BaneAssign { // general filler notes
-	public var notes:String = "";
+	@:ui("textarea") public var notes:String = "";
 	public function new() {
 		super();
 	}
@@ -168,7 +168,7 @@ class DirePast extends Bane
 		channels = BoonBane.__SHELTERED;
 	}
 	
-	override function getEmptyAssignInstance():BaneAssign {
+	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
 		return new BaneNotesAssign();
 	}
 }
@@ -177,16 +177,6 @@ class Mute extends Bane {
 	public function new() {
 		super("Mute", [5, 8]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-	}
-}
-
-
-class Oath extends Bane {
-	public function new() {
-		super("Oath", [2, -10]);
-	}
-	override function getEmptyAssignInstance():BaneAssign {
-		return new BaneNotesAssign();
 	}
 }
 

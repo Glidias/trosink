@@ -1,6 +1,7 @@
 package troshx.sos.bnb;
 import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.Boon;
+import troshx.sos.sheets.CharSheet;
 
 /**
  * ...
@@ -19,7 +20,7 @@ class Language extends Boon
 		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 	
-	override function getEmptyAssignInstance():BoonAssign {
+	override function getEmptyAssignInstance(charSheet:CharSheet):BoonAssign {
 		return new LanguageAssign();
 	}
 	
@@ -41,11 +42,18 @@ class Language extends Boon
 }
 
 class LanguageAssign extends BoonAssign {
-	public var languages:Array<String> = [""];
+	@:ui public var languages:Array<String> = [""];
+	@:ui("textarea") public var notes:String = "";
 	
 	public function new() {
 		super();
+		// TODO: proper...
+		
 		//EventModifierBinding.build(aHandler);
+	}
+	
+	override public function getQty():Int {
+		return languages.length;
 	}
 	
 	override public function getCost():Int {

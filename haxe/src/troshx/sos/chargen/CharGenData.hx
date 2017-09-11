@@ -2,6 +2,9 @@ package troshx.sos.chargen;
 
 import haxevx.vuex.core.IBuildListed;
 import troshx.sos.chargen.CategoryPCP;
+import troshx.sos.core.BoonBane.BaneAssign;
+import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.BoonBane.BoonBaneAssign;
 import troshx.sos.sheets.CharSheet;
 
 
@@ -181,6 +184,29 @@ class CharGenData implements IBuildListed
 	
 	// BOONS & BANES
 	
+	//public var allBaneAssignments():Int
+	/*
+	 * With Boones/Bane list, create BoonBaneInput for each boonBaneAssign.rank numeric stepper.
+		--------------------
+
+
+		For each list item of Boones/Banes....(If rank > 0) add send signal to add it into CharSheet,   If (rank == 0), send signal to remove from Charsheet. 
+		Remember to register/un-register any modifiers assosiated with each boon/bane adding/removal from CharSheet.
+
+		Each BoonBane sheet has their own computed cost variable to getCost(), and a watch: for that cost in order to dispatch any cost changes
+		Anytime computed cost changes within each Boon/Bane component assign while rank > 0, send another signal to indicate cost change to update cost cached..
+
+		totalCosts() of bNb is caslculated from cost cached variables.
+
+		Calcualted costs always clamped to baseCost always as bare minimum for purpose of character creation.
+		Math.max( baseCost(), signalCost) 
+
+		_____
+
+		
+
+		*/
+	
 	public static function getAvailableBnBFromPCP(pcp:Int) {
 		// TODO:
 		return pcp;
@@ -209,18 +235,11 @@ class CharGenData implements IBuildListed
 	}
 	
 
-
-
 	// TODO final: validate all char generation categories
 	
 	public function isValidAll(showWarnings:Bool=false):Bool { 
 		return true;
 	}
-	
-
-	
-	
-
 	
 	
 }

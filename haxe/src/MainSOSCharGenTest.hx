@@ -5,6 +5,7 @@ import troshx.sos.bnb.Boons;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.events.SOSNotification;
 import troshx.sos.vue.CharGen;
+import troshx.sos.vue.uifields.UI;
 
 /**
  * ...
@@ -27,6 +28,8 @@ class MainSOSCharGenTest
 		SOSNotification;
 		Boons;
 		Banes;
+		
+		UI;
 		
 		boot.startVueWithRootComponent( "#app", new CharGen());
 		VxBoot.notifyStarted();

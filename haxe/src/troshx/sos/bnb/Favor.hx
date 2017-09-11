@@ -7,35 +7,35 @@ import troshx.sos.sheets.CharSheet;
  * ...
  * @author Glidias
  */
-class Literate extends Boon
-{
+class Favor extends Boon {
 	
-	public function new() 
-	{
-		super("Literate", [1]);
+	public function new() {
+		super("Favor", [1, 3]);
+		clampRank = true;
 		multipleTimes = BoonBane.TIMES_VARYING;
+		
 	}
 	
 	override function getEmptyAssignInstance(charSheet:CharSheet):BoonAssign {
-		return new LiterateAssign();
+		return new FavorAssign();
 	}
-	
 }
 
-class LiterateAssign extends BoonAssign {
-	@:ui({label:"Known scripts", minLength:1}) public var scripts:Array<String> = [""];
-	@:ui("textarea") public var notes:String = "";
+
+class FavorAssign extends BoonAssign { // todo: combination of ranks
+	
+	@:ui({minLength:1}) public var list:Array<String> = [""];
+	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	public function new() {
 		super();
 	}
 	
 	override public function getQty():Int {
-		return scripts.length;
+		return list.length;
 	}
 	
 	override public function getCost():Int {
-		return boon.costs[0] * scripts.length;
+		return boon.costs[0] * list.length;
 	}
-
 }

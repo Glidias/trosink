@@ -18,11 +18,11 @@ class BrokenLimb extends Bane
 	{
 		super("Broken Limb", null);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		multipleTimes = BoonBane.TIMES_VARYING; // aries, usually 4 total for eahc limb
+		multipleTimes = BoonBane.TIMES_VARYING; 
 	}
 		
-	override function getEmptyAssignInstance():BaneAssign {
-		var b = new BrokenLimbAssign();
+	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
+		var b = new BrokenLimbAssign(); // note: for now assume this is humanoid standard
 		
 		return b;
 	}
@@ -34,12 +34,27 @@ class BrokenLimbAssign extends BaneAssign
 	public static inline var RIGHT_ARM:Int = (1 << 1);
 	public static inline var LEFT_LEG:Int = (1 << 2);
 	public static inline var RIGHT_LEG:Int = (1 << 3);
-	public var affectedLimb:Int = -1;
 	public static inline var BOTH_LEGS:Int = (LEFT_LEG | RIGHT_LEG);
 	
+	@:ui({type:"Bitmask", labels:["Left Arm, Right Arm, Left Leg, Right Leg"] })  public var affectedLimbs:Int = 0;
+	
 	override public function isValid():Bool {
-		return affectedLimb >= 0;
+		return affectedLimbs > 0;
 	}
+	
+	 override public function getCost():Int {
+		return getQty() * super.getCost();
+	}
+	
+	override public function getQty():Int {
+		var c:Int = 0;
+		c += (affectedLimbs & LEFT_ARM) != 0 ? 1 : 0;
+		c += (affectedLimbs & RIGHT_ARM) != 0 ? 1 : 0;
+		c += (affectedLimbs & LEFT_LEG) != 0 ? 1 : 0;
+		c += (affectedLimbs & RIGHT_LEG) != 0 ? 1 : 0;
+		return c;
+	}
+	
 	
 	public function new() {
 		super();
@@ -59,15 +74,15 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 		
 	}
 	override public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
-		if ( (current.affectedLimb & BrokenLimbAssign.BOTH_LEGS) != 0) {
+		if ( (current.affectedLimbs & BrokenLimbAssign.BOTH_LEGS) != 0) {
 			// house rule, both legs == 0.25  instead of .5 MOB penalty
 				
 			var equipedItems = char.inventory.equipedNonMeleeItems;
 			var crutchesHeld:Int = 0;
 			var affected:Int = 0;
 			var leftHanded:Bool = char.leftHanded;
-			affected |= (current.affectedLimb & BrokenLimbAssign.LEFT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_MASTER : Inventory.HELD_OFF) : 0;
-			affected |= (current.affectedLimb & BrokenLimbAssign.RIGHT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_OFF : Inventory.HELD_MASTER) : 0;
+			affected |= (current.affectedLimbs & BrokenLimbAssign.LEFT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_MASTER : Inventory.HELD_OFF) : 0;
+			affected |= (current.affectedLimbs & BrokenLimbAssign.RIGHT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_OFF : Inventory.HELD_MASTER) : 0;
 			for (i in 0...equipedItems.length) {
 				var entry = equipedItems[i];
 				if ( (entry.item.flags & (1 << Item.CRUTCH) ) != 0 ) {

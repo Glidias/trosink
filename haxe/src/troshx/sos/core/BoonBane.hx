@@ -14,7 +14,8 @@ class BoonBane
 {
 	public var isBane(default,null):Bool;
 	public var name(default, null):String;
-	public var flags(default,null):Int;
+	public var flags(default, null):Int;
+	public var clampRank(default, null):Bool;
 	public var costs(default, null):Array<Int>;
 	public var multipleTimes(default, null):Int;
 	public var channels(default, null):Int;
@@ -50,7 +51,7 @@ class BoonBane
 	public static inline var TIMES_INFINITE:Int = -1;
 	public static inline var TIMES_VARYING:Int = -2;
 	
-	
+	public var uid(default, never):String;
 	inline function get_uid():String 
 	{
 		return name;
@@ -61,6 +62,7 @@ class BoonBane
 		this.name = name;
 		this.costs = costs;
 		this.flags = 0;
+		this.clampRank = false;
 		this.multipleTimes = 0;
 	}
 	
@@ -73,15 +75,15 @@ class Boon extends BoonBane {
 		super(name, costs);
 	}
 	
-	function getEmptyAssignInstance():BoonAssign {
+	function getEmptyAssignInstance(char:CharSheet):BoonAssign {
 		return new BoonAssign();
 	}
 	
-	public function getAssign(boon:Boon, rank:Int):BoonAssign {
-		var me:BoonAssign = getEmptyAssignInstance();
+	public function getAssign(boon:Boon, rank:Int, char:CharSheet):BoonAssign {
+		var me:BoonAssign = getEmptyAssignInstance(char);
 		me.boon = boon;
 		me.rank = rank;
-		//me.qty = qty;
+		//if ( boon.costs != null) me._costCached = boon.costs[(rank >= 1 ? rank - 1 : 0];  // for reference only
 		return me;
 	}
 }
@@ -93,15 +95,15 @@ class Bane extends BoonBane {
 		isBane = true;
 	}
 	
-	function getEmptyAssignInstance():BaneAssign {
+	function getEmptyAssignInstance(char:CharSheet):BaneAssign {
 		return new BaneAssign();
 	}
 	
-	public function getAssign(bane:Bane, rank:Int):BaneAssign {
-		var me:BaneAssign =  getEmptyAssignInstance();
+	public function getAssign(bane:Bane, rank:Int, char:CharSheet):BaneAssign {
+		var me:BaneAssign =  getEmptyAssignInstance(char);
 		me.bane = bane;
 		me.rank = rank;
-		//me.qty = qty;
+		//if ( bane.costs != null) me._costCached = boon.costs[(rank >= 1 ? rank - 1 : 0]; // for reference only
 		return me;
 	}
 }
@@ -113,10 +115,13 @@ class BoonBaneAssign
 {
 	public var rank:Int;
 	//public var qty:Int;
+	
+	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
 
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
+	// ingame only
 	public function onFurtherAdded(char:CharSheet):Void {
 		
 	}
@@ -126,21 +131,16 @@ class BoonBaneAssign
 	public function onInited(char:CharSheet):Void {
 		
 	}
-
-	/*
-	public function setQty(val:Int):Void {
-		qty = val;
+	
+	public function getQty():Int {	// override this to reflect a different qty depending on Boon/Bane situation.
+		return 1;
 	}
-	*/
-	
-	
-
 	
 	public inline function getCosting(bb:BoonBane):Int {
 		return bb.costs[rank-1];  // assumed assigned rank is always > 0, else this method should NOT be called
 	}
 	
-	public function isValid():Bool {
+	public function isValid():Bool {	// mainly used as validation check for Character creation forms
 		return true;
 	}
 
@@ -157,6 +157,9 @@ class BoonAssign extends BoonBaneAssign
 	public function getCost():Int {
 		return getCosting(boon);
 	}
+	public inline function getBaseCost():Int {
+		return getCosting(boon);
+	}
 	
 }
 
@@ -170,6 +173,9 @@ class BaneAssign extends BoonBaneAssign
 	}
 	
 	public function getCost():Int {
+		return getCosting(bane);
+	}
+	public inline function getBaseCost():Int {
 		return getCosting(bane);
 	}
 	

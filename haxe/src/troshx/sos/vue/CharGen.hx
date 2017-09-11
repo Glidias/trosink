@@ -6,6 +6,7 @@ import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
 import troshx.sos.vue.inputs.impl.AttributeInput;
+import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
 
 /**
@@ -30,7 +31,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
 			CategoryPCPInput.NAME => new CategoryPCPInput(),
-			AttributeInput.NAME => new AttributeInput()
+			AttributeInput.NAME => new AttributeInput(),
+			
+			BoonBaneInput.NAME => new BoonBaneInput()
 		];
 	}
 	

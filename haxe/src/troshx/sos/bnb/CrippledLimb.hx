@@ -21,8 +21,8 @@ class CrippledLimb extends Bane
 		multipleTimes = BoonBane.TIMES_VARYING;  // varies based on humanoid or body tructure, usually 4 total for each limb
 	}
 	
-	override function getEmptyAssignInstance():BaneAssign {
-		return new CrippledLimbAssign();
+	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
+		return new CrippledLimbAssign();  // note: for now assume this is humanoid standard
 	}
 }
 
@@ -33,11 +33,24 @@ class CrippledLimbAssign extends BaneAssign
 	public static inline var LEFT_LEG:Int = (1 << 2);
 	public static inline var RIGHT_LEG:Int = (1 << 3);
 	public static inline var BOTH_LEGS:Int = (LEFT_LEG | RIGHT_LEG);
+	public static inline var BOTH_ARMS:Int = (LEFT_ARM | RIGHT_ARM);
 	
-	public var affectedLimb:Int = -1;
+	@:ui({type:"Bitmask", labels:["Left Arm, Right Arm, Left Leg, Right Leg"] }) public var affectedLimbs:Int = 0;
 	
 	override public function isValid():Bool {
-		return affectedLimb >= 0;
+		return affectedLimbs > 0;// && (affectedLimbs & (BOTH_LEGS | BOTH_ARMS)) != 0;
+	}
+	override public function getCost():Int {
+		return getQty() * super.getCost();
+	}
+	
+	override public function getQty():Int {
+		var c:Int = 0;
+		c += (affectedLimbs & LEFT_ARM) != 0 ? 1 : 0;
+		c += (affectedLimbs & RIGHT_ARM) != 0 ? 1 : 0;
+		c += (affectedLimbs & LEFT_LEG) != 0 ? 1 : 0;
+		c += (affectedLimbs & RIGHT_LEG) != 0 ? 1 : 0;
+		return c;
 	}
 	
 	public function new() {
@@ -59,9 +72,9 @@ class CrippedLimbMOBModifier extends SituationalCharModifier {
 		
 	}
 	override public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
-		if ( (current.affectedLimb & CrippledLimbAssign.BOTH_LEGS) != 0) {
+		if ( (current.affectedLimbs & CrippledLimbAssign.BOTH_LEGS) != 0) {
 			// house rule, both legs == 0.25  instead of .5 MOB penalty
-			var multipler = current.affectedLimb == CrippledLimbAssign.BOTH_LEGS ? .25 : .5;
+			var multipler = current.affectedLimbs == CrippledLimbAssign.BOTH_LEGS ? .25 : .5;
 			var mob = char.MOB;
 			return  mob * multipler < value ? mob * multipler : value;
 		}

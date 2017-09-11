@@ -2,6 +2,7 @@ package troshx.sos.bnb;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.Money;
+import troshx.sos.sheets.CharSheet;
 
 /**
  * ...
@@ -14,15 +15,14 @@ class Debt extends Bane {
 		
 	}
 	
-	override function getEmptyAssignInstance():DebtAssign {
+	override function getEmptyAssignInstance(charSheet:CharSheet):DebtAssign {
 		return new DebtAssign();
 	}
 }
 
 class DebtAssign extends BaneAssign {
 	
-	public var currentOwed:Money;
-	public var settled:Bool = false;
+	@:ui public var currentOwed:Money = new Money(); // currently, this is manual entry??
 	
 	public function new() {
 		super();

@@ -1,5 +1,7 @@
 package troshx.sos.sheets;
 import haxevx.vuex.core.IBuildListed;
+import troshx.sos.core.BodyChar;
+
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.Inventory;
@@ -56,8 +58,6 @@ class CharSheet implements IBuildListed
 	public var baseGrit(get, never):Int;
 	public var gritAccum:Int = 0;
 	
-	
-	
 	public var school:School = null;
 	public var schoolLevel:Int = 0;
 	public var profs:Int = 0;	// core profiecy mask
@@ -98,7 +98,8 @@ class CharSheet implements IBuildListed
 	
 	public var inventory:Inventory = new Inventory();
 	
-
+	
+	public var body:BodyChar = BodyChar.getInstance();
 	var wounds:Array<Wound> = [];
 	var woundHash:Dynamic<Wound> = {}; 
 	public function applyWound(w:Wound):Void {

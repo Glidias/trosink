@@ -14,7 +14,7 @@ class BrainDamage extends Bane {
 		multipleTimes = BoonBane.TIMES_VARYING;	
 	}
 	
-	override function getEmptyAssignInstance():BaneAssign {
+	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
 		return  new BrainDamageAssign();
 	}
 }
