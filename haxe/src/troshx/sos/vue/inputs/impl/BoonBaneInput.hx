@@ -44,9 +44,33 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 				_vEmit(isBane ? "addBane" : "addBoon", bb.uid);
 			}
 		}
+		
 	}
 	
+	@:computed function get_cost():Int {
+		return bba.getCost();
+	}
+	
+	@:computed function get_qty():Int {
+		return bba.getQty();
+	}
+	
+	
+	@:watch function watch_cost(newValue:Int):Void {  
+		if (bba.rank > 0) {
+			bba._costCached = newValue;
+		}
+	}
+	
+	
+	@:computed inline function get_bba():BoonBaneAssign {
+		
+		return obj;
+	}
+	
+	
 	@:computed function get_isBane():Bool {
+		
 		return Std.is(obj, BaneAssign );
 	}
 	

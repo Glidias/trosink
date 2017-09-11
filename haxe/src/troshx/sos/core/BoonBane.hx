@@ -117,7 +117,8 @@ class BoonBaneAssign
 	//public var qty:Int;
 	
 	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
-
+	
+	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
@@ -134,6 +135,10 @@ class BoonBaneAssign
 	
 	public function getQty():Int {	// override this to reflect a different qty depending on Boon/Bane situation.
 		return 1;
+	}
+	
+	public function getCost():Int {
+		return 0;
 	}
 	
 	public inline function getCosting(bb:BoonBane):Int {
@@ -154,7 +159,7 @@ class BoonAssign extends BoonBaneAssign
 		
 	}
 	
-	public function getCost():Int {
+	override public function getCost():Int {
 		return getCosting(boon);
 	}
 	public inline function getBaseCost():Int {
@@ -172,7 +177,7 @@ class BaneAssign extends BoonBaneAssign
 		
 	}
 	
-	public function getCost():Int {
+	override public function getCost():Int {
 		return getCosting(bane);
 	}
 	public inline function getBaseCost():Int {
