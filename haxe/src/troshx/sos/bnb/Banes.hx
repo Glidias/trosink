@@ -1,6 +1,7 @@
 package troshx.sos.bnb;
 import troshx.sos.core.Modifier;
 import troshx.sos.core.Modifier.StaticModifier;
+import troshx.sos.macro.MacroUtil;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane;
@@ -22,9 +23,14 @@ class Banes
 		OldWound;
 		SeveredLimb;
 	}	
+	
+	public static function getList():Array<Bane> {
+		return MacroUtil.getAllCurrentPackageInstancesInArray("troshx.sos.core.Bane");
+	}
+	
 }
 class BaneNotesAssign extends BaneAssign { // general filler notes
-	@:ui("textarea") public var notes:String = "";
+	@:ui({type:"textarea"}) public var notes:String = "";
 	public function new() {
 		super();
 	}
@@ -165,7 +171,6 @@ class DirePast extends Bane
 		super("Dire Past", [0]);
 		// manual missing character creation only...
 		flags = BoonBane.CHARACTER_CREATION_ONLY | BoonBane.CANNOT_BE_REMOVED;  
-		channels = BoonBane.__SHELTERED;
 	}
 	
 	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {

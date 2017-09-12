@@ -8,6 +8,7 @@ import troshx.sos.chargen.CharGenData;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
+import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 
 /**
  * ...
@@ -33,7 +34,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			CategoryPCPInput.NAME => new CategoryPCPInput(),
 			AttributeInput.NAME => new AttributeInput(),
 			
-			BoonBaneInput.NAME => new BoonBaneInput()
+			BoonBaneInput.NAME => new BoonBaneInput(),
+			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails()
 		];
 	}
 	

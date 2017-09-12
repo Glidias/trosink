@@ -16,7 +16,7 @@ class Language extends Boon
 		
 		// Language is special, can learn multiple times of level 1 at character creation only, 
 		// but never at levels 2 and 3 and never during gameplay (on all levels)
-		
+		customCostInnerLabel = "1|2/3";
 		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 	
@@ -43,7 +43,7 @@ class Language extends Boon
 
 class LanguageAssign extends BoonAssign {
 	@:ui public var languages:Array<String> = [""];
-	@:ui("textarea") public var notes:String = "";
+	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	public function new() {
 		super();

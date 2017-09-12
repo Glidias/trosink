@@ -46,6 +46,6 @@ class Bitmask extends VComponent<NoneT, BitmaskProps>
 typedef BitmaskProps = {
 	>BaseUIProps,
 	@:prop({required:true}) var labels:Array<String>;
-	@:prop({required:false}) var values:Array<Int>;
+	@:prop({required:false}) @:optional var values:Array<Int>;
 	
 }

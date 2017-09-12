@@ -3,6 +3,11 @@ import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.Modifier;
 import troshx.sos.core.Modifier.StaticModifier;
+import troshx.sos.macro.MacroUtil;
+
+#if macro
+import haxe.macro.Context;
+#end
 
 /**
  * ...
@@ -20,6 +25,11 @@ class Boons
 		Allies;
 		Favor;
 	}
+	
+	public static function getList():Array<Boon> {
+		return MacroUtil.getAllCurrentPackageInstancesInArray("troshx.sos.core.Boon");
+	}
+	
 	
 }
 class BoonNotesAssign extends BoonAssign {  // general filler notes

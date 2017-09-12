@@ -19,7 +19,7 @@ class Oath extends Bane {
 class OathAssign extends BaneAssign {
 	
 	@:ui({min:2, max:10}) public var cost:Int = 2;
-	@:ui("textarea") public var notes:String = "";
+	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	public function new() {
 		super();

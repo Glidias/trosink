@@ -20,6 +20,7 @@ class HitLocationSelector extends VComponent<NoneT, HitLocationProps>
 		super();
 	}
 	
+	/*
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		var src = UI.getComponents();
 	
@@ -27,6 +28,7 @@ class HitLocationSelector extends VComponent<NoneT, HitLocationProps>
 		LibUtil.setField(me, SingleSelection.NAME, LibUtil.field(src, SingleSelection.NAME) );
 		return me;
 	}
+	*/
 	
 	@:computed function get_labels():Array<String> {
 		var bd = this.body;

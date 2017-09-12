@@ -37,22 +37,29 @@
 		</section>
 			
 			
-		<section class="bnb">
+		<section class="gen-bnb">
 			<h2>Boons &amp; Banes <span class="valuer">({{remainingBnBpoints}} B&amp;B Points remaining. (Available: {{availableBnBpoints}}) ) </span></h2>
-				
+			<h3>Boons</h3>
+			<div class="boon-tags">
+				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" />
+			</div>	
+			<h3>Banes</h3>
+			<div class="bane-tags">
+				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" />	
+			</div>
 		</section>
 			
-		<section class="skills">
+		<section class="gen-skills">
 			<h2>Skills <span class="valuer">({{placeholder}} Skill Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				
 		</section>
 			
-		<section class="schoolprofs">
+		<section class="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				
 		</section>
 			
-		<section class="social-class">
+		<section class="gen-social-class">
 			<h2>Social Class/Wealth/Inventory <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
 		</section>
 	</div>

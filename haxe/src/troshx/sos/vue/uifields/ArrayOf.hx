@@ -18,16 +18,18 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 		super();
 	}
 	
+	/*
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return COMPONENTS != null ? COMPONENTS : (COMPONENTS = UI.getNewSetOfComponents(true));
 	}
+	*/
 	
 	override public function Template():String {
 		return '<div>
 		<label v-if="label">{{label}}</label>
 		<ul>
 			<li v-for="(li, i) in current">
-				<div :is="of"></div>
+				<div :is="typeMap[of]" :obj="li"></div>
 			</li>
 		</ul>
 		<button v-if="current.length > minLength" v-on:click="popEntry()">-</button>
@@ -68,6 +70,10 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	
 	@:computed inline function get_current():Array<Dynamic> {
 		return LibUtil.field(obj, prop);
+	}
+	
+	@:computed function get_typeMap():Dynamic<String> {
+		return UI.getTypeMapToComponentNames();
 	}
 	
 }

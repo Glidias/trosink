@@ -44,4 +44,12 @@ td.w-firearm-name .pop-widget{width:100%;}
 td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
 .widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
 .widget-prof .columner{width:50%;float:left;}
+.chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
 .chargen h2 .valuer{font-size:11px;}
+section.gen-bnb input[type=number]{width:27px;margin-right:2px;}
+section.gen-bnb .gen-comp-bb{margin-right:22px;display:inline-block;}
+section.gen-bnb .boon-tags .gen-comp-bb:hover{background-color:rgba(173,216,230,.25);}
+section.gen-bnb .bane-tags .gen-comp-bb:hover{background-color:rgba(255,192,203,.25);}
+section.gen-bnb .boon-tags .gen-comp-bb.selected{background-color:lightblue;}
+section.gen-bnb .bane-tags .gen-comp-bb.selected{background-color:pink;}
+

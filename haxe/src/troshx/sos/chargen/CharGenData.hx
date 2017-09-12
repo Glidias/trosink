@@ -1,8 +1,13 @@
 package troshx.sos.chargen;
 
 import haxevx.vuex.core.IBuildListed;
+import troshx.sos.bnb.Banes;
+import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CategoryPCP;
+import troshx.sos.core.BoonBane;
+import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.BaneAssign;
+import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.BoonBane.BoonBaneAssign;
 import troshx.sos.sheets.CharSheet;
@@ -22,10 +27,32 @@ class CharGenData implements IBuildListed
 	
 	public function new(charSheet:CharSheet=null) 
 	{
+		// Char sheet
 		this.char = charSheet != null ?charSheet : new CharSheet();
 
-		
+		// Categories
 		this.categories = getNewCharGenCategories();
+		
+		
+		// Boones and banes
+		var boonList:Array<Boon> = Boons.getList();
+		this.boonAssignList = [];
+		this.baneAssignList = [];
+		var bb:BoonBane;
+		for (i in 0...boonList.length) {
+			bb =  boonList[i];
+			if (bb.costs != null) {
+				this.boonAssignList.push(  boonList[i].getAssign(0, this.char) );
+			}
+		}
+		var baneList:Array<Bane> = Banes.getList();
+		for (i in 0...baneList.length) {
+			bb = baneList[i];
+			if (bb.costs != null) {
+				this.baneAssignList.push(baneList[i].getAssign(0, this.char) );
+			}
+		}
+		
 	}
 	
 	// CAMPAIGN POWER LEVEL
@@ -112,6 +139,9 @@ class CharGenData implements IBuildListed
 	// ATTRIBUTES
 	static public inline var ATTRIBUTE_START_MAX:Int = 8; 
 	static public inline var MORTAL_MAX:Int = 12;
+	
+	var boonAssignList:Array<BoonAssign>;
+	var baneAssignList:Array<BaneAssign>;
 
 	
 	public var totalAttributePointsSpent(get, never):Int;
@@ -206,6 +236,8 @@ class CharGenData implements IBuildListed
 		
 
 		*/
+
+	
 	
 	public static function getAvailableBnBFromPCP(pcp:Int) {
 		// TODO:

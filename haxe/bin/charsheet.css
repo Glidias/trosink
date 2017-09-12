@@ -218,6 +218,38 @@ td.w-tags .pop-widget {
 
 /* Character gen */
 
+.chargen {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
 .chargen h2 .valuer {
 	font-size:11px;
 }
+
+section.gen-bnb input[type=number] {
+	width:27px;
+	margin-right:2px;
+}
+section.gen-bnb .gen-comp-bb {
+	margin-right:22px;
+	display:inline-block;
+}
+section.gen-bnb .boon-tags .gen-comp-bb:hover {
+	background-color:rgba(173, 216, 230, .25);
+}
+section.gen-bnb .bane-tags .gen-comp-bb:hover {
+	background-color:rgba(255,192,203,.25);
+}
+section.gen-bnb .boon-tags .gen-comp-bb.selected {
+	background-color:lightblue;
+}
+section.gen-bnb .bane-tags .gen-comp-bb.selected {
+	background-color:pink;
+}
+

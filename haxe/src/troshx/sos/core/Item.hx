@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.macro.MacroUtil;
 
 #if macro
 import haxe.ds.StringMap;
@@ -207,7 +208,7 @@ class Item
 	
 		var fields = null;
 		if (moduleStr != null) {
-			fields = getFieldsFromModule(moduleStr, true);
+			fields = MacroUtil.getFieldsFromModule(moduleStr, true);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
 		
@@ -216,13 +217,13 @@ class Item
 		var count:Int = 0;
 		for ( i in 0...fields.length) {
 			var f = fields[i];
-			if (metadataLbl!=null && !hasMetaTag(f.meta.get(), metadataLbl))  {
+			if (metadataLbl!=null && !MacroUtil.hasMetaTag(f.meta.get(), metadataLbl))  {
 				continue;
 			}
 			var metaLabel:String = null;
 			
 			if (metadataLbl != null) {
-				var m = getMetaTagEntry(f.meta.get(), metadataLbl);
+				var m = MacroUtil.getMetaTagEntry(f.meta.get(), metadataLbl);
 				if (m != null) {
 					if (m.params == null || m.params.length == 0) {
 						//Context.error("Please specify string as parameter.", f.pos);
@@ -259,7 +260,7 @@ class Item
 	public static macro function pushFlagAbbrToArr(labelize:Bool = true, capitalize:Bool = false, moduleStr:String = null):Expr {
 		var fields = null;
 		if (moduleStr != null) {
-			fields =  getFieldsFromModule(moduleStr, true);
+			fields =  MacroUtil.getFieldsFromModule(moduleStr, true);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
 		var block:Array<Expr> = [];
@@ -273,7 +274,7 @@ class Item
 					if (fieldName != "TOTAL_FLAGS") {
 						var defaultValue:String; 
 						
-						var m = getMetaTagEntry(f.meta.get(), ":abbr");
+						var m = MacroUtil.getMetaTagEntry(f.meta.get(), ":abbr");
 						if (m != null) {
 							if (m.params == null || m.params.length == 0) {
 								Context.error("Please specify abbreviation string as parameter.", f.pos);
@@ -310,10 +311,10 @@ class Item
 	public static macro function pushVarLabelsToArr(labelize:Bool=true, moduleStr:String=null,  metadataLbl:String=null,  prefix:String=""):Expr {  // todo when needed: metadata support
 		var fields = null;
 		
-		
+			
 		
 		if (moduleStr != null) {
-			fields = getFieldsFromModule(moduleStr, false);
+			fields = MacroUtil.getFieldsFromModule(moduleStr, false);
 		}
 		if (fields == null) fields =   Context.getLocalClass().get().fields.get();
 		var block:Array<Expr> = [];
@@ -325,13 +326,13 @@ class Item
 
 		for ( i in 0...fields.length) {
 			var f = fields[i];
-			if (metadataLbl!=null && !hasMetaTag(f.meta.get(), metadataLbl))  {
+			if (metadataLbl!=null && !MacroUtil.hasMetaTag(f.meta.get(), metadataLbl))  {
 				continue;
 			}
 			var metaLabel:String = null;
 			
 			if (metadataLbl != null) {
-				var m = getMetaTagEntry(f.meta.get(), metadataLbl);
+				var m = MacroUtil.getMetaTagEntry(f.meta.get(), metadataLbl);
 				if (m != null) {
 					if (m.params == null || m.params.length == 0) {
 						//Context.error("Please specify string as parameter.", f.pos);
@@ -367,77 +368,7 @@ class Item
 	
 	
 	
-	// misc macro helpers
-	#if macro
-	static private function hasMetaTag(metaData:Metadata, tag:String):Bool {
-		for ( m in metaData) {
-			if (m.name == tag) return true;
-		}
-		return false;
-	}
-	
-	static private function getFieldsFromModule(moduleStr:String, statics:Bool) {
-		var fields = null;
-		var subModule = null;
-		var baseModuleStr:String;
-		
-		if (moduleStr.indexOf(":") >= 0) {
-			var moduleSplit = moduleStr.split(":");
-			var baseMod = moduleSplit[0].split(".");
-			baseMod.pop();
-			baseModuleStr = baseMod.join(".");
-			moduleStr = moduleSplit[0];
-			subModule = moduleSplit[1];
-		}
-		var cm;
-		
-		if (subModule == null) {
-			cm = Context.getModule(moduleStr)[0];
-		}
-		else {
-			var moduleArr = Context.getModule(moduleStr);
-			for (i in 0...moduleArr.length) {
-				
-				switch( moduleArr[i]) {
-					case TInst(t, _): 
-						// hopefully, this toString() hack is future proof in haxe...yikes..a better way later?
-						if (t.toString() == baseModuleStr + "."+ subModule ) {
-							cm = moduleArr[i];
-							break;
-						}
-					default:
-						Context.error("Failed to resolve subModuleStr:" + moduleStr+":"+subModule, Context.currentPos());
-				}
-			}
-		}
-		switch(cm) {
-			case TInst(t, _):
-			fields = statics ? t.get().statics.get() : t.get().fields.get();
-			default:	
-			Context.error("Failed to resolve moduleString:" + moduleStr, Context.currentPos());
-		} 
-		return fields;
-	}
-	
-	
-	static private function getMetaTagEntry(metaData:Metadata, tag:String):MetadataEntry {
-		if (metaData == null) return null;
-		
-		for ( m in metaData) {
-			if (m.name == tag) return m;
-		}
-		return null;
-	}
-	
-	
-	
-	static private function hasMetaTags(metaData:Metadata, tags:StringMap<Bool>):Bool {
-		for ( m in metaData) {
-			if (tags.exists(m.name)) return true;
-		}
-		return false;
-	}
-	#end
+
 	
 
 	

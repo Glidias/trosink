@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.bnb.IBuildUIFields;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
@@ -26,6 +27,8 @@ class BoonBane
 	
 	// these modifiers are only triggered upon events
 	public var eventBasedModifiers:Array<EventModifierBinding>;
+	
+	public var customCostInnerLabel(default, null):String;
 	
 	public var conditions(default, null):Array<CharSheet->Int->Bool>;
 	
@@ -68,6 +71,8 @@ class BoonBane
 	
 	
 	
+	
+	
 }
 
 class Boon extends BoonBane {
@@ -79,13 +84,14 @@ class Boon extends BoonBane {
 		return new BoonAssign();
 	}
 	
-	public function getAssign(boon:Boon, rank:Int, char:CharSheet):BoonAssign {
+	public function getAssign(rank:Int, char:CharSheet):BoonAssign {
 		var me:BoonAssign = getEmptyAssignInstance(char);
-		me.boon = boon;
+		me.boon = this;
 		me.rank = rank;
 		//if ( boon.costs != null) me._costCached = boon.costs[(rank >= 1 ? rank - 1 : 0];  // for reference only
 		return me;
 	}
+	
 }
 
 
@@ -99,19 +105,20 @@ class Bane extends BoonBane {
 		return new BaneAssign();
 	}
 	
-	public function getAssign(bane:Bane, rank:Int, char:CharSheet):BaneAssign {
+	public function getAssign(rank:Int, char:CharSheet):BaneAssign {
 		var me:BaneAssign =  getEmptyAssignInstance(char);
-		me.bane = bane;
+		me.bane = this;
 		me.rank = rank;
 		//if ( bane.costs != null) me._costCached = boon.costs[(rank >= 1 ? rank - 1 : 0]; // for reference only
 		return me;
 	}
+
 }
 
 
 // -------
 
-class BoonBaneAssign
+class BoonBaneAssign implements IBuildUIFields
 {
 	public var rank:Int;
 	//public var qty:Int;
@@ -148,6 +155,14 @@ class BoonBaneAssign
 	public function isValid():Bool {	// mainly used as validation check for Character creation forms
 		return true;
 	}
+	
+	public function getBoonOrBane():BoonBane {
+		return null;
+	}
+	
+	public function getUIFields():Array<Dynamic> {
+		return null;
+	}
 
 }
 
@@ -164,6 +179,14 @@ class BoonAssign extends BoonBaneAssign
 	}
 	public inline function getBaseCost():Int {
 		return getCosting(boon);
+	}
+	
+	override public function getBoonOrBane():BoonBane {
+		return boon;
+	}
+	
+	override public function getUIFields():Array<Dynamic> {
+		return null;
 	}
 	
 }
@@ -183,5 +206,14 @@ class BaneAssign extends BoonBaneAssign
 	public inline function getBaseCost():Int {
 		return getCosting(bane);
 	}
+	
+	override public function getBoonOrBane():BoonBane {
+		return bane;
+	}
+	
+	override public function getUIFields():Array<Dynamic> {
+		return null;
+	}
+	
 	
 }

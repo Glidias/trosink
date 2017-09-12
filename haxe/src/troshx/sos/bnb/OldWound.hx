@@ -29,6 +29,7 @@ class OldWoundAssign extends BaneAssign {
 	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask public var hitLocations:Int  = 0;
 	//public var hitLocations:Array<String> = [];
 	
+	
 	var char:CharSheet;
 	
 	public function new(char:CharSheet) {

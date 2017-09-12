@@ -39,6 +39,7 @@ class BrokenLimbAssign extends BaneAssign
 	@:ui({type:"Bitmask", labels:["Left Arm, Right Arm, Left Leg, Right Leg"] })  public var affectedLimbs:Int = 0;
 	
 	override public function isValid():Bool {
+		
 		return affectedLimbs > 0;
 	}
 	
