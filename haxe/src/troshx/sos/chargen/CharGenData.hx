@@ -39,17 +39,23 @@ class CharGenData implements IBuildListed
 		this.boonAssignList = [];
 		this.baneAssignList = [];
 		var bb:BoonBane;
+		
 		for (i in 0...boonList.length) {
 			bb =  boonList[i];
+			
 			if (bb.costs != null) {
-				this.boonAssignList.push(  boonList[i].getAssign(0, this.char) );
+				var ba;
+				this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
+				ba._costCached = 0;
 			}
 		}
 		var baneList:Array<Bane> = Banes.getList();
 		for (i in 0...baneList.length) {
 			bb = baneList[i];
 			if (bb.costs != null) {
-				this.baneAssignList.push(baneList[i].getAssign(0, this.char) );
+				var ba;
+				this.baneAssignList.push(ba = baneList[i].getAssign(0, this.char) );
+				ba._costCached = 0;
 			}
 		}
 		

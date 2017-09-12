@@ -52,4 +52,5 @@ section.gen-bnb .boon-tags .gen-comp-bb:hover{background-color:rgba(173,216,230,
 section.gen-bnb .bane-tags .gen-comp-bb:hover{background-color:rgba(255,192,203,.25);}
 section.gen-bnb .boon-tags .gen-comp-bb.selected{background-color:lightblue;}
 section.gen-bnb .bane-tags .gen-comp-bb.selected{background-color:pink;}
+.chargen section{padding-bottom:5px;padding-top:5px;}
 

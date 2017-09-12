@@ -92,7 +92,9 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 		
 		var joinStr =  bber.multipleTimes != BoonBane.TIMES_VARYING ? "/" : "|";
 		var costDisp = openBracket + (customCostInnerLabel != null ?  customCostInnerLabel : bber.costs.join(joinStr) ) + closeBracket;
-		return bb.name + " " +costDisp + (qty > 1 ? "(x"+qty+")" : "");
+		//<span style="color:red"></span>
+		//var costC = this.cost;
+		return bb.name + " " +costDisp + (qty > 1 ? "<b>(x"+qty+")</b>" : '');
 	}
 	
 	

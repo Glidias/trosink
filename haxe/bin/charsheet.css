@@ -252,4 +252,8 @@ section.gen-bnb .boon-tags .gen-comp-bb.selected {
 section.gen-bnb .bane-tags .gen-comp-bb.selected {
 	background-color:pink;
 }
+.chargen section {
+	padding-bottom:5px;
+	padding-top:5px;
+}
 
