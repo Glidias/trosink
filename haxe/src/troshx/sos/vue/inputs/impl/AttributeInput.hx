@@ -38,7 +38,8 @@ class AttributeInput extends VComponent<NoneT, AttributeInputProps>
 		return 	magic ? 0 : 1;
 	}
 	@:computed function get_max():Int {
-		return Std.int( Math.min(current + CharGenData.MaxAttributeLevelUpsFrom(current, this.remainingAttributePoints), CharGenData.ATTRIBUTE_START_MAX) );
+		var res:Int =  Std.int( Math.min(current + CharGenData.MaxAttributeLevelUpsFrom(current, this.remainingAttributePoints), CharGenData.ATTRIBUTE_START_MAX) );
+		return res < 0 ? 0 : res;
 	}
 	
 }

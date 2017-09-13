@@ -28,7 +28,7 @@ class BoonBane
 	// these modifiers are only triggered upon events
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
-	public var customCostInnerLabel(default, null):String;
+	public var customCostInnerSlashes(default, null):String;
 	
 	public var conditions(default, null):Array<CharSheet->Int->Bool>;
 	
@@ -144,11 +144,11 @@ class BoonBaneAssign implements IBuildUIFields
 		return 1;
 	}
 	
-	public function getCost():Int {
+	public function getCost(rank:Int):Int {
 		return 0;
 	}
 	
-	public inline function getCosting(bb:BoonBane):Int {
+	public inline function getCosting(bb:BoonBane, rank:Int):Int {
 		return bb.costs[rank-1];  // assumed assigned rank is always > 0, else this method should NOT be called
 	}
 	
@@ -174,11 +174,11 @@ class BoonAssign extends BoonBaneAssign
 		
 	}
 	
-	override public function getCost():Int {
-		return getCosting(boon);
+	override public function getCost(rank:Int):Int {
+		return getCosting(boon, rank);
 	}
-	public inline function getBaseCost():Int {
-		return getCosting(boon);
+	public inline function getBaseCost(rank:Int):Int {
+		return getCosting(boon, rank);
 	}
 	
 	override public function getBoonOrBane():BoonBane {
@@ -200,11 +200,11 @@ class BaneAssign extends BoonBaneAssign
 		
 	}
 	
-	override public function getCost():Int {
-		return getCosting(bane);
+	override public function getCost(rank:Int):Int {
+		return getCosting(bane, rank);
 	}
-	public inline function getBaseCost():Int {
-		return getCosting(bane);
+	public inline function getBaseCost(rank:Int):Int {
+		return getCosting(bane, rank);
 	}
 	
 	override public function getBoonOrBane():BoonBane {

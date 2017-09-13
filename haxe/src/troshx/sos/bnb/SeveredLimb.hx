@@ -72,7 +72,7 @@ class SeveredLimbAssign extends BaneAssign
 		return a || b;
 	}
 	
-	override public function getCost():Int {
+	override public function getCost(rank:Int):Int {
 		var c:Int = 0;
 		c += severedArmLeft == FULL_ARM ? SeveredLimb.COST_3 : severedArmLeft == LOWER_ARM ? SeveredLimb.COST_2 : severedArmLeft != 0 ? SeveredLimb.COST_1 : 0;
 		c +=  severedArmRight == FULL_ARM ? SeveredLimb.COST_3 : severedArmRight == LOWER_ARM ? SeveredLimb.COST_2 : severedArmRight != 0 ? SeveredLimb.COST_1 : 0;

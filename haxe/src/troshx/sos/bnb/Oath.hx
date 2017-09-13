@@ -25,7 +25,7 @@ class OathAssign extends BaneAssign {
 		super();
 	}
 	
-	override public function getCost():Int {
+	override public function getCost(rank:Int):Int {
 		return cost;
 	}
 }

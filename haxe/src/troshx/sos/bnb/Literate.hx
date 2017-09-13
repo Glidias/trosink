@@ -34,7 +34,7 @@ class LiterateAssign extends BoonAssign {
 		return scripts.length;
 	}
 	
-	override public function getCost():Int {
+	override public function getCost(rank:Int):Int {
 		return boon.costs[0] * scripts.length;
 	}
 

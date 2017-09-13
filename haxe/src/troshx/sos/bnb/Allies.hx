@@ -34,7 +34,7 @@ class AlliesAssign extends BoonAssign {  // todo: combination of ranks
 		return list.length;
 	}
 	
-	override public function getCost():Int {
+	override public function getCost(rank:Int):Int {
 		return boon.costs[0] * list.length;
 	}
 }

@@ -43,8 +43,8 @@ class BrokenLimbAssign extends BaneAssign
 		return affectedLimbs > 0;
 	}
 	
-	 override public function getCost():Int {
-		return getQty() * super.getCost();
+	 override public function getCost(rank:Int):Int {
+		return getQty() * super.getCost(rank);
 	}
 	
 	override public function getQty():Int {

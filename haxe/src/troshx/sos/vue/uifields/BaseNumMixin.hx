@@ -1,6 +1,7 @@
 package troshx.sos.vue.uifields;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import js.html.InputElement;
 import troshx.util.LibUtil;
 
 /**
@@ -25,13 +26,13 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 	
 	function checkConstraints():Void
 	{
-	
-		var currentVal:Float = current;
+		var theCurrent:Float = this.current;
+		var currentVal:Float = theCurrent;
 		var min:Float = this.min;
 		var max:Float = this.max;
-		if (currentVal < min) currentVal = min;
-		if (currentVal > max) currentVal = max;
-		if (currentVal != current)  LibUtil.setField(obj, prop, currentVal);
+		if (min != null && currentVal < min) currentVal = min;
+		if (max != null && currentVal > max) currentVal = max;
+		if (currentVal != theCurrent)  LibUtil.setField(obj, prop, currentVal);
 	}
 	
 	@:watch function watch_min(newVal:Float):Void {
@@ -43,6 +44,22 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 
 	@:computed inline function get_current():Float {
 		return LibUtil.field(obj, prop);
+	}
+	
+	
+	function inputHandler(input:InputElement):Void {
+		var max = this.max;
+		var min = this.min;
+		var result = input.valueAsNumber;
+		if (result > max) {
+			input.valueAsNumber = result = max;
+		}
+		if (result < min) {
+			input.valueAsNumber = result = min;
+		}
+		
+		LibUtil.setField(obj, prop, result);
+		
 	}
 	
 

@@ -37,8 +37,8 @@ class OldWoundAssign extends BaneAssign {
 		this.char = char;
 	}
 	
-	override public function getCost():Int {
-		return super.getCost() * getQty();
+	override public function getCost(rank:Int):Int {
+		return super.getCost(rank) * getQty();
 	}
 	
 	override public function getQty():Int {

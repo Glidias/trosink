@@ -40,8 +40,8 @@ class CrippledLimbAssign extends BaneAssign
 	override public function isValid():Bool {
 		return affectedLimbs > 0;// && (affectedLimbs & (BOTH_LEGS | BOTH_ARMS)) != 0;
 	}
-	override public function getCost():Int {
-		return getQty() * super.getCost();
+	override public function getCost(rank:Int):Int {
+		return getQty() * super.getCost(rank);
 	}
 	
 	override public function getQty():Int {
