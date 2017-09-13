@@ -231,6 +231,12 @@ td.w-tags .pop-widget {
 .chargen h2 .valuer {
 	font-size:11px;
 }
+.chargen h2 .valuer .num {
+	font-size:16px;
+	font-style:italic;
+	margin-left:2px;
+	margin-right:2px;
+}
 
 section.gen-bnb input[type=number] {
 	width:27px;
@@ -240,6 +246,7 @@ section.gen-bnb .gen-comp-bb {
 	margin-right:22px;
 	display:inline-block;
 }
+
 section.gen-bnb .boon-tags .gen-comp-bb:hover {
 	background-color:rgba(173, 216, 230, .25);
 }
@@ -255,5 +262,13 @@ section.gen-bnb .bane-tags .gen-comp-bb.selected {
 .chargen section {
 	padding-bottom:5px;
 	padding-top:5px;
+}
+section.gen-bnb .boon-tags .gen-comp-bb.disabled {
+	pointer-events:none;
+	opacity:.3;
+}
+section.gen-bnb .bane-tags .gen-comp-bb.disabled {
+	pointer-events:none;
+	opacity:.3;
 }
 

@@ -13,7 +13,7 @@ import troshx.util.LibUtil;
  * ...
  * @author Glidias
  */
-class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
+class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 {
 
 	
@@ -26,8 +26,8 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 	}
 	
 	override function Template():String {
-		return  '<span class="gen-comp-bb" :class="{enabled:max>=1, selected:obj[prop]>0}">
-		<label><input type="checkbox" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="obj[prop]=0">[x]</a></span></label>
+		return  '<span class="gen-comp-bb" :class="{disabled:max<1, selected:obj[prop]>0}">
+		<label><input type="checkbox" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span></label>
 		</span>';
 	}
 	
@@ -35,7 +35,22 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 		return 0;
 	}
 	@:computed function get_max():Int {
-		return this.coreMax;
+		var cm = this.coreMax;
+		if (this.remaining != null) {
+			var bba = this.bba;
+			var re = this.remaining + (this.current > 0 ? bba._costCached : 0);
+			var b = 0;
+			var lowestCost = this.bb.costs[0];
+			for (i in 0...cm) {
+				var c =  bba.getCost(i+1);
+				c = c < lowestCost ? lowestCost : c;
+				if ( re < c) break;
+				b = i+1;
+			}
+			return b;
+			
+		}
+		return cm;
 	}
 	
 	@:computed function get_coreMax():Int {
@@ -63,6 +78,10 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 		
 	}
 	
+	function closeBB():Void {
+		LibUtil.setField(obj, prop, 0);// = 0;
+	}
+	
 	@:computed inline function get_showClose():Bool {
 
 		return LibUtil.field(obj, prop) >= 1 && coreMax >= 2;  // 2
@@ -75,12 +94,12 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
 		if (oldValue > 0) { // start from "ON"
 			if (newValue <= 0) {
-				_vEmit(isBane ? "removeBane" : "removeBoon", bb.uid);
+				_vEmit("removeBB", bba, isBane);
 			}
 		}
 		else {  // start from "OFF"
 			if (newValue > 0) {
-				_vEmit(isBane ? "addBane" : "addBoon", bb.uid);
+				_vEmit("addBB", bba, isBane);
 			}
 		}
 		
@@ -95,9 +114,13 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 	}
 	
 	
-	@:watch function watch_cost(newValue:Int):Void {  
-		if (bba.rank > 0) {
-			bba._costCached = newValue;
+	@:watch function watch_cost(newValue:Int):Void { 
+		var bba = this.bba;
+		var rank = bba.rank;
+		if (rank > 0) {
+			var test = bb.costs[rank-1];
+
+			bba._costCached = newValue >= test ? newValue : test;
 		}
 	}
 	
@@ -117,7 +140,7 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 		var joinStr =  bber.multipleTimes != BoonBane.TIMES_VARYING ? "/" : "|";
 		var costArr = bber.costs;
 		var costJoin = ""+( bba.rank == 1 ? "<b>"+costArr[0]+"</b>" : ""+costArr[0]);
-		
+			
 		for (i in 1...costArr.length) {
 			costJoin += (customCostInnerSlashes!=null ?  customCostInnerSlashes.charAt(i-1) : joinStr ) + ( bba.rank == i+1 ? "<b>"+costArr[i]+"</b>" : ""+costArr[i]);
 		}
@@ -148,3 +171,7 @@ class BoonBaneInput extends VComponent<NoneT, NumericInputProps>
 }
 
 
+typedef BoonBaneInputProps = {
+	>NumericInputProps,
+	@:optional @prop({required:false}) var remaining:Int;
+}

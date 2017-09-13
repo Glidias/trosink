@@ -38,14 +38,20 @@
 			
 			
 		<section class="gen-bnb">
-			<h2>Boons &amp; Banes <span class="valuer">({{remainingBnBpoints}} B&amp;B Points remaining. (Available: {{availableBnBpoints}}) ) </span></h2>
-			<h3>Boons</h3>
+			<h2>Boons &amp; Banes <span class="valuer">(<span class="num">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>
+			<span v-show="totalBnBScore<0" class="invalid"><span style="color:red">invalid!</span><i style="font-size:13px">(Need &gt;=0 B&amp;B points!<br/>Assign more PCP to 'Boons &amp; Banes' or buy more Banes to pay off debt!)</i></span>
+			<span v-show="totalBnBScore>=0" class="valid">
+				<span style="color:green">Ok!</span><br/><span v-show="totalBnBScore>0" style="color:orange;font-size:13px">(but you additional {{ totalBnBScore }} B&amp;B Points!)</span>
+			</span>
+			
+			</h2>
+			<h3>Boons: -{{ totalBoonExpenditure }}   <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>
 			<div class="boon-tags">
-				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" />
+				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
 			</div>	
-			<h3>Banes</h3>
+			<h3>Banes: +{{ totalBanePointsEarned }}, -{{ totalBanePointsSpent }} <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBanesSpendableLeft }})</span></h3>
 			<div class="bane-tags">
-				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" />	
+				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:addBB="addBB" v-on:removeBB="removeBB" :remaining="maxBanesSpendableLeft"  />	
 			</div>
 		</section>
 			
@@ -66,6 +72,8 @@
 	
 	<hr/>
 	<div class="chargen__footer">
+		<div v-for="(li,i) in boonsArray" :key="li.get_uid()">{{li.toString()}}</div>
+		<div v-for="(li,i) in banesArray" :key="li.get_uid()">{{li.toString()}}</div>
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
 		</section>

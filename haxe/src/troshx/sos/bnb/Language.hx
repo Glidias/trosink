@@ -18,6 +18,7 @@ class Language extends Boon
 		// but never at levels 2 and 3 and never during gameplay (on all levels)
 		customCostInnerSlashes = "|/";
 		multipleTimes = BoonBane.TIMES_VARYING;
+		
 	}
 	
 	override function getEmptyAssignInstance(charSheet:CharSheet):BoonAssign {

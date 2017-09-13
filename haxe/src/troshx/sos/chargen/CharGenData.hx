@@ -5,11 +5,12 @@ import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.core.BoonBane;
-import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
-import troshx.sos.core.BoonBane.BoonBaneAssign;
+import troshx.util.LibUtil;
+
+
 import troshx.sos.sheets.CharSheet;
 
 
@@ -24,6 +25,8 @@ class CharGenData implements IBuildListed
 	public var char:CharSheet;
 	
 	static public inline var INT_MAX:Int = 2147483647;
+	
+
 	
 	public function new(charSheet:CharSheet=null) 
 	{
@@ -46,7 +49,7 @@ class CharGenData implements IBuildListed
 			if (bb.costs != null) {
 				var ba;
 				this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
-				ba._costCached = 0;
+				ba._costCached = bb.costs[0];
 			}
 		}
 		var baneList:Array<Bane> = Banes.getList();
@@ -55,7 +58,7 @@ class CharGenData implements IBuildListed
 			if (bb.costs != null) {
 				var ba;
 				this.baneAssignList.push(ba = baneList[i].getAssign(0, this.char) );
-				ba._costCached = 0;
+				ba._costCached = bb.costs[0];
 			}
 		}
 		
@@ -63,7 +66,7 @@ class CharGenData implements IBuildListed
 	
 	// CAMPAIGN POWER LEVEL
 	public var campaignPowerLevels:Array<CampaignPowerLevel> = [
-		new CampaignPowerLevel("TestLevel", 32, 18),
+		new CampaignPowerLevel("TestLevel", 30, 10),
 	];
 	public var campaignPowLevelIndex:Int = 0;
 
@@ -211,6 +214,7 @@ class CharGenData implements IBuildListed
 			warningAttributes.warn = true;
 			warningAttributes.remain = rm;
 			return true;
+			
 		}
 		else {
 			return false;
@@ -222,32 +226,38 @@ class CharGenData implements IBuildListed
 	
 	//public var allBaneAssignments():Int
 	/*
-	 * With Boones/Bane list, create BoonBaneInput for each boonBaneAssign.rank numeric stepper.
-		--------------------
-
-
-		For each list item of Boones/Banes....(If rank > 0) add send signal to add it into CharSheet,   If (rank == 0), send signal to remove from Charsheet. 
+	
 		Remember to register/un-register any modifiers assosiated with each boon/bane adding/removal from CharSheet.
-
-		Each BoonBane sheet has their own computed cost variable to getCost(), and a watch: for that cost in order to dispatch any cost changes
-		Anytime computed cost changes within each Boon/Bane component assign while rank > 0, send another signal to indicate cost change to update cost cached..
-
-		totalCosts() of bNb is caslculated from cost cached variables.
-
-		Calcualted costs always clamped to baseCost always as bare minimum for purpose of character creation.
-		Math.max( baseCost(), signalCost) 
 
 		_____
 
-		
 
 		*/
 
-	
-	
-	public static function getAvailableBnBFromPCP(pcp:Int) {
-		// TODO:
-		return pcp;
+		
+	public static inline function getBnBFromPCP(pcp:Int):Int {
+		return -BaneAssign.MAX_BANE_EARNABLE + (pcp*5-5);
+	}
+
+		
+	public function addBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
+		//trace("ADDING:" + bba + " , " + isBane);
+		if (isBane) {
+			char.addBane(cast bba);
+		}
+		else {
+			char.addBoon(cast bba);
+		}
+		
+	}
+	public function removeBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
+		//trace("REMOVING:" + bba + " , " + isBane);
+		if (isBane) {
+			char.removeBane(cast bba);
+		}
+		else {
+			char.removeBoon(cast bba);
+		}
 	}
 	
 	var categoryBnB(get, never):CategoryPCP;
@@ -258,19 +268,87 @@ class CharGenData implements IBuildListed
 	
 	public var totalBaneExpenditure(get, never):Int;
 	public function get_totalBaneExpenditure():Int {
-		// TODO:
-		return 0;
+		var arr = char.banesArray;
+		var total = 0;
+		var i:Int = arr.length;
+		while (--i > -1) {
+			total += arr[i]._costCached;
+		}
+		return total;
 	}
 	
-	public var availableBnBpoints(get, never):Int;
-	function get_availableBnBpoints():Int {
-		return getAvailableBnBFromPCP(categoryBnB.pcp);
+	public var maxBanePointsEarnable(get, never):Int;
+	public inline function get_maxBanePointsEarnable():Int {
+		return BnBpoints < 0 ? BaneAssign.MAX_BANE_EARNABLE - BnBpoints : BaneAssign.MAX_BANE_EARNABLE;
 	}
 	
-	public var remainingBnBpoints(get, never):Int;
-	function get_remainingBnBpoints():Int {
-		return availableBnBpoints - totalBaneExpenditure;
+	public var totalBanePointsEarned(get, never):Int;
+	public function get_totalBanePointsEarned():Int {
+		var a = totalBaneExpenditure;
+		var b = maxBanePointsEarnable;
+		return a > b ? b : a;
 	}
+	
+	public var totalBanePointsSpent(get, never):Int;
+	public function get_totalBanePointsSpent():Int {
+		return  totalBaneExpenditure - totalBanePointsEarned;
+	}
+	
+	public var totalBoonExpenditure(get, never):Int;
+	public function get_totalBoonExpenditure():Int {
+		var arr = char.boonsArray;
+		var total = 0;
+		var i:Int = arr.length;
+		while (--i > -1) {
+			total += arr[i]._costCached;
+		}
+		return total;
+	}
+	
+	public var boonsArray(get, never):Array<troshx.sos.core.BoonBane.BoonAssign>;
+	function get_boonsArray():Array<BoonAssign> {
+		return char.boonsArray;
+	}
+	public var banesArray(get, never):Array<troshx.sos.core.BoonBane.BaneAssign>;
+	function get_banesArray():Array<BaneAssign> {
+		return char.banesArray;
+	}
+	
+	public var BnBpoints(get, never):Int;
+	function get_BnBpoints():Int {
+	
+		return getBnBFromPCP( categoryBnB.pcp);
+	}
+	
+	
+	public var totalBnBScore(get, never):Int;
+	function get_totalBnBScore():Int {
+		return BnBpoints + totalBanePointsEarned - totalBanePointsSpent - totalBoonExpenditure;
+	}
+	
+	public var maxBoonsSpendable(get, never):Int;
+	function get_maxBoonsSpendable():Int {
+		return BnBpoints + maxBanePointsEarnable;
+		
+	}
+	public var maxBoonsSpendableLeft(get, never):Int;
+	function get_maxBoonsSpendableLeft():Int {
+		return  maxBoonsSpendable - totalBoonExpenditure;
+		
+	}
+	
+	
+	public var maxBanesSpendable(get, never):Int;
+	function get_maxBanesSpendable():Int {
+		return  maxBanePointsEarnable + (BnBpoints < 0 ? 0 : BnBpoints);
+		
+	}
+	public var maxBanesSpendableLeft(get, never):Int;
+	function get_maxBanesSpendableLeft():Int {
+		return  maxBanesSpendable - totalBaneExpenditure;
+		
+	}
+	
 	
 
 	// TODO final: validate all char generation categories

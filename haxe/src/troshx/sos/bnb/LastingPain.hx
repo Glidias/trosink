@@ -18,6 +18,7 @@ class LastingPain extends Bane
 		super("Lasting Pain", [4, 8]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
 		multipleTimes = BoonBane.TIMES_VARYING;
+		clampRank = true;
 	}
 	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
 		return new LastingPainAssign(charSheet);

@@ -1,5 +1,7 @@
 package troshx.sos.sheets;
 import haxevx.vuex.core.IBuildListed;
+import troshx.ds.HashedArray;
+
 import troshx.sos.core.BodyChar;
 
 import troshx.sos.core.BoonBane.BaneAssign;
@@ -11,6 +13,8 @@ import troshx.sos.core.School;
 import troshx.sos.core.Skill;
 import troshx.sos.core.Talent;
 import troshx.sos.core.Wound;
+
+//import troshx.ds.HashedArray;
 
 /**
  * ...
@@ -81,9 +85,31 @@ class CharSheet implements IBuildListed
 	public var socialClass:String = "";
 	
 	public var skills:Array<SkillAssign> = [];
-	public var boons:Array<BoonAssign> = [];
-	public var banes:Array<BaneAssign> = [];
 	public var talents:Array<Talent> = [];
+	
+	var boons:HashedArray<BoonAssign> = new HashedArray<BoonAssign>();
+	var banes:HashedArray<BaneAssign> =  new HashedArray<BaneAssign>();
+	public var boonsArray(get, never):Array<BoonAssign>;
+	inline function get_boonsArray():Array<BoonAssign> {
+		return boons.list;
+	}
+	public function addBoon(assign:BoonAssign):Void {
+		boons.add(assign);
+	}
+	public function removeBoon(assign:BoonAssign):Void {
+		boons.delete(assign);
+	}
+	
+	public var banesArray(get, never):Array<BaneAssign>;
+	inline function get_banesArray():Array<BaneAssign> {
+		return banes.list;
+	}
+	public function addBane(assign:BaneAssign):Void {
+		banes.add(assign);
+	}
+	public function removeBane(assign:BaneAssign):Void {
+		banes.delete(assign);
+	}
 	
 	public var arcPointsAccum:Int = 0;
 	var arcSpent:Int = 0;
@@ -112,6 +138,7 @@ class CharSheet implements IBuildListed
 			var fw:Wound = Reflect.field(woundHash, uid);
 			fw.updateAgainst(w);
 		}
+		
 	}
 	
 	public function removeWound(w:Wound):Void {

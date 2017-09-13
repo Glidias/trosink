@@ -5,5 +5,5 @@ package troshx.core;
  */
 interface IUid 
 {
-	public var uid(get,null):String;
+	public var uid(get,never):String;
 }

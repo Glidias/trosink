@@ -1,5 +1,9 @@
 package troshx.sos.core;
+import troshx.core.IUid;
+import troshx.ds.IUpdateWith;
 import troshx.sos.bnb.IBuildUIFields;
+import troshx.sos.core.BoonBane.BaneAssign;
+import troshx.sos.core.BoonBane.BoonBaneAssign;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
@@ -54,7 +58,7 @@ class BoonBane
 	public static inline var TIMES_INFINITE:Int = -1;
 	public static inline var TIMES_VARYING:Int = -2;
 	
-	public var uid(default, never):String;
+	public var uid(get, never):String;
 	inline function get_uid():String 
 	{
 		return name;
@@ -68,10 +72,7 @@ class BoonBane
 		this.clampRank = false;
 		this.multipleTimes = 0;
 	}
-	
-	
-	
-	
+
 	
 }
 
@@ -95,7 +96,7 @@ class Boon extends BoonBane {
 }
 
 
-class Bane extends BoonBane {
+class Bane extends BoonBane  {
 	public function new(name:String, costs:Array<Int>) {
 		super(name, costs);
 		isBane = true;
@@ -112,13 +113,13 @@ class Bane extends BoonBane {
 		//if ( bane.costs != null) me._costCached = boon.costs[(rank >= 1 ? rank - 1 : 0]; // for reference only
 		return me;
 	}
-
+	
+	
 }
 
 
-// -------
 
-class BoonBaneAssign implements IBuildUIFields
+class BoonBaneAssign implements IBuildUIFields implements IUid 
 {
 	public var rank:Int;
 	//public var qty:Int;
@@ -163,15 +164,31 @@ class BoonBaneAssign implements IBuildUIFields
 	public function getUIFields():Array<Dynamic> {
 		return null;
 	}
+	
+	
+
+	
+	/* INTERFACE troshx.core.IUid */
+	
+	public var uid(get, never):String;
+	
+	function get_uid():String 
+	{
+		return "";
+	}
 
 }
 
-class BoonAssign extends BoonBaneAssign
+class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 {
 	public var boon:Boon;
 	
 	public function new() {
 		
+	}
+	
+	override public function get_uid():String {
+		return boon.uid;
 	}
 	
 	override public function getCost(rank:Int):Int {
@@ -189,16 +206,39 @@ class BoonAssign extends BoonBaneAssign
 		return null;
 	}
 	
+	public function toString():String {
+		return "[BoonAssign: " + boon.uid + "]";
+	}
+	
+	
+	/* INTERFACE troshx.ds.IUpdateWith.IUpdateWith<W> */
+	
+	public function updateAgainst(ref:BoonAssign):Void 
+	{
+		
+	}
+	
+	public function spliceAgainst(ref:BoonAssign):Int 
+	{
+		return 0;
+	}
+	
 }
 
-class BaneAssign extends BoonBaneAssign
+class BaneAssign extends BoonBaneAssign implements IUpdateWith<BaneAssign>
 {
 
 	public var bane:Bane;
+	public static inline var MAX_BANE_EARNABLE:Int = 15;
 	
 	public function new() {
 		
 	}
+	
+	override public function get_uid():String {
+		return bane.uid;
+	}
+	
 	
 	override public function getCost(rank:Int):Int {
 		return getCosting(bane, rank);
@@ -214,6 +254,21 @@ class BaneAssign extends BoonBaneAssign
 	override public function getUIFields():Array<Dynamic> {
 		return null;
 	}
+	public function toString():String {
+		return "[BaneAssign: " + bane.uid + "]";
+	}
 	
+	
+	/* INTERFACE troshx.ds.IUpdateWith.IUpdateWith<W> */
+	
+	public function updateAgainst(ref:BaneAssign):Void 
+	{
+		
+	}
+	
+	public function spliceAgainst(ref:BaneAssign):Int 
+	{
+		return 0;
+	}
 	
 }
