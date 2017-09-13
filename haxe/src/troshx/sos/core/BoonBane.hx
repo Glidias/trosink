@@ -126,9 +126,12 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	
 	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
 	
+	public var ingame:Bool = false;
 	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
+	
+
 	
 	// ingame only
 	public function onFurtherAdded(char:CharSheet):Void {
@@ -187,15 +190,22 @@ class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 		
 	}
 	
+	// used internally by engine to imperatively update available points for this assignment (excluding cost of current assignment)
+	public var _remainingCached:Int; 
+	public inline function updateRemainingCache(totalRemaining:Int):Void {
+		_remainingCached = totalRemaining;
+		//_remainingCached = totalRemaining + ( rank >=  1 ?  Std.int(Math.max( getCost(rank), boon.costs[0])) : 0  );
+	}
+	
 	override public function get_uid():String {
 		return boon.uid;
 	}
 	
 	override public function getCost(rank:Int):Int {
-		return getCosting(boon, rank);
+		return getCosting(boon, rank < 2 ? 1 : rank);
 	}
 	public inline function getBaseCost(rank:Int):Int {
-		return getCosting(boon, rank);
+		return getCosting(boon, rank < 2 ? 1  : rank);
 	}
 	
 	override public function getBoonOrBane():BoonBane {
@@ -241,10 +251,10 @@ class BaneAssign extends BoonBaneAssign implements IUpdateWith<BaneAssign>
 	
 	
 	override public function getCost(rank:Int):Int {
-		return getCosting(bane, rank);
+		return getCosting(bane, rank  < 2 ? 1 : rank);
 	}
 	public inline function getBaseCost(rank:Int):Int {
-		return getCosting(bane, rank);
+		return getCosting(bane, rank < 2 ? 1 : rank);
 	}
 	
 	override public function getBoonOrBane():BoonBane {

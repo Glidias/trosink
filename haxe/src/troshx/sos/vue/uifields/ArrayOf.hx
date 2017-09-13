@@ -18,22 +18,22 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 		super();
 	}
 	
-	/*
+//	/*
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return COMPONENTS != null ? COMPONENTS : (COMPONENTS = UI.getNewSetOfComponents(true));
 	}
-	*/
+	//*/
 	
 	override public function Template():String {
 		return '<div>
-		<label v-if="label">{{label}}</label>
+		<label v-if="label">{{label}}:&nbsp;| {{maxLength}}</label><button :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button>
+
 		<ul>
 			<li v-for="(li, i) in current">
-				<div :is="typeMap[of]" :obj="li"></div>
+				<span :is="typeMap[of]" :obj="current" :prop="i" :key="i" :disabled="!(maxLength == null || i < maxLength)"></span>
 			</li>
 		</ul>
-		<button v-if="current.length > minLength" v-on:click="popEntry()">-</button>
-		<button v-if="maxLength != null && current.length + 1 < maxLength" v-on:click="pushEntry()">+</button>
+		
 		</div>';
 	}
 

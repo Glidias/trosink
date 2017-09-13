@@ -28,7 +28,13 @@ class HitLocationMultiSelector extends VComponent<NoneT, HitLocationProps>
 		LibUtil.setField(me, Bitmask.NAME, LibUtil.field(src, Bitmask.NAME) );
 		return me;
 	}
-	*/
+	///*/
+	
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
+		return [
+			"comp" => new SingleSelection()
+		];
+	}
 	
 	@:computed function get_labels():Array<String> {
 		var bd = this.body;
@@ -42,6 +48,7 @@ class HitLocationMultiSelector extends VComponent<NoneT, HitLocationProps>
 	
 
 	override function Render(c:CreateElement):VNode {
+		
 		var props:BitmaskProps = {
 			
 			label:this.label,
@@ -51,7 +58,7 @@ class HitLocationMultiSelector extends VComponent<NoneT, HitLocationProps>
 			labels: this.labels
 			
 		};
-		return c(SingleSelection.NAME, props);
+		return c("comp", {props:props});
 	}
 	
 

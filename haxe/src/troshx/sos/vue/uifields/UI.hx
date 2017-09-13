@@ -15,7 +15,9 @@ class UI
 	
 	public static function getNewSetOfComponents(excludeArray:Bool=false):Dynamic<VComponent<Dynamic,Dynamic>> {
 		var dyn:Dynamic = {};
-		if (!excludeArray) LibUtil.setField(dyn, ArrayOf.NAME, new ArrayOf()); 
+		if (!excludeArray) {
+			LibUtil.setField(dyn, ArrayOf.NAME, new ArrayOf()); 
+		}
 		LibUtil.setField(dyn, Bitmask.NAME, new Bitmask()); 
 		LibUtil.setField(dyn, FieldNumber.NAME, new FieldNumber()); 
 		LibUtil.setField(dyn, FieldInt.NAME, new FieldInt()); 

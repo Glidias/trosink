@@ -47,6 +47,13 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		}
 	}
 	
+	public function indexOf(item:T):Int {
+		for (i in 0...list.length) {
+			if (list[i].uid == item.uid) return i;
+		}
+		return -1;
+	}
+	
 	public function delete(item:T):Void {
 		var uid:String = item.uid;
 		if (hashContains(item)) {
@@ -57,7 +64,7 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 			trace("Warning: No item found to be removed for uid:" + item.uid);
 		}
 		
-		var index:Int = list.indexOf(item);
+		var index:Int = indexOf(item);
 		if (index >= 0) {
 			list.splice(index, 1);
 		}
@@ -75,7 +82,7 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 	}
 	
 	function listContains(item:T):Bool {
-		return list.indexOf(item) >= 0;
+		return indexOf(item) >= 0;
 	}
 	
 	

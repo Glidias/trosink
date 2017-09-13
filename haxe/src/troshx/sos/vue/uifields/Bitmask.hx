@@ -20,8 +20,8 @@ class Bitmask extends VComponent<NoneT, BitmaskProps>
 	
 	override function Template():String {
 		return '<div>
-			<label v-if="label">{{ label }}<label>
-			<div v-for="(li, i) in labels"><label><input type="checkbox" v-on:click="checkboxHandler($$event.target, i)" :checked="(valueAtIndex(i)&current)!=0"></input>{{ li }}</label></div>
+			<label v-if="label">{{ label }}:&nbsp;</label>
+			<div v-for="(li, i) in labels"><label><input  :disabled="disabled" type="checkbox" v-on:click="checkboxHandler($$event.target, i)" :checked="(valueAtIndex(i)&current)!=0"></input>{{ li }}</label></div>
 		</div>';
 	}
 	

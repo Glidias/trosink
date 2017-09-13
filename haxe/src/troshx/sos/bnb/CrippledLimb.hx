@@ -35,7 +35,7 @@ class CrippledLimbAssign extends BaneAssign
 	public static inline var BOTH_LEGS:Int = (LEFT_LEG | RIGHT_LEG);
 	public static inline var BOTH_ARMS:Int = (LEFT_ARM | RIGHT_ARM);
 	
-	@:ui({type:"Bitmask", labels:["Left Arm, Right Arm, Left Leg, Right Leg"] }) public var affectedLimbs:Int = 0;
+	@:ui({type:"Bitmask", labels:["Left Arm", "Right Arm", "Left Leg", "Right Leg"] }) public var affectedLimbs:Int = 0;
 	
 	override public function isValid():Bool {
 		return affectedLimbs > 0;// && (affectedLimbs & (BOTH_LEGS | BOTH_ARMS)) != 0;

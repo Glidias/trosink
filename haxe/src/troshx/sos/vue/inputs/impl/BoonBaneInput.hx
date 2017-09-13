@@ -27,8 +27,22 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	
 	override function Template():String {
 		return  '<span class="gen-comp-bb" :class="{disabled:max<1, selected:obj[prop]>0}">
-		<label><input type="checkbox" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span></label>
+		<label><input type="checkbox" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
 		</span>';
+	}
+	
+	@:computed function get_showReset():Bool {
+		var costArr = bb.costs;
+		var cc = this.cost;
+		if (cc == null) cc = costArr[0];
+		cc = cc < costArr[0] ? costArr[0] : cc;
+		var rank = bba.rank;
+		return cc != costArr[rank > 1 ? rank -1 : 0];
+		
+	}
+	
+	function resetBB():Void {
+		_vEmit("resetBB", bba, isBane);
 	}
 	
 	@:computed function get_min():Int {
@@ -117,11 +131,9 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	@:watch function watch_cost(newValue:Int):Void { 
 		var bba = this.bba;
 		var rank = bba.rank;
-		if (rank > 0) {
-			var test = bb.costs[rank-1];
 
-			bba._costCached = newValue >= test ? newValue : test;
-		}
+		var test = bb.costs[0];
+		bba._costCached = newValue >= test ? newValue : test;
 	}
 	
 	
@@ -139,6 +151,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		
 		var joinStr =  bber.multipleTimes != BoonBane.TIMES_VARYING ? "/" : "|";
 		var costArr = bber.costs;
+		var rankCost = bba.rank < 2 ? costArr[0] : costArr[bba.rank - 1];
 		var costJoin = ""+( bba.rank == 1 ? "<b>"+costArr[0]+"</b>" : ""+costArr[0]);
 			
 		for (i in 1...costArr.length) {
@@ -148,7 +161,12 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		
 		//<span style="color:red"></span>
 		//var costC = this.cost;
-		return bb.name + " " +costDisp + (qty > 1 ? "<b>(x"+qty+")</b>" : '');
+		var cc = this.cost;
+		//if (cc == null) cc = costArr[0];
+		//if (Math.isNaN(cc)) trace();
+		cc = cc < costArr[0] ? costArr[0] : cc;
+		
+		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "");
 	}
 	
 	

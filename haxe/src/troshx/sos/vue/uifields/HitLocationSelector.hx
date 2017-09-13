@@ -29,6 +29,11 @@ class HitLocationSelector extends VComponent<NoneT, HitLocationProps>
 		return me;
 	}
 	*/
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
+		return [
+			"comp" => new SingleSelection()
+		];
+	}
 	
 	@:computed function get_labels():Array<String> {
 		var bd = this.body;
@@ -51,7 +56,7 @@ class HitLocationSelector extends VComponent<NoneT, HitLocationProps>
 			labels: this.labels
 			
 		};
-		return c(SingleSelection.NAME, props);
+		return c("comp", {props:props});
 	}
 	
 

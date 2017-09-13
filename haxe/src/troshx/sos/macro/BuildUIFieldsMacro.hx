@@ -79,6 +79,7 @@ class BuildUIFieldsMacro
 											
 											case TPType(ComplexType.TPath({pack:pack, name:name})):
 												arrayOf = name;
+												
 												if (name == "String") {
 													defaultingValue = "";
 												}
@@ -102,7 +103,7 @@ class BuildUIFieldsMacro
 										}
 										metaParam = MacroUtil.combineObjDeclarations([ 
 											metaParam, 
-											{ expr: EObjectDecl([{field:"of", expr:macro $v{resolvedType} }]), pos:f.pos},
+											{ expr: EObjectDecl([{field:"of", expr:macro $v{arrayOf} }]), pos:f.pos},
 											{ expr: EObjectDecl([{field:"defaultValue", expr:macro $v{defaultingValue} }]), pos:f.pos}
 										], f.pos);
 										

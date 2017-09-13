@@ -23,7 +23,7 @@ class SingleSelection extends VComponent<NoneT, SelectionProps>
 	
 	override function Template():String {
 		return '<div>
-			<label v-if="label">{{ label }}<label>:<br/>
+			<label v-if="label">{{ label }}</label>:<br/>
 			<select v-model="obj[prop]">
 				<option v-for="(li, i) in labels" :value="valueAtIndex(i)">{{ li }}</option> 
 			</select>

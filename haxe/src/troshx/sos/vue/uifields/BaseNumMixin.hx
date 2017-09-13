@@ -50,6 +50,7 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 	function inputHandler(input:InputElement):Void {
 		var max = this.max;
 		var min = this.min;
+		
 		var result = input.valueAsNumber;
 		if (result > max) {
 			input.valueAsNumber = result = max;

@@ -10,9 +10,10 @@ import troshx.sos.sheets.CharSheet;
 class Language extends Boon
 {
 	
+	public static inline var COST_SINGLE:Int = 1;
 	public function new() 
 	{
-		super("Language", [1, 2, 3]);
+		super("Language", [COST_SINGLE, 2, 3]);
 		
 		// Language is special, can learn multiple times of level 1 at character creation only, 
 		// but never at levels 2 and 3 and never during gameplay (on all levels)
@@ -43,8 +44,12 @@ class Language extends Boon
 }
 
 class LanguageAssign extends BoonAssign {
-	@:ui public var languages:Array<String> = [""];
+	@:ui({ label:"Beginning Languages #1", maxLength:Std.int((_remainingCached +  startingLanguages.length * Language.COST_SINGLE) / Language.COST_SINGLE)  })
+	public var startingLanguages:Array<String> = [""];
+	@:ui({maxLength:ingame ? null : 0 }) public var ingameLanguages:Array<String> = [];
 	@:ui({type:"textarea"}) public var notes:String = "";
+	
+	
 	
 	public function new() {
 		super();
@@ -54,11 +59,15 @@ class LanguageAssign extends BoonAssign {
 	}
 	
 	override public function getQty():Int {
-		return languages.length;
+		return startingLanguages.length;
+	}
+	
+	inline function getLevelCost(rank:Int):Int {
+		return (rank > 1 ? boon.costs[rank - 1] : 0);
 	}
 	
 	override public function getCost(rank:Int):Int {
-		return boon.costs[0] * languages.length;
+		return Language.COST_SINGLE * startingLanguages.length + getLevelCost(rank);
 	}
 	// instance based modifier example under BoonAssign/BaneAssign class
 	/*

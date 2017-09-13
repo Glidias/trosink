@@ -1,10 +1,13 @@
 package troshx.sos.vue;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
+import troshx.sos.core.BoonBane.Bane;
+import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
@@ -21,13 +24,50 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	public function new() 
 	{
 		super();
-		
 	}
 	
 	override function Data():CharGenData {
 		return new CharGenData();
 	}
 	
+	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
+		var arr = this.boonsArray;
+		var i = arr.length;
+		while (--i > -1) {
+			var v = arr[i];
+			v.updateRemainingCache(newValue);
+		}
+		
+	}
+	
+	function getBnBSlug(name:String):String {
+		return BoonBaneApplyDetails.getSlug(name);
+	}
+	
+	function resetBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
+		//trace("REMOVING:" + bba + " , " + isBane);
+		if (isBane) {
+			//char.removeBane(cast bba);
+			var bane:Bane = cast bba.getBoonOrBane();
+			var ba;
+			var i = baneAssignList.indexOf(cast bba);
+			ba = bane.getAssign(0, char);
+			ba._costCached = bane.costs[0];
+			Vue.set(this.baneAssignList, i, ba );
+			
+		}
+		else {
+		
+			var boon:Boon = cast bba.getBoonOrBane();
+			var ba;
+			var i = boonAssignList.indexOf(cast bba);
+			ba = boon.getAssign(0, char);
+			ba._costCached = boon.costs[0];
+			ba._remainingCached = maxBoonsSpendableLeft;
+			Vue.set(this.boonAssignList, i, ba );
+		}
+	}
+
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [

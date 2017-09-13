@@ -14,6 +14,9 @@
 		</section>
 			
 			
+		<hr/>
+			
+			
 		<!-- for each category -->
 		<section class="gen-race">
 			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span></h2>
@@ -21,6 +24,8 @@
 				<label><input type="radio">Human</input></label>	
 			</div>
 		</section>
+			
+		
 			
 			
 		<section class="gen-attributes">
@@ -47,11 +52,11 @@
 			</h2>
 			<h3>Boons: -{{ totalBoonExpenditure }}   <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>
 			<div class="boon-tags">
-				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
+				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
 			</div>	
-			<h3>Banes: +{{ totalBanePointsEarned }}, -{{ totalBanePointsSpent }} <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBanesSpendableLeft }})</span></h3>
+			<h3>Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>
 			<div class="bane-tags">
-				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:addBB="addBB" v-on:removeBB="removeBB" :remaining="maxBanesSpendableLeft"  />	
+				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
 			</div>
 		</section>
 			
@@ -72,8 +77,14 @@
 	
 	<hr/>
 	<div class="chargen__footer">
-		<div v-for="(li,i) in boonsArray" :key="li.get_uid()">{{li.toString()}}</div>
-		<div v-for="(li,i) in banesArray" :key="li.get_uid()">{{li.toString()}}</div>
+		<div class="bb-details">
+			<h3>Boon(s) details:</h3>
+			<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
+		</div>
+		<div class="bb-details">
+			<h3>Bane(s) details:</h3>
+			<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
+		</div>
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
 		</section>

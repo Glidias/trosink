@@ -31,11 +31,11 @@ class CharGenData implements IBuildListed
 	public function new(charSheet:CharSheet=null) 
 	{
 		// Char sheet
-		this.char = charSheet != null ?charSheet : new CharSheet();
+		this.char = charSheet != null ? charSheet : new CharSheet();
 
 		// Categories
 		this.categories = getNewCharGenCategories();
-		
+		this.categories[CATEGORY_BNB].pcp = 4;
 		
 		// Boones and banes
 		var boonList:Array<Boon> = Boons.getList();
@@ -50,6 +50,7 @@ class CharGenData implements IBuildListed
 				var ba;
 				this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
 				ba._costCached = bb.costs[0];
+				ba._remainingCached = 999;
 			}
 		}
 		var baneList:Array<Bane> = Banes.getList();
@@ -259,6 +260,7 @@ class CharGenData implements IBuildListed
 			char.removeBoon(cast bba);
 		}
 	}
+	
 	
 	var categoryBnB(get, never):CategoryPCP;
 		function get_categoryBnB():CategoryPCP 

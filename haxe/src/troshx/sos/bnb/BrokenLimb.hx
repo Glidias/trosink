@@ -36,7 +36,7 @@ class BrokenLimbAssign extends BaneAssign
 	public static inline var RIGHT_LEG:Int = (1 << 3);
 	public static inline var BOTH_LEGS:Int = (LEFT_LEG | RIGHT_LEG);
 	
-	@:ui({type:"Bitmask", labels:["Left Arm, Right Arm, Left Leg, Right Leg"] })  public var affectedLimbs:Int = 0;
+	@:ui({type:"Bitmask", labels:["Left Arm", "Right Arm", "Left Leg", "Right Leg"] })  public var affectedLimbs:Int = 0;
 	
 	override public function isValid():Bool {
 		

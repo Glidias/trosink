@@ -246,6 +246,22 @@ section.gen-bnb .gen-comp-bb {
 	margin-right:22px;
 	display:inline-block;
 }
+.chargen__footer .bb-details h3 {
+	text-decoration:underline;
+	
+}
+.chargen__footer .bb-details h4 {
+	text-decoration:underline;
+}
+.chargen__footer .bb-details > div {
+	border-bottom:1px solid black;
+	margin-bottom:5px;
+	padding-bottom:15px;
+	
+}
+.chargen__footer .bb-details label, .chargen__footer .bb-details input, .chargen__footer .bb-details textarea, .chargen__footer .bb-details select {
+	vertical-align:top;
+}
 
 section.gen-bnb .boon-tags .gen-comp-bb:hover {
 	background-color:rgba(173, 216, 230, .25);
