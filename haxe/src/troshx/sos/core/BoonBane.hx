@@ -127,11 +127,13 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
 	
 	public var ingame:Bool = false;
+	public var _forcePermanent:Bool = false;
+	public var _canceled:Bool = false;
 	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
-
+	
 	
 	// ingame only
 	public function onFurtherAdded(char:CharSheet):Void {
@@ -190,12 +192,24 @@ class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 		
 	}
 	
+	
+	// utility
+
+	inline function getMaxLength(costBase:Int, curLength:Int):Int {
+		return Std.int((_remainingCached + curLength*costBase ) / costBase);
+	}
+	inline function clampLength(length:Int, minClamp:Int = 1 ):Int {
+		return length >= minClamp ? length : minClamp;
+	}
+	
+	
 	// used internally by engine to imperatively update available points for this assignment (excluding cost of current assignment)
 	public var _remainingCached:Int; 
 	public inline function updateRemainingCache(totalRemaining:Int):Void {
 		_remainingCached = totalRemaining;
 		//_remainingCached = totalRemaining + ( rank >=  1 ?  Std.int(Math.max( getCost(rank), boon.costs[0])) : 0  );
 	}
+	
 	
 	override public function get_uid():String {
 		return boon.uid;

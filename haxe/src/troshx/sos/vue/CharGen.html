@@ -1,6 +1,7 @@
 <div class="chargen">
 	<h1>Song of Swords: Character Creation</h1>
 	<div class="chargen__body">
+		
 		<section class="gen-campaign-type">
 			<h2>Campaign Type:</h2>
 			<div v-for="(li, i) in campaignPowerLevels">
@@ -65,14 +66,16 @@
 				
 		</section>
 			
+		<section class="gen-social-class">
+			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
+		</section>
+			
 		<section class="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				
 		</section>
 			
-		<section class="gen-social-class">
-			<h2>Social Class/Wealth/Inventory <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
-		</section>
+		
 	</div>
 	
 	<hr/>
@@ -85,6 +88,13 @@
 			<h3>Bane(s) details:</h3>
 			<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
 		</div>
+		<hr/>
+
+		<section class="gen-inventory">
+			<h2>Inventory</h2>
+		</section>
+		
+		<hr/>
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
 		</section>

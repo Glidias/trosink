@@ -23,7 +23,7 @@ class Literate extends Boon
 }
 
 class LiterateAssign extends BoonAssign {
-	@:ui({label:"Known scripts", minLength:1, maxLength:Std.int( (_remainingCached + scripts.length)/1) }) public var scripts:Array<String> = [""];
+	@:ui({label:"Known scripts", minLength:1, maxLength:Std.int( (_remainingCached + clampLength(scripts.length))/1) }) public var scripts:Array<String> = [""];
 	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	

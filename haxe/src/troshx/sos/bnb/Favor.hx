@@ -9,8 +9,11 @@ import troshx.sos.sheets.CharSheet;
  */
 class Favor extends Boon {
 	
+	public static inline var COST_1:Int = 1;
+	public static inline var COST_2:Int = 3;
+	
 	public function new() {
-		super("Favor", [1, 3]);
+		super("Favor", [COST_1, COST_2]);
 		clampRank = true;
 		multipleTimes = BoonBane.TIMES_VARYING;
 		
@@ -22,20 +25,24 @@ class Favor extends Boon {
 }
 
 
-class FavorAssign extends BoonAssign { // todo: combination of ranks
+class FavorAssign extends BoonAssign { 
 	
-	@:ui({minLength:1}) public var list:Array<String> = [""];
+	@:ui({minLength:0, maxLength:getMaxLength(Favor.COST_1, clampLength(simpleFavors.length)) }) public var simpleFavors:Array<String> = [""];
+	@:ui({minLength:0, maxLength:getMaxLength(Favor.COST_2, greaterFavors.length) }) public var greaterFavors:Array<String> = [];
 	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	public function new() {
 		super();
 	}
+	override public function isValid():Bool {
+		return getQty() >= 1;
+	}
 	
 	override public function getQty():Int {
-		return list.length;
+		return simpleFavors.length + greaterFavors.length;
 	}
 	
 	override public function getCost(rank:Int):Int {
-		return boon.costs[0] * list.length;
+		return Favor.COST_1 * simpleFavors.length + Favor.COST_2 * greaterFavors.length;
 	}
 }

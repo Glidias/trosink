@@ -36,12 +36,16 @@ class ImpressiveVoiceAssign extends BoonAssign {
 		return (voiceQualities & (POWERFUL | GRATING | SOOTHING)) != 0;
 	}
 	
-	override public function getCost(rank:Int):Int {
+	override public function getQty():Int {
 		var c:Int = 0;
-		c += (voiceQualities & POWERFUL) != 0 ? ImpressiveVoice.COST : 0;
-		c += (voiceQualities & GRATING) != 0 ? ImpressiveVoice.COST: 0;
-		c += (voiceQualities & SOOTHING) != 0 ? ImpressiveVoice.COST : 0;
+		c += (voiceQualities & POWERFUL) != 0 ?  1: 0;
+		c += (voiceQualities & GRATING) != 0 ? 1 : 0;
+		c += (voiceQualities & SOOTHING) != 0 ? 1 : 0;
 		return c;
+	}
+	
+	override public function getCost(rank:Int):Int {
+		return getQty() * ImpressiveVoice.COST;
 	}
 	
 	public function new() {

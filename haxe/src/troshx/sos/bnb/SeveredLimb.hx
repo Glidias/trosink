@@ -35,7 +35,6 @@ class SeveredLimb extends Bane
 
 class SeveredLimbAssign extends BaneAssign
 {
-	// creating ui here is tricky based on level, best to define it in custom inteface method
 	@:ui({type:"SingleSelection", label:"Left Side Upper Limb", labels:["None", "Left Hand", "Left Lower Arm", "Left Full Arm"], values:[0, HAND, LOWER_ARM, FULL_ARM] }) public var severedArmLeft:Int = 0;
 	@:ui({type:"SingleSelection", label:"Right Side Upper Limb", labels:["None", "Right Hand", "Right Lower Arm", "Right Full Arm"], values:[0, HAND, LOWER_ARM, FULL_ARM] }) public var severedArmRight:Int = 0;
 	

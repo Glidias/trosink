@@ -26,8 +26,8 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	}
 	
 	override function Template():String {
-		return  '<span class="gen-comp-bb" :class="{disabled:max<1, selected:obj[prop]>0}">
-		<label><input type="checkbox" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
+		return  '<span class="gen-comp-bb" :class="{canceled:obj._canceled, disabled:max<1, selected:obj[prop]>0}">
+		<label><input type="checkbox" :disabled="obj._canceled" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" :disabled="obj._canceled" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
 		</span>';
 	}
 	
@@ -46,7 +46,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	}
 	
 	@:computed function get_min():Int {
-		return 0;
+		return bba._forcePermanent ? 1 : 0;
 	}
 	@:computed function get_max():Int {
 		var cm = this.coreMax;
@@ -78,7 +78,12 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	function toggleIfPossible(e:Event):Void {
 		
 		var cur:Int = LibUtil.field(obj, prop);
-		if (cur ==0) {
+		if (bba._canceled) {	
+			bba._canceled = false;
+			return;
+		}
+		
+		if (cur == 0 ) {
 			LibUtil.setField(obj, prop, 1);
 			e.stopPropagation();
 			e.preventDefault();
@@ -153,9 +158,11 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		var costArr = bber.costs;
 		var rankCost = bba.rank < 2 ? costArr[0] : costArr[bba.rank - 1];
 		var costJoin = ""+( bba.rank == 1 ? "<b>"+costArr[0]+"</b>" : ""+costArr[0]);
-			
+		var max = this.max;
 		for (i in 1...costArr.length) {
-			costJoin += (customCostInnerSlashes!=null ?  customCostInnerSlashes.charAt(i-1) : joinStr ) + ( bba.rank == i+1 ? "<b>"+costArr[i]+"</b>" : ""+costArr[i]);
+			var joinChar = (customCostInnerSlashes != null ?  customCostInnerSlashes.charAt(i - 1) : (joinStr) );
+			
+			costJoin += (i==max ? '<span class="limit-join">'+joinChar+"</span>" : joinChar) + ( bba.rank == i+1 ? "<b>"+costArr[i]+"</b>" : ""+costArr[i]);
 		}
 		var costDisp = openBracket + costJoin + closeBracket;
 		

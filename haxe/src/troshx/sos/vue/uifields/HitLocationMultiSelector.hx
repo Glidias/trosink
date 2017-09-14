@@ -32,7 +32,7 @@ class HitLocationMultiSelector extends VComponent<NoneT, HitLocationProps>
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
-			"comp" => new SingleSelection()
+			"comp" => new Bitmask()
 		];
 	}
 	

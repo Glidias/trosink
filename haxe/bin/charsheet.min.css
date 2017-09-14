@@ -49,6 +49,8 @@ td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
 .chargen h2 .valuer .num{font-size:16px;font-style:italic;margin-left:2px;margin-right:2px;}
 section.gen-bnb input[type=number]{width:27px;margin-right:2px;}
 section.gen-bnb .gen-comp-bb{margin-right:22px;display:inline-block;}
+section.gen-bnb .gen-comp-bb span.limit-join{font-size:17px;}
+section.gen-bnb .gen-comp-bb.canceled{text-decoration:line-through;}
 .chargen__footer .bb-details h3{text-decoration:underline;}
 .chargen__footer .bb-details h4{text-decoration:underline;}
 .chargen__footer .bb-details>div{border-bottom:1px solid black;margin-bottom:5px;padding-bottom:15px;}

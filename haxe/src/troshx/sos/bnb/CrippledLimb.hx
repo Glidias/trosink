@@ -38,7 +38,7 @@ class CrippledLimbAssign extends BaneAssign
 	@:ui({type:"Bitmask", labels:["Left Arm", "Right Arm", "Left Leg", "Right Leg"] }) public var affectedLimbs:Int = 0;
 	
 	override public function isValid():Bool {
-		return affectedLimbs > 0;// && (affectedLimbs & (BOTH_LEGS | BOTH_ARMS)) != 0;
+		return getQty() > 0;// && (affectedLimbs & (BOTH_LEGS | BOTH_ARMS)) != 0;
 	}
 	override public function getCost(rank:Int):Int {
 		return getQty() * super.getCost(rank);

@@ -24,9 +24,9 @@ class MoneyField  extends VComponent<NoneT, BaseUIProps>
 	override function Template():String {
 		return '<div>
 			<h6>Money:</h6>
-			<label><input type="number" step="1" v-model.number="current.gp"></input>&nbsp;GP</label> &nbsp;
-			<label><input type="number" step="1" v-model.number="current.sp"></input>&nbsp;SP</label> &nbsp;
-			<label><input type="number" step="1" v-model.number="current.cp"></input>&nbsp;CP</label> &nbsp;
+			<label><input type="number" step="1" v-model.number="current.gp" :disabled="disabled"></input>&nbsp;GP</label> &nbsp;
+			<label><input type="number" step="1" v-model.number="current.sp" :disabled="disabled"></input>&nbsp;SP</label> &nbsp;
+			<label><input type="number" step="1" v-model.number="current.cp" :disabled="disabled"></input>&nbsp;CP</label> &nbsp;
 		</div>';
 	}
 	

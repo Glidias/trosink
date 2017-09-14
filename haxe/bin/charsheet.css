@@ -246,6 +246,13 @@ section.gen-bnb .gen-comp-bb {
 	margin-right:22px;
 	display:inline-block;
 }
+section.gen-bnb .gen-comp-bb span.limit-join {
+	font-size:17px;
+	
+}
+section.gen-bnb .gen-comp-bb.canceled {
+	text-decoration: line-through;
+}
 .chargen__footer .bb-details h3 {
 	text-decoration:underline;
 	

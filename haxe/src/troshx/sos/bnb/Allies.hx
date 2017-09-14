@@ -26,7 +26,7 @@ class Allies extends Boon {
 
 class AlliesAssign extends BoonAssign {  // todo: combination of ranks
 	
-	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_1, minorPowerList.length)}) public var minorPowerList:Array<String> = [""];
+	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_1, clampLength(minorPowerList.length))}) public var minorPowerList:Array<String> = [""];
 	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_2, moderatePowerList.length)}) public var moderatePowerList:Array<String> = [];
 	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_3, majorPowerList.length)}) public var majorPowerList:Array<String> = [];
 	@:ui({type:"textarea"}) public var notes:String;
@@ -39,9 +39,7 @@ class AlliesAssign extends BoonAssign {  // todo: combination of ranks
 		return minorPowerList.length + moderatePowerList.length + majorPowerList.length;
 	}
 	
-	inline function getMaxLength(costBase:Int, curLength:Int):Int {
-		return Std.int((_remainingCached + curLength*costBase ) / costBase);
-	}
+	
 	
 	 function getMaxLengthCost(costBase:Int, length:Int):Int {
 		//var a = getMaxLength(costBase);

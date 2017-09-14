@@ -49,6 +49,23 @@ class CharSheet implements IBuildListed
 	public var intelligence:Int = 0;
 	public var perception:Int = 0;
 	
+	
+	public var STR(get, never):Int;	// strength
+	inline function get_STR():Int { return strength;  } 
+	public var AGI(get, never):Int;	// agility
+	inline function get_AGI():Int { return agility;  } 
+	public var END(get, never):Int;	// endurance
+	inline function get_END():Int { return endurance;  } 
+	public var HLT(get, never):Int;	// health
+	inline function get_HLT():Int { return health;  } 
+	public var WIL(get, never):Int;	// willpower
+	inline function get_WIL():Int { return willpower;  } 
+	public var WIT(get, never):Int;	// wit
+	inline function get_WIT():Int { return wit;  } 
+	public var INT(get, never):Int;	// intelligence
+	inline function get_INT():Int { return intelligence;  } 
+	public var PER(get, never):Int;	// perception
+	inline function get_PER():Int { return perception;  } 
 
 	public var ADR(get, never):Int;	// Adroitness
 	public var MOB(get, never):Int;	// Mobility

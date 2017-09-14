@@ -274,7 +274,8 @@ class CharGenData implements IBuildListed
 		var total = 0;
 		var i:Int = arr.length;
 		while (--i > -1) {
-			total += arr[i]._costCached;
+			var b = arr[i];
+			total += !b._canceled ? b._costCached : 0;
 		}
 		return total;
 	}
@@ -302,7 +303,8 @@ class CharGenData implements IBuildListed
 		var total = 0;
 		var i:Int = arr.length;
 		while (--i > -1) {
-			total += arr[i]._costCached;
+			var b = arr[i];
+			total += !b._canceled ? b._costCached : 0;
 		}
 		return total;
 	}
