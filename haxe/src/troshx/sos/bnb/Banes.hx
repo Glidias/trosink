@@ -200,6 +200,7 @@ class Poor extends Bane {
 	public function new() {
 		super("Poor", [4, 6, 8]);
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
+		channels = BoonBane.__RICH__POOR;
 		staticModifiers = [
 			StaticModifier.create(Modifier.STARTING_WEALTH, 0, .5),
 			StaticModifier.create(Modifier.STARTING_WEALTH, 0, .25),
