@@ -19,7 +19,7 @@
 			
 			
 		<!-- for each category -->
-		<section class="gen-race">
+		<section class="gen-race" id="gen-race">
 			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span></h2>
 			<div>
 				<label><input type="radio">Human</input></label>	
@@ -29,7 +29,7 @@
 		
 			
 			
-		<section class="gen-attributes">
+		<section class="gen-attributes" id="gen-attributes">
 			<h2>Attributes <span class="valuer">({{remainingAttributePoints}}  Attribute Points remaining. (Available: {{availableAttributePoints}}) ) </span></h2>
 			<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
 			<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
@@ -41,55 +41,61 @@
 			<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /></div>
 			
 		</section>
+
 			
-			
-		<section class="gen-bnb">
+		<section class="gen-bnb"  id="gen-bnb">
 			<h2>Boons &amp; Banes <span class="valuer">(<span class="num">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>
+			
 			<span v-show="totalBnBScore<0" class="invalid"><span style="color:red">invalid!</span><i style="font-size:13px">(Need &gt;=0 B&amp;B points!<br/>Assign more PCP to 'Boons &amp; Banes' or buy more Banes to pay off debt!)</i></span>
 			<span v-show="totalBnBScore>=0" class="valid">
-				<span style="color:green">Ok!</span><br/><span v-show="totalBnBScore>0" style="color:orange;font-size:13px">(but you additional {{ totalBnBScore }} B&amp;B Points!)</span>
+				<span style="color:green">Ok!</span><br/><span v-show="totalBnBScore>0" style="color:orange;font-size:13px">(but you have additional {{ totalBnBScore }} B&amp;B Points!)</span>
+				<div class="opencloselink"><a href="#" v-show="showBnBs" v-on:click.prevent="showBnBs=false">^ Hide</a><a href="#" v-show="!showBnBs" v-on:click.prevent="showBnBs=true">Open &gt;</a> &nbsp;&nbsp;<a style="font-size:12px;float:right" href="#gen-skills" class="jumplink">Skip to Skills{{ totalBnBScore > 0 ? " first..." : "" }}</a></div>
 			</span>
 			
 			</h2>
-			<h3>Boons: -{{ totalBoonExpenditure }}   <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>
-			<div class="boon-tags">
-				<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
-			</div>	
-			<h3>Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>
-			<div class="bane-tags">
-				<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
+			<div v-show="shouldShowBnBs">
+				<h3>Choose Boons: -{{ totalBoonExpenditure }}   <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>
+				<div class="boon-tags">
+					<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
+				</div>	
+				<h3>Choose Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>
+				<div class="bane-tags">
+					<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
+				</div>
+				
+				<hr/>
+				<div class="bb-details">
+				<h3><span class="underline">Boon(s):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
+				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
+				</div>
+				<div class="bb-details">
+					<h3><span>Bane(s):</span><span class="header-liners"></span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined" v-for="li in banesArray">{{li.bane.name}}</a></span></h3>
+					<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
+				</div>
 			</div>
 		</section>
 			
-		<section class="gen-skills">
+		<hr/>
+			
+		<section class="gen-skills"  id="gen-skills">
 			<h2>Skills <span class="valuer">({{placeholder}} Skill Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				
 		</section>
 			
-		<section class="gen-social-class">
+		<section class="gen-social-class"  id="gen-social-class">
 			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
 		</section>
 			
-		<section class="gen-schoolprofs">
+		<section class="gen-schoolprofs"  id="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				
 		</section>
 			
-		
+	
 	</div>
 	
 	<hr/>
 	<div class="chargen__footer">
-		<div class="bb-details">
-			<h3>Boon(s) details:</h3>
-			<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
-		</div>
-		<div class="bb-details">
-			<h3>Bane(s) details:</h3>
-			<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
-		</div>
-		<hr/>
-
 		<section class="gen-inventory">
 			<h2>Inventory</h2>
 		</section>

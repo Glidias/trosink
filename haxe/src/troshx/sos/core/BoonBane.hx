@@ -166,10 +166,10 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 		return null;
 	}
 	
+	
 	public function getUIFields():Array<Dynamic> {
 		return null;
 	}
-	
 	
 
 	

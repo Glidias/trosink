@@ -26,7 +26,12 @@ class CharGenData implements IBuildListed
 	
 	static public inline var INT_MAX:Int = 2147483647;
 	
-
+	var showBnBs:Bool = true;
+	public var shouldShowBnBs(get, never):Bool;
+	function get_shouldShowBnBs():Bool 
+	{
+		return showBnBs ||  totalBnBScore<0;
+	}
 	
 	public function new(charSheet:CharSheet=null) 
 	{
@@ -85,12 +90,14 @@ class CharGenData implements IBuildListed
 	public static inline var CATEGORY_BNB:Int = 2;
 	static function getNewCharGenCategories():Array<CategoryPCP> {
 		var arr:Array<CategoryPCP> = [];
-		arr[CATEGORY_RACE] = new CategoryPCP("Race");
-		arr[CATEGORY_ATTRIBUTES] = new CategoryPCP("Attributes");
-		arr[CATEGORY_BNB] = new CategoryPCP("Boons & Banes");
-		arr[CATEGORY_RACE] = new CategoryPCP("Race");
-		arr[CATEGORY_RACE] = new CategoryPCP("Race");
-		arr[CATEGORY_RACE] = new CategoryPCP("Race");
+		var a;
+		arr[CATEGORY_RACE] = a = new CategoryPCP("Race"); a.slug = "gen-race";
+		arr[CATEGORY_ATTRIBUTES] =a= new CategoryPCP("Attributes"); a.slug = "gen-attributes";
+		arr[CATEGORY_BNB] = a=new CategoryPCP("Boons & Banes"); a.slug = "gen-bnb";
+		
+		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
+		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
+		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
 		return arr;
 	}
 	public var categoryRace(get, never):CategoryPCP;
@@ -360,6 +367,8 @@ class CharGenData implements IBuildListed
 	public function isValidAll(showWarnings:Bool=false):Bool { 
 		return true;
 	}
+	
+	
 	
 	
 }

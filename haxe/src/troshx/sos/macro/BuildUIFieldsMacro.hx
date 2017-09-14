@@ -187,6 +187,18 @@ class BuildUIFieldsMacro
 			}),
 			pos: cp	
 		});
+		
+		if (collectedObjExpr.length > 0) {
+			fields.push({
+			name:"__hasUIFields__",
+			access: [Access.APublic],
+			kind: FieldType.FProp("default", "never",
+			  MacroStringTools.toComplex("Bool"), macro true
+			),
+		
+			pos: cp	
+		});
+		}
 
 		
 		return fields;

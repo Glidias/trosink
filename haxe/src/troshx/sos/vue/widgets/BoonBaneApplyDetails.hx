@@ -66,9 +66,9 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 	
 	override function Template():String {
 		return '
-			<div v-show="uiFields!=null && uiFields.length > 0" :id="slug">
+			<div class="bb-detail" v-show="assign.__hasUIFields__" :id="slug">
 				<h4>{{ titleheader }}</h4>
-				<div v-if="uiFields!=null">	
+				<div>	
 					<div v-for="(li, i) in uiFields" :is="typeMap[li.type]" :obj="assign" v-bind="li" :key="li.prop"></div>
 				</div>
 			</div>

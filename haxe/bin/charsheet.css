@@ -253,20 +253,43 @@ section.gen-bnb .gen-comp-bb span.limit-join {
 section.gen-bnb .gen-comp-bb.canceled {
 	text-decoration: line-through;
 }
-.chargen__footer .bb-details h3 {
+.bb-details h3 .underline {
+	
 	text-decoration:underline;
 	
 }
-.chargen__footer .bb-details h4 {
+
+.bb-details h4 {
 	text-decoration:underline;
 }
-.chargen__footer .bb-details > div {
+.bb-details .header-liners {
+	font-size:12px;
+	text-decoration:none;
+	font-weight:normal;
+}
+.bb-details .header-liners a {
+	display:inline-block;
+	margin-left:5px;
+	
+	
+	
+}
+
+
+.bb-details .header-liners a:after {
+	content:', ';
+}
+.bb-details .header-liners a:last-child:after {
+	content:'';
+}
+
+.bb-details > div {
 	border-bottom:1px solid black;
 	margin-bottom:5px;
 	padding-bottom:15px;
 	
 }
-.chargen__footer .bb-details label, .chargen__footer .bb-details input, .chargen__footer .bb-details textarea, .chargen__footer .bb-details select {
+bb-details label,  .bb-details input, .bb-details textarea,  .bb-details select {
 	vertical-align:top;
 }
 
