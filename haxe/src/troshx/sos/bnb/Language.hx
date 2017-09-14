@@ -53,7 +53,7 @@ class LanguageAssign extends BoonAssign {
 	}
 	
 	override public function getQty():Int {
-		return startingLanguages.length;
+		return startingLanguages.length + secondLanguage.length + polyglotLanguages.length + ingameLanguages.length;
 	}
 	
 
