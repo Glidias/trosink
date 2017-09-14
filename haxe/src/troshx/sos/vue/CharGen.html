@@ -31,15 +31,16 @@
 			
 		<section class="gen-attributes" id="gen-attributes">
 			<h2>Attributes <span class="valuer">({{remainingAttributePoints}}  Attribute Points remaining. (Available: {{availableAttributePoints}}) ) </span></h2>
-			<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /></div>
-			<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /></div>
-			
+			<div class="gen-col">
+				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /></div>
+			</div>
 		</section>
 
 			
@@ -65,11 +66,11 @@
 				
 				<hr/>
 				<div class="bb-details">
-				<h3><span class="underline">Boon(s):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
+				<h3><span class="underline">Boon(s):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" :class="{canceled:li._canceled}" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
 				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
 				</div>
 				<div class="bb-details">
-					<h3><span>Bane(s):</span><span class="header-liners"></span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined" v-for="li in banesArray">{{li.bane.name}}</a></span></h3>
+					<h3><span>Bane(s):</span><span class="header-liners"></span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined"  :class="{canceled:li._canceled}" v-for="li in banesArray">{{li.bane.name}}</a></span></h3>
 					<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
 				</div>
 			</div>

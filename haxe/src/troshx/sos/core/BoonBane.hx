@@ -129,6 +129,7 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	public var ingame:Bool = false;
 	public var _forcePermanent:Bool = false;
 	public var _canceled:Bool = false;
+
 	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;

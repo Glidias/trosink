@@ -21,7 +21,7 @@ class Bitmask extends VComponent<NoneT, BitmaskProps>
 	override function Template():String {
 		return '<div class="troshx-uifields" :class="{disabled:disabled}">
 			<label v-if="label">{{ label }}:&nbsp;</label>
-			<div v-for="(li, i) in labels"><label><input type="checkbox" v-on:click="checkboxHandler($$event.target, i)" :checked="(valueAtIndex(i)&current)!=0" :disabled="!(validateOptionFunc == null || validateOptionFunc())"></input>{{ li }}</label></div>
+			<span style="vertical-align:top; margin-right:5px; display:inline-block" v-for="(li, i) in labels"><label><input type="checkbox" v-on:click="checkboxHandler($$event.target, i)" :checked="(valueAtIndex(i)&current)!=0" :disabled="!(validateOptionFunc == null || validateOptionFunc())"></input>{{ li }}</label></span>
 		</div>';
 	}
 	

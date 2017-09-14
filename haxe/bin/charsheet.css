@@ -271,11 +271,10 @@ section.gen-bnb .gen-comp-bb.canceled {
 	display:inline-block;
 	margin-left:5px;
 	
-	
-	
 }
-
-
+.bb-details .header-liners a.canceled {
+	text-decoration: line-through;
+}
 .bb-details .header-liners a:after {
 	content:', ';
 }

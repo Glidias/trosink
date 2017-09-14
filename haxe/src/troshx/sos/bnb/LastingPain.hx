@@ -11,11 +11,12 @@ import troshx.sos.sheets.CharSheet;
  */
 class LastingPain extends Bane
 {
-	
+	public static inline var COST_MINOR:Int = 4;
+	public static inline var COST_MAJOR:Int = 8;
 
 	public function new() 
 	{
-		super("Lasting Pain", [4, 8]);
+		super("Lasting Pain", [COST_MINOR, COST_MAJOR]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
 		multipleTimes = BoonBane.TIMES_VARYING;
 		clampRank = true;
@@ -28,7 +29,8 @@ class LastingPain extends Bane
 class LastingPainAssign extends BaneAssign {
 	var char:CharSheet;
 	
-	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask  public var hitLocations:Int;
+	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask  public var hitLocationsMinor:Int = 0;
+	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask  public var hitLocationsMajor:Int = 0;
 	//public var hitLocationId:String = "";
 	
 	
@@ -38,22 +40,40 @@ class LastingPainAssign extends BaneAssign {
 	}
 	
 	override public function getCost(rank:Int):Int {
-		return super.getCost(rank) * getQty();
+		return minorCount() * LastingPain.COST_MINOR +  majorCount() * LastingPain.COST_MAJOR;
 	}
 	
-	override public function getQty():Int {
+	function minorCount():Int {
+		var i = char.body.hitLocations.length;
+	
+		var qty:Int = 0;
+		while (--i > -1) {
+			if ( ((1 << i) & hitLocationsMinor) != 0 ) {
+				qty++;
+			}
+		}
+		return qty;
+		
+	}
+	
+	function majorCount():Int {
 		var i = char.body.hitLocations.length;
 		var qty:Int = 0;
 		while (--i > -1) {
-			if ( ((1 << i) & hitLocations) != 0 ) {
+			if ( ((1 << i) & hitLocationsMajor) != 0 ) {
 				qty++;
 			}
 		}
 		return qty;
 	}
 	
+	override public function getQty():Int {
+	
+		return minorCount() + majorCount();
+	}
+	
 	override public function isValid():Bool {
-		return hitLocations != 0; // hitLocationId != null && hitLocationId != "";
+		return hitLocationsMajor != 0 || hitLocationsMinor !=0; // hitLocationId != null && hitLocationId != "";
 	}
 }
 

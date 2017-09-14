@@ -31,6 +31,8 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		</span>';
 	}
 	
+
+	
 	@:computed function get_showReset():Bool {
 		var costArr = bb.costs;
 		var cc = this.cost;

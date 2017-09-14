@@ -195,6 +195,49 @@ class MacroUtil
 		}
 	}
 	
+	public static function labelizeAllCaps(name:String):String {
+		var spl = name.split("_");
+		for (i in 0...spl.length) {
+			spl[i] =  spl[i].charAt(0).toUpperCase() + spl[i].substr(1).toLowerCase();
+		}
+		return spl.join(" ");
+	}
+	
+	public static function slugifyAllCaps(name:String):String {
+		var spl = name.split("_");
+		for (i in 0...spl.length) {
+			spl[i] =  ( i != 0 ? spl[i].charAt(0).toUpperCase() : spl[i].charAt(0).toLowerCase() ) + spl[i].substr(1).toLowerCase();
+		}
+		return spl.join("");
+	}
+	
+	public static function labelizeCamelCase(name:String):String {
+		var r = new EReg("([A-Z]+)", "g");
+		var r2 = new EReg("([A-Z][a-z])", "g");
+		name = r.replace(name, "$1");
+		name = r2.replace(name, " $1");
+		name = StringTools.trim(name);
+		name = name.charAt(0).toUpperCase() + name.substr(1);
+		//trace(name);
+		return name;
+	}
+	
+	public static function labelizeAllCapsArr(arr:Array<String>):Array<String> {
+		var newArr:Array<String> = [];
+		for (i in 0...arr.length) {
+			newArr[i] = labelizeAllCaps(arr[i]);
+		}
+		return newArr;
+	}
+	
+	public static function labelizeCamelCaseArr(arr:Array<String>):Array<String> {
+		var newArr:Array<String> = [];
+		for (i in 0...arr.length) {
+			newArr[i] = labelizeCamelCase(arr[i]);
+		}
+		return newArr;
+	}
+	
 
 #end
 

@@ -26,7 +26,7 @@ class OldWound extends Bane
 
 class OldWoundAssign extends BaneAssign {
 	
-	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask public var hitLocations:Int  = 0;
+	@:ui({type:"HitLocationMultiSelector", body:char.body }) public var hitLocations:Int  = 0;
 	//public var hitLocations:Array<String> = [];
 	
 	

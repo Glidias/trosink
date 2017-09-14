@@ -61,8 +61,8 @@ class BodyChar
 		bodyChar.name = "Humanoid";
 		
 		// this shoudl be factored into the IBodyHitZones macro
-		bodyChar.targetZones = [];
-		bodyChar.hitLocations = [];
+		bodyChar.targetZones = Humanoid.getNewTargetZones();
+		bodyChar.hitLocations = Humanoid.getNewHitLocations();
 		bodyChar.thrustStartIndex = Humanoid.thrustStartIndex;
 		
 		// todo; remaining damage tables for actual game.
@@ -167,7 +167,6 @@ class Humanoid implements IBodyHitZones {
 	@:hitMask("Lower Arm") public static inline var LOWER_ARM:Int = (1 << ELBOW) |  (1 << FOREARM) | (1 << HAND);
 	@:hitMask("Lower Leg") public static inline var LOWER_LEG:Int =  (1 << KNEE) | (1 << SHIN) | (1 << FOOT);
 
-	
 	
 	
 	

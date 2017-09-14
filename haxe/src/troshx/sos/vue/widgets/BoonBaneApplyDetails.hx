@@ -52,6 +52,13 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 		return Std.int( Math.max(this.cost, bb.costs[0]) );
 	}
 	
+	@:computed function get_locked():Bool {
+		return assign._forcePermanent;
+	}
+	@:computed function get_isCanceled():Bool {
+		return assign._canceled;
+	}
+	
 	@:computed function get_typeMap():Dynamic<String> {
 		return UI.getTypeMapToComponentNames();
 	}
@@ -66,7 +73,7 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 	
 	override function Template():String {
 		return '
-			<div class="bb-detail" v-show="assign.__hasUIFields__" :id="slug">
+			<div class="bb-detail" v-show="assign.__hasUIFields__ && !isCanceled" :id="slug">
 				<h4>{{ titleheader }}</h4>
 				<div>	
 					<div v-for="(li, i) in uiFields" :is="typeMap[li.type]" :obj="assign" v-bind="li" :key="li.prop"></div>
