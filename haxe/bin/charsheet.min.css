@@ -55,7 +55,7 @@ section.gen-bnb .gen-comp-bb.canceled{text-decoration:line-through;}
 .bb-details h4{text-decoration:underline;}
 .bb-details .header-liners{font-size:12px;text-decoration:none;font-weight:normal;}
 .bb-details .header-liners a{display:inline-block;margin-left:5px;}
-.bb-details .header-liners a.canceled{text-decoration:line-through;}
+.bb-details .header-liners a.canceled{text-decoration:line-through;pointer-events:none;}
 .bb-details .header-liners a:after{content:', ';}
 .bb-details .header-liners a:last-child:after{content:'';}
 .bb-details>div{border-bottom:1px solid black;margin-bottom:5px;padding-bottom:15px;}

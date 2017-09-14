@@ -274,6 +274,7 @@ section.gen-bnb .gen-comp-bb.canceled {
 }
 .bb-details .header-liners a.canceled {
 	text-decoration: line-through;
+	pointer-events:none;
 }
 .bb-details .header-liners a:after {
 	content:', ';

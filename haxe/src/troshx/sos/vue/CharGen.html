@@ -57,11 +57,11 @@
 			<div v-show="shouldShowBnBs">
 				<h3>Choose Boons: -{{ totalBoonExpenditure }}   <span v-show="true" style="color:#aaaaaa">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>
 				<div class="boon-tags">
-					<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
+					<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:uncancel="uncancel" v-on:addBB="addBB" v-on:removeBB="removeBB"  :remaining="maxBoonsSpendableLeft" />
 				</div>	
 				<h3>Choose Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>
 				<div class="bane-tags">
-					<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
+					<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:uncancel="uncancel"  v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
 				</div>
 				
 				<hr/>

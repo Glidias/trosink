@@ -82,6 +82,14 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		var cur:Int = LibUtil.field(obj, prop);
 		if (bba._canceled) {	
 			bba._canceled = false;
+			if (cur == 0) {
+				LibUtil.setField(obj, prop, 1);
+				e.stopPropagation();
+				e.preventDefault();
+			}
+			else {
+				_vEmit("uncancel", bba, isBane);
+			}
 			return;
 		}
 		

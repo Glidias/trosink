@@ -128,6 +128,7 @@ class CharSheet implements IBuildListed
 		banes.delete(assign);
 	}
 	
+	
 	public var arcPointsAccum:Int = 0;
 	var arcSpent:Int = 0;
 	public var arcPointsAvailable(get, never):Int;

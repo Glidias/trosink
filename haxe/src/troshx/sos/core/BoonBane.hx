@@ -71,6 +71,7 @@ class BoonBane
 		this.flags = 0;
 		this.clampRank = false;
 		this.multipleTimes = 0;
+		this.channels = 0;
 	}
 
 	

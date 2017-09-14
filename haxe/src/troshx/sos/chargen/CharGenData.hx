@@ -242,29 +242,110 @@ class CharGenData implements IBuildListed
 
 		*/
 
+		public function restoreAnyBnBWithMask(msk:Int):Void {
+		var arr = baneAssignList;
+		var arr2 = boonAssignList;
+		for (i in 0...arr.length) {  // banes first
+			var a = arr[i];
+			if ( a._canceled && (a.bane.channels & msk)!=0 ) {
+				a._canceled = false;
+				return;
+			}
+		}
+		for (i in 0...arr2.length) {
+			var a = arr2[i];
+			if ( a._canceled &&  (a.boon.channels & msk)!=0 ) {
+				a._canceled = false;
+				return;
+			}
+		}
+	}
+	
+	// Duplicate
+	public function checkBaneAgainstOthers(baneAssign:troshx.sos.core.BoonBane.BaneAssign):Void {
+		var arr = baneAssignList;
+		var arr2 = boonAssignList;
+		baneAssign._canceled = false;
+		if (baneAssign.bane.channels == 0) return;
+		
+		var msk:Int = baneAssign.bane.channels;
+		for (i in 0...arr.length) {
+			var a = arr[i];
+			if ( a != baneAssign && (a.bane.channels & msk)!=0 ) {
+				a._canceled = true;
+			}
+		}
+		for (i in 0...arr2.length) {
+			var a = arr2[i];
+			if (  (a.boon.channels & msk)!=0 ) {
+				a._canceled = true;
+			}
+		}
+	}
+	
+	// dupliacte semi
+	public function checkBoonAgainstOthers(boonAssign:troshx.sos.core.BoonBane.BoonAssign):Void {
+		var arr = baneAssignList;
+		var arr2 = boonAssignList;
+		boonAssign._canceled = false;
+		if (boonAssign.boon.channels == 0) return;
+		
+		var msk:Int = boonAssign.boon.channels;
+			for (i in 0...arr.length) {
+			var a = arr[i];
+			if (   (a.bane.channels & msk)!=0 ) {
+				a._canceled = true;
+			}
+		}
+		for (i in 0...arr2.length) {
+			var a = arr2[i];
+			if ( a != boonAssign && (a.boon.channels & msk)!=0 ) {
+				a._canceled = true;
+			}
+		}
+		
+	}
 		
 	public static inline function getBnBFromPCP(pcp:Int):Int {
 		return -BaneAssign.MAX_BANE_EARNABLE + (pcp*5-5);
 	}
-
+	
+	public function uncancel(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
+		bba._canceled = false;
+		if (isBane) {
+		
+			checkBaneAgainstOthers(cast bba);
+		}
+		else {
+			
+			checkBoonAgainstOthers(cast bba);
+		}
+	}
 		
 	public function addBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
 		//trace("ADDING:" + bba + " , " + isBane);
 		if (isBane) {
 			char.addBane(cast bba);
+			checkBaneAgainstOthers(cast bba);
 		}
 		else {
 			char.addBoon(cast bba);
+			checkBoonAgainstOthers(cast bba);
 		}
 		
 	}
 	public function removeBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
 		//trace("REMOVING:" + bba + " , " + isBane);
 		if (isBane) {
-			char.removeBane(cast bba);
+			var b:BaneAssign = cast bba;
+			char.removeBane(b);
+			if (b.bane.channels!=0 ) restoreAnyBnBWithMask(b.bane.channels);
+			
 		}
 		else {
-			char.removeBoon(cast bba);
+			var b:BoonAssign = cast bba;
+			char.removeBoon(b);
+			if (b.boon.channels !=0) restoreAnyBnBWithMask(b.boon.channels);
 		}
 	}
 	
@@ -317,11 +398,11 @@ class CharGenData implements IBuildListed
 	}
 	
 	public var boonsArray(get, never):Array<troshx.sos.core.BoonBane.BoonAssign>;
-	function get_boonsArray():Array<BoonAssign> {
+	inline function get_boonsArray():Array<BoonAssign> {
 		return char.boonsArray;
 	}
 	public var banesArray(get, never):Array<troshx.sos.core.BoonBane.BaneAssign>;
-	function get_banesArray():Array<BaneAssign> {
+	inline function get_banesArray():Array<BaneAssign> {
 		return char.banesArray;
 	}
 	

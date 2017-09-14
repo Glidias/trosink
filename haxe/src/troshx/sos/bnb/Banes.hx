@@ -60,7 +60,7 @@ class BadReputation extends Bane {
 class BarrenOrSterility extends Bane {
 	public function new() {
 		super("Barren/Sterility", [1, 3]);
-		channels = BoonBane.CANNOT_BE_REMOVED;
+		flags = BoonBane.CANNOT_BE_REMOVED;
 		conditions = [null, canBeEunich];
 	}
 	
