@@ -25,7 +25,7 @@ class SingleSelection extends VComponent<NoneT, SelectionProps>
 		return '<div>
 			<label v-if="label">{{ label }}</label>:<br/>
 			<select v-model="obj[prop]" :disabled="disabled">
-				<option v-for="(li, i) in labels" :value="valueAtIndex(i)" :disabled="!(validateOptionFunc == null || validateOptionFunc())">{{ li }}</option> 
+				<option v-for="(li, i) in labels" :value="valueAtIndex(i)" :disabled="!(validateOptionFunc == null || validateOptionFunc(i))">{{ li }}</option> 
 			</select>
 		</div>';
 	}
@@ -35,5 +35,5 @@ typedef SelectionProps = {
 	>BaseUIProps,
 	@:prop({required:true}) var labels:Array<String>;
 	@:prop({required:false}) @:optional var values:Array<Dynamic>;
-	@:prop({required:false}) @:optional var validateOptionFunc:Void->Void;
+	@:prop({required:false}) @:optional var validateOptionFunc:Int->Void;
 }

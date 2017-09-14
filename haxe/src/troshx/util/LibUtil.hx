@@ -41,6 +41,12 @@ class LibUtil
 		#end
 	}
 	
+	public static function override2ndObjInto(into:Dynamic, obj2:Dynamic):Dynamic {
+		for (p in Reflect.fields(obj2)) {
+			LibUtil.setField(into, p, LibUtil.field(obj2, p));
+		}
+		return into;
+	}
 	public static function setFieldChain<T>(of:Dynamic<T>, field:String, value:T):T {
 		setField(of, field, value);
 		return value;

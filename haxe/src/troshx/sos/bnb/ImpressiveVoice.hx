@@ -30,10 +30,14 @@ class ImpressiveVoiceAssign extends BoonAssign {
 	public static inline var GRATING:Int = (1 << 1);
 	public static inline var SOOTHING:Int = (1 << 2);
 	
-	@:ui({type:"Bitmask", labels:["Powerful", "Grating", "Soothing"] }) var voiceQualities:Int = 0;
+	@:ui({type:"Bitmask", labels:["Powerful", "Grating", "Soothing"], validateOptionFunc:canBeToggled }) var voiceQualities:Int = 0;
 	
 	override public function isValid():Bool {
 		return (voiceQualities & (POWERFUL | GRATING | SOOTHING)) != 0;
+	}
+	
+	function canBeToggled(index:Int):Bool {
+		return bitmaskIndexCanBeToggledAtCost(index, voiceQualities, ImpressiveVoice.COST);
 	}
 	
 	override public function getQty():Int {

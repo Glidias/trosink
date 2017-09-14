@@ -56,6 +56,8 @@ class HitLocationSelector extends VComponent<NoneT, HitLocationProps>
 			labels: this.labels
 			
 		};
+		var otherAttrs = _vAttrs;
+		LibUtil.override2ndObjInto(props, otherAttrs);
 		return c("comp", {props:props});
 	}
 	

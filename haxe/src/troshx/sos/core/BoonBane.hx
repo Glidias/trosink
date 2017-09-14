@@ -202,6 +202,11 @@ class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 	inline function clampLength(length:Int, minClamp:Int = 1 ):Int {
 		return length >= minClamp ? length : minClamp;
 	}
+	inline function bitmaskIndexCanBeToggledAtCost(index:Int, value:Int, cost:Int):Bool {
+		var curChecked:Bool = (value & (1 << index)) != 0;
+		var b =  _remainingCached >= cost;
+		return curChecked || b;
+	}
 	
 	
 	// used internally by engine to imperatively update available points for this assignment (excluding cost of current assignment)
