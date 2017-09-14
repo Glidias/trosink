@@ -30,7 +30,7 @@ class BoonBane
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	
 	// these modifiers are only triggered upon events
-	public var eventBasedModifiers:Array<EventModifierBinding>;
+	public var eventBasedModifiers(default, null):Array<EventModifierBinding>;
 	
 	public var customCostInnerSlashes(default, null):String;
 	

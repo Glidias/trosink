@@ -26,6 +26,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		super();
 	}
 	
+	
+	
 	override function Data():CharGenData {
 		return new CharGenData();
 	}
@@ -38,6 +40,12 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			v.updateRemainingCache(newValue);
 		}
 		
+	}
+	@:watch function watch_raceTier(newValue:Int):Void {
+		
+		if (this.selectedTierIndex >= newValue) {
+			this.resetToHuman();
+		}
 	}
 	
 	function getBnBSlug(name:String):String {

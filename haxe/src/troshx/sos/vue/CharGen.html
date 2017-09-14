@@ -3,14 +3,14 @@
 	<div class="chargen__body">
 		
 		<section class="gen-campaign-type">
-			<h2>Campaign Type:</h2>
+			<h2>Campaign Power</h2>
 			<div v-for="(li, i) in campaignPowerLevels">
-				<label><input type="radio" :checked="campaignPowLevelIndex == i">{{li.name}} (<span class="num">{{li.pcp}}</span> PCP Total) (Max <span class="num">{{li.maxCategoryPCP}}</span> PCP per category) </input></label>
+				<label><input type="radio" name="campaign-power" v-on:click="campaignPowLevelIndex=i" :checked="campaignPowLevelIndex == i">{{li.name}} (<span class="num">{{li.pcp}}</span> PCP Total) (Max <span class="num">{{li.maxCategoryPCP}}</span> PCP per category) </input></label>
 			</div>
 		</section>
+				
 		<section class="gen-categories">
-			<h2>Categories <span class="valuer">({{ categoriesRemainingAssignable }} remaining PCP)</span></h2>
-
+			<h2>Categories <span class="valuer" :class="{'still-have':categoriesRemainingAssignable>0}">({{ categoriesRemainingAssignable }} remaining PCP)</span> <span class="valid" v-show="categoriesRemainingAssignable==0" style="color:green">Ok!</span></h2>
 			<div v-for="(li, i) in categories"><label>{{li.name}}: </label><CategoryPCPInput :obj="li" prop="pcp" :magic="li.magic" :remainingAssignable="categoriesRemainingAssignable" :maxPCPPerCategory="campaignPowLevel.maxCategoryPCP" />PCP</div>
 		</section>
 			
@@ -20,17 +20,19 @@
 			
 		<!-- for each category -->
 		<section class="gen-race" id="gen-race">
-			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span></h2>
-			<div>
-				<label><input type="radio">Human</input></label>	
+			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span> <span class="valid" v-show="!promptSettleRaceTier" style="color:green">Ready.</span></h2>
+			<div v-for="(tier, ti) in raceTierTable" :key="ti">
+				{{ ti + 1 }}: ({{pcpForTiers[ti]}} PCP)
+				<label :class="{disabled:ti>=raceTier}" v-for="(race, ri) in tier"><input type="radio" :disabled="ti>=raceTier" name="race" :checked="race.name == selectedRaceName" v-on:click="selectRaceAt(ti, ri)" :key="ri"></input>{{ race.name }}</label>
 			</div>
+			<div v-show="promptSettleRaceTier"><button style="margin-top:10px"  v-on:click="settleRaceTier()">Finalise Race/Tier!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm.</span></div>
 		</section>
 			
-		
+		<hr/>
 			
 			
 		<section class="gen-attributes" id="gen-attributes">
-			<h2>Attributes <span class="valuer">({{remainingAttributePoints}}  Attribute Points remaining. (Available: {{availableAttributePoints}}) ) </span></h2>
+			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0" style="color:green">Ok!</span></h2>
 			<div class="gen-col">
 				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
 				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
@@ -43,14 +45,14 @@
 			</div>
 		</section>
 
-			
+		<hr/>
 		<section class="gen-bnb"  id="gen-bnb">
 			<h2>Boons &amp; Banes <span class="valuer">(<span class="num">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>
 			
 			<span v-show="totalBnBScore<0" class="invalid"><span style="color:red">invalid!</span><i style="font-size:13px">(Need &gt;=0 B&amp;B points!<br/>Assign more PCP to 'Boons &amp; Banes' or buy more Banes to pay off debt!)</i></span>
 			<span v-show="totalBnBScore>=0" class="valid">
-				<span style="color:green">Ok!</span><br/><span v-show="totalBnBScore>0" style="color:orange;font-size:13px">(but you have additional {{ totalBnBScore }} B&amp;B Points!)</span>
-				<div class="opencloselink"><a href="#" v-show="showBnBs" v-on:click.prevent="showBnBs=false">^ Hide</a><a href="#" v-show="!showBnBs" v-on:click.prevent="showBnBs=true">Open &gt;</a> &nbsp;&nbsp;<a style="font-size:12px;float:right" href="#gen-skills" class="jumplink">Skip to Skills{{ totalBnBScore > 0 ? " first..." : "" }}</a></div>
+				<span style="color:green">Ok!</span><br/><span v-show="totalBnBScore>0" style="color:#ff4444;font-size:13px">(but you have additional {{ totalBnBScore }} B&amp;B Points!)</span>
+				<div class="opencloselink"><a href="#" v-show="showBnBs" v-on:click.prevent="showBnBs=false">^ Hide</a><a href="#" v-show="!showBnBs" v-on:click.prevent="showBnBs=true">Open &gt;</a> &nbsp;&nbsp;<a style="font-size:12px;float:right" href="#gen-skills" class="jumplink">Skip to Skills..</a></div>
 			</span>
 			
 			</h2>
@@ -83,10 +85,12 @@
 				
 		</section>
 			
+		<hr/>
 		<section class="gen-social-class"  id="gen-social-class">
 			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
 		</section>
-			
+
+		<hr/>
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
 				

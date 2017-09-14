@@ -8,6 +8,8 @@ import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.Race;
+import troshx.sos.races.Races;
 import troshx.util.LibUtil;
 
 
@@ -24,6 +26,7 @@ class CharGenData implements IBuildListed
 	
 	public var char:CharSheet;
 	
+	
 	static public inline var INT_MAX:Int = 2147483647;
 	
 	var showBnBs:Bool = true;
@@ -38,6 +41,13 @@ class CharGenData implements IBuildListed
 		// Char sheet
 		this.char = charSheet != null ? charSheet : new CharSheet();
 
+		// Default race tier table
+		raceTierTable = Races.getTiers();
+		pcpForTiers = Races.PCP_FOR_TIERS.concat([]);
+		
+		if (charSheet == null) {
+			this.char.race = raceTierTable[0][0];
+		}
 		// Categories
 		this.categories = getNewCharGenCategories();
 		this.categories[CATEGORY_BNB].pcp = 4;
@@ -72,9 +82,13 @@ class CharGenData implements IBuildListed
 	
 	// CAMPAIGN POWER LEVEL
 	public var campaignPowerLevels:Array<CampaignPowerLevel> = [
-		new CampaignPowerLevel("TestLevel", 30, 10),
+		new CampaignPowerLevel("Low (Grittiest)", 14, 5),
+		new CampaignPowerLevel("Medium(Default)", 18, 6),
+		new CampaignPowerLevel("High Fantasy", 22, 7),
+		new CampaignPowerLevel("Epic Fantasy", 26, 8),
+		new CampaignPowerLevel("Awesome Fantasy", 30, 10),
 	];
-	public var campaignPowLevelIndex:Int = 0;
+	public var campaignPowLevelIndex:Int = 1;
 
 	public var campaignPowLevel(get, never):CampaignPowerLevel;
 	inline function get_campaignPowLevel():CampaignPowerLevel 
@@ -84,20 +98,25 @@ class CharGenData implements IBuildListed
 	
 	// CATEGORIES
 	public var categories:Array<CategoryPCP>;
+	
 
 	public static inline var CATEGORY_RACE:Int = 0;
 	public static inline var CATEGORY_ATTRIBUTES:Int = 1;
 	public static inline var CATEGORY_BNB:Int = 2;
+	public static inline var CATEGORY_SKILLS:Int = 3;
+	public static inline var CATEGORY_SOCIAL_WEALTH:Int = 4;
+	public static inline var CATEGORY_PROFECIENCIES:Int = 5;
+	
 	static function getNewCharGenCategories():Array<CategoryPCP> {
 		var arr:Array<CategoryPCP> = [];
 		var a;
 		arr[CATEGORY_RACE] = a = new CategoryPCP("Race"); a.slug = "gen-race";
 		arr[CATEGORY_ATTRIBUTES] =a= new CategoryPCP("Attributes"); a.slug = "gen-attributes";
 		arr[CATEGORY_BNB] = a=new CategoryPCP("Boons & Banes"); a.slug = "gen-bnb";
-		
-		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
-		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
-		//arr[CATEGORY_RACE] = a=new CategoryPCP("Race");
+		arr[CATEGORY_SKILLS] = new CategoryPCP("Skills"); a.slug = "gen-skills";
+		arr[CATEGORY_SOCIAL_WEALTH] = a=new CategoryPCP("Social class/Wealth");  a.slug = "gen-social-class";
+		arr[CATEGORY_PROFECIENCIES] = a = new CategoryPCP("School/Profeciencies"); a.slug = "gen-schoolprofs";
+
 		return arr;
 	}
 	public var categoryRace(get, never):CategoryPCP;
@@ -143,19 +162,56 @@ class CharGenData implements IBuildListed
 	
 	
 	// RACE
+	public var selectedTierIndex:Int = 0;
+	public var raceTierTable:Array<Array<Race>>;
+	
+	var pcpForTiers:Array<Int>;
+	
+	public var selectedRaceName(get, never):String;
+	inline function get_selectedRaceName():String {
+		return char.race != null ? char.race.name : "";
+	}
+	
+	public inline function resetToHuman():Void {
+		selectedTierIndex = 0;
+		this.char.race = raceTierTable[0][0];
+	}
+
+	
+	public inline function selectRaceAt(ti:Int, ri:Int):Void {
+		selectedTierIndex = ti;
+		char.race = raceTierTable[ti][ri];
+
+		
+	}
+	
+	public inline function settleRaceTier():Void {
+		categories[CATEGORY_RACE].pcp = pcpForTiers[selectedTierIndex];
+	}
+	public var promptSettleRaceTier(get, never):Bool;
+	function get_promptSettleRaceTier():Bool {
+		return categories[CATEGORY_RACE].pcp != pcpForTiers[selectedTierIndex];
+	}
 	
 	public var raceTier(get, never):Int;
 	function get_raceTier():Int {
 		return getRaceTierFromPCP(categoryRace.pcp);
 	}
-	public static function getRaceTierFromPCP(pcp:Int):Int {
+	public function getRaceTierFromPCP(pcp:Int):Int {
 		// TODO: lookup table
-		return pcp;
+		var b:Int = 0;
+		for ( i in 0...pcpForTiers.length) {
+			if (pcpForTiers[i] > pcp) break;
+			b = i;
+		}
+		return b + 1;
 	}
 	
 	// ATTRIBUTES
 	static public inline var ATTRIBUTE_START_MAX:Int = 8; 
 	static public inline var MORTAL_MAX:Int = 12;
+	
+	static var PCP_COLUMN_ATTRIBUTES:Array<Int> = [22,23,24,27,31,35,40,45,50,56];
 	
 	var boonAssignList:Array<BoonAssign>;
 	var baneAssignList:Array<BaneAssign>;
@@ -179,13 +235,10 @@ class CharGenData implements IBuildListed
 	
 	public var availableAttributePoints(get, never):Int;
 	function get_availableAttributePoints():Int {
-		return getAvailableAttributePointsFromPCP(categoryAttributes.pcp);
+		return PCP_COLUMN_ATTRIBUTES[categoryAttributes.pcp-1];
 	}
 	
-	public static function getAvailableAttributePointsFromPCP(pcp:Int):Int {
-		// TODO: lookup table
-		return pcp;
-	}
+
 	
 	function get_remainingAttributePoints():Int {
 		return availableAttributePoints- totalAttributePointsSpent;
@@ -439,6 +492,26 @@ class CharGenData implements IBuildListed
 	function get_maxBanesSpendableLeft():Int {
 		return  maxBanesSpendable - totalBaneExpenditure;
 		
+	}
+	
+	
+	// SKILLS
+
+	//static var PCP_COLUMN_SKILLS:Array<Int> = [6,9,12,15,18,21,24,27,30,33];
+	public var SkillPoints(get, never):Int;
+	inline function get_SkillPoints():Int {
+		return 6+(categories[CATEGORY_SKILLS].pcp-1) * 3;	
+	}
+	
+	// SOCIAL CLASS/WEALTH
+	// to lookup wealth table of different social classes
+	
+	
+	// SCHOOL/PROFECIENCIES
+	//static var PCP_COLUMN_PROFS:Array<Int> = [0,3,6,9,12,15,18,21,24,27];
+	public var ProfPoints(get, never):Int;
+	inline function get_ProfPoints():Int {
+		return (categories[CATEGORY_PROFECIENCIES].pcp-1) * 3;	
 	}
 	
 	

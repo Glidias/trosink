@@ -1,6 +1,7 @@
 package troshx.sos.sheets;
 import haxevx.vuex.core.IBuildListed;
 import troshx.ds.HashedArray;
+import troshx.sos.core.Race;
 
 import troshx.sos.core.BodyChar;
 
@@ -25,7 +26,7 @@ class CharSheet implements IBuildListed
 	
 	
 	public var name:String = "";
-	public var race:String = "";
+	public var race:Race = null;
 	
 	public var gender:Int = 0; 
 	@:gender("Male") public static inline var GENDER_MALE:Int = 0;
@@ -250,7 +251,7 @@ class CharSheet implements IBuildListed
 	
 	inline function get_labelRace():String 
 	{
-		return race;
+		return race != null ? race.name : "Unspecified";
 	}
 	
 	

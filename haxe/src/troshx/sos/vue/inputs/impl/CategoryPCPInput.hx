@@ -29,12 +29,13 @@ class CategoryPCPInput extends VComponent<NoneT, CategoryPCPProps>
 		return this.current >= min && this.max <= maxPCPPerCategory;
 	}
 
-	
 	@:computed function get_min():Int {
 		return 	magic ? 0 : 1;
 	}
 	@:computed function get_max():Int {
-		return Std.int( Math.min( this.current + this.remainingAssignable, maxPCPPerCategory ) );
+		var r = Std.int( Math.min( this.current + this.remainingAssignable, maxPCPPerCategory ) );
+		var m = magic ? 0 : 1;
+		return r >= m ? r : m;
 	}
 	
 }

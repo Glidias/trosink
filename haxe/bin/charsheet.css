@@ -295,6 +295,10 @@ bb-details label,  .bb-details input, .bb-details textarea,  .bb-details select 
 	vertical-align:top;
 }
 
+.chargen .valuer.still-have {
+	color:red;
+}
+
 section.gen-bnb .boon-tags .gen-comp-bb:hover {
 	background-color:rgba(173, 216, 230, .25);
 }
@@ -316,6 +320,10 @@ section.gen-bnb .bane-tags .gen-comp-bb.selected.canceled {
 }
 
 
+section.gen-race label.disabled {
+	pointer-events:none;
+	opacity:.5;
+}
 
 .chargen section {
 	padding-bottom:5px;

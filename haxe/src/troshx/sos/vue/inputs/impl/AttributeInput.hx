@@ -34,11 +34,13 @@ class AttributeInput extends VComponent<NoneT, AttributeInputProps>
 		return this.current + this.racialModifier >= this.bareMinAttribute;
 	}
 
-	@:computed function get_min():Int {
+	@:computed inline function get_min():Int {
 		return 	magic ? 0 : 1;
 	}
 	@:computed function get_max():Int {
-		return Std.int( Math.min(current + CharGenData.MaxAttributeLevelUpsFrom(current, this.remainingAttributePoints), CharGenData.ATTRIBUTE_START_MAX) );
+		var r = Std.int( Math.min(current + CharGenData.MaxAttributeLevelUpsFrom(current, this.remainingAttributePoints), CharGenData.ATTRIBUTE_START_MAX) );
+		var b = min;
+		return r >= b ? r : b;
 	}
 	
 }
