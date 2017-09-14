@@ -86,7 +86,7 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 			affected |= (current.affectedLimbs & BrokenLimbAssign.RIGHT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_OFF : Inventory.HELD_MASTER) : 0;
 			for (i in 0...equipedItems.length) {
 				var entry = equipedItems[i];
-				if ( (entry.item.flags & (1 << Item.CRUTCH) ) != 0 ) {
+				if ( (entry.item.flags & Item.CRUTCH ) != 0 ) {
 					crutchesHeld |= entry.held;
 					break;
 				}
