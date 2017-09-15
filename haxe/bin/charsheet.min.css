@@ -58,7 +58,7 @@ section.gen-bnb .gen-comp-bb.canceled{text-decoration:line-through;}
 .bb-details .header-liners a.canceled{text-decoration:line-through;pointer-events:none;}
 .bb-details .header-liners a:after{content:', ';}
 .bb-details .header-liners a:last-child:after{content:'';}
-.bb-details>div{border-bottom:1px solid black;margin-bottom:5px;padding-bottom:15px;}
+.bb-details>div{border-bottom:1px solid #dddddd;margin-bottom:5px;padding-bottom:15px;}
 bb-details label,.bb-details input,.bb-details textarea,.bb-details select{vertical-align:top;}
 .chargen .valuer.still-have{color:red;}
 section.gen-bnb .boon-tags .gen-comp-bb:hover{background-color:rgba(173,216,230,.25);}
@@ -69,6 +69,13 @@ section.gen-bnb .boon-tags .gen-comp-bb.selected.canceled{background-color:rgba(
 section.gen-bnb .bane-tags .gen-comp-bb.selected.canceled{background-color:rgba(100,100,100,.2);}
 section.gen-race label.disabled{pointer-events:none;opacity:.5;}
 .chargen section{padding-bottom:5px;padding-top:5px;}
+.chargen__footer textarea,.chargen__footer label{vertical-align:top;}
 section.gen-bnb .boon-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
 section.gen-bnb .bane-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
+section.gen-skills .skillpacket{display:inline-block;width:160px;border:1px solid black;margin-right:5px;margin-bottom:5px;}
+section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;}
+section.gen-skills .skillpacket label{font-weight:bold;}
+section.gen-skills input[type='number']{width:35px;}
+section.gen-skills input[type='text']{width:50%;}
+section.gen-skills select{width:100%;width:calc(100% - 5px);}
 

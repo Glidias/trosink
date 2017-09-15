@@ -36,7 +36,7 @@ class LanguageAssign extends BoonAssign {
 	@:ui({ minLength:(rank >= 2 ? 0 : 1), label:"Starting Languages #1", maxLength:getMaxLength(Language.COST_SINGLE, startingLanguages.length)  })
 	public var startingLanguages:Array<String> = [""];
 	
-	@:ui({  label:"2nd Language #2", maxLength:(rank == 2 ? 1 : 0) })
+	@:ui({  label:"2nd Starting Language #2", maxLength:(rank == 2 ? 1 : 0) })
 	public var secondLanguage:Array<String> = [];
 	
 	@:ui({  label:"Starting Polyglot Languages #3", maxLength:(rank >= 3 ? char.INT + 2 : 0)  })

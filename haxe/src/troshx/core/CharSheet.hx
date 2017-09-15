@@ -1,4 +1,5 @@
 package troshx.core;
+import troshx.core.BodyChar;
 import troshx.core.BodyChar.Wound;
 import troshx.core.BodyChar.WoundInflict;
 import troshx.core.CharSheet.WoundAffliction;

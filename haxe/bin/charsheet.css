@@ -286,7 +286,7 @@ section.gen-bnb .gen-comp-bb.canceled {
 }
 
 .bb-details > div {
-	border-bottom:1px solid black;
+	border-bottom:1px solid #dddddd;
 	margin-bottom:5px;
 	padding-bottom:15px;
 	
@@ -329,6 +329,9 @@ section.gen-race label.disabled {
 	padding-bottom:5px;
 	padding-top:5px;
 }
+.chargen__footer textarea, .chargen__footer label {
+	vertical-align:top;
+}
 section.gen-bnb .boon-tags .gen-comp-bb.disabled {
 	pointer-events:none;
 	opacity:.3;
@@ -338,3 +341,28 @@ section.gen-bnb .bane-tags .gen-comp-bb.disabled {
 	opacity:.3;
 }
 
+section.gen-skills .skillpacket {
+	display:inline-block;
+	width:160px;
+	border:1px solid black;
+	margin-right:5px;
+	margin-bottom:5px;
+	
+}
+
+section.gen-skills .skillpacket .skill-listing {
+	border-top:1px solid silver;
+}
+section.gen-skills .skillpacket label {
+	font-weight:bold;
+}
+section.gen-skills input[type='number'] {
+	width:35px;
+}
+section.gen-skills input[type='text'] {
+	width:50%;
+}
+section.gen-skills select {
+	width:100%;
+	width:calc(100% - 5px);
+}

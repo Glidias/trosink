@@ -4,11 +4,13 @@ import haxevx.vuex.core.IBuildListed;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CategoryPCP;
+import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.Race;
+import troshx.sos.core.Skill;
 import troshx.sos.races.Races;
 import troshx.util.LibUtil;
 
@@ -78,7 +80,14 @@ class CharGenData implements IBuildListed
 			}
 		}
 		
+		// Skills
+		this.skillPackets = CharGenSkillPackets.getNewSkillPackets();
+		this.skillLabelMappingBases = CharGenSkillPackets.getNewSkillLabelMappingBases();
+		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
+		
 	}
+	
+	
 	
 	// CAMPAIGN POWER LEVEL
 	public var campaignPowerLevels:Array<CampaignPowerLevel> = [
@@ -166,6 +175,11 @@ class CharGenData implements IBuildListed
 	public var raceTierTable:Array<Array<Race>>;
 	
 	var pcpForTiers:Array<Int>;
+	
+	public var isHuman(get, never):Bool;
+	inline function get_isHuman():Bool {
+		return selectedRaceName == "Human";
+	}
 	
 	public var selectedRaceName(get, never):String;
 	inline function get_selectedRaceName():String {
@@ -497,6 +511,20 @@ class CharGenData implements IBuildListed
 	
 	// SKILLS
 
+	var skillPackets:Array<SkillPacket>;
+	
+	var skillLabelMappingBases:Dynamic;
+	var skillLabelMappings:Dynamic<String>;
+
+	function getEmptyMappingsFromBase(base:Dynamic):Dynamic<String>
+	{
+		var map:Dynamic<String> = {};
+		for (p in Reflect.fields(base)) {
+			LibUtil.setField(map, p, "");
+		}
+		return map;
+	}
+	
 	//static var PCP_COLUMN_SKILLS:Array<Int> = [6,9,12,15,18,21,24,27,30,33];
 	public var SkillPoints(get, never):Int;
 	inline function get_SkillPoints():Int {
@@ -531,3 +559,5 @@ typedef WarningDef = {
 	var warn:Bool;
 	var remain:Int;
 }
+
+

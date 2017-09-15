@@ -1,15 +1,13 @@
 package troshx.sos.events;
 
-import troshx.core.CharSheet;
-
-import troshx.core.Weapon;
 import troshx.sos.core.Armor;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.Skill;
 import troshx.ds.ValueHolder;
 import troshx.sos.core.Wound;
-
+import troshx.sos.sheets.CharSheet;
+import troshx.sos.core.Weapon;
 /**
  * DRAFT:
  * A record of syncronous RPG events from which respective modifiers under Item Specials

@@ -2,6 +2,12 @@
 	<h1>Song of Swords: Character Creation</h1>
 	<div class="chargen__body">
 		
+		<section class="gen-general" id="gen-general">
+			<div><label>Name:<input type="text" v-model="char.name"></input></label></div>
+			<div><label>Gender:</label><select number v-model.number="char.gender"><option :value="0">Male</option><option :value="1">Female</option></select></div>
+			<div><label>Left-handed?:<input type="checkbox" v-model="char.leftHanded"></input></label></div>
+		</section>
+		
 		<section class="gen-campaign-type">
 			<h2>Campaign Power</h2>
 			<div v-for="(li, i) in campaignPowerLevels">
@@ -11,7 +17,7 @@
 				
 		<section class="gen-categories">
 			<h2>Categories <span class="valuer" :class="{'still-have':categoriesRemainingAssignable>0}">({{ categoriesRemainingAssignable }} remaining PCP)</span> <span class="valid" v-show="categoriesRemainingAssignable==0" style="color:green">Ok!</span></h2>
-			<div v-for="(li, i) in categories"><label>{{li.name}}: </label><CategoryPCPInput :obj="li" prop="pcp" :magic="li.magic" :remainingAssignable="categoriesRemainingAssignable" :maxPCPPerCategory="campaignPowLevel.maxCategoryPCP" />PCP</div>
+			<div v-for="(li, i) in categories"><label>{{li.name}}: </label><CategoryPCPInput :obj="li" prop="pcp" :magic="li.magic" :remainingAssignable="categoriesRemainingAssignable" :maxPCPPerCategory="campaignPowLevel.maxCategoryPCP" />PCP &nbsp;&nbsp;|{{campaignPowLevel.maxCategoryPCP}}</div>
 		</section>
 			
 			
@@ -29,7 +35,8 @@
 		</section>
 			
 		<hr/>
-			
+				
+		
 			
 		<section class="gen-attributes" id="gen-attributes">
 			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0" style="color:green">Ok!</span></h2>
@@ -66,7 +73,8 @@
 					<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:uncancel="uncancel"  v-on:addBB="addBB" v-on:removeBB="removeBB"  />	
 				</div>
 				
-				<hr/>
+				<br/>
+				
 				<div class="bb-details">
 				<h3><span class="underline">Boon(s):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" :class="{canceled:li._canceled}" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
 				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
@@ -81,8 +89,13 @@
 		<hr/>
 			
 		<section class="gen-skills"  id="gen-skills">
-			<h2>Skills <span class="valuer">({{placeholder}} Skill Points remaining. (Available: {{placeholder}}) ) </span></h2>
-				
+			<h2>Skills <span class="valuer">({{placeholder}} Skill Points remaining. (Available: {{SkillPoints}}) ) </span></h2>
+			<h3>Skill(s):</h3>
+			<div class="packet-list">
+				<h4>Skill Packets:</h4>
+				<SkillPacketInput v-for="packet in skillPackets" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" />
+				<div style="clear:both"></div>
+			</div>
 		</section>
 			
 		<hr/>
@@ -92,7 +105,7 @@
 
 		<hr/>
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
-			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{placeholder}}) ) </span></h2>
+			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{ProfPoints}}) ) </span></h2>
 				
 		</section>
 			
@@ -108,6 +121,15 @@
 		<hr/>
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
+		</section>
+		
+		<section class="arcs">
+			<h2>Arcs</h2>
+			<div><label>Saga:</label><textarea v-model="char.arcSaga"></textarea></div>
+			<div><label>Epic:</label><textarea v-model="char.arcEpic"></textarea></div>
+			<div><label>Belief:</label><textarea v-model="char.arcBelief"></textarea></div>
+			<div><label>Glory:</label><textarea v-model="char.arcGlory"></textarea></div>
+			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw"></textarea></div>
 		</section>
 		<button>Save Character</button>
 	</div>

@@ -1,7 +1,7 @@
 package troshx.sos.events;
-import troshx.core.CharSheet;
 import troshx.ds.ValueHolder;
 import troshx.sos.core.Skill;
+import troshx.sos.sheets.CharSheet;
 
 /**
  * 

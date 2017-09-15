@@ -5,8 +5,8 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
 import js.html.Event;
-import troshx.core.Weapon;
 import troshx.sos.core.Item;
+import troshx.sos.core.Weapon;
 
 /**
  * 

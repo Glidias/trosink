@@ -80,7 +80,7 @@ class Blind extends Bane {
 	public function new() {
 		super("Blind", [20]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		channels = BoonBane.__BLIND__ONE_EYED_BANE;
+		channels = BoonBane.__BLIND__ONE_EYED_BANE | BoonBane.__GOOD_EYES__BAD_EYES;
 		
 	}
 }

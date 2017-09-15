@@ -59,8 +59,8 @@ class CharSheet implements IBuildListed
 	inline function get_END():Int { return endurance;  } 
 	public var HLT(get, never):Int;	// health
 	inline function get_HLT():Int { return health;  } 
-	public var WIL(get, never):Int;	// willpower
-	inline function get_WIL():Int { return willpower;  } 
+	public var WIP(get, never):Int;	// willpower
+	inline function get_WIP():Int { return willpower;  } 
 	public var WIT(get, never):Int;	// wit
 	inline function get_WIT():Int { return wit;  } 
 	public var INT(get, never):Int;	// intelligence

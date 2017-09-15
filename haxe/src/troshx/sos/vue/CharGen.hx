@@ -6,11 +6,14 @@ import haxevx.vuex.util.VHTMacros;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
+import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
+import troshx.sos.core.Skill;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
+import troshx.sos.vue.inputs.impl.SkillPacketInput;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 
 /**
@@ -83,7 +86,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			AttributeInput.NAME => new AttributeInput(),
 			
 			BoonBaneInput.NAME => new BoonBaneInput(),
-			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails()
+			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails(),
+			
+			SkillPacketInput.NAME => new SkillPacketInput()
 		];
 	}
 	

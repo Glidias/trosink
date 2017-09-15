@@ -13,6 +13,15 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.core.Armor;
+import troshx.sos.core.Crossbow;
+import troshx.sos.core.DamageType;
+import troshx.sos.core.Firearm;
+import troshx.sos.core.HitLocation;
+import troshx.sos.core.Item;
+import troshx.sos.core.ItemQty;
+import troshx.sos.core.Profeciency;
+import troshx.sos.core.Shield;
 import troshx.sos.vue.widgets.InputName;
 import troshx.sos.vue.widgets.InputNameQty;
 import troshx.sos.vue.widgets.SelectHeld;
@@ -36,9 +45,6 @@ import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.core.Inventory;
 
-
-
-import troshx.sos.core.*;
 
 /**
  * ...
