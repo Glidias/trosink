@@ -51,7 +51,14 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 		var max = this.max;
 		var min = this.min;
 		
-		var result = input.valueAsNumber;
+		var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
+		
+		if (result == null || Math.isNaN(result) ) {
+			input.valueAsNumber =  LibUtil.field(obj, prop);
+			return;
+		}
+		if (result != input.valueAsNumber) input.valueAsNumber = result;
+		
 		if (result > max) {
 			input.valueAsNumber = result = max;
 		}
@@ -73,4 +80,5 @@ typedef BaseNumProps = {
 	@:optional @:prop({required:false}) var min:Float;
 	@:optional @:prop({required:false}) var max:Float;
 	@:optional @:prop({required:false}) var step:Float;	
+	@:optional @:prop({required:false, 'default':true}) var floating:Bool;	
 }

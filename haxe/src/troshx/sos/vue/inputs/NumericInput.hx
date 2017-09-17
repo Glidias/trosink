@@ -66,7 +66,14 @@ class NumericInput extends VComponent<NoneT, NumericInputProps>
 	function inputHandler(input:InputElement):Void {
 		var max = this.max;
 		var min = this.min;
-		var result = input.valueAsNumber;
+			var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
+		
+		if (result == null || Math.isNaN(result) ) {
+			input.valueAsNumber =  LibUtil.field(obj, prop);
+			return;
+		}
+		if (result != input.valueAsNumber) input.valueAsNumber = result;
+		
 		if (result > max) {
 			input.valueAsNumber = result = max;
 		}
@@ -91,6 +98,6 @@ class NumericInput extends VComponent<NoneT, NumericInputProps>
 typedef NumericInputProps = {
 	@:prop({required:true}) var obj:Dynamic;
 	@:prop({required:true}) var prop:String;
-
+	@:prop({required:false, 'default':false}) var floating:Bool;
 }
 

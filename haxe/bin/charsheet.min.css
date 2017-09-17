@@ -1,5 +1,5 @@
 td{position:relative;}
-body{font-family:Times New Roman,Arial,sans-serif;font-size:12px;}
+body{font-family:Times New Roman,Arial,sans-serif;font-size:12px;background-color:#f3f5f6;}
 td.actions{min-width:105px;}
 select{font-size:12px;font-family:Arial;}
 td input[type='text']{position:relative;width:100%;font-size:12px;font-family:Arial;}
@@ -72,10 +72,24 @@ section.gen-race label.disabled{pointer-events:none;opacity:.5;}
 .chargen__footer textarea,.chargen__footer label{vertical-align:top;}
 section.gen-bnb .boon-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
 section.gen-bnb .bane-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
-section.gen-skills .skillpacket{display:inline-block;width:160px;border:1px solid black;margin-right:5px;margin-bottom:5px;}
-section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;}
+section.gen-skills .skillpacket{display:inline-block;width:160px;border:1px solid black;margin-right:5px;vertical-align:top;margin-bottom:5px;position:relative;margin-top:15px;}
+section.gen-skills .skillpacket.active .heading{background-color:#77ddff;}
+section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;min-height:80px;}
+section.gen-skills .skillpacket .flex{display:flex;position:relative;width:100%;}
+section.gen-skills .skillpacket .flex>span{display:block;}
+section.gen-skills .skillpacket .flex>span:last-child{z-index:1;}
+section.gen-skills .skillpacket .flex>span.middle{display:block;position:relative;flex:100%;}
 section.gen-skills .skillpacket label{font-weight:bold;}
 section.gen-skills input[type='number']{width:35px;}
-section.gen-skills input[type='text']{width:50%;}
-section.gen-skills select{width:100%;width:calc(100% - 5px);}
+section.gen-skills .skill-list{min-height:16px;}
+section.gen-skills .skill-list .num{font-family:Arial;}
+section.gen-skills .skill-list>span{display:inline-block;//border:1px solid #dddddd;padding-left:5px;padding-right:5px;border-left:1px solid #dddddd;border-right:1px solid #dddddd;}
+section.gen-skills .skill-list>span:last-child{margin-right:0}
+section.gen-skills input[type='text']{width:100%;display:block;font-size:inherit;font-family:inherit;}
+section.gen-skills select{width:100%;width:calc(100% - 5px);font-size:inherit;font-family:inherit;color:black;}
+section.gen-skills select:invalid{color:gray;}
+section.gen-skills .skill-lib{margin-top:5px;}
+section.gen-skills .skill-lib>span{margin-right:10px;display:inline-block;}
+section.gen-skills .skill-lib>span.active{background-color:#77ddff;}
+section.gen-skills .skill-lib>span:last-child{margin-right:0px;}
 

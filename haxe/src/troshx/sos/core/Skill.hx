@@ -127,7 +127,8 @@ class SkillTable
 		s.requiresSpecialisation = {
 			"Profession": true,
 			"Knowledge": true,
-			"Crafting": true
+			"Crafting": true,
+			"Performance": true
 		};
 		return s;
 	}
@@ -161,6 +162,10 @@ class SkillTable
 	public inline function matchRulesWith(other:SkillTable):Void {
 		requiresTrained = other.requiresTrained;
 		requiresSpecialisation = other.requiresSpecialisation;
+	}
+	
+	public function requiresSpecification(name:String):Bool {
+		return LibUtil.field(requiresSpecialisation, name);
 	}
 	
 	public function clearAllSkills(flushed:Bool):Void {

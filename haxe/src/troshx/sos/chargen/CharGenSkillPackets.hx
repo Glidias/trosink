@@ -156,6 +156,21 @@ class CharGenSkillPackets
 		];
 	}
 	
+	public static function getExistingSubjects():Array<String> {
+		return [	// hardcoded 
+			"Farmer",
+			"Trade",
+			"Finance",
+			"Wood",
+			"Homestead",
+			"Criminal",
+			"Nobility",
+			"Politics",
+			"Sailing",
+			"Doctor"
+		];
+	}
+	
 	
 	public static function getNewSkillLabelMappingBases():Dynamic {
 		return {

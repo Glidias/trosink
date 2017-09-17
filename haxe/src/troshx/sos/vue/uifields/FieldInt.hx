@@ -33,4 +33,6 @@ typedef FieldIntProps = {
 	@:optional @:prop({required:false}) var min:Int;
 	@:optional @:prop({required:false}) var max:Int;
 	@:optional @:prop({required:false}) var step:Int;	
+	
+	@:optional @:prop({required:false, 'default':false}) var floating:Bool;	
 }

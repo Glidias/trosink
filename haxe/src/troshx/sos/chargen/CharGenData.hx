@@ -38,6 +38,8 @@ class CharGenData implements IBuildListed
 		return showBnBs ||  totalBnBScore<0;
 	}
 	
+
+	
 	public function new(charSheet:CharSheet=null) 
 	{
 		// Char sheet
@@ -83,10 +85,23 @@ class CharGenData implements IBuildListed
 		// Skills
 		this.skillPackets = CharGenSkillPackets.getNewSkillPackets();
 		this.skillLabelMappingBases = CharGenSkillPackets.getNewSkillLabelMappingBases();
-		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
 		
+		skillsTable = SkillTable.getDefaultSkillTable();
+		
+		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
 	}
 	
+	
+	// Non-reactive data can be intialized here.
+	public function privateInit():Void {
+		
+		for (i in 0...skillPackets.length) {
+			var s = skillPackets[i];
+			s.fields = Reflect.fields(s.values);
+		}
+		
+	
+	}
 	
 	
 	// CAMPAIGN POWER LEVEL
@@ -515,21 +530,114 @@ class CharGenData implements IBuildListed
 	
 	var skillLabelMappingBases:Dynamic;
 	var skillLabelMappings:Dynamic<String>;
+	
+	var skillValues:Dynamic<Int>;
+	var skillsTable:SkillTable;
+	
+	static inline var MAX_SKILL_LEVEL:Int = 5;
+	
+	
+	
+	public function onSkillPacketChange(index:Int, vector:Int):Void {
+		var packet = skillPackets[index];
+		for (i in 0...packet.fields.length) {
+			var f = packet.fields[i];
+			LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f)*vector);
+		}
+	}
+	
+	public function tallySkillsFromPackets():Void {
+		for (f in Reflect.fields(skillValues)) {
+			LibUtil.setField(skillValues, f, 0);
+		}
+		for (i in 0...skillPackets.length) {
+			var packet = skillPackets[i];
+			for (i in 0...packet.fields.length) {
+				var f = packet.fields[i];
+				LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
+			}	
+		}
+	}
+	
+	public function finaliseSkillsFromPackets():Void {
+		// to do this when finailising char sheet
+		
+	}
+	public inline function clampSkillValue(value:Int):Int {
+		return value >= MAX_SKILL_LEVEL ? MAX_SKILL_LEVEL : value;
+	}
 
+	inline function isSkillLabelBinded(s:String):Bool {
+		return s.charAt(0) == "~";
+	}
+	public function getSkillLabel(s:String):String {
+		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + "("+ LibUtil.field(skillLabelMappings, s)+")" :  LibUtil.field(skillLabelMappings, s) : s;
+	}
+	
+	public var numberOfBoughtSkillPackets(get, never):Int;
+	function get_numberOfBoughtSkillPackets():Int {
+		var c:Int = 0;
+		var i = skillPackets.length;
+		while (--i > -1) {
+			c += skillPackets[i].qty;
+		}
+		return c;
+	}
+	
+	public var SkillPoints(get, never):Int;
+	function get_SkillPoints():Int {
+		return (categories[CATEGORY_SKILLS].pcp-1) * 3;	
+	}
+	
+	public var totalSkillPointsProvided(get, never):Int;
+	function get_totalSkillPointsProvided():Int {
+	
+		return SkillPoints + char.intelligence * 2;
+	}
+	
+	
+	public var skillsExpenditure(get, never):Int;
+	function get_skillsExpenditure():Int {
+		return numberOfBoughtSkillPackets * 3;
+	}
+	
+	public var totalSkillPointsLeft(get, never):Int;
+	function get_totalSkillPointsLeft():Int {
+		return totalSkillPointsProvided - skillsExpenditure;
+	}
+	
+	
 	function getEmptyMappingsFromBase(base:Dynamic):Dynamic<String>
 	{
 		var map:Dynamic<String> = {};
+		var count:Int = 1;
 		for (p in Reflect.fields(base)) {
-			LibUtil.setField(map, p, "");
+			var dyn = LibUtil.field(base, p);
+			if (Std.is(dyn, Array)) {
+				LibUtil.setField(map, p, LibUtil.as(dyn, Array)[0]); 
+			}
+			else {
+				LibUtil.setField(map, p, "");
+			}
+			
+		}
+		
+		this.skillValues = {};
+		for (i in 0...skillPackets.length) {
+			var s = skillPackets[i];
+			for ( f in Reflect.fields(s.values)) {
+				LibUtil.setField(this.skillValues, f, 0);
+			}
+		}
+		
+		for (f in Reflect.fields(skillsTable.skillHash)) {
+			if ( !skillsTable.requiresSpecification(f) ) LibUtil.setField(this.skillValues, f, 0);
 		}
 		return map;
 	}
 	
 	//static var PCP_COLUMN_SKILLS:Array<Int> = [6,9,12,15,18,21,24,27,30,33];
-	public var SkillPoints(get, never):Int;
-	inline function get_SkillPoints():Int {
-		return 6+(categories[CATEGORY_SKILLS].pcp-1) * 3;	
-	}
+
 	
 	// SOCIAL CLASS/WEALTH
 	// to lookup wealth table of different social classes

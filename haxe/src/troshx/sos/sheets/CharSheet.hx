@@ -41,14 +41,14 @@ class CharSheet implements IBuildListed
 	public var age:Int = -1;
 	
 	
-	public var strength:Int= 0;
-	public var agility:Int = 0;
-	public var endurance:Int = 0;
-	public var health:Int = 0;
-	public var willpower:Int= 0;
-	public var wit:Int = 0;
-	public var intelligence:Int = 0;
-	public var perception:Int = 0;
+	public var strength:Int= 1;
+	public var agility:Int = 1;
+	public var endurance:Int = 1;
+	public var health:Int = 1;
+	public var willpower:Int= 1;
+	public var wit:Int = 1;
+	public var intelligence:Int = 1;
+	public var perception:Int = 1;
 	
 	
 	public var STR(get, never):Int;	// strength

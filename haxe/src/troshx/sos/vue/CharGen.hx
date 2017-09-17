@@ -35,6 +35,10 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return new CharGenData();
 	}
 	
+	override function Created():Void {
+		_vData.privateInit();
+	}
+	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
 		var arr = this.boonsArray;
 		var i = arr.length;
