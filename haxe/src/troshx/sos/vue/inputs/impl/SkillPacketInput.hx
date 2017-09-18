@@ -36,7 +36,9 @@ class SkillPacketInput extends VComponent<NoneT, SkillPacketInputProps>
 	
 	
 	@:computed function get_max():Int {
-		return current + 1;
+		var r =  current + skillPacketsRemaining;
+		// no point going above 5 in anyway, maxQty until useless 
+		return r >= 5 ? 5 : r;
 	}
 	
 	function checkValidTextEntry(txt:String, checkSchema:Dynamic, checkProp:String):Bool {
@@ -100,8 +102,8 @@ typedef SkillPacketInputProps = {
 	@:prop({required:true}) var labelMap:Dynamic<String>;
 	@:prop({required:true}) var labelSchema:Dynamic<String>;
 	@:prop({required:true}) var index:Int;
-	@:prop({required:true}) var skillValues:Dynamic<Int>;
-	@:prop({required:true}) var totalSkillPointsLeft:Int;
+
+	@:prop({required:true}) var skillPacketsRemaining:Int;
 	
 }
 

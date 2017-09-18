@@ -89,16 +89,14 @@
 		<hr/>
 			
 		<section class="gen-skills"  id="gen-skills">
-			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.)</span> <span class="valuer">(Available: {{totalSkillPointsProvided}}) </span></h2>
+			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}}) </span></h2>
 			<h3>Skill(s):</h3>
 			<div class="skill-lib">
-				<span v-for="(attribs, name) in skillsTable.skillHash" :class="{active:skillValues[name]>0}" v-if="!skillsTable.requiresSpecialisation[name]">
-					<label><input type="number" number v-model.number="skillValues[name]" :min="0" :max="5"></input>{{name}}<span v-show="skillsTable.requiresSpecialisation[name]">()</span><sup v-show="skillsTable.requiresTrained[name]">1</sup></label>
-				</span>
+				<SkillLibInput v-for="(attribs, name) in skillsTable.skillHash" v-if="!skillsTable.requiresSpecialisation[name]" :key="name" :obj="skillValues" :prop="name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" />
 			</div>
 			
 			<div class="packet-list">
-				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :totalSkillPointsLeft="totalSkillPointsLeft" :skillValues="skillValues" />
+				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining"  />
 				<div style="clear:both"></div>
 			</div>
 			

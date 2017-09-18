@@ -532,9 +532,10 @@ class CharGenData implements IBuildListed
 	var skillLabelMappings:Dynamic<String>;
 	
 	var skillValues:Dynamic<Int>;
+	var skillPacketValues:Dynamic<Int>;
 	var skillsTable:SkillTable;
 	
-	static inline var MAX_SKILL_LEVEL:Int = 5;
+	static inline var MAX_PACKET_SKILL_LEVEL:Int = 5;
 	
 	
 	
@@ -542,29 +543,40 @@ class CharGenData implements IBuildListed
 		var packet = skillPackets[index];
 		for (i in 0...packet.fields.length) {
 			var f = packet.fields[i];
+			LibUtil.setField(skillPacketValues, f, LibUtil.field(skillPacketValues, f) + LibUtil.field(packet.values, f) * vector);
+			/*
+			if (LibUtil.field(skillPacketValues, f) > MAX_PACKET_SKILL_LEVEL) {
+				LibUtil.setField(skillPacketValues, f, MAX_PACKET_SKILL_LEVEL);
+			}
+			
 			LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f)*vector);
+			*/
 		}
 	}
 	
+	/*
 	public function tallySkillsFromPackets():Void {
 		for (f in Reflect.fields(skillValues)) {
 			LibUtil.setField(skillValues, f, 0);
+			LibUtil.setField(skillPacketValues, f, 0);
 		}
 		for (i in 0...skillPackets.length) {
 			var packet = skillPackets[i];
 			for (i in 0...packet.fields.length) {
 				var f = packet.fields[i];
-				LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
+				LibUtil.setField(skillPacketValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
+				//LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
 			}	
 		}
 	}
+	*/
 	
 	public function finaliseSkillsFromPackets():Void {
 		// to do this when finailising char sheet
 		
 	}
 	public inline function clampSkillValue(value:Int):Int {
-		return value >= MAX_SKILL_LEVEL ? MAX_SKILL_LEVEL : value;
+		return value >= MAX_PACKET_SKILL_LEVEL ? MAX_PACKET_SKILL_LEVEL : value;
 	}
 
 	inline function isSkillLabelBinded(s:String):Bool {
@@ -574,8 +586,53 @@ class CharGenData implements IBuildListed
 		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + "("+ LibUtil.field(skillLabelMappings, s)+")" :  LibUtil.field(skillLabelMappings, s) : s;
 	}
 	
-	public var numberOfBoughtSkillPackets(get, never):Int;
-	function get_numberOfBoughtSkillPackets():Int {
+	
+	
+	public var SkillPoints(get, never):Int;
+	function get_SkillPoints():Int {
+		return (categories[CATEGORY_SKILLS].pcp-1) * 3;	
+	}
+	
+	public var individualSkillsSpent(get, never):Int;
+	function get_individualSkillsSpent():Int {
+		var c:Int = 0;
+		for (f in Reflect.fields(skillValues)) {
+			c += LibUtil.field(skillValues, f);  // how to seperate out skillpackets
+		}
+		
+		return c;
+	}
+	
+	public var maxSkillPacketsAllowed(get, never):Int;
+	function get_maxSkillPacketsAllowed():Int {
+		return Math.floor( (totalSkillPointsProvided - individualSkillsSpent) / 3);
+	}
+	
+	public var maxIndividualSkillsSpendable(get, never):Int;
+	function get_maxIndividualSkillsSpendable():Int {
+		return totalSkillPointsProvided - skillPacketsBought * 3;
+	}
+	
+	public var individualSkillsRemaining (get, never):Int;
+	function get_individualSkillsRemaining ():Int {
+		return maxIndividualSkillsSpendable - individualSkillsSpent;
+	}
+	
+	
+	public var totalSkillPointsProvided(get, never):Int;
+	function get_totalSkillPointsProvided():Int {
+		
+		return SkillPoints + char.intelligence * 2;
+	}
+	
+	public var skillPacketsRemaining(get, never):Int;
+	function get_skillPacketsRemaining():Int {
+	
+		return maxSkillPacketsAllowed - skillPacketsBought;
+	}
+	
+	public var skillPacketsBought(get, never):Int; 
+	function get_skillPacketsBought():Int {
 		var c:Int = 0;
 		var i = skillPackets.length;
 		while (--i > -1) {
@@ -584,26 +641,9 @@ class CharGenData implements IBuildListed
 		return c;
 	}
 	
-	public var SkillPoints(get, never):Int;
-	function get_SkillPoints():Int {
-		return (categories[CATEGORY_SKILLS].pcp-1) * 3;	
-	}
-	
-	public var totalSkillPointsProvided(get, never):Int;
-	function get_totalSkillPointsProvided():Int {
-	
-		return SkillPoints + char.intelligence * 2;
-	}
-	
-	
-	public var skillsExpenditure(get, never):Int;
-	function get_skillsExpenditure():Int {
-		return numberOfBoughtSkillPackets * 3;
-	}
-	
 	public var totalSkillPointsLeft(get, never):Int;
 	function get_totalSkillPointsLeft():Int {
-		return totalSkillPointsProvided - skillsExpenditure;
+		return totalSkillPointsProvided - individualSkillsSpent - skillPacketsBought*3;
 	}
 	
 	
@@ -623,15 +663,20 @@ class CharGenData implements IBuildListed
 		}
 		
 		this.skillValues = {};
+		this.skillPacketValues = {};
 		for (i in 0...skillPackets.length) {
 			var s = skillPackets[i];
 			for ( f in Reflect.fields(s.values)) {
 				LibUtil.setField(this.skillValues, f, 0);
+				LibUtil.setField(this.skillPacketValues, f, 0);
 			}
 		}
 		
 		for (f in Reflect.fields(skillsTable.skillHash)) {
-			if ( !skillsTable.requiresSpecification(f) ) LibUtil.setField(this.skillValues, f, 0);
+			if ( !skillsTable.requiresSpecification(f) ) {
+				LibUtil.setField(this.skillValues, f, 0);
+				LibUtil.setField(this.skillPacketValues, f, 0);
+			}
 		}
 		return map;
 	}

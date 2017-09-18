@@ -89,7 +89,9 @@ section.gen-skills input[type='text']{width:100%;display:block;font-size:inherit
 section.gen-skills select{width:100%;width:calc(100% - 5px);font-size:inherit;font-family:inherit;color:black;}
 section.gen-skills select:invalid{color:gray;}
 section.gen-skills .skill-lib{margin-top:5px;}
-section.gen-skills .skill-lib>span{margin-right:10px;display:inline-block;}
+section.gen-skills .skill-lib>span{margin-right:12px;display:inline-block;}
 section.gen-skills .skill-lib>span.active{background-color:#77ddff;}
+section.gen-skills .skill-lib>span.activepack input{border-bottom:2px solid #77ddff;}
+section.gen-skills .skill-lib>span.activepack label{}
 section.gen-skills .skill-lib>span:last-child{margin-right:0px;}
 
