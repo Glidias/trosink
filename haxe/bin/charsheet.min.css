@@ -46,6 +46,7 @@ td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
 .widget-prof .columner{width:50%;float:left;}
 .chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
 .chargen h2 .valuer{font-size:11px;}
+.chargen h2 .formula{font-size:11px;margin-left:15px;font-weight:normal;display:inline-block;}
 .chargen h2 .valuer .num{font-size:16px;font-style:italic;margin-left:2px;margin-right:2px;}
 section.gen-bnb input[type=number]{width:27px;margin-right:2px;}
 section.gen-bnb .gen-comp-bb{margin-right:22px;display:inline-block;}
