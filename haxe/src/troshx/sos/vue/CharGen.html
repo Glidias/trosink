@@ -92,11 +92,15 @@
 			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}}) </span></h2>
 			<h3>Skill(s):</h3>
 			<div class="skill-lib">
-				<SkillLibInput v-for="(attribs, name) in skillsTable.skillHash" v-if="!skillsTable.requiresSpecialisation[name]" :key="name" :obj="skillValues" :prop="name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" />
+				<SkillLibInput v-for="(attribs, name) in skillsTable.skillHash" v-if="!skillsTable.requiresSpecialisation[name]" :key="name" :obj="skillValues" :prop="name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" v-on:change="onSkillIndividualChange" />
 			</div>
-			
+			<div class="packet-selection-mode">
+				<b>Buy Packets:</b>
+				<label><input type="radio" name="packetSelectionMode" :checked="!packetChoosy" v-on:click="packetChoosy = false"></input>Pennywise</label>
+				<label><input type="radio" name="packetSelectionMode" :checked="packetChoosy" v-on:click="packetChoosy = true"></input>Pennywise and Choosy</label>
+			</div>
 			<div class="packet-list">
-				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining"  />
+				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining" :skillValues="skillPacketValues"  :packetChoosy="packetChoosy"  />
 				<div style="clear:both"></div>
 			</div>
 			

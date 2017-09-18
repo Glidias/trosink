@@ -73,8 +73,16 @@ section.gen-race label.disabled{pointer-events:none;opacity:.5;}
 section.gen-bnb .boon-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
 section.gen-bnb .bane-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
 section.gen-skills .skillpacket{display:inline-block;width:160px;border:1px solid black;margin-right:5px;vertical-align:top;margin-bottom:5px;position:relative;margin-top:15px;}
+section.gen-skills .skillpacket .max-predict{position:absolute;right:4px;top:2px;vertical-align:middle;xfont-weight:bold;display:inline-block;font-style:italic;}
+section.gen-skills .skillpacket .max-length{display:block;float:right;font-size:13px;font-family:Arial;}
+section.gen-skills .skillpacket button.revert{}
+section.gen-skills .skillpacket .max-length-input{display:block;float:right;}
+section.gen-skills .skillpacket .heading>span{vertical-align:middle;}
+section.gen-skills .skillpacket .heading>label{vertical-align:middle;}
+section.gen-skills .skillpacket .heading>button{vertical-align:middle;}
 section.gen-skills .skillpacket.active .heading{background-color:#77ddff;}
 section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;min-height:80px;}
+section.gen-skills .skillpacket .skill-listing>div>.disabled{opacity:.6;text-decoration:line-through;}
 section.gen-skills .skillpacket .flex{display:flex;position:relative;width:100%;}
 section.gen-skills .skillpacket .flex>span{display:block;}
 section.gen-skills .skillpacket .flex>span:last-child{z-index:1;}
@@ -89,6 +97,7 @@ section.gen-skills input[type='text']{width:100%;display:block;font-size:inherit
 section.gen-skills select{width:100%;width:calc(100% - 5px);font-size:inherit;font-family:inherit;color:black;}
 section.gen-skills select:invalid{color:gray;}
 section.gen-skills .skill-lib{margin-top:5px;}
+section.gen-skills .packet-selection-mode{margin-top:5px;}
 section.gen-skills .skill-lib>span{margin-right:12px;display:inline-block;}
 section.gen-skills .skill-lib>span.active{background-color:#77ddff;}
 section.gen-skills .skill-lib>span.activepack input{border-bottom:2px solid #77ddff;}

@@ -156,6 +156,7 @@ class CharGenSkillPackets
 		];
 	}
 	
+
 	public static function getExistingSubjects():Array<String> {
 		return [	// hardcoded 
 			"Farmer",
@@ -190,5 +191,22 @@ class CharGenSkillPackets
 		}
 		return dyn;
 	}
+	
+		
+	public inline static function isSkillLabelBinded(s:String):Bool {
+		return s.charAt(0) == "~";
+	}
+	
+	/**
+	 * 
+	 * @param	s	The string id if needs to be binded to something else
+	 * @param	skillLabelMappingBases	Schema
+	 * @param 	skillLabelMappings The string values to resolve to schema
+	 * @return
+	 */
+	public  static function getSkillLabel(s:String, skillLabelMappingBases:Dynamic, skillLabelMappings:Dynamic<String>):String {
+		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + "("+ LibUtil.field(skillLabelMappings, s)+")" :  LibUtil.field(skillLabelMappings, s) : s;
+	}
+	
 	
 }

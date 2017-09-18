@@ -27,7 +27,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	
 	override function Template():String {
 		return  '<span class="gen-comp-bb" :class="{canceled:obj._canceled, disabled:max<1, selected:obj[prop]>0}">
-		<label><input type="checkbox" :disabled="obj._canceled" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" :disabled="obj._canceled" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
+		<label><input type="checkbox" :disabled="obj._canceled" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target)"></input><input type="number" :disabled="obj._canceled" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" v-on:blur="blurHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
 		</span>';
 	}
 	

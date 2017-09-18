@@ -12,7 +12,7 @@ import troshx.util.LibUtil;
 class NumericInput extends VComponent<NoneT, NumericInputProps>
 {
 	
-	public static var TEMPLATE:String = '<input type="number" number :value="obj[prop]" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>';
+	public static var TEMPLATE:String = '<input type="number" number :value="obj[prop]" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>';
 	
 	static var INSTANCE:NumericInput;
 	public static function getSampleInstance():NumericInput {
@@ -63,10 +63,18 @@ class NumericInput extends VComponent<NoneT, NumericInputProps>
 		checkConstraints();
 	}
 	
+	function blurHandler(input:InputElement):Void {
+		if (input.value == "") {
+			input.valueAsNumber =  LibUtil.field(obj, prop);
+		
+		}
+	}
+	
 	function inputHandler(input:InputElement):Void {
+		if (input.value == "") return;
 		var max = this.max;
 		var min = this.min;
-			var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
+		var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
 		
 		if (result == null || Math.isNaN(result) ) {
 			input.valueAsNumber =  LibUtil.field(obj, prop);

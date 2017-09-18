@@ -26,6 +26,15 @@ class LibUtil
 		return Std.parseInt(val); // TOCHECK: across all platforms validity
 	}
 	
+		
+	public static inline function setArrayLength<T>(of:Array<T>, len:Int):Void {
+		//#if js
+		//untyped of.length = len;
+		//#else
+		of.splice(len, of.length - len );
+		//#end
+	}
+	
 	public static inline function field<T>(of:Dynamic<T>, field:String):T {
 		#if js
 		return untyped of[field];

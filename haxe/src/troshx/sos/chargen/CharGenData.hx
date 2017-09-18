@@ -89,6 +89,17 @@ class CharGenData implements IBuildListed
 		skillsTable = SkillTable.getDefaultSkillTable();
 		
 		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
+
+		for (i in 0...skillPackets.length) {
+			var p = skillPackets[i];
+			for (s in Reflect.fields(p.values)) {
+				if (LibUtil.field(this.skillLabelMappings, s)!=null) {
+					p.history = [];
+					break;
+				}
+			}
+		}
+		
 	}
 	
 	
@@ -98,6 +109,7 @@ class CharGenData implements IBuildListed
 		for (i in 0...skillPackets.length) {
 			var s = skillPackets[i];
 			s.fields = Reflect.fields(s.values);
+			
 		}
 		
 	
@@ -535,6 +547,8 @@ class CharGenData implements IBuildListed
 	var skillPacketValues:Dynamic<Int>;
 	var skillsTable:SkillTable;
 	
+	var packetChoosy:Bool = false;
+	
 	static inline var MAX_PACKET_SKILL_LEVEL:Int = 5;
 	
 	
@@ -551,6 +565,29 @@ class CharGenData implements IBuildListed
 			
 			LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f)*vector);
 			*/
+		}
+		
+		if (vector > 0) {  // items added, invalidate stateful history current levels
+			truncateSkillPacketHistory();
+			
+		}
+	}
+	
+	public function onSkillIndividualChange(vector:Int):Void {
+		if (vector > 0) {  
+			truncateSkillPacketHistory();
+		}
+	}
+	
+	 // naive approach..just clear future history instead of evaluating future per-history item instance max qty caps.
+	function truncateSkillPacketHistory():Void {
+		for ( i in 0...skillPackets.length) {
+			var s = skillPackets[i];
+			if (s.history != null) {
+				if (s.history.length != s.qty) {
+					LibUtil.setArrayLength(s.history, s.qty);
+				}
+			}
 		}
 	}
 	
@@ -580,10 +617,10 @@ class CharGenData implements IBuildListed
 	}
 
 	inline function isSkillLabelBinded(s:String):Bool {
-		return s.charAt(0) == "~";
+		return  CharGenSkillPackets.isSkillLabelBinded(s);
 	}
 	public function getSkillLabel(s:String):String {
-		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + "("+ LibUtil.field(skillLabelMappings, s)+")" :  LibUtil.field(skillLabelMappings, s) : s;
+		return CharGenSkillPackets.getSkillLabel(s, skillLabelMappingBases, skillLabelMappings);
 	}
 	
 	

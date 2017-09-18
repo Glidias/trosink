@@ -29,7 +29,6 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 	
 	function checkConstraints():Void
 	{
-	
 		var theCurrent:Float = this.current;
 		var currentVal:Float = theCurrent;
 		var min:Float = this.min;
@@ -42,7 +41,14 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 		if (currentVal != theCurrent)  LibUtil.setField(obj, prop, currentVal - min);   // last line of duplicate adjusted to set obj value based on how display value above min
 	}
 	
+	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
+		_vEmit("change",  newValue - oldValue);
+	}
+	
 	function inputHandler(input:InputElement):Void {
+		
+		if (input.value == "") return;
+		
 		var max = this.max;
 		var min = this.min;
 			var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
@@ -86,7 +92,7 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 	
 	override function Template():String {
 		return '<span :class="{active:obj[prop]>0, activepack:min>0}">
-				<label><input type="number" number :value="current" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>{{prop}}<span v-show="skillsTable.requiresSpecialisation[prop]">()</span><sup v-show="skillsTable.requiresTrained[prop]">1</sup></label>
+				<label><input type="number" number :value="current" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>{{prop}}<span v-show="skillsTable.requiresSpecialisation[prop]">()</span><sup v-show="skillsTable.requiresTrained[prop]">1</sup></label>
 			</span>';
 	}
 	

@@ -351,7 +351,49 @@ section.gen-skills .skillpacket {
 	margin-bottom:5px;
 	position:relative;
 	margin-top:15px;
+	
 }
+
+
+
+section.gen-skills .skillpacket .max-predict {
+	position:absolute;
+	right:4px;
+	top:2px;
+	vertical-align:middle;
+	xfont-weight:bold;
+	display:inline-block;
+	font-style:italic;
+}
+
+section.gen-skills .skillpacket .max-length {
+	display:block;
+	float:right;
+	font-size:13px;
+	font-family:Arial;
+	
+}
+section.gen-skills .skillpacket button.revert {
+	
+}
+
+section.gen-skills .skillpacket .max-length-input {
+	display:block;
+	float:right;
+	
+	
+}
+
+section.gen-skills .skillpacket .heading >span {
+	vertical-align:middle;
+}
+section.gen-skills .skillpacket .heading >label {
+	vertical-align:middle;
+}
+section.gen-skills .skillpacket .heading >button {
+	vertical-align:middle;
+}
+
 
 section.gen-skills .skillpacket.active .heading {
 	background-color:#77ddff;
@@ -363,7 +405,11 @@ section.gen-skills .skillpacket .skill-listing {
 	min-height:80px;
 }
 
-
+section.gen-skills .skillpacket .skill-listing > div > .disabled {
+	opacity:.6;
+	text-decoration:line-through;
+	
+}
 
 section.gen-skills .skillpacket .flex {
 	display:flex;
@@ -430,6 +476,9 @@ section.gen-skills select:invalid {
 section.gen-skills .skill-lib  {
 	margin-top:5px;
 
+}
+section.gen-skills .packet-selection-mode {
+	margin-top:5px;
 }
 section.gen-skills .skill-lib > span {
 	margin-right:12px;
