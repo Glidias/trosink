@@ -46,8 +46,14 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 		return LibUtil.field(obj, prop);
 	}
 	
+	function blurHandler(input:InputElement):Void {
+		if (input.value == "") {
+			input.valueAsNumber =  LibUtil.field(obj, prop);
+		}
+	}
 	
 	function inputHandler(input:InputElement):Void {
+		if (input.value == "") return;
 		var max = this.max;
 		var min = this.min;
 		

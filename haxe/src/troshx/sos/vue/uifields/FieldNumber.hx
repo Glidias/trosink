@@ -19,7 +19,7 @@ class FieldNumber extends VComponent<NoneT, FieldNumberProps>
 	override function Template():String {
 		return '<div>
 			<label v-if="label">{{ label }}:&nbsp;</label>
-			<input type="number"  :disabled="disabled" number v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="step"></input>
+			<input type="number"  :disabled="disabled" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="step"></input>
 		</div>';
 	}
 	
