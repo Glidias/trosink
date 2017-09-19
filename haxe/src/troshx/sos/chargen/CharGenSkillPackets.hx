@@ -133,7 +133,7 @@ class CharGenSkillPackets
 				values: strMapValues([
 					"Etiquette" => 1,
 					Skill.specialisationName("Knowledge", "Politics") => 1,
-					"Orate" => 1,
+					"Oration" => 1,
 					"Persuasion" => 1,
 				]),
 			},

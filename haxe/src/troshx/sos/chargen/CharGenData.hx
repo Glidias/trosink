@@ -85,8 +85,10 @@ class CharGenData implements IBuildListed
 		// Skills
 		this.skillPackets = CharGenSkillPackets.getNewSkillPackets();
 		this.skillLabelMappingBases = CharGenSkillPackets.getNewSkillLabelMappingBases();
+		//this.
 		
 		skillsTable = SkillTable.getDefaultSkillTable();
+		skillObjs = skillsTable.getSkillObjectsAsArray(true);
 		
 		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
 
@@ -546,6 +548,7 @@ class CharGenData implements IBuildListed
 	var skillValues:Dynamic<Int>;
 	var skillPacketValues:Dynamic<Int>;
 	var skillsTable:SkillTable;
+	var skillObjs:Array<SkillObj>;
 	
 	var packetChoosy:Bool = false;
 	
@@ -613,6 +616,8 @@ class CharGenData implements IBuildListed
 	public function getSkillLabel(s:String):String {
 		return CharGenSkillPackets.getSkillLabel(s, skillLabelMappingBases, skillLabelMappings);
 	}
+	
+	
 	
 	
 	
@@ -690,6 +695,8 @@ class CharGenData implements IBuildListed
 			
 		}
 		
+		var arrAdded:Array<SkillObj> = [];
+		
 		this.skillValues = {};
 		this.skillPacketValues = {};
 		for (i in 0...skillPackets.length) {
@@ -697,6 +704,9 @@ class CharGenData implements IBuildListed
 			for ( f in Reflect.fields(s.values)) {
 				LibUtil.setField(this.skillValues, f, 0);
 				LibUtil.setField(this.skillPacketValues, f, 0);
+				if ( !CharGenSkillPackets.isSkillLabelBinded(f) && !skillsTable.hasSkill(f)) {
+					arrAdded.push({ name:f, attribs:0});
+				}
 			}
 		}
 		
@@ -706,6 +716,9 @@ class CharGenData implements IBuildListed
 				LibUtil.setField(this.skillPacketValues, f, 0);
 			}
 		}
+		arrAdded.sort(SkillTable.sortArrayMethod);
+		skillObjs = skillObjs.concat(arrAdded);
+		
 		return map;
 	}
 	

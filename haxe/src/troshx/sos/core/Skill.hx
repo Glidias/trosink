@@ -164,7 +164,7 @@ class SkillTable
 		requiresSpecialisation = other.requiresSpecialisation;
 	}
 	
-	public function requiresSpecification(name:String):Bool {
+	inline public function requiresSpecification(name:String):Bool {
 		return LibUtil.field(requiresSpecialisation, name);
 	}
 	
@@ -184,10 +184,10 @@ class SkillTable
 		return !LibUtil.field(requiresTrained, name);
 	}
 	
-	public function getSkillValue(name:String):Int {
+	inline public function getSkillValue(name:String):Int {
 		return LibUtil.field(skillHash, name);
 	}
-	public function hasSkill(name:String):Bool {
+	inline public function hasSkill(name:String):Bool {
 		return Reflect.hasField(skillHash, name);
 	}
 	public inline function setSkill(name:String, attribs:Int):Void {
