@@ -11,7 +11,7 @@ import troshx.util.LibUtil;
  * ...
  * @author Glidias
  */
-class SkillPacketInput extends VComponent<NoneT, SkillPacketInputProps>
+class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInputProps>
 {
 
 	public static inline var NAME:String = "SkillPacketInput";
@@ -23,8 +23,19 @@ class SkillPacketInput extends VComponent<NoneT, SkillPacketInputProps>
 	
 	}
 	
+	override function Data():SkillPacketInputData {
+		return {
+			
+		}
+	}
+	
+	override function Created():Void {
+		this.clickedOnPlus = false;
+	}
+	
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
-		_vEmit("change", this.index, newValue - oldValue);
+		_vEmit("change", this.index, newValue - oldValue, clickedOnPlus);
+		clickedOnPlus = false;
 	}
 	
 	@:computed inline function get_current():Int {
@@ -128,6 +139,7 @@ class SkillPacketInput extends VComponent<NoneT, SkillPacketInputProps>
 	
 	function incrementBtnHit():Void {
 		var val:Int = this.current;
+		clickedOnPlus = true;
 
 		LibUtil.setArrayLength(packet.history, val);
 		packet.history.push(cloneCurrentState());
@@ -225,3 +237,6 @@ typedef SkillPacketInputProps = {
 	@:prop({required:true}) var packetChoosy:Bool;
 }
 
+typedef SkillPacketInputData = {
+	@:optional var clickedOnPlus:Bool;
+}

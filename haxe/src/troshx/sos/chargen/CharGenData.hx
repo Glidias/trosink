@@ -553,23 +553,15 @@ class CharGenData implements IBuildListed
 	
 	
 	
-	public function onSkillPacketChange(index:Int, vector:Int):Void {
+	public function onSkillPacketChange(index:Int, vector:Int, clickedPlus:Bool):Void {
 		var packet = skillPackets[index];
 		for (i in 0...packet.fields.length) {
 			var f = packet.fields[i];
 			LibUtil.setField(skillPacketValues, f, LibUtil.field(skillPacketValues, f) + LibUtil.field(packet.values, f) * vector);
-			/*
-			if (LibUtil.field(skillPacketValues, f) > MAX_PACKET_SKILL_LEVEL) {
-				LibUtil.setField(skillPacketValues, f, MAX_PACKET_SKILL_LEVEL);
-			}
-			
-			LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f)*vector);
-			*/
 		}
 		
-		if (vector > 0) {  // items added, invalidate stateful history current levels
-			truncateSkillPacketHistory();
-			
+		if (vector > 0  ) {  // items added, invalidate stateful history current levels
+			if (packet.history == null || clickedPlus) truncateSkillPacketHistory();
 		}
 	}
 	
@@ -590,11 +582,10 @@ class CharGenData implements IBuildListed
 			}
 		}
 	}
-	
-	/*
+	/*  // not used atm
 	public function tallySkillsFromPackets():Void {
 		for (f in Reflect.fields(skillValues)) {
-			LibUtil.setField(skillValues, f, 0);
+			
 			LibUtil.setField(skillPacketValues, f, 0);
 		}
 		for (i in 0...skillPackets.length) {
@@ -602,7 +593,7 @@ class CharGenData implements IBuildListed
 			for (i in 0...packet.fields.length) {
 				var f = packet.fields[i];
 				LibUtil.setField(skillPacketValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
-				//LibUtil.setField(skillValues, f, LibUtil.field(skillValues, f) + LibUtil.field(packet.values, f) );
+				
 			}	
 		}
 	}
@@ -616,7 +607,7 @@ class CharGenData implements IBuildListed
 		return value >= MAX_PACKET_SKILL_LEVEL ? MAX_PACKET_SKILL_LEVEL : value;
 	}
 
-	inline function isSkillLabelBinded(s:String):Bool {
+	public inline function isSkillLabelBinded(s:String):Bool {
 		return  CharGenSkillPackets.isSkillLabelBinded(s);
 	}
 	public function getSkillLabel(s:String):String {

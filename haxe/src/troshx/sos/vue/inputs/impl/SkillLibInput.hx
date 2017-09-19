@@ -12,7 +12,7 @@ import troshx.util.LibUtil;
  * 
  * @author Glidias
  */
-class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
+class SkillLibInput extends VComponent<SkillLibInputData, SkillLibInputProps>
 {
 	
 	public static inline var NAME:String = "SkillLibInput";
@@ -21,6 +21,14 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 	{
 		super();
 		untyped this.mixins = [NumericInput.getSampleInstance()];
+	}
+	
+	override function Data():SkillLibInputData {
+		return {};
+	}
+	
+	override function Created():Void {
+		this.interactedInput = false;
 	}
 	
 	@:computed function get_min():Int {  // cannot be reduced to  < points of current skill level from packets
@@ -42,7 +50,8 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 	}
 	
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
-		_vEmit("change",  newValue - oldValue);
+		if (interactedInput) _vEmit("change",  newValue - oldValue);
+		interactedInput = false;
 	}
 	
 	function inputHandler(input:InputElement):Void {
@@ -66,6 +75,9 @@ class SkillLibInput extends VComponent<NoneT, SkillLibInputProps>
 			input.valueAsNumber = result = min;
 		}
 		//  UNFORTUANTELY, duplicate of inputHandler boilerplate above (oops, too bad..)
+		
+		
+		interactedInput = true;
 		
 		LibUtil.setField(obj, prop, result - min);  // last line of duplicate adjusted to set obj value based on display value above min
 	}
@@ -106,4 +118,8 @@ typedef SkillLibInputProps = {
 	@:prop({required:true}) var skillLevelsPacket:Dynamic<Int>;
 	
 
+}
+
+typedef SkillLibInputData = {
+	@:optional var interactedInput:Bool;
 }
