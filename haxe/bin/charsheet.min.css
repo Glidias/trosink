@@ -81,6 +81,10 @@ section.gen-skills .skillpacket .max-length-input{display:block;float:right;}
 section.gen-skills .skillpacket .heading>span{vertical-align:middle;}
 section.gen-skills .skillpacket .heading>label{vertical-align:middle;}
 section.gen-skills .skillpacket .heading>button{vertical-align:middle;}
+section.gen-skills .skill-subjects{display:inline-block;}
+section.gen-skills .skill-subjects .columner{width:160px;display:inline-block;position:relative;}
+section.gen-skills .skill-subjects .del{position:absolute;right:0;bottom:0;}
+section.gen-skills .skill-subjects h4{margin:5px 0;}
 section.gen-skills .skillpacket.active .heading{background-color:#77ddff;}
 section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;min-height:80px;}
 section.gen-skills .skillpacket .skill-listing>div>.disabled{opacity:.6;text-decoration:line-through;}
@@ -98,6 +102,8 @@ section.gen-skills input[type='text']{width:100%;display:block;font-size:inherit
 section.gen-skills select{width:100%;width:calc(100% - 5px);font-size:inherit;font-family:inherit;color:black;}
 section.gen-skills select:invalid{color:gray;}
 section.gen-skills .skill-lib{margin-top:5px;}
+section.gen-skills .packet-list>div{vertical-align:top;}
+section.gen-skills .col-add-subject button{margin-top:5px;font:inherit;}
 section.gen-skills .packet-selection-mode{margin-top:5px;}
 section.gen-skills .skill-lib>span{margin-right:12px;display:inline-block;}
 section.gen-skills .skill-lib>span.active{background-color:#77ddff;}

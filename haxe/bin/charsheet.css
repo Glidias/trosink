@@ -260,7 +260,6 @@ section.gen-bnb .gen-comp-bb span.limit-join {
 }
 section.gen-bnb .gen-comp-bb.canceled {
 	text-decoration: line-through;
-
 }
 
 .bb-details h3 .underline {
@@ -401,6 +400,22 @@ section.gen-skills .skillpacket .heading >button {
 	vertical-align:middle;
 }
 
+section.gen-skills .skill-subjects {
+	display:inline-block;
+}
+section.gen-skills .skill-subjects .columner {
+	width:160px;
+	display:inline-block;
+	position:relative;
+	
+}
+section.gen-skills .skill-subjects .del {
+	position:absolute; right:0; bottom:0;
+}
+section.gen-skills .skill-subjects h4 {
+	margin:5px 0;
+}
+
 
 section.gen-skills .skillpacket.active .heading {
 	background-color:#77ddff;
@@ -482,6 +497,15 @@ section.gen-skills select:invalid {
 }
 section.gen-skills .skill-lib  {
 	margin-top:5px;
+
+}
+section.gen-skills .packet-list > div {
+	vertical-align:top;
+}
+
+section.gen-skills .col-add-subject button {
+	margin-top:5px;
+		font:inherit;
 
 }
 section.gen-skills .packet-selection-mode {

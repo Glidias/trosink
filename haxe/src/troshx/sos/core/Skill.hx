@@ -45,7 +45,7 @@ class Skill
 		return (n & (n - 1)) != 0;
 	}
 	
-	public static function specialisationName(base:String, special:String):String {
+	public static inline function specialisationName(base:String, special:String):String {
 		return base + " (" + special + ")";
 	}
 }
@@ -131,6 +131,14 @@ class SkillTable
 			"Performance": true
 		};
 		return s;
+	}
+	
+	public function getSpecialisationList():Array<String> {
+		var arr:Array<String> = [];
+		for (f in Reflect.fields(requiresSpecialisation)) {
+			arr.push( f );
+		}
+		return arr;
 	}
 	
 	public function getSkillObjectsAsArray(sortAlphabetically:Bool=true):Array<SkillObj> {

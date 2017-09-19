@@ -16,6 +16,7 @@ import troshx.sos.vue.inputs.impl.CategoryPCPInput;
 import troshx.sos.vue.inputs.impl.SkillLibInput;
 import troshx.sos.vue.inputs.impl.SkillPacketInput;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
+import troshx.sos.vue.widgets.SkillSubjectCreator;
 
 /**
  * ...
@@ -94,7 +95,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails(),
 			
 			SkillPacketInput.NAME => new SkillPacketInput(),
-			SkillLibInput.NAME => new SkillLibInput()
+			SkillLibInput.NAME => new SkillLibInput(),
+			SkillSubjectCreator.NAME => new SkillSubjectCreator()
 		];
 	}
 	

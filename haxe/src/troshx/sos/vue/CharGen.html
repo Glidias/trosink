@@ -101,8 +101,9 @@
 			</div>
 			<div class="packet-list">
 				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining" :skillValues="skillPacketValues"  :packetChoosy="packetChoosy"  />
-				<div style="clear:both"></div>
+				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" />
 			</div>
+			
 			
 		</section>
 			

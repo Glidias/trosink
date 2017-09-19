@@ -89,9 +89,10 @@ class CharGenData implements IBuildListed
 		
 		skillsTable = SkillTable.getDefaultSkillTable();
 		skillObjs = skillsTable.getSkillObjectsAsArray(true);
+		specialisedSkills = skillsTable.getSpecialisationList();
 		
 		this.skillLabelMappings = getEmptyMappingsFromBase(skillLabelMappingBases);
-
+		
 		for (i in 0...skillPackets.length) {
 			var p = skillPackets[i];
 			for (s in Reflect.fields(p.values)) {
@@ -379,6 +380,8 @@ class CharGenData implements IBuildListed
 		}
 	}
 	
+
+	
 	// dupliacte semi
 	public function checkBoonAgainstOthers(boonAssign:troshx.sos.core.BoonBane.BoonAssign):Void {
 		var arr = baneAssignList;
@@ -549,10 +552,14 @@ class CharGenData implements IBuildListed
 	var skillPacketValues:Dynamic<Int>;
 	var skillsTable:SkillTable;
 	var skillObjs:Array<SkillObj>;
-	
+	var skillSubjects:Array<String>;
+	var skillSubjectsInitial:Dynamic<Bool>;
+	var specialisedSkills:Array<String>;
 	var packetChoosy:Bool = false;
 	
 	static inline var MAX_PACKET_SKILL_LEVEL:Int = 5;
+	
+	
 	
 	
 	
@@ -616,10 +623,7 @@ class CharGenData implements IBuildListed
 	public function getSkillLabel(s:String):String {
 		return CharGenSkillPackets.getSkillLabel(s, skillLabelMappingBases, skillLabelMappings);
 	}
-	
-	
-	
-	
+
 	
 	public var SkillPoints(get, never):Int;
 	function get_SkillPoints():Int {
@@ -718,6 +722,14 @@ class CharGenData implements IBuildListed
 		}
 		arrAdded.sort(SkillTable.sortArrayMethod);
 		skillObjs = skillObjs.concat(arrAdded);
+		
+		skillSubjects = CharGenSkillPackets.getExistingSubjects();
+		var reflectedExisting:Dynamic<Bool> = {};
+		for ( i in 0...skillSubjects.length) {
+			LibUtil.setField(reflectedExisting, skillSubjects[i], true);
+		}
+		skillSubjectsInitial = reflectedExisting;
+	
 		
 		return map;
 	}
