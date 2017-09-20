@@ -87,7 +87,7 @@ section.gen-skills .skill-subjects .del{position:absolute;right:0;bottom:0;}
 section.gen-skills .skill-subjects h4{margin:5px 0;}
 section.gen-skills .skillpacket.active .heading{background-color:#77ddff;}
 section.gen-skills .skillpacket .skill-listing{border-top:1px solid silver;min-height:80px;}
-section.gen-skills .skillpacket .skill-listing>div>.disabled{opacity:.6;text-decoration:line-through;}
+section.gen-skills .skillpacket .skill-listing .disabled{opacity:.6;text-decoration:line-through;}
 section.gen-skills .skillpacket .flex{display:flex;position:relative;width:100%;}
 section.gen-skills .skillpacket .flex>span{display:block;}
 section.gen-skills .skillpacket .flex>span:last-child{z-index:1;}

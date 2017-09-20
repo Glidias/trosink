@@ -56,7 +56,17 @@ class CharGenData implements IBuildListed
 		this.categories = getNewCharGenCategories();
 		this.categories[CATEGORY_BNB].pcp = 4;
 		
+		// ............
+		
 		// Boones and banes
+		initBoons();
+		
+		// Skills
+		initSkills();
+		
+	}
+	
+	function initBoons():Void {
 		var boonList:Array<Boon> = Boons.getList();
 		this.boonAssignList = [];
 		this.baneAssignList = [];
@@ -81,8 +91,9 @@ class CharGenData implements IBuildListed
 				ba._costCached = bb.costs[0];
 			}
 		}
-		
-		// Skills
+	}
+	
+	function initSkills():Void {
 		this.skillPackets = CharGenSkillPackets.getNewSkillPackets();
 		this.skillLabelMappingBases = CharGenSkillPackets.getNewSkillLabelMappingBases();
 		//this.
@@ -103,6 +114,27 @@ class CharGenData implements IBuildListed
 			}
 		}
 		
+		skillSubjectHash = {};
+		
+		for (f in Reflect.fields(skillValues)) {
+			var arr = Skill.getSplitFromSpecialisation(f);
+			if (arr != null) {
+				var skill = arr[0];
+				var special = arr[1];
+				var skillToSpecial:Array<String>;
+				var specialToSkill:Array<String>;
+				if ( (skillToSpecial=LibUtil.field(skillSubjectHash, skill)) == null ) {
+					LibUtil.setField(skillSubjectHash, skill, skillToSpecial=[]);
+				}
+				if ( (specialToSkill=LibUtil.field(skillSubjectHash, special)) == null ) {
+					LibUtil.setField(skillSubjectHash, special, specialToSkill=[]);
+				}
+				skillToSpecial.push(special);
+				specialToSkill.push(skill);
+			}
+		}
+		
+		startingSkillObjsCount = skillObjs.length;
 	}
 	
 	
@@ -552,22 +584,87 @@ class CharGenData implements IBuildListed
 	var skillPacketValues:Dynamic<Int>;
 	var skillsTable:SkillTable;
 	var skillObjs:Array<SkillObj>;
+	var startingSkillObjsCount:Int;
 	var skillSubjects:Array<String>;
 	var skillSubjectsInitial:Dynamic<Bool>;
 	var specialisedSkills:Array<String>;
 	var packetChoosy:Bool = false;
 	
+	var skillSubjectHash:Dynamic<Array<String>>;
+	
+	
 	static inline var MAX_PACKET_SKILL_LEVEL:Int = 5;
 	
+	public static function dynSetField<T>(of:Dynamic<T>, field:String, value:T):Void {
+		#if js
+		untyped of[field] = value;
+		#else
+		Reflect.setField(of, field, value);
+		#end
+	}
 	
+	public static function dynDeleteField<T>(of:Dynamic<T>, field:String):Void {
+		Reflect.deleteField(of, field);
+	}
+	
+	
+	public function addSkill(skill:String, special:String):Void {
+		var skillToSpecial:Array<String>;
+		var specialToSkill:Array<String>;
+		if ( (skillToSpecial=LibUtil.field(skillSubjectHash, skill)) == null ) {
+			dynSetField(skillSubjectHash, skill, skillToSpecial=[]);
+		}
+		if ( (specialToSkill=LibUtil.field(skillSubjectHash, special)) == null ) {
+			dynSetField(skillSubjectHash, special, specialToSkill=[]);
+		}
+		skillToSpecial.push(special);
+		specialToSkill.push(skill);
+		
+		var name = Skill.specialisationName(skill, special);
+		dynSetField(skillValues, name, 0);
+		dynSetField(skillPacketValues, name, 0);
+		
+		skillObjs.push({
+			name: name,
+			attribs:0	// for this case (or for now), this isn't needed
+		});
+	}
+	
+	
+	public function deleteSkillInput(index:Int):Void {
+		var obj = skillObjs[index];
+		var spl = Skill.getSplitFromSpecialisation(obj.name);
+		var skill = spl[0];
+		var special = spl[1];
+		
+		
+		var skillToSpecial:Array<String> = LibUtil.field(skillSubjectHash, skill);
+		var specialToSkill:Array<String>  = LibUtil.field(skillSubjectHash, special);
+		skillToSpecial.splice( skillToSpecial.indexOf(special), 1 );
+		specialToSkill.splice( skillToSpecial.indexOf(skill), 1 );
+		dynDeleteField(skillValues, obj.name);
+		dynDeleteField(skillPacketValues, obj.name);
+		
+		skillObjs.splice(index, 1);
+	}
 	
 	
 	
 	public function onSkillPacketChange(index:Int, vector:Int, clickedPlus:Bool):Void {
 		var packet = skillPackets[index];
-		for (i in 0...packet.fields.length) {
-			var f = packet.fields[i];
-			LibUtil.setField(skillPacketValues, f, LibUtil.field(skillPacketValues, f) + LibUtil.field(packet.values, f) * vector);
+		
+		if (packet.history == null) {
+			for (i in 0...packet.fields.length) {
+				var f = packet.fields[i];
+				LibUtil.setField(skillPacketValues, f, LibUtil.field(skillPacketValues, f) + LibUtil.field(packet.values, f) * vector);
+			}
+		}
+		else { // todo: history scrolling case
+			for (i in 0...packet.fields.length) {
+				var f = packet.fields[i];
+				var l = getSkillLabel(f);
+				LibUtil.setField(skillPacketValues, l, LibUtil.field(skillPacketValues, l) + LibUtil.field(packet.values, f) * vector);
+			}
 		}
 		
 		if (vector > 0  ) {  // items added, invalidate stateful history current levels

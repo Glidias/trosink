@@ -2,6 +2,7 @@ package troshx.sos.vue.inputs.impl;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import js.html.InputElement;
+import js.html.SelectElement;
 import troshx.sos.chargen.CharGenSkillPackets;
 import troshx.sos.chargen.SkillPacket;
 import troshx.sos.vue.inputs.NumericInput.NumericInputProps;
@@ -51,7 +52,6 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		var packet = this.packet;
 		var r =  packet.qty + skillPacketsRemaining; // regular skillPackets remaining through points only...
 		
-		// TODO: maxQty until useless which also factors 
 		var s = packet.history != null ?  dynamicMaxQtyUntilUseless() : staticMaxQtyUntilUseless();
 		
 		r = r < s ? r : s;
@@ -113,17 +113,12 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		}
 		return true;
 	}
-	// TO be depreciated
-	function setSpecialText(input:InputElement, prop:String):Void {
-
-		if (input.value != "" && checkValidTextEntry(input.value, LibUtil.field(this.labelSchema, prop), prop )) {
-			LibUtil.setField(labelMap, prop, input.value);	
-		}
-		else {
-			input.value = LibUtil.field(this.labelMap, prop);
-		}
 	
+	/*
+	function onSpecialSelectionChange(select:SelectElement, prop:String):Void {
+		trace(select.value + " : "+prop);
 	}
+	*/
 	
 	function cloneCurrentState():Dynamic<Int> {
 		var cl:Dynamic<Int> = {};
@@ -164,7 +159,7 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	inline function isLabelBinded(s:String):Bool {
 		return  CharGenSkillPackets.isSkillLabelBinded(s);
 	}
-	function getLabel(s:String):String {
+	inline function getLabel(s:String):String {
 		return CharGenSkillPackets.getSkillLabel(s, labelSchema, labelMap);
 	
 		
@@ -189,8 +184,9 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	// need to: invalidate future history whenever any adding of new skill elsewhere is made
 
 	
+
 	inline function getBindedValue(p:String):Int  {
-		// TODO: checkbinding for getLabelValue using schema and getLabel(..)
+		p = getLabel(p);
 		return LibUtil.field(skillValues, p);
 	}
 	
@@ -199,6 +195,30 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		var b = this.obj.history.length > 0;
 		return a || b;
 	}
+	
+	@:computed function get_packetValueList():Array<PacketProp> {  // homogenised display of data in array format
+		var arr = [];
+		for (p in Reflect.fields(packet.values)) {
+			var lbb = isLabelBinded(p);
+			var count  = LibUtil.field(packet.values, p);
+			var iaa = lbb && isArray(LibUtil.field(labelSchema, p));
+			while ( --count > -1) {
+				arr.push({p:p, isLabelBinded:lbb, isArray:iaa  });
+			}
+		}
+		return arr;
+	}
+	
+
+	function disabledFrom(arr:Array<PacketProp>, p:String, i:Int):Bool {
+		p = getLabel(p);
+		var cur = LibUtil.field(skillValues, p);
+		while (--i > -1) {
+			cur += getLabel(arr[i].p) == p ? 1 :  0;
+		}
+		return cur >= 5;
+	}
+
 
 	
 	inline function isArray(dyn:Dynamic):Bool {
@@ -209,16 +229,19 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		return '<div class="skillpacket" :class="{active:obj[prop]>0}">
 <div class="heading"><button v-if="obj.history!=null" v-on:click="incrementBtnHit" v-show="true || current==obj.history.length" :disabled="current>=max">+</button><input type="number" v-if="obj.history==null" number :value="obj[prop]" v-on:input="inputHandler($$event.target)" v-on:blur="blurHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input><label>{{ obj.name }}</label><button v-if="false && obj.history!=null" v-on:click="spliceBtnHit" v-show="current!=obj.history.length" class="revert" :disabled="obj[prop]>=max">&#9100;</button><span class="max-length" v-if="obj.history!=null" v-show="showHistoryInterface">/{{ obj.history.length }}</span><input type="number" number :value="current" :max="obj.history.length" :min="0" v-on:input="inputHandler($$event.target)" v-if="obj.history!=null" v-show="showHistoryInterface" class="max-length-input"></input><span class="max-predict" v-if="obj.history==null">{{max - current}}</span><span style="display:block;clear:both"></span></div>
 			<div class="skill-listing">
-				<div v-for="(count,p) in packet.values">
-					<div v-for="i in count" :class="{disabled:getBindedValue(p)+i-1>=5}">
-						<div v-if="!isLabelBinded(p)">{{ p }}</div>
-						<div v-else>
-							<select v-if="isArray(labelSchema[p])" v-model="labelMap[p]">
+				<div v-for="(entry,i) in packetValueList" :class="{disabled:disabledFrom(packetValueList, entry.p, i)}">
+					<div v-if="!entry.isLabelBinded">{{ entry.p }}</div>
+					<div v-else>
+						<select v-if="entry.isArray" v-model="labelMap[entry.p]">
+							<option value="" disabled selected hidden>Choose One...</option>
+							<option v-for="val in labelSchema[entry.p]" :value="val">{{ val }}</option>
+						</select>
+						<span v-else class="flex"><span>{{labelSchema[entry.p]}}(</span><span class="middle">
+							<select v-if="skillSubjectHash[labelSchema[entry.p]]" v-model="labelMap[entry.p]">
 								<option value="" disabled selected hidden>Choose One...</option>
-								<option v-for="val in labelSchema[p]" :value="val">{{ val }}</option>
+								<option v-for="special in skillSubjectHash[labelSchema[entry.p]]" :value="special">{{ special }}</option>
 							</select>
-							<span v-else class="flex"><span>{{labelSchema[p]}}(</span><span class="middle"><input type="text" placeholder="provide unique.." v-on:blur="setSpecialText($$event.target, p)" :value="labelMap[p]"></input></span><span>)</span></span>
-						</div>
+						</span><span>)</span></span>
 					</div>
 				</div>
 			</div>
@@ -235,8 +258,16 @@ typedef SkillPacketInputProps = {
 	@:prop({required:true}) var skillValues:Dynamic<Int>;
  	@:prop({required:true}) var skillPacketsRemaining:Int;
 	@:prop({required:true}) var packetChoosy:Bool;
+	
+	@:prop({required:true}) var skillSubjectHash:Dynamic<Array<String>>;
 }
 
 typedef SkillPacketInputData = {
 	@:optional var clickedOnPlus:Bool;
+}
+
+typedef PacketProp = {
+	var p:String;
+	var isLabelBinded:Bool;
+	var isArray:Bool;
 }

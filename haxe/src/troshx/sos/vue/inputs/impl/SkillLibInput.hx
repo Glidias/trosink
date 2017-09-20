@@ -101,10 +101,17 @@ class SkillLibInput extends VComponent<SkillLibInputData, SkillLibInputProps>
 		return clamp5(LibUtil.field(skillLevelsPacket, prop)) + LibUtil.field(obj, prop); 
 	}
 	
+	@:computed function get_deleteBtnStyle():Dynamic {
+		return {'visibility':current == 0 ? 'visible' : 'hidden' };
+	}
+	
+	function onDeleteClick():Void {
+		_vEmit("delete", index);
+	}
 	
 	override function Template():String {
 		return '<span :class="{active:obj[prop]>0, activepack:min>0}">
-				<label><input type="number" number :value="current" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>{{prop}}<span v-show="skillsTable.requiresSpecialisation[prop]">()</span><sup v-show="skillsTable.requiresTrained[prop]">1</sup></label>
+				<label><input type="number" number :value="current" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>{{prop}}<span v-show="skillsTable.requiresSpecialisation[prop]">()</span><sup v-show="skillsTable.requiresTrained[prop]">1</sup><span v-if="canDelete" :style="deleteBtnStyle">[<a href="#" v-on:click.prevent="onDeleteClick">x</a>]</span></label>
 			</span>';
 	}
 	
@@ -115,8 +122,9 @@ typedef SkillLibInputProps = {
 	
 	@:prop({required:true}) var remaining:Int; // individualSkillsRemaining
 	@:prop({required:true}) var skillsTable:SkillTable;
+	@:prop({required:true}) var index:Int;
 	@:prop({required:true}) var skillLevelsPacket:Dynamic<Int>;
-	
+	@:prop({required:false, 'default':false}) var canDelete:Bool;
 
 }
 

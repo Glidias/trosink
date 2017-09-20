@@ -39,6 +39,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	
 	override function Created():Void {
 		_vData.privateInit();
+		untyped CharGenData.dynSetField = Vue.set;
+		untyped CharGenData.dynDeleteField = Vue.delete;
 	}
 	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {

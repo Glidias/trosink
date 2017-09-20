@@ -205,7 +205,7 @@ class CharGenSkillPackets
 	 * @return
 	 */
 	public  static function getSkillLabel(s:String, skillLabelMappingBases:Dynamic, skillLabelMappings:Dynamic<String>):String {
-		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + "("+ LibUtil.field(skillLabelMappings, s)+")" :  LibUtil.field(skillLabelMappings, s) : s;
+		return isSkillLabelBinded(s) ? Std.is(LibUtil.field(skillLabelMappingBases,s), String) ? LibUtil.field(skillLabelMappingBases,s) + Skill.CHARS_SPECIAL_OPEN+ LibUtil.field(skillLabelMappings, s)+Skill.CHARS_SPECIAL_CLOSE :  LibUtil.field(skillLabelMappings, s) : s;
 	}
 	
 	

@@ -45,8 +45,44 @@ class Skill
 		return (n & (n - 1)) != 0;
 	}
 	
+	public static inline var CHARS_SPECIAL_OPEN:String = " (";
+	public static inline var CHARS_SPECIAL_CLOSE:String = ")";
+	
 	public static inline function specialisationName(base:String, special:String):String {
-		return base + " (" + special + ")";
+		return base + CHARS_SPECIAL_OPEN + special + CHARS_SPECIAL_CLOSE;
+	}
+	
+	/**
+	 * This approach only checks for opening set of characters, might yield false positives to find given base of specialisation name
+	 * but is useful for quick naive checks
+	 * @param	name
+	 * @return
+	 */
+	public static inline function getBaseFromSpecialisationNaive(name:String):String {
+		var index:Int = name.indexOf(CHARS_SPECIAL_OPEN);
+		return index > 0 ? name.substring(0, index) : null;
+	}
+	
+	/**
+	 * This approach  checks for opening and ending set of characters to find given base of specialisation name
+	 * @param	name
+	 * @return
+	 */
+	public static function getBaseFromSpecialisation(name:String):String {
+		var index:Int = name.indexOf(CHARS_SPECIAL_OPEN);
+		var len:Int = CHARS_SPECIAL_OPEN.length + CHARS_SPECIAL_CLOSE.length;
+		return index > 0 && name.length > len &&  name.substr(name.length - CHARS_SPECIAL_CLOSE.length) == CHARS_SPECIAL_CLOSE ? name.substring(0,index) : null;
+	}
+	
+	/**
+	 * This approach checks for opening and ending set of characters to find given base and special tag of specialisation name
+	 * @param	name
+	 * @return
+	 */
+	public static function getSplitFromSpecialisation(name:String):Array<String> {
+		var index:Int = name.indexOf(CHARS_SPECIAL_OPEN);
+		var len:Int = CHARS_SPECIAL_OPEN.length + CHARS_SPECIAL_CLOSE.length;
+		return index > 0 && name.length > len &&  name.substr(name.length - CHARS_SPECIAL_CLOSE.length) == CHARS_SPECIAL_CLOSE ? [name.substring(0,index), name.substring(index+CHARS_SPECIAL_OPEN.length, name.length - CHARS_SPECIAL_CLOSE.length) ] : null;
 	}
 }
 

@@ -427,7 +427,7 @@ section.gen-skills .skillpacket .skill-listing {
 	min-height:80px;
 }
 
-section.gen-skills .skillpacket .skill-listing > div > .disabled {
+section.gen-skills .skillpacket .skill-listing  .disabled {
 	opacity:.6;
 	text-decoration:line-through;
 	

@@ -92,7 +92,7 @@
 			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}})</span><span class="formula">(PCP-1)*3+INT*2</span></h2>
 		<h3>Skill(s):</h3>
 			<div class="skill-lib">
-				<SkillLibInput v-for="(skillObj, i) in skillObjs" v-if="!skillsTable.requiresSpecialisation[skillObj.name]" :key="skillObj.name" :obj="skillValues" :prop="skillObj.name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" v-on:change="onSkillIndividualChange" />
+				<SkillLibInput v-for="(skillObj, i) in skillObjs" v-if="!skillsTable.requiresSpecialisation[skillObj.name]" :index="i" :key="skillObj.name" :obj="skillValues" :prop="skillObj.name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" :canDelete="i>=startingSkillObjsCount" v-on:change="onSkillIndividualChange" v-on:delete="deleteSkillInput" />
 			</div>
 			<div class="packet-selection-mode">
 				<b>Buy Packets:</b> (cost 3 skill points each)
@@ -100,8 +100,8 @@
 				<label><input type="radio" name="packetSelectionMode" :checked="packetChoosy" v-on:click="packetChoosy = true"></input>Pennywise and Choosy</label>
 			</div>
 			<div class="packet-list">
-				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining" :skillValues="skillPacketValues"  :packetChoosy="packetChoosy"  />
-				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" />
+				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining" :skillValues="skillPacketValues"  :packetChoosy="packetChoosy" :skillSubjectHash="skillSubjectHash"  />
+				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :skillPacketValues="skillPacketValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" :skillSubjectHash="skillSubjectHash" v-on:addSkill="addSkill" />
 			</div>
 			
 			
