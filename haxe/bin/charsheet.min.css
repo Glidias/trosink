@@ -81,6 +81,7 @@ section.gen-skills .skillpacket .max-length-input{display:block;float:right;}
 section.gen-skills .skillpacket .heading>span{vertical-align:middle;}
 section.gen-skills .skillpacket .heading>label{vertical-align:middle;}
 section.gen-skills .skillpacket .heading>button{vertical-align:middle;}
+section.gen-skills .skillpacket select.invalid{outline:red solid 2px;}
 section.gen-skills .skill-subjects{display:inline-block;}
 section.gen-skills .skill-subjects .columner{width:160px;display:inline-block;position:relative;}
 section.gen-skills .skill-subjects .del{position:absolute;right:0;bottom:0;}

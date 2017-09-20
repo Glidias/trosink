@@ -178,9 +178,9 @@ class CharGenSkillPackets
 		"~academic1":"Knowledge",
 		"~academic2":"Knowledge",
 		"~academicLast":["Engineering", Skill.specialisationName("Knowledge", "Politics"), "Chymistry" ],
-		"~soldier1": ["Athletics", "Ride"],
-		"~scout1": ["Athletics", "Ride"],
-		"~hunter1": ["Stealth", "Ride"]
+		"~soldier1": ["Athletics", "Riding"],
+		"~scout1": ["Athletics", "Riding"],
+		"~hunter1": ["Stealth", "Riding"]
 		};
 	}
 	

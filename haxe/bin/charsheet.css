@@ -400,6 +400,10 @@ section.gen-skills .skillpacket .heading >button {
 	vertical-align:middle;
 }
 
+section.gen-skills .skillpacket select.invalid {
+	outline:red solid 2px;
+}
+
 section.gen-skills .skill-subjects {
 	display:inline-block;
 }

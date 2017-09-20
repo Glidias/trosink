@@ -1,6 +1,7 @@
 package troshx.sos.vue.inputs.impl;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import js.html.InputElement;
 import js.html.SelectElement;
 import troshx.sos.chargen.CharGenSkillPackets;
@@ -26,13 +27,15 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	
 	override function Data():SkillPacketInputData {
 		return {
-			
+			errorsDetected: {}
 		}
 	}
 	
 	override function Created():Void {
 		this.clickedOnPlus = false;
 	}
+	
+
 	
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
 		_vEmit("change", this.index, newValue - oldValue, clickedOnPlus);
@@ -102,40 +105,49 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		return current + 1;
 	}
 	
-	
-	// TO be depreciated
-	function checkValidTextEntry(txt:String, checkSchema:Dynamic, checkProp:String):Bool {
-		for (p in Reflect.fields(this.labelSchema)) {
-			if (checkProp == p || LibUtil.field(this.labelSchema, p) !=checkSchema ) continue;
-			if (  LibUtil.field(this.labelMap, p) == txt ) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	/*
-	function onSpecialSelectionChange(select:SelectElement, prop:String):Void {
-		trace(select.value + " : "+prop);
-	}
-	*/
-	
-	function cloneCurrentState():Dynamic<Int> {
-		var cl:Dynamic<Int> = {};
+	function cloneCurrentState():Dynamic<String> {
+		var cl:Dynamic<String> = {};
 		var packet = this.packet;
 		var fields = packet.fields;
 		for (i in 0...fields.length) {
 			var f = fields[i];
-			// todo: proper history for backtracking
-			LibUtil.setField(cl, f,  LibUtil.field(packet.values, f));
+			var p = getLabel(f);
+			LibUtil.setField(cl, f,  p);
 		}
 		return cl;
 	}
 	
+	function validation():Bool {
+		var invalid:Bool = false;
+		for (i in 0...packet.fields.length) {
+			var f = packet.fields[i];
+			if (!CharGenSkillPackets.isSkillLabelBinded(f) || isArray(LibUtil.field(labelSchema, f) ) ) continue;
+			
+			var chk = LibUtil.field(this.labelMap, f);
+			//var elem:SelectElement = LibUtil.field(_vRefs, f);
+			//trace(elem.checkValidity());
+			if (chk == "") {
+				invalid = true;
+				//LibUtil.field(_vRefs, f);
+				Vue.set(errorsDetected, f, true);
+				
+			}
+			else {
+				Vue.set(errorsDetected, f, false);
+			}
+		}
+		return !invalid;
+	}
+	
+	
 	function incrementBtnHit():Void {
+		
+		if (!validation()) return;
+		
 		var val:Int = this.current;
+		
 		clickedOnPlus = true;
-
+		
 		LibUtil.setArrayLength(packet.history, val);
 		packet.history.push(cloneCurrentState());
 		
@@ -209,6 +221,31 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		return arr;
 	}
 	
+	
+	@:watch({deep:true}) function watch_skillSubjectHash(newValue:Dynamic<Array<String>>, oldValue:Dynamic<Array<String>>):Void {
+		if (obj.history == null) return;
+		
+		for (i in 0...packet.fields.length) {
+			var f = packet.fields[i];
+			if (!CharGenSkillPackets.isSkillLabelBinded(f) || isArray(LibUtil.field(labelSchema, f) ) ) continue;
+			
+			var chk = LibUtil.field(this.labelMap, f);
+			if (chk == "") continue;
+			var skill = LibUtil.field( this.labelSchema, f);
+			var arr = LibUtil.field(this.skillSubjectHash, skill);
+			if (arr == null) continue;
+			if (arr.indexOf(chk) < 0) {
+				LibUtil.setField(this.labelMap, f, "");
+			}
+		}
+		
+	}
+	
+	
+	function onOptionClickUnder(prop:String):Void {
+		//LibUtil.setField(
+		Vue.set(errorsDetected, prop, false);
+	}
 
 	function disabledFrom(arr:Array<PacketProp>, p:String, i:Int):Bool {
 		p = getLabel(p);
@@ -237,9 +274,9 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 							<option v-for="val in labelSchema[entry.p]" :value="val">{{ val }}</option>
 						</select>
 						<span v-else class="flex"><span>{{labelSchema[entry.p]}}(</span><span class="middle">
-							<select v-if="skillSubjectHash[labelSchema[entry.p]]" v-model="labelMap[entry.p]">
+							<select v-if="skillSubjectHash[labelSchema[entry.p]]" v-model="labelMap[entry.p]"  v-on:change="onOptionClickUnder(entry.p)" :class="{invalid:errorsDetected[entry.p]}">
 								<option value="" disabled selected hidden>Choose One...</option>
-								<option v-for="special in skillSubjectHash[labelSchema[entry.p]]" :value="special">{{ special }}</option>
+								<option v-for="special in skillSubjectHash[labelSchema[entry.p]]" :value="special" >{{ special }}</option>
 							</select>
 						</span><span>)</span></span>
 					</div>
@@ -264,6 +301,7 @@ typedef SkillPacketInputProps = {
 
 typedef SkillPacketInputData = {
 	@:optional var clickedOnPlus:Bool;
+	var errorsDetected:Dynamic<Bool>;
 }
 
 typedef PacketProp = {

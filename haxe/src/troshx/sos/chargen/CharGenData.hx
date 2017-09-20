@@ -646,6 +646,8 @@ class CharGenData implements IBuildListed
 		dynDeleteField(skillPacketValues, obj.name);
 		
 		skillObjs.splice(index, 1);
+		
+		truncateSkillPacketHistory();
 	}
 	
 	
@@ -659,12 +661,24 @@ class CharGenData implements IBuildListed
 				LibUtil.setField(skillPacketValues, f, LibUtil.field(skillPacketValues, f) + LibUtil.field(packet.values, f) * vector);
 			}
 		}
-		else { // todo: history scrolling case
-			for (i in 0...packet.fields.length) {
-				var f = packet.fields[i];
-				var l = getSkillLabel(f);
-				LibUtil.setField(skillPacketValues, l, LibUtil.field(skillPacketValues, l) + LibUtil.field(packet.values, f) * vector);
+		else {
+			var start:Int = packet.qty - vector;
+			var forward:Bool = vector >= 0;
+			var step:Int = forward ? 1 : -1;  // assume vector cannot be zero
+			var h:Int = forward ? start : start - 1;
+			var limit:Int = start + vector;
+			while ( (forward ? h <  limit : h >= limit) ) {
+				var history = packet.history[h];
+		
+				for (i in 0...packet.fields.length) {
+					var f = packet.fields[i];
+					var p = LibUtil.field(history, f);
+					LibUtil.setField(skillPacketValues, p, LibUtil.field(skillPacketValues, p) + LibUtil.field(packet.values, f) * step);
+				}
+				h += step;
 			}
+			
+			
 		}
 		
 		if (vector > 0  ) {  // items added, invalidate stateful history current levels
