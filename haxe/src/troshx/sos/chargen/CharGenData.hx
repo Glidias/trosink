@@ -374,20 +374,43 @@ class CharGenData implements IBuildListed
 		public function restoreAnyBnBWithMask(msk:Int):Void {
 		var arr = baneAssignList;
 		var arr2 = boonAssignList;
+		var restored:Bool = false;
+		var restoredBane:troshx.sos.core.BoonBane.BaneAssign = null;
+		var restoredBoon:troshx.sos.core.BoonBane.BoonAssign = null;
+		
 		for (i in 0...arr.length) {  // banes first
 			var a = arr[i];
 			if ( a._canceled && (a.bane.channels & msk)!=0 ) {
 				a._canceled = false;
-				return;
+				
+				if (a.rank > 0)  {
+					restoredBane = a;
+					break;
+				}
 			}
 		}
-		for (i in 0...arr2.length) {
-			var a = arr2[i];
-			if ( a._canceled &&  (a.boon.channels & msk)!=0 ) {
-				a._canceled = false;
-				return;
+	
+		
+		if (restoredBane == null) {
+			for (i in 0...arr2.length) {
+				var a = arr2[i];
+				if ( a._canceled &&  (a.boon.channels & msk)!=0 ) {
+					a._canceled = false;
+					if (a.rank > 0)  {
+						restoredBoon = a;
+						break;
+					}
+				}
 			}
 		}
+		
+		if (restoredBoon != null) {
+			checkBoonAgainstOthers(restoredBoon);
+		}
+		else if (restoredBane != null) {
+			checkBaneAgainstOthers(restoredBane);
+		}
+		
 	}
 	
 	// Duplicate
@@ -470,13 +493,18 @@ class CharGenData implements IBuildListed
 		if (isBane) {
 			var b:BaneAssign = cast bba;
 			char.removeBane(b);
-			if (b.bane.channels!=0 ) restoreAnyBnBWithMask(b.bane.channels);
+			if (b.bane.channels != 0 ) {
+				restoreAnyBnBWithMask(b.bane.channels);
+				
+			}
 			
 		}
 		else {
 			var b:BoonAssign = cast bba;
 			char.removeBoon(b);
-			if (b.boon.channels !=0) restoreAnyBnBWithMask(b.boon.channels);
+			if (b.boon.channels != 0){
+				restoreAnyBnBWithMask(b.boon.channels);
+			}
 		}
 	}
 	
