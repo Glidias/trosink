@@ -98,7 +98,7 @@ class CharGenData implements IBuildListed
 		this.skillLabelMappingBases = CharGenSkillPackets.getNewSkillLabelMappingBases();
 		//this.
 		
-		skillsTable = SkillTable.getDefaultSkillTable();
+		skillsTable = SkillTable.getNewDefaultSkillTable();
 		skillObjs = skillsTable.getSkillObjectsAsArray(true);
 		specialisedSkills = skillsTable.getSpecialisationList();
 		
@@ -848,6 +848,7 @@ class CharGenData implements IBuildListed
 				LibUtil.setField(this.skillValues, f, 0);
 				LibUtil.setField(this.skillPacketValues, f, 0);
 				if ( !CharGenSkillPackets.isSkillLabelBinded(f) && !skillsTable.hasSkill(f)) {
+					skillsTable.setSkill(f, 0);
 					arrAdded.push({ name:f, attribs:0});
 				}
 			}
