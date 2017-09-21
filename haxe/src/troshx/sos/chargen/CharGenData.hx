@@ -759,10 +759,7 @@ class CharGenData implements IBuildListed
 	public inline function isSkillLabelBinded(s:String):Bool {
 		return  CharGenSkillPackets.isSkillLabelBinded(s);
 	}
-	public function getSkillLabel(s:String):String {
-		return CharGenSkillPackets.getSkillLabel(s, skillLabelMappingBases, skillLabelMappings);
-	}
-
+	
 	
 	public var SkillPoints(get, never):Int;
 	function get_SkillPoints():Int {

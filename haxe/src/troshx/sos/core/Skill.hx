@@ -84,6 +84,14 @@ class Skill
 		var len:Int = CHARS_SPECIAL_OPEN.length + CHARS_SPECIAL_CLOSE.length;
 		return index > 0 && name.length > len &&  name.substr(name.length - CHARS_SPECIAL_CLOSE.length) == CHARS_SPECIAL_CLOSE ? [name.substring(0,index), name.substring(index+CHARS_SPECIAL_OPEN.length, name.length - CHARS_SPECIAL_CLOSE.length) ] : null;
 	}
+	
+	/*		// dupplicate yagni
+	public static function getSubjectFromSpecialisation(name:String):Array<String> {
+		var index:Int = name.indexOf(CHARS_SPECIAL_OPEN);
+		var len:Int = CHARS_SPECIAL_OPEN.length + CHARS_SPECIAL_CLOSE.length;
+		return index > 0 && name.length > len &&  name.substr(name.length - CHARS_SPECIAL_CLOSE.length) == CHARS_SPECIAL_CLOSE ? name.substring(index+CHARS_SPECIAL_OPEN.length, name.length - CHARS_SPECIAL_CLOSE.length) : null;
+	}
+	*/
 }
 
 

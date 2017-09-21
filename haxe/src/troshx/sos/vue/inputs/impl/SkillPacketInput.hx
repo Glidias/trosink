@@ -6,6 +6,7 @@ import js.html.InputElement;
 import js.html.SelectElement;
 import troshx.sos.chargen.CharGenSkillPackets;
 import troshx.sos.chargen.SkillPacket;
+import troshx.sos.core.Skill;
 import troshx.sos.vue.inputs.NumericInput.NumericInputProps;
 import troshx.util.LibUtil;
 
@@ -39,7 +40,30 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
 		_vEmit("change", this.index, newValue - oldValue, clickedOnPlus);
+		if (obj.history != null && !clickedOnPlus && current < obj.history.length) {
+			showCurrentHistory();
+		}
 		clickedOnPlus = false;
+	}
+	
+	
+	function showCurrentHistory() {
+		var packet = this.packet;
+		var samples = packet.history[current];
+		for (i in 0...packet.fields.length) {
+			var f = packet.fields[i];
+			if ( CharGenSkillPackets.isSkillLabelBinded(f) ) {
+				if ( isArray(LibUtil.field(labelSchema, f)) ) {
+					LibUtil.setField(this.labelMap, f, LibUtil.field(samples, f));
+				}
+				else {
+					var spl = Skill.getSplitFromSpecialisation( LibUtil.field(samples, f) );
+					LibUtil.setField(this.labelMap, f, spl[1]);
+				}
+				
+			}
+		}
+		
 	}
 	
 	@:computed inline function get_current():Int {
@@ -90,15 +114,14 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	}
 	
 	function dynamicMaxQtyUntilUseless():Int {
-		var packet = this.packet;
-		var current:Int = packet.qty;
-		var compare = packetChoosy ? 0 : 1;
-		for (i in 0...packet.fields.length) {
-			var f = packet.fields[i];
-			var v = LibUtil.field( packet.values, f);
-			var skill:Int = getBindedValue(f);
-			
-			if ( currentPacketClampedSkillLevel(skill) + v - 5 > compare) {
+		// count number of disabled items instead from bottom
+		var packValList = this.packetValueList;
+		var disabledCount:Int = 0;
+		var limit:Int = packetChoosy ? 5 : 6;
+		var i:Int = packValList.length;
+		while (--i>-1) {
+			var entry = packValList[i];
+			if (disabledFromCount(packValList, entry.p, i) >= limit) {
 				return current;
 			}
 		}
@@ -176,24 +199,6 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 	
 		
 	}
-	/*
-	@:computed function get_maxHistoryLength():Int {
-		if (obj.history == null) return 0;
-		
-		return obj.history.length;  // handling of history is done outside this component
-		
-	}
-	*/
-	
-	
-	/*  // no longer needed, handle outside
-	@:watch function watch_maxHistoryLength(newValue:Int):Void {
-		if (this.obj.history != null && this.obj.history.length != newValue) {
-			LibUtil.setArrayLength(obj.history, newValue);
-		}
-	}
-	*/
-	// need to: invalidate future history whenever any adding of new skill elsewhere is made
 
 	
 
@@ -246,14 +251,18 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 		//LibUtil.setField(
 		Vue.set(errorsDetected, prop, false);
 	}
-
-	function disabledFrom(arr:Array<PacketProp>, p:String, i:Int):Bool {
+	
+	function disabledFromCount(arr:Array<PacketProp>, p:String, i:Int):Int {
 		p = getLabel(p);
-		var cur = LibUtil.field(skillValues, p);
+		var cur = LibUtil.field(skillValues, p); 
 		while (--i > -1) {
 			cur += getLabel(arr[i].p) == p ? 1 :  0;
 		}
-		return cur >= 5;
+		return cur;
+	}
+
+	inline function disabledFrom(arr:Array<PacketProp>, p:String, i:Int):Bool {
+		return disabledFromCount(arr,p,i) >=  5;
 	}
 
 
@@ -288,7 +297,11 @@ class SkillPacketInput extends VComponent<SkillPacketInputData, SkillPacketInput
 
 typedef SkillPacketInputProps = {
 	>NumericInputProps,
-	@:prop({required:true}) var labelMap:Dynamic<String>;
+	
+	// By right, 'labelMap' should not be an outside dependency, should be auto-computed based on labelSchema and skillValues!
+	// If it ain't broke though, don't fix it.
+	@:prop({required:true}) var labelMap:Dynamic<String>; 
+	
 	@:prop({required:true}) var labelSchema:Dynamic;
 	@:prop({required:true}) var index:Int;
 	
