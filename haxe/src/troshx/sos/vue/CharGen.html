@@ -36,7 +36,12 @@
 			
 		<hr/>
 				
-		
+			
+		<section class="gen-social-class"  id="gen-social-class">
+			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
+		</section>
+
+		<hr/>
 			
 		<section class="gen-attributes" id="gen-attributes">
 			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0" style="color:green">Ok!</span></h2>
@@ -53,12 +58,7 @@
 		</section>
 
 		<hr/>
-			
-		<section class="gen-social-class"  id="gen-social-class">
-			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
-		</section>
-
-		<hr/>
+		
 			
 		<section class="gen-bnb"  id="gen-bnb">
 			<h2>Boons &amp; Banes <span class="valuer">(<span class="num">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>
