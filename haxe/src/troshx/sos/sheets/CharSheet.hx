@@ -2,6 +2,8 @@ package troshx.sos.sheets;
 import haxevx.vuex.core.IBuildListed;
 import troshx.ds.HashedArray;
 import troshx.sos.core.Race;
+import troshx.sos.core.SocialClass;
+import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 
 import troshx.sos.core.BodyChar;
 
@@ -98,12 +100,59 @@ class CharSheet implements IBuildListed
 	public var totalPain(get, never):Int;
 	public var totalBloodLost(get, never):Int;
 	
-	public var money:Money = new Money();
-	public var wealthAssets:Array<WealthAssetQty> = [];
-	public var socialClass:String = "";
+	public var money:Money = new Money();  // note: this field is for ingame use only
+	
+	public var socialClass:SocialClass = new SocialClass("", new Money(), 0);  // this field's inner Money() is for char generation 
+	public var wealthAssets:Array<WealthAssetAssign> = [];
+	public var assetWorth(get, never):Int;
+	function get_assetWorth():Int {
+		var i:Int = wealthAssets.length;
+		var c:Int = 0;
+		while (--i > -1) {
+			c += wealthAssets[i].worth;
+		}
+		return c;
+	}
+	
+	public function getAssetsWithWorth(worth:Int):Array<WealthAssetAssign> {
+		var arr:Array<WealthAssetAssign> = [];
+		for (i in 0...wealthAssets.length) {
+			var w = wealthAssets[i];
+			if (w.worth == worth) {
+				arr.push(w);
+			}
+		}
+		return arr;
+	}
+	
+	var wealthAssetAssignCount:Int = 0; 
+	public function getEmptyWealthAssetAssign(worth:Int):WealthAssetAssign {
+		var w:WealthAssetAssign = {
+			name: "",
+			liquidate:false,
+			uidCount:wealthAssetAssignCount,
+			worth: worth
+		}
+		wealthAssetAssignCount++;
+		return w;
+	}
+	
+	
+	public static inline var LIQUIDATE_ASSET_BASE:Int = 6;  // assumed in GP
+	function get_assetLiquidateTotal():Int {
+		var i:Int = wealthAssets.length;
+		var c:Int = 0;
+		while (--i > -1) {
+			var w = wealthAssets[i];
+			c += w.liquidate ? w.worth*LIQUIDATE_ASSET_BASE : 0;
+		}
+		return c;
+	}
 	
 	public var skills:Array<SkillAssign> = [];
 	public var talents:Array<Talent> = [];
+	
+	
 	
 	var boons:HashedArray<BoonAssign> = new HashedArray<BoonAssign>();
 	var banes:HashedArray<BaneAssign> =  new HashedArray<BaneAssign>();
@@ -304,9 +353,11 @@ class CharSheet implements IBuildListed
 	
 }
 
-typedef WealthAssetQty = {
+typedef WealthAssetAssign = {
 	name:String,
-	quantity:String
+	liquidate:Bool,
+	uidCount:Int,
+	worth:Int  // 1 to 3
 }
 
 typedef SkillAssign = {

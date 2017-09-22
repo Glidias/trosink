@@ -1,5 +1,6 @@
 package troshx.sos.chargen;
 
+import haxe.ds.StringMap;
 import haxevx.vuex.core.IBuildListed;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
@@ -9,8 +10,10 @@ import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.Money;
 import troshx.sos.core.Race;
 import troshx.sos.core.Skill;
+import troshx.sos.core.SocialClass;
 import troshx.sos.races.Races;
 import troshx.util.LibUtil;
 
@@ -19,7 +22,8 @@ import troshx.sos.sheets.CharSheet;
 
 
 /**
- * ...
+ * All formulas based off gist: https://gist.github.com/Glidias/9cbd8bd8114649207b79c252873fd207
+ * 
  * @author Glidias
  */
 
@@ -63,6 +67,11 @@ class CharGenData implements IBuildListed
 		
 		// Skills
 		initSkills();
+		
+		// Social class
+		initSocialClasses();
+		
+		initSocialClassesBenefits();
 		
 	}
 	
@@ -137,6 +146,66 @@ class CharGenData implements IBuildListed
 		startingSkillObjsCount = skillObjs.length;
 	}
 	
+	function initSocialClasses():Void {
+		var haleAndHearty2 = {cost:2, name:"Hale and Hearty", rank:1};
+		var beautiful3 = {cost:3, name:"Beautiful", rank:1};
+		var folksBackHome3 = {cost:3, name:"Folks Back Home", rank:1};
+		var folksBackHome6 = {cost:6, name:"Folks Back Home", rank:2};
+		var literate1 = {cost:1, name:"Literate", rank:1};
+		var literate2= {cost:2, name:"Literate", rank:1, qty:2};
+		var literate3 = {cost:3, name:"Literate", rank:1, qty:3};
+		var languages3 = {cost:3, name:"Language", rank:3};
+		var languages2 = {cost:2, name:"Language", rank:2};
+		var languages1 = {cost:1, name:"Language", rank:1};
+		var contacts1 = {cost:1, name:"Contacts", rank:1};
+		var contacts4 = {cost:4, name:"Contacts", rank:2};
+		var contacts6 = {cost:6, name:"Contacts", rank:3};
+		var allies5 = {cost:5, name:"Allies", rank:2};
+		var allies10 = {cost:10, name:"Allies", rank:3};
+		var famous2 = {cost:2, name:"Famous", rank:1};
+		var famous4 = {cost:4, name:"Famous", rank:2};
+		
+		socialClassList = [
+			{ socialClass: new SocialClass("Slave/Exile", Money.create(0, 10, 0), 0 ), boons:[haleAndHearty2, beautiful3, languages2], maxBoons:1  },
+			{ socialClass: new SocialClass("Peasant", Money.create(5, 0, 0), 0 ), boons:[haleAndHearty2, folksBackHome3], maxBoons:1  },
+			{ socialClass: new SocialClass("Poor Freeman", Money.create(15, 0, 0), 0 ), boons:[haleAndHearty2, folksBackHome3, literate1], maxBoons:1  },
+			{ socialClass: new SocialClass("Freeman", Money.create(25, 0, 0), 1 ), boons:[haleAndHearty2, folksBackHome3, literate1]  , maxBoons:2 },
+			{ socialClass: new SocialClass("High Freeman", Money.create(40, 0, 0), 2 ), boons:[folksBackHome6, literate1, languages1, contacts1 ], maxBoons:2  },
+			{ socialClass: new SocialClass("Minor Noble", Money.create(80, 0, 0), 3 ), boons:[allies5, famous2, haleAndHearty2, literate1, languages1, contacts1, folksBackHome6], maxBoons:2 },
+			{ socialClass: new SocialClass("Landed Noble", Money.create(150, 0, 0), 6 ), boons:[allies5, famous2, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6], maxBoons:2  },
+			{ socialClass: new SocialClass("High Noble", Money.create(300, 0, 0), 10 ), boons:[allies10, famous4, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6] , maxBoons:2 },
+			{ socialClass: new SocialClass("Royalty", Money.create(800, 0, 0), 15 ), boons:[allies10, famous4, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6 ], maxBoons:3},
+			{ socialClass: new SocialClass("High Royalty", Money.create(1500, 0, 0), 20 ), boons:[allies10, famous4, haleAndHearty2, literate3, languages3, contacts6, folksBackHome6 ], maxBoons:3}
+		];
+		
+	}
+	
+	function initSocialClassesBenefits():Void {
+		for (i in 0...socialClassList.length) {
+			var s = socialClassList[i];
+			for (b in 0...s.boons.length) {
+				var sb = s.boons[b];
+				if (sb.index == null) {
+					sb.index = findBoonIndexByName(sb.name);
+					if (sb.index == -1) {
+						throw "Could not find Social boon by: " + sb.name;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	function findBoonIndexByName(boonName:String):Int {
+		for ( i in 0...boonAssignList.length) {
+			var b = boonAssignList[i];
+			if (b.boon.name == boonName) return i;
+		}
+		return -1;
+	}
+	
+	
+	
 	
 	// Non-reactive data can be intialized here.
 	public function privateInit():Void {
@@ -200,6 +269,13 @@ class CharGenData implements IBuildListed
 	{
 		return categories[CATEGORY_ATTRIBUTES];
 	}
+	
+	public var categorySocialClassWealth(get, never):CategoryPCP;
+	inline function get_categorySocialClassWealth():CategoryPCP 
+	{
+		return categories[CATEGORY_SOCIAL_WEALTH];
+	}
+	
 	
 	public var categoriesRemainingAssignable(get, never):Int;
 	function get_categoriesRemainingAssignable():Int {
@@ -359,6 +435,144 @@ class CharGenData implements IBuildListed
 	}
 	
 	
+	
+	// SOCIAL CLASS/WEALTH
+	// to lookup wealth table of different social classes
+	public var socialClassList:Array<SocialClassAssign>;
+
+	var socialClassIndex:Int = 0;
+	var wealthIndex:Int = 0;
+	var syncSocialWealth:Bool = true; // user prefered option flag
+	
+	
+	public var maxSocialClassIndex(get, never):Int;
+	inline function get_maxSocialClassIndex():Int 
+	{
+		return categorySocialClassWealth.pcp  - 1;
+	}
+	
+	public function constraintSocialWealth():Void {
+		if (syncSocialWealth) {
+			var max = maxSocialClassIndex;
+			
+			if (socialClassIndex > max) {
+				socialClassIndex = max;
+			}
+			
+			wealthIndex = socialClassIndex;
+		}
+		else {  
+			// constraint the wealth first
+			
+			var max = unevenMaxWealthIndex;
+
+			if (wealthIndex > max) {
+				wealthIndex = max;
+			}
+			
+			// priotitiese to keep social class 
+			
+			max =  unevenMaxSocialClassIndex;  
+			if (socialClassIndex > max) {
+				socialClassIndex = max;
+			}
+		}
+	}
+	
+	public var socialEitherMaxIndex(get, never):Int;
+	function get_socialEitherMaxIndex():Int {
+		var a = maxSocialClassIndex;
+		var b = unevenMaxSocialClassIndex;
+		return syncSocialWealth ? a : b;
+	}
+	
+	public var wealthEitherMaxIndex(get, never):Int;
+	function get_wealthEitherMaxIndex():Int {
+		var a = maxSocialClassIndex;
+		var b = unevenMaxWealthIndex;
+		return syncSocialWealth ? a : b;
+	}
+	
+	public var socialClassPlaceHolderName(get, never):String;
+	function get_socialClassPlaceHolderName():String {
+		return socialClassIndex != wealthIndex ? socialClassList[socialClassIndex].socialClass.name + " -$: " + socialClassList[wealthIndex].socialClass.name : socialClassList[socialClassIndex].socialClass.name;
+	}
+	public var promptSettleSocialTier(get, never):Bool;
+	inline function get_promptSettleSocialTier():Bool {
+		return socialPCPRequired != categorySocialClassWealth.pcp;// this.maxSocialClassIndex;
+	}
+	
+	public var socialPCPRequired(get, never):Int;
+	inline function get_socialPCPRequired():Int {
+		return socialClassIndex != wealthIndex ? unevenSocialPCPRequired : socialClassIndex + 1;
+	}
+	
+	
+	public function settleSocialTier():Void {
+		//if (socialClassIndex == wealthIndex) {
+			syncSocialWealth = socialClassIndex == wealthIndex; // lazy imperative fix.
+		//}
+		categorySocialClassWealth.pcp = socialPCPRequired;
+	}
+	
+	inline function solveSocialOrWealthMaxX(x:Int, y:Int, C:Int):Int {
+		x = C * 2 - 4 - y;
+		x -= ((x & 1) ^ (y & 1)); 
+		return x;
+	}
+	
+	public var unevenSocialPCPRequired(get, never):Int;
+	function get_unevenSocialPCPRequired():Int {
+		var x =  socialClassIndex + 1;
+		var y = wealthIndex + 1;
+		var C = categorySocialClassWealth.pcp;
+		return Math.ceil((x + y)/2) + 2;
+	}
+	
+	public var unevenMaxSocialClassIndex(get, never):Int; 
+	function get_unevenMaxSocialClassIndex():Int 
+	{
+		var r =  solveSocialOrWealthMaxX(socialClassIndex + 1, wealthIndex + 1, categorySocialClassWealth.pcp) - 1;
+		return r >= 0 ? r : 0;
+	}
+	
+	public var unevenMaxWealthIndex(get, never):Int; 
+	function get_unevenMaxWealthIndex():Int 
+	{
+		var r =  solveSocialOrWealthMaxX(wealthIndex + 1, socialClassIndex + 1, categorySocialClassWealth.pcp) - 1;
+		return r >= 0 ? r : 0;
+	}
+	
+	public function setSocialClassIndex(index:Int):Void {
+		socialClassIndex = index;
+		if (syncSocialWealth) {
+			wealthIndex = index;
+		}
+	}
+	
+	public function setWealthIndex(index:Int):Void {
+		wealthIndex = index;
+	}
+	
+	public function updateSocialToCharsheet():Void {
+		var s =  socialClassList[socialClassIndex];
+
+		this.char.socialClass.classIndex = socialClassIndex;
+		
+	}
+	
+	public function updateMoneyToCharsheet():Void {
+		var s =  socialClassList[wealthIndex];
+		this.char.socialClass.wealthIndex = wealthIndex;
+		this.char.socialClass.money.matchWith(s.socialClass.money );
+		this.char.socialClass.wealth = s.socialClass.wealth;
+	}
+	
+	public function saveFinaliseSocial():Void {
+		if (socialClassIndex == wealthIndex || this.char.socialClass.name == "") this.char.socialClass.name = socialClassPlaceHolderName; 
+		
+	}
+	
 	// BOONS & BANES
 	
 	//public var allBaneAssignments():Int
@@ -412,6 +626,39 @@ class CharGenData implements IBuildListed
 		}
 		
 	}
+	
+	public function resetBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
+		//trace("REMOVING:" + bba + " , " + isBane);
+		if (isBane) {
+			//char.removeBane(cast bba);
+			var bane:Bane = cast bba.getBoonOrBane();
+			var ba;
+			var i = baneAssignList.indexOf(cast bba);
+			ba = bane.getAssign(0, char);
+			ba._costCached = bane.costs[0];
+			ba._forcePermanent = bba._forcePermanent;
+			ba._minRequired = bba._minRequired;
+			ba._canceled = bba._canceled;
+			CharGenData.dynSetArray(this.baneAssignList, i, ba );
+			
+		}
+		else {
+			var boonAssign:BoonAssign = cast bba;
+			var boon:Boon = boonAssign.boon;
+			var ba;
+			var i = boonAssignList.indexOf(cast bba);
+			ba = boon.getAssign(0, char);
+			ba.discount = boonAssign.discount;
+			ba._remainingCached = maxBoonsSpendableLeft;
+			
+			ba._costCached = boon.costs[0];
+			ba._forcePermanent = bba._forcePermanent;
+			ba._minRequired = bba._minRequired;
+			ba._canceled = bba._canceled;
+			CharGenData.dynSetArray(this.boonAssignList, i, ba );
+		}
+	}
+
 	
 	// Duplicate
 	public function checkBaneAgainstOthers(baneAssign:troshx.sos.core.BoonBane.BaneAssign):Void {
@@ -522,7 +769,7 @@ class CharGenData implements IBuildListed
 		var i:Int = arr.length;
 		while (--i > -1) {
 			var b = arr[i];
-			total += !b._canceled ? b._costCached : 0;
+			total += !b.dontCountCost() ? b._costCached : 0;
 		}
 		return total;
 	}
@@ -551,7 +798,14 @@ class CharGenData implements IBuildListed
 		var i:Int = arr.length;
 		while (--i > -1) {
 			var b = arr[i];
-			total += !b._canceled ? b._costCached : 0;
+			var countCost = !b.dontCountCost();
+			var amt:Int = countCost ? b._costCached : 0;
+			
+			if (b.discount != 0) {  // check for social benefit discount
+				amt -= b.discount;
+				if (amt < 0) amt = 0;
+			}
+			total += amt;
 		}
 		return total;
 	}
@@ -629,6 +883,10 @@ class CharGenData implements IBuildListed
 		#else
 		Reflect.setField(of, field, value);
 		#end
+	}
+	
+	public static function dynSetArray<T>(of:Array<T>, i:Int, value:T):Void {
+		of[i] = value;
 	}
 	
 	public static function dynDeleteField<T>(of:Dynamic<T>, field:String):Void {
@@ -748,7 +1006,7 @@ class CharGenData implements IBuildListed
 	}
 	*/
 	
-	public function finaliseSkillsFromPackets():Void {
+	public function saveFinaliseSkillsFromPackets():Void {
 		// to do this when finailising char sheet
 		
 	}
@@ -874,10 +1132,6 @@ class CharGenData implements IBuildListed
 	//static var PCP_COLUMN_SKILLS:Array<Int> = [6,9,12,15,18,21,24,27,30,33];
 
 	
-	// SOCIAL CLASS/WEALTH
-	// to lookup wealth table of different social classes
-	
-	
 	// SCHOOL/PROFECIENCIES
 	//static var PCP_COLUMN_PROFS:Array<Int> = [0,3,6,9,12,15,18,21,24,27];
 	public var ProfPoints(get, never):Int;
@@ -894,9 +1148,27 @@ class CharGenData implements IBuildListed
 	}
 	
 	
-	
+
 	
 }
+
+typedef SocialClassAssign = {
+	var socialClass:SocialClass;
+	var boons:Array<SocialBoonAssign>;
+	var maxBoons:Int;
+	
+}
+
+typedef SocialBoonAssign = {
+	var name:String;
+	var rank:Int;
+	var cost:Int;
+	@:optional var qty:Int;
+	
+	// used internally 
+	@:optional var index:Int; 
+}
+
 
 typedef WarningDef = {
 	var warn:Bool;

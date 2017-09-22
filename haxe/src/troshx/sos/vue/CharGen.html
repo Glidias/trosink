@@ -27,20 +27,36 @@
 		<!-- for each category -->
 		<section class="gen-race" id="gen-race">
 			<h2>Race <span class="valuer">(Tier {{raceTier}}) </span> <span class="valid" v-show="!promptSettleRaceTier" style="color:green">Ready.</span></h2>
-			<div v-for="(tier, ti) in raceTierTable" :key="ti">
-				{{ ti + 1 }}: ({{pcpForTiers[ti]}} PCP)
-				<label :class="{disabled:ti>=raceTier}" v-for="(race, ri) in tier"><input type="radio" :disabled="ti>=raceTier" name="race" :checked="race.name == selectedRaceName" v-on:click="selectRaceAt(ti, ri)" :key="ri"></input>{{ race.name }}</label>
+			<div class="gen-col">
+				<div v-for="(tier, ti) in raceTierTable" :key="ti">
+					<span class="index-num">{{ ti + 1 }}:</span> ({{pcpForTiers[ti]}} PCP)
+					<label :class="{disabled:ti>=raceTier}" v-for="(race, ri) in tier"><input type="radio" :disabled="ti>=raceTier" name="race" :checked="race.name == selectedRaceName" v-on:click="selectRaceAt(ti, ri)" :key="ri"></input>{{ race.name }}</label>
+				</div>
+				<div v-show="promptSettleRaceTier"><button style="margin-top:10px"  v-on:click="settleRaceTier()">Finalise Race/Tier!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm.</span>
+				</div>
 			</div>
-			<div v-show="promptSettleRaceTier"><button style="margin-top:10px"  v-on:click="settleRaceTier()">Finalise Race/Tier!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm.</span></div>
 		</section>
 			
 		<hr/>
 				
 			
 		<section class="gen-social-class"  id="gen-social-class">
-			<h2>Social Class/Wealth <span class="valuer">({{placeholder}} for {{placeholder}} PCP assigned)</span></h2>
+			<h2>Social Class/Wealth <span class="valuer">({{categorySocialClassWealth.pcp}} PCP assigned)</span></h2>
+			<div class="gen-col">
+				<div class="socialclass-li">
+					<span class="index-num"></span><span class="col-social-class" style="text-align:right;">Sync Wealth?</span><span class="col-wealth"><input type="checkbox" v-model="syncSocialWealth"></input><label v-show="!syncSocialWealth">&#128275;</label><label v-show="syncSocialWealth">&#128274;</label> <label>{{ socialClassIndex == wealthIndex ? "==" :  "!="}}</label></span>
+				</div>
+				<div v-for="(li, i) in socialClassList" class="socialclass-li">
+					<span class="index-num">{{i+1}}:</span> <label class="col-social-class" :class="{disabled:socialEitherMaxIndex<i}"><input type="radio" v-on:click="setSocialClassIndex(i)" name="social-class" :checked="socialClassIndex==i"></input>{{ li.socialClass.name }}</label> <label class="col-wealth" :class="{disabled:wealthEitherMaxIndex<i}"><input type="radio" v-on:click="setWealthIndex(i)" name="wealth" :disabled="syncSocialWealth" :checked="wealthIndex==i"></input>{{ li.socialClass.money.getLabel() }}{{ li.socialClass.wealth!= 0 ? ", ["+li.socialClass.wealth+"W]" : "" }}</label>
+				</div>
+			</div>
+			<div class="gen-col">
+				<div v-show="wealthIndex != socialClassIndex"><label>Custom Label: <input type="text" :placeholder="socialClassPlaceHolderName" v-model="char.socialClass.name"></input></label></div>
+			</div>
+			<div v-show="promptSettleSocialTier"><button style="margin-top:10px"  v-on:click="settleSocialTier()">Finalise Social Class/Wealth!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm. </span><span v-show="!syncSocialWealth">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>
+				</div>
 		</section>
-
+		
 		<hr/>
 			
 		<section class="gen-attributes" id="gen-attributes">

@@ -130,11 +130,17 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	public var ingame:Bool = false;
 	public var _forcePermanent:Bool = false;
 	public var _canceled:Bool = false;
+	public var _minRequired:Int = 0;
 
+
+	
 	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	
+	public inline function dontCountCost():Bool {
+		return _canceled || _forcePermanent;
+	}
 	
 	
 	// ingame only
@@ -152,6 +158,7 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 		return 1;
 	}
 	
+
 	public function getCost(rank:Int):Int {
 		return 0;
 	}
@@ -194,6 +201,8 @@ class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 		
 	}
 	
+	// boon assignments may have a discount assosiated to them which is factored in when calculating Boon expediture elsewhere
+	public var discount:Int = 0;
 	
 	// utility
 

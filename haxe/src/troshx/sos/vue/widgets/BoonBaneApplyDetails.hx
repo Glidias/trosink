@@ -55,6 +55,7 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 	@:computed function get_locked():Bool {
 		return assign._forcePermanent;
 	}
+	
 	@:computed function get_isCanceled():Bool {
 		return assign._canceled;
 	}

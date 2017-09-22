@@ -46,6 +46,8 @@ td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
 .widget-prof .columner{width:50%;float:left;}
 .chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
 .chargen h2 .valuer{font-size:11px;}
+.chargen .gen-col{display:inline-block;vertical-align:top;margin-right:15px;}
+.chargen .gen-col:last-child{margin-right:0;}
 .chargen h2 .formula{font-size:11px;margin-left:15px;font-weight:normal;display:inline-block;}
 .chargen h2 .valuer .num{font-size:16px;font-style:italic;margin-left:2px;margin-right:2px;}
 section.gen-bnb input[type=number]{width:27px;margin-right:2px;}
@@ -73,6 +75,17 @@ section.gen-race label.disabled{pointer-events:none;opacity:.5;}
 .chargen__footer textarea,.chargen__footer label{vertical-align:top;}
 section.gen-bnb .boon-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
 section.gen-bnb .bane-tags .gen-comp-bb.disabled{pointer-events:none;opacity:.3;}
+section.gen-bnb .gen-comp-bb.force-perm .close-btn,section.gen-bnb .gen-comp-bb.force-perm .reset-btn{display:none;}
+section.gen-bnb .boon-tags .gen-comp-bb.force-perm{pointer-events:none;color:green;}
+section.gen-bnb .bane-tags .gen-comp-bb.force-perm{pointer-events:none;color:green;}
+section.gen-bnb .boon-tags .gen-comp-bb.required{pointer-events:none;color:green;}
+section.gen-bnb .bane-tags .gen-comp-bb.required{pointer-events:none;color:green;}
+section.gen-social-class .col-social-class{min-width:100px;display:inline-block;}
+section.gen-social-class .col-wealth{min-width:100px;display:inline-block;}
+section.gen-social-class input{font-family:inherit;font-size:inherit;}
+section.gen-social-class .socialclass-li{border-bottom:1px solid #dddddd;}
+section.gen-social-class .socialclass-li .disabled{pointer-events:none;opacity:.5;}
+section.gen-social-class .socialclass-li .index-num{min-width:15px;display:inline-block;}
 section.gen-skills .skillpacket{display:inline-block;width:160px;border:1px solid black;margin-right:5px;vertical-align:top;margin-bottom:5px;position:relative;margin-top:15px;}
 section.gen-skills .skillpacket .max-predict{position:absolute;right:4px;top:2px;vertical-align:middle;xfont-weight:bold;display:inline-block;font-style:italic;}
 section.gen-skills .skillpacket .max-length{display:block;float:right;font-size:13px;font-family:Arial;}

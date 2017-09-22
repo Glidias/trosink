@@ -41,6 +41,7 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		_vData.privateInit();
 		untyped CharGenData.dynSetField = Vue.set;
 		untyped CharGenData.dynDeleteField = Vue.delete;
+		untyped CharGenData.dynSetArray = Vue.set;
 	}
 	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
@@ -59,34 +60,29 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		}
 	}
 	
+	@:watch function watch_socialEitherMaxIndex(newValue:Int):Void {
+		this.constraintSocialWealth();
+	}
+	
+	@:watch function watch_wealthEitherMaxIndex(newValue:Int):Void {
+		this.constraintSocialWealth();
+	}
+	@:watch function watch_syncSocialWealth(newValue:Bool):Void {
+		this.constraintSocialWealth();
+	}
+	
+	@:watch function watch_socialClassIndex(newValue:Int):Void {
+		this.updateSocialToCharsheet();
+	}
+	@:watch function watch_wealthIndex(newValue:Int):Void {
+		this.updateMoneyToCharsheet();
+	}
+	
+	
 	function getBnBSlug(name:String):String {
 		return BoonBaneApplyDetails.getSlug(name);
 	}
 	
-	function resetBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
-		//trace("REMOVING:" + bba + " , " + isBane);
-		if (isBane) {
-			//char.removeBane(cast bba);
-			var bane:Bane = cast bba.getBoonOrBane();
-			var ba;
-			var i = baneAssignList.indexOf(cast bba);
-			ba = bane.getAssign(0, char);
-			ba._costCached = bane.costs[0];
-			Vue.set(this.baneAssignList, i, ba );
-			
-		}
-		else {
-		
-			var boon:Boon = cast bba.getBoonOrBane();
-			var ba;
-			var i = boonAssignList.indexOf(cast bba);
-			ba = boon.getAssign(0, char);
-			ba._costCached = boon.costs[0];
-			ba._remainingCached = maxBoonsSpendableLeft;
-			Vue.set(this.boonAssignList, i, ba );
-		}
-	}
-
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
