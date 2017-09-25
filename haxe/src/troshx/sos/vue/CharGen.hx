@@ -10,11 +10,13 @@ import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.Skill;
+import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
 import troshx.sos.vue.inputs.impl.SkillLibInput;
 import troshx.sos.vue.inputs.impl.SkillPacketInput;
+import troshx.sos.vue.uifields.ArrayOf;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 import troshx.sos.vue.widgets.SkillSubjectCreator;
 
@@ -71,11 +73,22 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		this.constraintSocialWealth();
 	}
 	
-	@:watch function watch_socialClassIndex(newValue:Int):Void {
+	@:watch function watch_socialClassIndex(newValue:Int, lastValue:Int):Void {
 		this.updateSocialToCharsheet();
 	}
 	@:watch function watch_wealthIndex(newValue:Int):Void {
 		this.updateMoneyToCharsheet();
+	}
+	
+	@:watch function watch_socialBenefit1(newValue:SocialBoonAssign, oldValue:SocialBoonAssign):Void {
+		this.updateSocialBenefitsToBoon(newValue, oldValue);
+		
+	}
+	@:watch function watch_socialBenefit2(newValue:SocialBoonAssign, oldValue:SocialBoonAssign):Void {
+		this.updateSocialBenefitsToBoon(newValue, oldValue);
+	}
+	@:watch function watch_socialBenefit3(newValue:SocialBoonAssign, oldValue:SocialBoonAssign):Void {
+		this.updateSocialBenefitsToBoon(newValue, oldValue);
 	}
 	
 	
@@ -94,7 +107,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			
 			SkillPacketInput.NAME => new SkillPacketInput(),
 			SkillLibInput.NAME => new SkillLibInput(),
-			SkillSubjectCreator.NAME => new SkillSubjectCreator()
+			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
+			
+			ArrayOf.NAME => new ArrayOf()
 		];
 	}
 	

@@ -24,9 +24,11 @@ class UI
 		LibUtil.setField(dyn, FieldString.NAME, new FieldString()); 
 		LibUtil.setField(dyn, FieldTextArea.NAME, new FieldTextArea()); 
 		LibUtil.setField(dyn, SingleSelection.NAME, new SingleSelection());
+		
 		LibUtil.setField(dyn, MoneyField.NAME, new MoneyField());
 		LibUtil.setField(dyn, HitLocationSelector.NAME, new HitLocationSelector());
 		LibUtil.setField(dyn, HitLocationMultiSelector.NAME, new HitLocationMultiSelector());
+		LibUtil.setField(dyn, WealthAssetField.NAME, new WealthAssetField());
 		return dyn;
 	}
 	
@@ -45,9 +47,11 @@ class UI
 			"String":FieldString.NAME,
 			"textarea":FieldTextArea.NAME,
 			"SingleSelection":SingleSelection.NAME,
+			
 			"HitLocationSelector":HitLocationSelector.NAME,
 			"HitLocationMultiSelector":HitLocationMultiSelector.NAME,
-			"Money":MoneyField.NAME
+			"Money":MoneyField.NAME,
+			"WealthAssetAssign":WealthAssetField.NAME
 		};
 	}
 	

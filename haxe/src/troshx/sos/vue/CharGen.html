@@ -51,10 +51,19 @@
 				</div>
 			</div>
 			<div class="gen-col">
-				<div v-show="wealthIndex != socialClassIndex"><label>Custom Label: <input type="text" :placeholder="socialClassPlaceHolderName" v-model="char.socialClass.name"></input></label></div>
+				<div v-show="wealthIndex != socialClassIndex" class="custom-label"><label>Custom Label: <input type="text" :placeholder="socialClassPlaceHolderName" v-model="char.socialClass.name"></input></label></div>
+				<div class="social-benefits">
+					<div class="social-benefit"><label>Social Benefit #1: </label><select  v-on:change="socialBenefitSelectChangeHandler(1, $event.target.selectedIndex)"><option v-for="(li,i) in socialBenefitChoices" :disabled="socialBenefit2.name===li.name || (curSelectedSocialClass.maxBoons >= 3 && socialBenefit3.name===li.name)" :selected="li===socialBenefit1" :key="li.label">{{ li.label }}</option></select></div>
+					<div class="social-benefit"  v-show="curSelectedSocialClass.maxBoons>= 2"><label>Social Benefit #2: </label><select v-on:change="socialBenefitSelectChangeHandler(2, $event.target.selectedIndex)" :disabled="curSelectedSocialClass.maxBoons<2"><option v-for="(li,i) in socialBenefitChoices" :disabled="socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons>=3 && socialBenefit3.name===li.name)" :selected="li===socialBenefit2" :key="li.label">{{ li.label }}</option></select></div>
+					<div class="social-benefit"  v-show="curSelectedSocialClass.maxBoons>=3"><label>Social Benefit #3: </label><select v-on:change="socialBenefitSelectChangeHandler(3, $event.target.selectedIndex)" :disabled="curSelectedSocialClass.maxBoons<3"><option v-for="(li,i) in socialBenefitChoices" :disabled="socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons >=2 && socialBenefit2.name===li.name)" :selected="li===socialBenefit3" :key="li.label">{{ li.label }}</option></select></div>
+				</div>
+				<div class="wealth-assets">
+					<label>Your Wealth Assets: <span class="valuer" v-show="remainingWealthPoints>0" :class="{'still-have':remainingWealthPoints>0}">({{remainingWealthPoints}}  Wealth Points remaining.)</span></label>
+					<ArrayOf of="WealthAssetAssign" :defaultValue="getEmptyWealthAssign" :obj="$data" prop="wealthAssets" :minLength="0" :maxLength="maxWealthAssets" :remainingWealth="remainingWealthPoints" />
+				</div>
 			</div>
 			<div v-show="promptSettleSocialTier"><button style="margin-top:10px"  v-on:click="settleSocialTier()">Finalise Social Class/Wealth!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm. </span><span v-show="!syncSocialWealth">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>
-				</div>
+			</div>
 		</section>
 		
 		<hr/>

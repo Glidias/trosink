@@ -84,8 +84,12 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	
 	function toggleIfPossible(e:Event):Void {
 		
+		
+		
 		var bba = this.bba;
+		if (gotDiscount || bba._forcePermanent) return;
 		var cur:Int = LibUtil.field(obj, prop);
+		
 		
 		if (bba._canceled) {	
 			bba._canceled = false;
@@ -149,6 +153,10 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		return bba.getQty();
 	}
 	
+	@:computed inline function get_gotDiscount():Bool {
+		return this.asBoonAssign.discount > 0;
+	}
+	
 	
 	@:watch function watch_cost(newValue:Int):Void { 
 		var bba = this.bba;
@@ -190,7 +198,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		//if (Math.isNaN(cc)) trace();
 		cc = cc < costArr[0] ? costArr[0] : cc;
 		
-		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "");
+		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "") + (gotDiscount ?  "-"+this.asBoonAssign.discount : "");
 	}
 	
 	

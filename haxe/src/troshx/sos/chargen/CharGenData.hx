@@ -22,6 +22,7 @@ import troshx.sos.sheets.CharSheet;
 
 
 /**
+ * View model for Character generation 
  * All formulas based off gist: https://gist.github.com/Glidias/9cbd8bd8114649207b79c252873fd207
  * 
  * @author Glidias
@@ -166,16 +167,16 @@ class CharGenData implements IBuildListed
 		var famous4 = {cost:4, name:"Famous", rank:2};
 		
 		socialClassList = [
-			{ socialClass: new SocialClass("Slave/Exile", Money.create(0, 10, 0), 0 ), boons:[haleAndHearty2, beautiful3, languages2], maxBoons:1  },
+			{ socialClass: new SocialClass("Slave/Exile", Money.create(0, 10, 0), 0 ), boons:[haleAndHearty2, languages2, beautiful3], maxBoons:1  },
 			{ socialClass: new SocialClass("Peasant", Money.create(5, 0, 0), 0 ), boons:[haleAndHearty2, folksBackHome3], maxBoons:1  },
 			{ socialClass: new SocialClass("Poor Freeman", Money.create(15, 0, 0), 0 ), boons:[haleAndHearty2, folksBackHome3, literate1], maxBoons:1  },
-			{ socialClass: new SocialClass("Freeman", Money.create(25, 0, 0), 1 ), boons:[haleAndHearty2, folksBackHome3, literate1]  , maxBoons:2 },
+			{ socialClass: new SocialClass("Freeman", Money.create(25, 0, 0), 1 ), boons:[haleAndHearty2, folksBackHome3, literate1] , maxBoons:2 },
 			{ socialClass: new SocialClass("High Freeman", Money.create(40, 0, 0), 2 ), boons:[folksBackHome6, literate1, languages1, contacts1 ], maxBoons:2  },
-			{ socialClass: new SocialClass("Minor Noble", Money.create(80, 0, 0), 3 ), boons:[allies5, famous2, haleAndHearty2, literate1, languages1, contacts1, folksBackHome6], maxBoons:2 },
-			{ socialClass: new SocialClass("Landed Noble", Money.create(150, 0, 0), 6 ), boons:[allies5, famous2, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6], maxBoons:2  },
-			{ socialClass: new SocialClass("High Noble", Money.create(300, 0, 0), 10 ), boons:[allies10, famous4, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6] , maxBoons:2 },
-			{ socialClass: new SocialClass("Royalty", Money.create(800, 0, 0), 15 ), boons:[allies10, famous4, haleAndHearty2, literate2, languages2, contacts4, folksBackHome6 ], maxBoons:3},
-			{ socialClass: new SocialClass("High Royalty", Money.create(1500, 0, 0), 20 ), boons:[allies10, famous4, haleAndHearty2, literate3, languages3, contacts6, folksBackHome6 ], maxBoons:3}
+			{ socialClass: new SocialClass("Minor Noble", Money.create(80, 0, 0), 3 ), boons:[haleAndHearty2, folksBackHome6, literate1, languages1, contacts1, allies5,  famous2], maxBoons:2 },
+			{ socialClass: new SocialClass("Landed Noble", Money.create(150, 0, 0), 6 ), boons:[haleAndHearty2, folksBackHome6, literate2, languages2, contacts4, allies5, famous2], maxBoons:2  },
+			{ socialClass: new SocialClass("High Noble", Money.create(300, 0, 0), 10 ), boons:[haleAndHearty2, folksBackHome6, literate2, languages2, contacts4, allies10, famous4, ] , maxBoons:2 },
+			{ socialClass: new SocialClass("Royalty", Money.create(800, 0, 0), 15 ), boons:[haleAndHearty2, folksBackHome6, literate2, languages2, contacts4, allies10, famous4 ], maxBoons:3},
+			{ socialClass: new SocialClass("High Royalty", Money.create(1500, 0, 0), 20 ), boons:[haleAndHearty2, folksBackHome6, literate3, languages3, contacts6, allies10, famous4 ], maxBoons:3}
 		];
 		
 	}
@@ -187,13 +188,20 @@ class CharGenData implements IBuildListed
 				var sb = s.boons[b];
 				if (sb.index == null) {
 					sb.index = findBoonIndexByName(sb.name);
+					sb.label = sb.name + " (" +  sb.cost + ")";
 					if (sb.index == -1) {
 						throw "Could not find Social boon by: " + sb.name;
 					}
 				}
 			}
 		}
+		
+		socialBenefit1 = emptySocialBenefit; // socialClassList[0].boons[0];
+		socialBenefit2 = emptySocialBenefit;// socialClassList[3].boons[1];
+		socialBenefit3 = emptySocialBenefit;// socialClassList[8].boons[2];
+		
 	}
+	
 	
 	
 	function findBoonIndexByName(boonName:String):Int {
@@ -210,12 +218,16 @@ class CharGenData implements IBuildListed
 	// Non-reactive data can be intialized here.
 	public function privateInit():Void {
 		
+		// skills
 		for (i in 0...skillPackets.length) {
 			var s = skillPackets[i];
 			s.fields = Reflect.fields(s.values);
 			
 		}
 		
+		
+		// social class
+		validateSocialBenefitsWithClass(1);
 	
 	}
 	
@@ -440,10 +452,175 @@ class CharGenData implements IBuildListed
 	// to lookup wealth table of different social classes
 	public var socialClassList:Array<SocialClassAssign>;
 
+
 	var socialClassIndex:Int = 0;
 	var wealthIndex:Int = 0;
 	var syncSocialWealth:Bool = true; // user prefered option flag
 	
+	var socialBenefit1:SocialBoonAssign;
+	var socialBenefit2:SocialBoonAssign;
+	var socialBenefit3:SocialBoonAssign;
+	
+	var socialBenefitTempArr:Array<String> = [];
+	var wealthAssets:Array<WealthAssetAssign> = [];
+	
+	var emptySocialBenefit:SocialBoonAssign = {name:"", rank:0, cost:0};
+	
+	public function getEmptyWealthAssign():WealthAssetAssign {
+		return this.char.getEmptyWealthAssetAssign(1);
+	}
+	
+	public function updateSocialBenefitsToBoon(newValue:SocialBoonAssign, oldValue:SocialBoonAssign):Void {
+		
+		var b;
+		if (oldValue.rank > 0) {
+			b = boonAssignList[oldValue.index];
+	
+			
+			//b.rank > 0 && 
+			if (b.rank == oldValue.rank) {
+				
+				if ( b.getCost(b.rank) == oldValue.cost) {
+					b.rank = 0; 
+				}
+				
+			}
+			
+			b._minRequired = 0;
+			b.discount = 0;
+		}
+		
+		if (newValue.rank > 0) {
+			b = boonAssignList[newValue.index];
+			b.discount = newValue.cost;
+			if (b.rank == 0) {
+				b.rank = newValue.rank;
+			}
+			b._minRequired = newValue.rank;
+			
+			
+			if (newValue.qty != null) {
+				// TODO: setQty marker for boon..
+			}
+		}
+	}
+	
+	public function validateSocialBenefitsWithClass(zoneNum:Int):Void {
+		
+		var socialBenefit:SocialBoonAssign = null;
+		if (zoneNum==1) {
+			socialBenefit = socialBenefit1;
+		}
+		else if (zoneNum==2) {
+			socialBenefit = socialBenefit2;
+		}
+		else if (zoneNum==3) {
+			socialBenefit = socialBenefit3;
+		}
+		
+		var maxBoons = curSelectedSocialClass.maxBoons;
+		
+		socialBenefitTempArr[0] = zoneNum ==1 ? null : socialBenefit1.name;
+		socialBenefitTempArr[1] = zoneNum ==2  || maxBoons< 2 ? null : socialBenefit2.name;
+		socialBenefitTempArr[2] = zoneNum == 3  || maxBoons < 3 ? null : socialBenefit3.name;
+
+	
+		var choices = socialBenefitChoices;
+		var resolvedIndex = choices.indexOf(socialBenefit);
+		
+		var secondaryResolvedIndex:Int = -1;
+		
+		if (resolvedIndex < 0) {
+			// need to disable off hash
+			
+			
+			for (i in 0...choices.length) {
+				if (secondaryResolvedIndex == -1) {
+					if (  socialBenefitTempArr.indexOf(choices[i].name)  < 0 ) {
+						secondaryResolvedIndex = i;
+					}
+				}
+				if (choices[i].name == socialBenefit.name) {
+					resolvedIndex = i;
+					break;
+				}
+			}
+			
+			if (resolvedIndex  < 0) resolvedIndex = secondaryResolvedIndex >= 0 ? secondaryResolvedIndex : 0;
+			
+			
+			// need to enable into hash
+			if (zoneNum==1) {
+				socialBenefit1 = choices[resolvedIndex];
+			}
+			else if (zoneNum==2) {
+				socialBenefit2 = choices[resolvedIndex];
+			}
+			else if (zoneNum==3) {
+				socialBenefit3 = choices[resolvedIndex];
+			}
+		}
+		
+		if (resolvedIndex < 0) throw "Should have resolved index for social benefit choice!";
+	}
+	
+	public function socialBenefitSelectChangeHandler(zoneNum:Int, selectedIndex:Int):Void {
+		var choices = socialBenefitChoices;
+		if (zoneNum==1) {
+			socialBenefit1 = choices[selectedIndex];
+		}
+		else if (zoneNum==2) {
+			socialBenefit2 = choices[selectedIndex];
+		}
+		else if (zoneNum==3) {
+			socialBenefit3 = choices[selectedIndex];
+		}
+	}
+	
+	public var availableWealthPoints(get,never):Int;
+	inline function get_availableWealthPoints():Int {
+		return socialClassList[wealthIndex].socialClass.wealth;
+	}
+	
+	public var remainingWealthPointsFull(get,never):Int;
+	inline function get_remainingWealthPointsFull():Int {
+		return availableWealthPoints - wealthAssetsWorthFullArray();
+	}
+	
+	public var remainingWealthPoints(get,never):Int;
+	inline function get_remainingWealthPoints():Int {
+		return availableWealthPoints - wealthAssetsWorth();
+	}
+	
+	function wealthAssetsWorthFullArray():Int {
+		var i:Int = wealthAssets.length;
+		var c:Int = 0;
+		while (--i > -1) {
+			c += wealthAssets[i].worth;
+		}
+		return c;
+	}
+	
+	function wealthAssetsWorth():Int {
+		var c:Int = 0;
+		var len:Int = wealthAssets.length;
+		var max = maxWealthAssets;
+		len = len >= max ? max : len;
+		for (i in 0...len) {
+			c += wealthAssets[i].worth;
+		}
+		return c;
+	}
+	
+	public var socialBenefitChoices(get,never):Array<SocialBoonAssign>;
+	inline function get_socialBenefitChoices():Array<SocialBoonAssign> {
+		return curSelectedSocialClass.boons;
+	}
+	
+	public var curSelectedSocialClass(get,never):SocialClassAssign;
+	inline function get_curSelectedSocialClass():SocialClassAssign {
+		return socialClassList[socialClassIndex];
+	}
 	
 	public var maxSocialClassIndex(get, never):Int;
 	inline function get_maxSocialClassIndex():Int 
@@ -556,9 +733,24 @@ class CharGenData implements IBuildListed
 	
 	public function updateSocialToCharsheet():Void {
 		var s =  socialClassList[socialClassIndex];
+		
+		this.validateSocialBenefitsWithClass(1);
+		if (s.maxBoons >= 2) this.validateSocialBenefitsWithClass(2);
+		else {
+			socialBenefit2  = emptySocialBenefit;
+		}
+		if (s.maxBoons >= 3)  this.validateSocialBenefitsWithClass(3);
+		else {
+			socialBenefit3 = emptySocialBenefit;
+		}
 
 		this.char.socialClass.classIndex = socialClassIndex;
 		
+	}
+	
+	public var maxWealthAssets(get, never):Int;
+	function get_maxWealthAssets():Int {
+		return wealthAssets.length + remainingWealthPointsFull;
 	}
 	
 	public function updateMoneyToCharsheet():Void {
@@ -568,8 +760,11 @@ class CharGenData implements IBuildListed
 		this.char.socialClass.wealth = s.socialClass.wealth;
 	}
 	
+	
 	public function saveFinaliseSocial():Void {
 		if (socialClassIndex == wealthIndex || this.char.socialClass.name == "") this.char.socialClass.name = socialClassPlaceHolderName; 
+		
+		this.char.wealthAssets = this.wealthAssets.slice(0, maxWealthAssets);
 		
 	}
 	
@@ -637,6 +832,7 @@ class CharGenData implements IBuildListed
 			ba = bane.getAssign(0, char);
 			ba._costCached = bane.costs[0];
 			ba._forcePermanent = bba._forcePermanent;
+			
 			ba._minRequired = bba._minRequired;
 			ba._canceled = bba._canceled;
 			CharGenData.dynSetArray(this.baneAssignList, i, ba );
@@ -649,7 +845,10 @@ class CharGenData implements IBuildListed
 			var i = boonAssignList.indexOf(cast bba);
 			ba = boon.getAssign(0, char);
 			ba.discount = boonAssign.discount;
+			ba.rank = bba._minRequired;
 			ba._remainingCached = maxBoonsSpendableLeft;
+			
+			
 			
 			ba._costCached = boon.costs[0];
 			ba._forcePermanent = bba._forcePermanent;
@@ -1163,10 +1362,12 @@ typedef SocialBoonAssign = {
 	var name:String;
 	var rank:Int;
 	var cost:Int;
+	
 	@:optional var qty:Int;
 	
 	// used internally 
 	@:optional var index:Int; 
+	@:optional var label:String;
 }
 
 

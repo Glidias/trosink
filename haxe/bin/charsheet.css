@@ -361,30 +361,40 @@ section.gen-bnb .bane-tags .gen-comp-bb.disabled {
 section.gen-bnb .gen-comp-bb.force-perm .close-btn, section.gen-bnb .gen-comp-bb.force-perm .reset-btn  {
 	display:none;
 }
+section.gen-bnb .gen-comp-bb.required .close-btn, section.gen-bnb .gen-comp-bb.required .reset-btn  {
+	display:none;
+}
 
 section.gen-bnb .boon-tags .gen-comp-bb.force-perm {
 	pointer-events:none;
-	color:green;
+	color:brown;
 	
 }
 section.gen-bnb .bane-tags .gen-comp-bb.force-perm {
 	pointer-events:none;
-	color:green;
+	color:brown;
 }
 
 section.gen-bnb .boon-tags .gen-comp-bb.required {
-	pointer-events:none;
+
 	color:green;
 	
 }
 section.gen-bnb .bane-tags .gen-comp-bb.required {
-	pointer-events:none;
+	
 	color:green;
 }
 
 section.gen-social-class .col-social-class {
 	min-width:100px;
 	display:inline-block;
+}
+
+section.gen-social-class .wealth-assets {
+	margin-top:10px;
+}
+section.gen-social-class .custom-label {
+	margin-bottom:10px;
 }
 section.gen-social-class .col-wealth {
 	min-width:100px;
@@ -403,6 +413,10 @@ section.gen-social-class  .socialclass-li {
 section.gen-social-class  .socialclass-li .disabled {
 	pointer-events:none;
 	opacity:.5;
+}
+section.gen-social-class .wealth-asset-row.disabled {
+	pointer-events:none;
+	opacity:.3;
 }
 
 section.gen-social-class  .socialclass-li .index-num {

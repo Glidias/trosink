@@ -1,6 +1,7 @@
 package troshx.sos.vue.uifields;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import troshx.core.IUid;
 import troshx.util.LibUtil;
 
 /**
@@ -18,6 +19,13 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 		super();
 	}
 	
+	
+	function getKey(obj:Dynamic, i:Int):Dynamic {
+		var castToIder = LibUtil.as(obj, IUid);
+
+		return  castToIder != null ? castToIder.uid : LibUtil.field(obj, "uid") != null ?  LibUtil.field(obj, "uid") : i;
+	}
+	
 //	/*
 	override public function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return COMPONENTS != null ? COMPONENTS : (COMPONENTS = UI.getNewSetOfComponents(true));
@@ -30,7 +38,7 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 
 		<ul>
 			<li v-for="(li, i) in current">
-				<span :is="typeMap[of]" :obj="current" :prop="i" :key="i" :disabled="!(maxLength == null || i < maxLength)"></span>
+				<span :is="typeMap[of]" v-bind="$$attrs" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
 			</li>
 		</ul>
 		

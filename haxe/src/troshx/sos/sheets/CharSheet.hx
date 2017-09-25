@@ -130,7 +130,7 @@ class CharSheet implements IBuildListed
 		var w:WealthAssetAssign = {
 			name: "",
 			liquidate:false,
-			uidCount:wealthAssetAssignCount,
+			uid:wealthAssetAssignCount,
 			worth: worth
 		}
 		wealthAssetAssignCount++;
@@ -239,6 +239,16 @@ class CharSheet implements IBuildListed
 	public function new() 
 	{
 		
+	}
+	
+	public function wealthAssetsWorth():Int
+	{
+		var i:Int = wealthAssets.length;
+		var c:Int = 0;
+		while (--i > -1) {
+			c += wealthAssets[i].worth;
+		}
+		return c;
 	}
 	
 	function get_totalPain():Int {
@@ -356,7 +366,7 @@ class CharSheet implements IBuildListed
 typedef WealthAssetAssign = {
 	name:String,
 	liquidate:Bool,
-	uidCount:Int,
+	uid:Int,
 	worth:Int  // 1 to 3
 }
 
