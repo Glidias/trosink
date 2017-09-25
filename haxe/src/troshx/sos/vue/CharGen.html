@@ -62,6 +62,7 @@
 					<ArrayOf of="WealthAssetAssign" :defaultValue="getEmptyWealthAssign" :obj="$data" prop="wealthAssets" :minLength="0" :maxLength="maxWealthAssets" :remainingWealth="remainingWealthPoints" />
 				</div>
 			</div>
+					
 			<div v-show="promptSettleSocialTier"><button style="margin-top:10px"  v-on:click="settleSocialTier()">Finalise Social Class/Wealth!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm. </span><span v-show="!syncSocialWealth">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>
 			</div>
 		</section>
@@ -152,6 +153,9 @@
 	<div class="chargen__footer">
 		<section class="gen-inventory">
 			<h2>Inventory</h2>
+			<div class="checkout">
+				<div class="cash">Cash Remaining: ({{ moneyAvailableStr }})  + &#128167;(0)  &nbsp; - &#10060;(0)- &#9876;(0) - (0) = [{{ moneyLeftStr }}]</div>
+			</div>
 		</section>
 		
 		<hr/>

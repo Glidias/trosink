@@ -10,9 +10,9 @@ class SocialClass
 	public var money:Money;
 	public var name:String;
 	
-	// ingame use only
-	public var classIndex:Int;
-	public var wealthIndex:Int;
+	// as of character generation
+	public var classIndex:Int = 0;
+	public var wealthIndex:Int = 0;
 	
 	public function new(name:String, money:Money, wealth:Int):Void {
 		this.name = name;

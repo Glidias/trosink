@@ -161,9 +161,9 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	@:watch function watch_cost(newValue:Int):Void { 
 		var bba = this.bba;
 		var rank = bba.rank;
-
-		var test = bb.costs[0];
-		bba._costCached = newValue >= test ? newValue : test;
+		
+		//var test = bb.costs[0];
+		bba._costCached = newValue;// newValue >= test ? newValue : test;
 	}
 	
 	
@@ -196,7 +196,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		var cc = this.cost;
 		//if (cc == null) cc = costArr[0];
 		//if (Math.isNaN(cc)) trace();
-		cc = cc < costArr[0] ? costArr[0] : cc;
+		cc = cc != 0 ? cc : costArr[0];// cc < costArr[0] ? costArr[0] : cc;
 		
 		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "") + (gotDiscount ?  "-"+this.asBoonAssign.discount : "");
 	}

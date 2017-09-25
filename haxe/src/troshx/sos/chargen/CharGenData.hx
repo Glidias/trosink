@@ -582,6 +582,16 @@ class CharGenData implements IBuildListed
 		return socialClassList[wealthIndex].socialClass.wealth;
 	}
 	
+	public var moneyAvailableStr(get,never):String;
+	inline function get_moneyAvailableStr():String {
+		return socialClassList[wealthIndex].socialClass.money.getLabel();
+	}
+	
+	public var moneyLeftStr(get,never):String;
+	inline function get_moneyLeftStr():String {  // todo: total expenditure
+		return  moneyAvailableStr; //  - 0;
+	}
+	
 	public var remainingWealthPointsFull(get,never):Int;
 	inline function get_remainingWealthPointsFull():Int {
 		return availableWealthPoints - wealthAssetsWorthFullArray();
@@ -748,6 +758,8 @@ class CharGenData implements IBuildListed
 		
 	}
 	
+
+	
 	public var maxWealthAssets(get, never):Int;
 	function get_maxWealthAssets():Int {
 		return wealthAssets.length + remainingWealthPointsFull;
@@ -764,6 +776,7 @@ class CharGenData implements IBuildListed
 	public function saveFinaliseSocial():Void {
 		if (socialClassIndex == wealthIndex || this.char.socialClass.name == "") this.char.socialClass.name = socialClassPlaceHolderName; 
 		
+		// TODO: remove off liquidated assets
 		this.char.wealthAssets = this.wealthAssets.slice(0, maxWealthAssets);
 		
 	}

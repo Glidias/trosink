@@ -22,13 +22,14 @@ class WealthAssetField extends VComponent<NoneT, WealthAssetFieldProps>
 	}
 	
 	@:computed function get_residueWealth():Int {
-		return remainingWealth + current.worth;
+		var cw = current.worth;
+		return remainingWealth!= null ? remainingWealth + cw : 999;
 	}
 	
 	override function Template():String {
 		return '<div class="wealth-asset-row">
 			<label>Name: <input type="text" v-model="current.name"></input></label>
-			<label>Worth: <select number v-model.number="current.worth">
+			<label>Worth: <select :disabled="fixedWorth" number v-model.number="current.worth">
 					<option :value="1" :disabled="residueWealth < 1">1W</option>
 					<option :value="2" :disabled="residueWealth < 2">2W</option>
 					<option :value="3" :disabled="residueWealth < 3">3W</option>
@@ -43,5 +44,6 @@ class WealthAssetField extends VComponent<NoneT, WealthAssetFieldProps>
 
 typedef WealthAssetFieldProps = {
 	>BaseUIProps,
-	@:prop({required:true}) var remainingWealth:Int;
+	@:prop({required:false, 'default':false}) @:optional var fixedWorth:Bool;
+	@:prop({required:false}) @:optional var remainingWealth:Int;
 }

@@ -90,16 +90,7 @@ class DirectionSense extends Boon {
 	}
 }
 
-class Estate extends Boon {
-	
-	public static inline var WEALTH_PER_QTY:Int = 2;
-	
-	public function new() {
-		super("Estate", [10]);
-		flags = BoonBane.CHARACTER_CREATION_ONLY;
-		multipleTimes = BoonBane.TIMES_VARYING;
-	}
-}
+
 
 class Famous extends Boon {
 	public function new() {
