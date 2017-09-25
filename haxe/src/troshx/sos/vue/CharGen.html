@@ -66,6 +66,17 @@
 			<div v-show="promptSettleSocialTier"><button style="margin-top:10px"  v-on:click="settleSocialTier()">Finalise Social Class/Wealth!</button> <span class="invalid" style="color:red">&lt;&lt; Click this to confirm. </span><span v-show="!syncSocialWealth">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>
 			</div>
 		</section>
+			
+			<hr/>
+		<section class="gen-checkout">
+			<h3>Checkout<span class="legend valuer">&#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining]</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span></h3>
+			<div class="checkout">
+				<div class="cash">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;(0) + &#9650;(0) &nbsp; - &#10060;(0) - &#9876;(0) - &#10064;(0) = [{{ moneyLeftStr }}]</div>
+			</div>
+			<div class="inventory">
+				<button :disabled="true">&#10064; Proceed to Inventory &gt;&gt;</button>
+			</div>
+		</section>
 		
 		<hr/>
 			
@@ -151,14 +162,6 @@
 	
 	<hr/>
 	<div class="chargen__footer">
-		<section class="gen-inventory">
-			<h2>Inventory</h2>
-			<div class="checkout">
-				<div class="cash">Cash Remaining: ({{ moneyAvailableStr }})  + &#128167;(0)  &nbsp; - &#10060;(0)- &#9876;(0) - (0) = [{{ moneyLeftStr }}]</div>
-			</div>
-		</section>
-		
-		<hr/>
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
 		</section>

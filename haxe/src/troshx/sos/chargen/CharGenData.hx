@@ -231,6 +231,8 @@ class CharGenData implements IBuildListed
 	
 	}
 	
+
+	
 	
 	// CAMPAIGN POWER LEVEL
 	public var campaignPowerLevels:Array<CampaignPowerLevel> = [
@@ -779,6 +781,14 @@ class CharGenData implements IBuildListed
 		// TODO: remove off liquidated assets
 		this.char.wealthAssets = this.wealthAssets.slice(0, maxWealthAssets);
 		
+	}
+	
+	
+	// CHECKOUT  
+
+	public var notBankrupt(get, never):Bool; // TODO:
+	function get_notBankrupt():Bool {
+		return true; 
 	}
 	
 	// BOONS & BANES
