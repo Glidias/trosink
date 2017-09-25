@@ -47,6 +47,21 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		}
 	}
 	
+	/*
+	public function replace(item:T):Bool {
+		var uid:String = item.uid;
+		if (hashContains(item)) {
+			LibUtil.setField(hash, uid, item);
+			var index:Int = indexOf(item);
+			if (index >= 0) {
+				list[index] = item;
+			}
+			return true;
+		}
+		return false;
+	}
+	*/
+	
 	public function indexOf(item:T):Int {
 		for (i in 0...list.length) {
 			if (list[i].uid == item.uid) return i;

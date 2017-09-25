@@ -878,6 +878,11 @@ class CharGenData implements IBuildListed
 			ba._minRequired = bba._minRequired;
 			ba._canceled = bba._canceled;
 			CharGenData.dynSetArray(this.boonAssignList, i, ba );
+			if (ba.rank > 0) {
+				i = char.boonsArray.indexOf(boonAssign);
+				CharGenData.dynSetArray(char.boonsArray, i, ba );
+				
+			}
 		}
 	}
 
