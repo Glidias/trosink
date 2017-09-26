@@ -174,6 +174,7 @@ td.d10 {
 
 td.w-holder .pop-widget {
 	width:200%;
+	min-width:300px;
 }
 
 td.w-span-tools .pop-widget {
@@ -181,9 +182,17 @@ td.w-span-tools .pop-widget {
 	min-width:165px;
 }
 
-
+/* td.w-coverage related */
 td.w-coverage .pop-widget {
-	width:100%;
+	width:200%;
+}
+td.w-coverage .coverage-list {
+	-webkit-columns: 100px 2; /* Chrome, Safari, Opera */
+    -moz-columns: 100px 2; /* Firefox */
+    columns: 100px 2;
+}
+td.w-coverage .coverage-list .symbols label:nth-of-type(1) {
+	vertical-align:top;
 }
 
 td.w-unheld .pop-widget {

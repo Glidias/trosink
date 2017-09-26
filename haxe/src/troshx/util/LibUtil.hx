@@ -26,6 +26,14 @@ class LibUtil
 		return Std.parseInt(val); // TOCHECK: across all platforms validity
 	}
 	
+	public static function sortAlphabetically(aStr:String, bStr:String):Int
+	{
+		aStr = aStr.toLowerCase();
+		bStr = bStr.toLowerCase();
+		if (aStr < bStr) return -1;
+		if (aStr > bStr) return 1;
+		return 0;
+	} 
 		
 	public static inline function setArrayLength<T>(of:Array<T>, len:Int):Void {
 		//#if js

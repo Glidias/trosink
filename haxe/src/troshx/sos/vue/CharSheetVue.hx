@@ -13,6 +13,8 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.core.BodyChar;
+
 import troshx.sos.core.Armor;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.DamageType;
@@ -151,8 +153,25 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		clearWidgets();
 	}
 	
-	function getCoverage(coverage:Dynamic<HitLocation>):String {  // todo: return string representation
-		return "[Coverage]";
+	
+	
+	function getCoverage(coverage:Dynamic<Int>, body:BodyChar=null):String {  // todo: return string representation
+		if (body == null) {
+			body = BodyChar.getInstance();
+		}
+		var arr:Array<String> = [];
+		var hitLocations = body.hitLocations;
+		var fields = Reflect.fields(coverage);
+		for (i in 0...hitLocations.length) {
+			var ider = hitLocations[i].id;
+			var specs:Int = LibUtil.field(coverage, ider);
+			if (specs != null) {
+				arr.push((i+1) + ( (specs & Armor.WEAK_SPOT)!=0 ? Armor.WEAK_SPOT_SYMBOL : "") + ( (specs & Armor.HALF)!=0 ? Armor.HALF_SYMBOL : "")  );
+			}
+			
+		}
+	
+		return arr.join("-");
 	}
 	
 	function getTags(item:Item):String {
