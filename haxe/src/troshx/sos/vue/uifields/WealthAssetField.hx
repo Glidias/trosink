@@ -35,7 +35,7 @@ class WealthAssetField extends VComponent<NoneT, WealthAssetFieldProps>
 					<option :value="3" :disabled="residueWealth < 3">3W</option>
 				</select>
 			</label>
-			<label>Liquidate? <input type="checkbox" v-model="current.liquidate"></input></label>
+			<label v-if="!disableLiquidity">Liquidate? <input type="checkbox" v-model="current.liquidate"></input></label>
 		</div>';
 	}
 	
@@ -46,4 +46,5 @@ typedef WealthAssetFieldProps = {
 	>BaseUIProps,
 	@:prop({required:false, 'default':false}) @:optional var fixedWorth:Bool;
 	@:prop({required:false}) @:optional var remainingWealth:Int;
+	@:prop({required:false, 'default':false}) @:optional var disableLiquidity:Bool;
 }

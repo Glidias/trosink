@@ -100,7 +100,9 @@ class CharSheet implements IBuildListed
 	public var totalPain(get, never):Int;
 	public var totalBloodLost(get, never):Int;
 	
-	public var money:Money = new Money();  // note: this field is for ingame use only
+	public var ingame:Bool = false; // when no longer in character generation mode
+	
+	public var money:Money = new Money(); 
 	
 	public var socialClass:SocialClass = new SocialClass("", new Money(), 0);  // this field's inner Money() is for char generation 
 	public var wealthAssets:Array<WealthAssetAssign> = [];
@@ -140,7 +142,11 @@ class CharSheet implements IBuildListed
 	
 	public static inline var LIQUIDATE_ASSET_BASE:Int = 6;  // assumed in GP
 	function get_assetLiquidateTotal():Int {
-		var i:Int = wealthAssets.length;
+		return getTotalLiquidity(wealthAssets);
+	}
+	
+	public static function getTotalLiquidity(wealthAssets:Array<WealthAssetAssign>, customLen:Int=0):Int {
+		var i:Int = customLen!=0 ? customLen : wealthAssets.length;
 		var c:Int = 0;
 		while (--i > -1) {
 			var w = wealthAssets[i];

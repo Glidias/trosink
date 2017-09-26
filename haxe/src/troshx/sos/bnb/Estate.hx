@@ -19,7 +19,8 @@ class Estate extends Boon {
 		multipleTimes = BoonBane.TIMES_VARYING;
 	}
 	override function getEmptyAssignInstance(charSheet:CharSheet):BoonAssign {
-		return new EstateAssign();
+	
+		return new EstateAssign(charSheet);
 	}
 	
 }
@@ -27,10 +28,11 @@ class Estate extends Boon {
 
 class EstateAssign extends BoonAssign {
 	
-	@:ui({label:"Estates", defaultValue:getEmptyWealthAssign, fixedWorth:true, minLength:1,  maxLength: getMaxLength(Estate.COST_PER_ESTATE, estates.length)  }) public var estates:Array<WealthAssetAssign> = [getEmptyWealthAssign()];
+	@:ui({label:"Estates", defaultValue:getEmptyWealthAssign, fixedWorth:true, disableLiquidity:!char.ingame, minLength:1,  maxLength: getMaxLength(Estate.COST_PER_ESTATE, estates.length)  }) public var estates:Array<WealthAssetAssign> = [getEmptyWealthAssign()];
 	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	static var COUNT:Int = 0;
+	var char:CharSheet;
 	
 	static function getEmptyWealthAssign():WealthAssetAssign {
 		return {
@@ -49,8 +51,10 @@ class EstateAssign extends BoonAssign {
 		return estates.length * Estate.COST_PER_ESTATE;
 	}
 	
-	public function new() {
+	public function new(char:CharSheet) {
 		super();
+		this.char = char;
+		
 	}
 	
 

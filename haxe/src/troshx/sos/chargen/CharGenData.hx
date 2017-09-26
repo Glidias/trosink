@@ -364,7 +364,6 @@ class CharGenData implements IBuildListed
 		return getRaceTierFromPCP(categoryRace.pcp);
 	}
 	public function getRaceTierFromPCP(pcp:Int):Int {
-		// TODO: lookup table
 		var b:Int = 0;
 		for ( i in 0...pcpForTiers.length) {
 			if (pcpForTiers[i] > pcp) break;
@@ -411,7 +410,6 @@ class CharGenData implements IBuildListed
 	}
 	
 	
-	// todo: check these methods with table
 	public static inline function GetAttributeTotalCostOfLevel(level:Int):Int {
 		return level < 11 ? level - 1 :  9  + (level - 10) * 2; 
 	}
@@ -502,7 +500,7 @@ class CharGenData implements IBuildListed
 			
 			
 			if (newValue.qty != null) {
-				// TODO: setQty marker for boon..
+				// yagni setQty marker for boon
 			}
 		}
 	}
@@ -584,15 +582,6 @@ class CharGenData implements IBuildListed
 		return socialClassList[wealthIndex].socialClass.wealth;
 	}
 	
-	public var moneyAvailableStr(get,never):String;
-	inline function get_moneyAvailableStr():String {
-		return socialClassList[wealthIndex].socialClass.money.getLabel();
-	}
-	
-	public var moneyLeftStr(get,never):String;
-	inline function get_moneyLeftStr():String {  // todo: total expenditure
-		return  moneyAvailableStr; //  - 0;
-	}
 	
 	public var remainingWealthPointsFull(get,never):Int;
 	inline function get_remainingWealthPointsFull():Int {
@@ -613,11 +602,14 @@ class CharGenData implements IBuildListed
 		return c;
 	}
 	
-	function wealthAssetsWorth():Int {
-		var c:Int = 0;
+	inline function wealthAssetsWorthLen():Int {
 		var len:Int = wealthAssets.length;
 		var max = maxWealthAssets;
-		len = len >= max ? max : len;
+		return ( len >= max ? max : len);
+	}
+	function wealthAssetsWorth():Int {
+		var c:Int = 0;
+		var len:Int = wealthAssetsWorthLen();
 		for (i in 0...len) {
 			c += wealthAssets[i].worth;
 		}
@@ -775,21 +767,85 @@ class CharGenData implements IBuildListed
 	}
 	
 	
+	
+	function filterAwayLiquidatedAssets(w:WealthAssetAssign):Bool
+	{
+		return !w.liquidate;
+	}
+	
+	
 	public function saveFinaliseSocial():Void {
 		if (socialClassIndex == wealthIndex || this.char.socialClass.name == "") this.char.socialClass.name = socialClassPlaceHolderName; 
+
 		
-		// TODO: remove off liquidated assets
-		this.char.wealthAssets = this.wealthAssets.slice(0, maxWealthAssets);
-		
+		var len:Int = wealthAssetsWorthLen();
+		var a = this.wealthAssets.slice(0, len);
+		a =  a.filter(filterAwayLiquidatedAssets);
+		this.char.wealthAssets = a;
 	}
 	
 	
 	// CHECKOUT  
+	
+	public var moneyAvailableStr(get,never):String;
+	inline function get_moneyAvailableStr():String {
+		return socialClassList[wealthIndex].socialClass.money.getLabel();
+	}
+	
 
 	public var notBankrupt(get, never):Bool; // TODO:
 	function get_notBankrupt():Bool {
 		return true; 
 	}
+	
+	public var checkoutBonuses(get, never):String; 
+	function get_checkoutBonuses():String {
+		return "0"; 
+	}
+
+	public var checkoutPenalties(get, never):String; 
+	function get_checkoutPenalties():String {
+		return "0"; 
+	}
+	public var checkoutSchool(get, never):String; 
+	function get_checkoutSchool():String {
+		return "0"; 
+	}
+	
+	public var checkoutInventory(get, never):String; 
+	function get_checkoutInventory():String {
+		return "0"; 
+	}
+
+	
+	public var moneyLeftStr(get,never):String; // TODO:
+	inline function get_moneyLeftStr():String {  
+		return  socialClassList[wealthIndex].socialClass.money.tempCalc().addValues(this.liquidity, 0, 0).getLabel(); 
+	}
+
+	public var liquidity(get, never):Int; 
+	inline function get_liquidity():Int {
+		var len:Int = wealthAssetsWorthLen();
+		return CharSheet.getTotalLiquidity(wealthAssets, len); 
+	}
+	
+	public var liquidityStr(get, never):String; 
+	function get_liquidityStr():String {
+		return Money.getLabelWith(this.liquidity, 0,0);
+	}
+	
+	
+	public function isValidAll(showWarnings:Bool=false):Bool { 
+		return true;
+	}
+	
+	public function saveFinaliseAll():Void { // TODO
+		if (isValidAll(true)) {
+			char.ingame = true;
+			// save data
+		}
+	}
+	
 	
 	// BOONS & BANES
 	
@@ -1368,13 +1424,7 @@ class CharGenData implements IBuildListed
 	
 	
 
-	// TODO final: validate all char generation categories
-	
-	public function isValidAll(showWarnings:Bool=false):Bool { 
-		return true;
-	}
-	
-	
+
 
 	
 }
