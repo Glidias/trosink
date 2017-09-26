@@ -17,6 +17,7 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	public function new() 
 	{
 		super();
+		untyped this["inheritAttrs"] = false;
 	}
 	
 	
@@ -38,7 +39,7 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 
 		<ul>
 			<li v-for="(li, i) in current">
-				<span :is="typeMap[of]" v-bind="$$attrs" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
+				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
 			</li>
 		</ul>
 		
@@ -91,7 +92,7 @@ typedef ArrayOfProps = {
 	@:prop({required:true}) var of:String;
 	@:prop({required:true}) var defaultValue:Dynamic;
 	
-	@:prop({required:false, 'default':0}) var minLength:Int;
-	@:prop({required:false}) var maxLength:Int;
+	@:prop({required:false, 'default':0}) @:optional var minLength:Int;
+	@:prop({required:false}) @:optional var maxLength:Int;
 	
 }

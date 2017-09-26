@@ -18,6 +18,7 @@ class HitLocationMultiSelector extends VComponent<NoneT, HitLocationProps>
 	public function new() 
 	{
 		super();
+		untyped this["inheritAttrs"] = false;
 	}
 	
 	/*

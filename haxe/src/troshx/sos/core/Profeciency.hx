@@ -16,6 +16,8 @@ class Profeciency implements IUid  implements IUpdateWith<Profeciency>
 	public static inline var TYPE_MELEE:Int = 0;
 	public static inline var TYPE_RANGED:Int = 1;
 	
+	public static inline var MASK_ALL:Int = 2147483647;
+	
 	// melee core
 	public static inline var M_1H_SWORD:Int = 0;
 	public static inline var M_1H_BLUNT:Int = 1;

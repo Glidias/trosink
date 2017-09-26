@@ -146,8 +146,29 @@
 		
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{ProfPoints}}) ) </span></h2>
+			<div class="select-school">
+				<div>
+					<label class="lbl-school">School: <select></select></label> <label class="lbl-level">Level:<input type="number" v-model.number="char.schoolLevel" number :min="0" :max="25"></input></label>
+				</div>
+	
+			</div>
 			<div class="prof-list">
-				<ArrayOf of="SingleSelection" :defaultValue="0" :obj="$data" prop="wealthAssets" :minLength="0" :maxLength="maxWealthAssets" :remainingWealth="remainingWealthPoints" />
+				<div class="gen-col">
+					<h5>Melee Profeciencies: <span v-for="li in traceProfCoreMeleeCurrent" :key="li">|{{li}}</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee"  />
+				</div>
+				<div class="gen-col">
+					<h5>Ranged Profeciencies: <span v-for="li in traceProfCoreRangedCurrent" :key="li">|{{li}}</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged"  />
+				</div>
+			</div>
+			<div class="superior-manuever-list manuever-list gen-col">
+				<h5>Superior Manuevers: </h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes" />
+			</div>
+			<div class="mastery-manuever-list manuever-list gen-col">
+				<h5>Mastery Manuevers: </h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes"  />
 			</div>
 		</section>
 			

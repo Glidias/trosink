@@ -619,4 +619,14 @@ section.gen-skills .skill-lib > span:last-child {
 	margin-right:0px;
 }
 
+section.gen-schoolprofs .prof-list option:disabled {
+	
+}
 
+section.gen-schoolprofs  .gen-col {
+	min-width:232px;
+}
+section.gen-schoolprofs .manuever-list input {
+	font-family:inherit;
+	font-size:inherit;
+}

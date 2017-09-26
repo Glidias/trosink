@@ -5,7 +5,7 @@ import js.html.InputElement;
 import troshx.util.LibUtil;
 
 /**
- * ...
+ * A bitmask component represented as a bunch of checkbox options
  * @author Glidias
  */
 class Bitmask extends VComponent<NoneT, BitmaskProps>

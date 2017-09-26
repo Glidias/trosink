@@ -84,8 +84,12 @@ class CharSheet implements IBuildListed
 	
 	public var school:School = null;
 	public var schoolLevel:Int = 0;
-	public var profs:Int = 0;	// core profiecy mask
-	public var profsCustom:Array<Profeciency> = null;  // gm-homebrews (if any)
+	public var profsMelee:Int = 0;	// core melee profiecy mask
+	public var profsRanged:Int = 0;	// core ranged profiecy mask
+	public var profsCustom:Array<Profeciency> = null;  // gm-homebrews (if any) // consider: divide to melee and ranged?
+	
+	public var superiorManueverNotes:Array<String> = [];
+	public var masteryManueverNotes:Array<String> = [];
 	
 	public var labelRace(get, never):String;
 	public var labelGender(get, never):String;

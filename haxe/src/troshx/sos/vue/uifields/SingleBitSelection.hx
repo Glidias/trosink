@@ -6,7 +6,10 @@ import troshx.sos.vue.uifields.SingleSelection.SelectionProps;
 import troshx.util.LibUtil;
 
 /**
- * Higher order component for SingleSelection that links to external bitmask value to control option validities
+ * Higher order component for SingleSelection that links to external bitmask value to control option validities.
+ * 
+ * This is to be used under ArrayOfBits component as of now. Standalone not supported.
+ * 
  * @author Glidias
  */
 class SingleBitSelection extends VComponent<NoneT, SingleBitSelectionProps>
@@ -31,19 +34,24 @@ class SingleBitSelection extends VComponent<NoneT, SingleBitSelectionProps>
 	
 	function isValidOptionAt(i:Int):Bool {
 		var curBitmask = this.currentBitmask;
-		var curValue:Int = bitList[i];
-		curBitmask &= ~(curValue);
-		return (curBitmask & (1 << i)) == 0;
+		
+		var curValue:Int = bitList[index];
+		
+		return ((curBitmask&~curValue) & (1 << i)) == 0;
 	}
 	
 	
 	override function Template():String {
-		return '<comp v-bind="$$attrs" :validateOptionFunc="isValidOptionAt" :valueAtIndexFunc="shiftIndex"></comp>';
+		return '<comp v-bind="$$attrs" :includeZeroOption="true" :labels="$$attrs.labels" :validateOptionFunc="isValidOptionAt" :valueAtIndexFunc="shiftIndex"></comp>';
 	}
 	
 }
 
 typedef SingleBitSelectionProps = {
-	var currentBitmask:Int; // current bitmask being clamped to bitList max process length
-	var bitList:Array<Int>; // bit list values of each individual SingleSelection component (1 component = 1 bit)
+//	>SelectionProps,
+	@:prop({required:true}) var currentBitmask:Int; // current bitmask being clamped to bitList max process length
+	@:prop({required:true}) var bitList:Array<Int>; // bit list values of each individual SingleSelection component (1 component = 1 bit)
+	
+	@:prop({required:true}) var index:Int;
+
 }

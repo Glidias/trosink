@@ -11,6 +11,7 @@ import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.Money;
+import troshx.sos.core.Profeciency;
 import troshx.sos.core.Race;
 import troshx.sos.core.Skill;
 import troshx.sos.core.SocialClass;
@@ -1417,10 +1418,37 @@ class CharGenData implements IBuildListed
 	
 	// SCHOOL/PROFECIENCIES
 	//static var PCP_COLUMN_PROFS:Array<Int> = [0,3,6,9,12,15,18,21,24,27];
+	var profCoreListMelee:Array<Int> = [];
+	var profCoreListRanged:Array<Int> = [];
+	
 	public var ProfPoints(get, never):Int;
 	inline function get_ProfPoints():Int {
 		return (categories[CATEGORY_PROFECIENCIES].pcp-1) * 3;	
 	}
+	
+	
+	public var profCoreMeleeListNames(get, never):Array<String>;
+	function get_profCoreMeleeListNames():Array<String> {
+		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreMelee(), Profeciency.MASK_ALL);
+	}
+	
+	public var profCoreRangedListNames(get, never):Array<String>;
+	function get_profCoreRangedListNames():Array<String> {
+		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreRanged(), Profeciency.MASK_ALL);
+	}
+	
+	public var traceProfCoreRangedCurrent(get, never):Array<String>;
+	function get_traceProfCoreRangedCurrent():Array<String> {
+		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreRanged(), char.profsRanged);
+	}
+	
+	public var traceProfCoreMeleeCurrent(get, never):Array<String>;
+	function get_traceProfCoreMeleeCurrent():Array<String> {
+		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreMelee(), char.profsMelee);
+	}
+
+
+
 	
 	
 

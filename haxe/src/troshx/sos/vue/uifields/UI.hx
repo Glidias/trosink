@@ -17,6 +17,7 @@ class UI
 		var dyn:Dynamic = {};
 		if (!excludeArray) {
 			LibUtil.setField(dyn, ArrayOf.NAME, new ArrayOf()); 
+			LibUtil.setField(dyn, ArrayOfBits.NAME, new ArrayOfBits()); 
 		}
 		LibUtil.setField(dyn, Bitmask.NAME, new Bitmask()); 
 		LibUtil.setField(dyn, FieldNumber.NAME, new FieldNumber()); 
@@ -42,6 +43,7 @@ class UI
 	public static function getNewTypeMapToComponentNames():Dynamic<String> {
 		return {
 			"Array": ArrayOf.NAME,
+			"ArrayOfBits": ArrayOfBits.NAME,
 			"Bitmask": Bitmask.NAME,
 			"Float":FieldNumber.NAME,
 			"Int":FieldInt.NAME,
