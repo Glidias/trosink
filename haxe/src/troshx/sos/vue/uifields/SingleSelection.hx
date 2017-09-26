@@ -18,7 +18,7 @@ class SingleSelection extends VComponent<NoneT, SelectionProps>
 	}
 	
 	inline function valueAtIndex(i:Int):Int {
-		return values != null ? values[i] : i;
+		return values != null ? values[i] : valueAtIndexFunc!= null ? valueAtIndexFunc(i) : i;
 	}
 	
 	override function Template():String {
@@ -36,4 +36,5 @@ typedef SelectionProps = {
 	@:prop({required:true}) var labels:Array<String>;
 	@:prop({required:false}) @:optional var values:Array<Dynamic>;
 	@:prop({required:false}) @:optional var validateOptionFunc:Int->Void;
+	@:prop({required:false}) @:optional var valueAtIndexFunc:Int->Int;
 }

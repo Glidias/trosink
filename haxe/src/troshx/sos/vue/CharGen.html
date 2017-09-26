@@ -146,6 +146,9 @@
 		
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{ProfPoints}}) ) </span></h2>
+			<div class="prof-list">
+				<ArrayOf of="SingleSelection" :defaultValue="0" :obj="$data" prop="wealthAssets" :minLength="0" :maxLength="maxWealthAssets" :remainingWealth="remainingWealthPoints" />
+			</div>
 		</section>
 			
 		<hr/>

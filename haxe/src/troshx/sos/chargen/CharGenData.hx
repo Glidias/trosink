@@ -1111,7 +1111,7 @@ class CharGenData implements IBuildListed
 	
 	public var totalBnBScore(get, never):Int;
 	function get_totalBnBScore():Int {
-		return BnBpoints + totalBanePointsEarned - totalBanePointsSpent - totalBoonExpenditure;
+		return BnBpoints + totalBanePointsEarned  - totalBoonExpenditure;
 	}
 	
 	public var maxBoonsSpendable(get, never):Int;
