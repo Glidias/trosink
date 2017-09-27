@@ -140,7 +140,7 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	
 	@:watch function watch_excessDraftedSlots(newValue:Int, oldValue:Int):Void {
 		if (newValue < 1) return;
-		trace("EXCESS to remove:" + newValue);
+		
 		var a = this.profCoreListRanged;  // cull away empty +ranged profeciency slots if any
 		var newArr:Array<Int> = [];
 		for (i in 0...a.length) {
