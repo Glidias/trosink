@@ -1497,8 +1497,10 @@ class CharGenData implements IBuildListed
 		}
 		else {
 			var lv = char.schoolLevel + 1;
+			
 			if (lv <= School.MAX_LEVELS) {
-				affordMin = schoolLevelCosts[lv - 1];
+				affordMin = schoolLevelCosts[lv - 1] - (lv  >= 2 ? schoolLevelCosts[lv-2] : 0);
+			
 			}
 			/*  // not relavant i feel..
 			var profCost = profArcCost;
