@@ -4,6 +4,7 @@ import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.events.SOSNotification;
+import troshx.sos.schools.Schools;
 import troshx.sos.vue.CharGen;
 import troshx.sos.vue.uifields.UI;
 
@@ -28,6 +29,7 @@ class MainSOSCharGenTest
 		SOSNotification;
 		Boons;
 		Banes;
+		Schools;
 		
 		UI;
 		

@@ -17,10 +17,12 @@ class Armor extends Item
 	// generic armor coverage hash by string id.
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
 	
-	@:coverage public static inline var HALF:Int = (1 << 0);
-	@:coverage public static inline var WEAK_SPOT:Int = (1 << 1);
+
+	@:coverage public static inline var WEAK_SPOT:Int = (1 << 0);
+	@:coverage public static inline var HALF:Int = (1 << 1);
 	
-	public static inline var WEAK_SPOT_SYMBOL:String = "☄";
+	public static inline var HALF_SYMBOL:String = "*";
+	public static inline var WEAK_SPOT_SYMBOL:String = "ϕ"; //☄
 	
 	public var helmet:Bool = false;
 	
