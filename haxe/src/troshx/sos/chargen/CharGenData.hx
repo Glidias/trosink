@@ -834,17 +834,18 @@ class CharGenData implements IBuildListed
 	
 	
 	// CHECKOUT  
+	public var moneyAvailable(get,never):Money;
+	inline function get_moneyAvailable():Money {
+		return socialClassList[wealthIndex].socialClass.money;
+	}
+	
 	
 	public var moneyAvailableStr(get,never):String;
 	inline function get_moneyAvailableStr():String {
-		return socialClassList[wealthIndex].socialClass.money.getLabel();
+		return moneyAvailable.getLabel();
 	}
 	
 
-	public var notBankrupt(get, never):Bool; // TODO:
-	function get_notBankrupt():Bool {
-		return true; 
-	}
 	
 	public var checkoutBonuses(get, never):String; 
 	function get_checkoutBonuses():String {
@@ -864,11 +865,19 @@ class CharGenData implements IBuildListed
 	function get_checkoutInventory():String {
 		return "0"; 
 	}
-
+	
+	
+	var tempMoneyLeft:Money;
+	
+	public var moneyLeft(get, never):Money;
+	inline function get_moneyLeft():Money {
+		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
+		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO );
+	}
 	
 	public var moneyLeftStr(get,never):String; // TODO:
 	inline function get_moneyLeftStr():String {  
-		return  socialClassList[wealthIndex].socialClass.money.tempCalc().addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).getLabel(); 
+		return  moneyLeft.changeToHighest().getLabel(); 
 	}
 
 	public var liquidity(get, never):Int; 
@@ -1621,10 +1630,6 @@ class CharGenData implements IBuildListed
 		return hasSchool ? r : 0;
 	}
 	
-	public var validAffordCurrentSchool(get, never):Bool;
-	function get_validAffordCurrentSchool():Bool {
-		return hasSchool ? char.school.canAffordWith(ProfPoints) : true;
-	}
 
 	public var totalProfecienciesBought(get, never):Int;  // under school
 	function get_totalProfecienciesBought():Int {

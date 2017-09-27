@@ -10,6 +10,7 @@ import troshx.sos.chargen.CharGenData;
 import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
+import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.vue.inputs.impl.AttributeInput;
@@ -111,6 +112,18 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			 // we assume first school in list is always affordable in this context and is always downgradable towards
 			this.selectSchoolAssign(this.schoolAssignList[0]);
 		}
+	}
+	
+	
+	
+	@:computed function get_notBankrupt():Bool {
+		
+		return !moneyLeft.isNegative(); 
+	}
+	
+	var validAffordCurrentSchool(get, never):Bool;
+	function get_validAffordCurrentSchool():Bool {
+		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) : true;
 	}
 	
 	

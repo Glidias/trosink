@@ -148,7 +148,7 @@
 			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':profPointsLeft>0 && canStillSpendSchool(profPointsLeft) }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
 			<div class="select-school">
 				<div>
-					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :disabled="char.school==null" /></label>
+					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints, moneyLeft, char.school)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :disabled="char.school==null" /></label>
 				</div>
 	
 			</div>
@@ -186,7 +186,7 @@
 		<hr/>
 			
 		<section class="gen-checkout">
-			<h2>Checkout <span class="legend valuer">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span></h2>
+			<h2>Checkout <span class="legend valuer">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span><span class="invalid" v-show="!notBankrupt" style="color:red"> &nbsp;Bankrupt!</span></h2>
 			<div class="checkout">
 				<div class="cash">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>
 			</div>

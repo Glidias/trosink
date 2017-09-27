@@ -43,9 +43,20 @@ class School
 		this.costArc = costArc;
 	}
 	
-	public function canAffordWith(arcPoints:Int, money:Money = null):Bool {
+
+	public function canAffordWith(arcPoints:Int, money:Money = null, schoolToReplace:School=null):Bool {
 		
-		if (money != null && costMoney != null) { // todo:
+		if (schoolToReplace != null) {
+			arcPoints += schoolToReplace.costArc;
+			
+		}
+		if (money != null && costMoney != null) { 
+
+			//var test =;
+			//trace("TEST AGAINST:"+money.getLabel());
+			if (  money.tempCalc().addAgainst(schoolToReplace!= null && schoolToReplace.costMoney!=null ? schoolToReplace.costMoney : Money.ZERO ).subtractAgainst(costMoney).isNegative() ) {
+				return false;
+			}
 			
 		}
 		
