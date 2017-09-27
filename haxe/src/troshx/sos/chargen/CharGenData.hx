@@ -1576,6 +1576,9 @@ class CharGenData implements IBuildListed
 		return hasSchool ? char.school.profLimit : 0;
 	}
 	
+	
+	
+	
 	public var maxMeleeProfSlots(get, never):Int;
 	function get_maxMeleeProfSlots():Int {
 		var r =  maxAvailableProfSlots - profCoreListRanged.length;
@@ -1583,8 +1586,6 @@ class CharGenData implements IBuildListed
 		//if (c > 0) {
 			var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure  - profCoreListRanged.length * c;
 			if (c > 0) {
-				trace(rm + " FOR :" + c);
-				
 				rm = Math.floor(rm/c);
 				if (rm < 0) rm = 0;
 				if (rm < r) r = rm;

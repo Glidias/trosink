@@ -51,6 +51,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		untyped CharGenData.dynSetArray = Vue.set;
 	}
 	
+	
+	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
 		var arr = this.boonsArray;
 		var i = arr.length;
@@ -119,6 +121,59 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	@:computed function get_notBankrupt():Bool {
 		
 		return !moneyLeft.isNegative(); 
+	}
+	
+	@:computed function get_totalDraftedProfSlots():Int {
+		return profCoreListRanged.length  + profCoreListMelee.length;
+	}
+	
+	@:computed function get_maxBuyableProfSlots():Int {
+		var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure;
+		var cost = this.profArcCost;
+		rm = cost > 0 ? Std.int(rm/cost) : this.totalAvailProfSlots;
+		return char.school != null ? rm : 0;
+	}
+	
+	@:computed function get_excessDraftedSlots():Int {
+		return this.totalDraftedProfSlots - this.maxBuyableProfSlots;
+	}
+	
+	@:watch function watch_excessDraftedSlots(newValue:Int, oldValue:Int):Void {
+		if (newValue < 1) return;
+		trace("EXCESS to remove:" + newValue);
+		var a = this.profCoreListRanged;  // cull away empty +ranged profeciency slots if any
+		var newArr:Array<Int> = [];
+		for (i in 0...a.length) {
+			if (newValue > 0 && a[i] == 0) {
+				newValue--;
+			}
+			else {
+				newArr.push(a[i]);
+			}
+		}
+		this.profCoreListRanged = newArr;
+		
+		if (newValue < 1) return;
+		
+		a = this.profCoreListMelee;   // cull away empty melee profeciency slots if any
+		newArr = [];
+		for (i in 0...a.length) {
+			if (newValue > 0 && a[i] == 0) {
+				newValue--;
+			}
+			else {
+				newArr.push(a[i]);
+			}
+		}
+		this.profCoreListMelee = newArr;
+		
+		if (newValue < 1) return;
+		
+		a = this.profCoreListRanged; 
+		while (--newValue >= 0 && a.length > 0) {  // kill off any +ranged profeciencies if needed
+			a.pop();
+		}
+		
 	}
 	
 	var validAffordCurrentSchool(get, never):Bool;
