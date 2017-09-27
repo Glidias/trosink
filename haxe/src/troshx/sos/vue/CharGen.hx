@@ -3,6 +3,7 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
+import js.html.SelectElement;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
@@ -14,11 +15,13 @@ import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;
+import troshx.sos.vue.inputs.impl.SchoolLevelInput;
 import troshx.sos.vue.inputs.impl.SkillLibInput;
 import troshx.sos.vue.inputs.impl.SkillPacketInput;
 import troshx.sos.vue.uifields.ArrayOf;
 import troshx.sos.vue.uifields.ArrayOfBits;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
+import troshx.sos.vue.widgets.SchoolSheetDetails;
 import troshx.sos.vue.widgets.SkillSubjectCreator;
 
 /**
@@ -92,6 +95,24 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		this.updateSocialBenefitsToBoon(newValue, oldValue);
 	}
 	
+	function schoolSelectChangeHandler(select:SelectElement):Void {
+		var valueAsNum = Std.parseInt(select.value);
+		if (valueAsNum >= 0) {
+			this.selectSchoolAssign(this.schoolAssignList[valueAsNum]);
+		}
+		else {
+			this.selectSchoolAssign(null);
+		}
+	}
+	
+	// can current school be afforded with base Profeciency Points?
+	@:watch function watch_validAffordCurrentSchool(newValue:Bool, oldValue:Bool):Void {
+		if (!newValue) {
+			 // we assume first school in list is always affordable in this context and is always downgradable towards
+			this.selectSchoolAssign(this.schoolAssignList[0]);
+		}
+	}
+	
 	
 	function getBnBSlug(name:String):String {
 		return BoonBaneApplyDetails.getSlug(name);
@@ -102,9 +123,12 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return [
 			CategoryPCPInput.NAME => new CategoryPCPInput(),
 			AttributeInput.NAME => new AttributeInput(),
+			SchoolLevelInput.NAME => new SchoolLevelInput(),
 			
 			BoonBaneInput.NAME => new BoonBaneInput(),
 			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails(),
+			
+			SchoolSheetDetails.NAME => new SchoolSheetDetails(),
 			
 			SkillPacketInput.NAME => new SkillPacketInput(),
 			SkillLibInput.NAME => new SkillLibInput(),

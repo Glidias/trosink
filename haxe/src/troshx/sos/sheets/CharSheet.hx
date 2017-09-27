@@ -83,6 +83,7 @@ class CharSheet implements IBuildListed
 	public var gritAccum:Int = 0;
 	
 	public var school:School = null;
+	public var schoolBonuses:SchoolBonuses = null;
 	public var schoolLevel:Int = 0;
 	public var profsMelee:Int = 0;	// core melee profiecy mask
 	public var profsRanged:Int = 0;	// core ranged profiecy mask
@@ -90,6 +91,8 @@ class CharSheet implements IBuildListed
 	
 	public var superiorManueverNotes:Array<String> = [];
 	public var masteryManueverNotes:Array<String> = [];
+	public var talentNotes:Array<String> = [];
+	
 	
 	public var labelRace(get, never):String;
 	public var labelGender(get, never):String;

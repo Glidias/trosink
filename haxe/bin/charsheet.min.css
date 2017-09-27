@@ -135,4 +135,8 @@ section.gen-skills .skill-lib>span:last-child{margin-right:0px;}
 section.gen-schoolprofs .prof-list option:disabled{}
 section.gen-schoolprofs .gen-col{min-width:232px;}
 section.gen-schoolprofs .manuever-list input{font-family:inherit;font-size:inherit;}
+section.gen-schoolprofs .tag{display:inline-block;margin-left:3px;margin-right:3px;background-color:#aaccee;padding:4px;}
+section.gen-schoolprofs .school-info{margin-top:5px;}
+section.gen-schoolprofs .cost-info .selected{text-decoration:underline;}
+.chargen .array-of li.disabled{opacity:.5;}
 

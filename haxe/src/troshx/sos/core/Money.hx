@@ -10,6 +10,8 @@ class Money
 	@:ui public var sp:Int = 0;	// Shilling
 	@:ui public var cp:Int = 0;	// Pence
 	
+	
+	
 	public function new() 
 	{
 		
@@ -29,15 +31,36 @@ class Money
 		cp = other.cp;
 	}
 	
-	public inline function getLabel():String {
-		return (gp != 0 ? gp+ " gp" : "") + (sp != 0 ? sp + " sp" : "") + (cp != 0 ? cp + " cp" : "");
+	/*
+	public function isNegative():Bool {
+		
+	}
+	*/
+	
+	/**
+	 * Removes any negative values if possible so the Money makes sense.
+	 */
+	public function sanitize():Void {
+		
 	}
 	
-	public static inline function getLabelWith(gp:Int, sp:Int, cp:Int):String {
-		return (gp != 0 ? gp+ " gp" : "") + (sp != 0 ? sp + " sp" : "") + (cp != 0 ? cp + " cp" : "");
+	
+	
+	// Displays labels of 3 gp/sp/cp components
+	
+	public function getLabel():String {
+		return (gp != 0 ? gp+ " gp" : "") + (sp != 0 ? (gp!=0? " " : "") +sp + " sp" : "") + (cp != 0 ? (sp!=0 || gp!=0 ? " " : "") +cp + " cp" : "");
+	}
+	
+	public static function getLabelWith(gp:Int, sp:Int, cp:Int):String {
+		return (gp != 0 ? gp+ " gp" : "") + (sp != 0 ? (gp!=0?" ":"") +sp + " sp" : "") + (cp != 0 ? (sp!=0 || gp!=0 ? " " : "") + cp + " cp" : "");
 	}
 	
 	// CALCULATOR METHODS
+	public static var ZERO:Money = new Money();
+	
+	
+	
 	
 	static var TEMP:Money = new Money();
 	
@@ -62,6 +85,13 @@ class Money
 		this.gp -= gp;
 		this.sp -= sp;
 		this.cp -= cp;
+		return this;
+	}
+	
+	public function subtractAgainst(against:Money):Money {
+		this.gp -= against.gp;
+		this.sp -= against.sp;
+		this.cp -= against.cp;
 		return this;
 	}
 

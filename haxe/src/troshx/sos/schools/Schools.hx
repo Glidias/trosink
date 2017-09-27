@@ -25,15 +25,6 @@ class Schools
 	
 	}
 
-	public function new() 
-	{
-		
-	}
 	
 }
 
-// To move this to CharGenData
-typedef SchoolAssign = {
-	var school:School;
-	@:optional var bonuses:SchoolBonuses;
-}

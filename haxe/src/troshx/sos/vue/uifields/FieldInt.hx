@@ -25,7 +25,6 @@ class FieldInt extends VComponent<NoneT, FieldIntProps>
 	}
 	
 	
-	
 }
 
 typedef FieldIntProps = {

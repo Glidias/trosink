@@ -12,7 +12,7 @@ import troshx.util.LibUtil;
 class NumericInput extends VComponent<NoneT, NumericInputProps>
 {
 	
-	public static var TEMPLATE:String = '<input type="number" number :value="obj[prop]" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>';
+	public static var TEMPLATE:String = '<input type="number" number :disabled="disabled" :value="obj[prop]" v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :class="{invalid:!valid}" :min="min" :max="max"></input>';
 	
 	static var INSTANCE:NumericInput;
 	public static function getSampleInstance():NumericInput {
@@ -107,5 +107,6 @@ typedef NumericInputProps = {
 	@:prop({required:true}) var obj:Dynamic;
 	@:prop({required:true}) var prop:String;
 	@:prop({required:false, 'default':false}) var floating:Bool;
+	@:prop({required:false, 'default':false}) var disabled:Bool;
 }
 

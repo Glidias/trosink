@@ -17,7 +17,7 @@ class SingleSelectionStr extends VComponent<NoneT, SingleSelectionStrProps>
 		super();
 	}
 	
-	inline function valueAtIndex(i:Int):Int {
+	inline function valueAtIndex(i:Int):String {
 		return values != null ? values[i] : labels[i];
 	}
 	

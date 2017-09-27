@@ -145,31 +145,42 @@
 		<hr/>
 		
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
-			<h2>School &amp; Profeciencies <span class="valuer">({{placeholder}} Profeciency Points remaining. (Available: {{ProfPoints}}) ) </span></h2>
+			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':profPointsLeft>0 && canStillSpendSchool(profPointsLeft) }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
 			<div class="select-school">
 				<div>
-					<label class="lbl-school">School: <select></select></label> <label class="lbl-level">Level:<input type="number" v-model.number="char.schoolLevel" number :min="0" :max="25"></input></label>
+					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :disabled="char.school==null" /></label>
 				</div>
 	
 			</div>
+			<div class="school-info" v-if="hasSchool">
+				<div>Max Profeciencies: {{ char.school.profLimit }}</div>
+				<div class="cost-info">Learning Profeciency/Arc Point Cost: ( <span :class="{selected:isHuman}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman}"><b>3 points</b> - Non-human)</span></div>
+			</div>
 			<div class="prof-list">
 				<div class="gen-col">
-					<h5>Melee Profeciencies: <span v-for="li in traceProfCoreMeleeCurrent" :key="li">|{{li}}</span></h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee"  />
+					<h5>Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots"  />
 				</div>
 				<div class="gen-col">
-					<h5>Ranged Profeciencies: <span v-for="li in traceProfCoreRangedCurrent" :key="li">|{{li}}</span></h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged"  />
+					<h5>Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots"  />
 				</div>
 			</div>
-			<div class="superior-manuever-list manuever-list gen-col">
-				<h5>Superior Manuevers: </h5>
-				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes" />
+			<div class="manuever-list gen-col">
+				<h5>Superior Manuevers: <span class="valid ready" style="color:green" v-show="char.superiorManueverNotes.length>=maxSuperiorSlots">{{ maxSuperiorSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-show="char.superiorManueverNotes.length<maxSuperiorSlots">Not Full!</span></h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes"  :maxLength="maxSuperiorSlots"/>
+				<h5>Mastery Manuever: <span class="valid ready" style="color:green" v-show="char.masteryManueverNotes.length>=maxMasterySlots">{{ maxMasterySlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-show="char.masteryManueverNotes.length<maxMasterySlots">Not Full!</span></h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes" :maxLength="maxMasterySlots"  />
 			</div>
-			<div class="mastery-manuever-list manuever-list gen-col">
-				<h5>Mastery Manuevers: </h5>
-				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes"  />
+			<div class="talent-list gen-col">
+				<h5>Talents: <span class="valid ready" style="color:green" v-show="char.talentNotes.length>=maxTalentSlots">{{maxTalentSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-show="char.talentNotes.length<maxTalentSlots">Not Full!</span></h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="talentNotes" :maxLength="maxTalentSlots" />
+			</div>		
+			<div class="school-benefits gen-col" v-if="char.schoolBonuses != null">
+				<h5>Benefits: <span class="tag" v-for="li in schoolTags" :key="li">{{li}}</span></h5>
+				<SchoolSheetDetails :bonuses="char.schoolBonuses" />
 			</div>
+			
 		</section>
 			
 		<hr/>

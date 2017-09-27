@@ -13,9 +13,11 @@ import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.Money;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Race;
+import troshx.sos.core.School;
 import troshx.sos.core.Skill;
 import troshx.sos.core.SocialClass;
 import troshx.sos.races.Races;
+import troshx.sos.schools.Schools;
 import troshx.util.LibUtil;
 
 
@@ -33,6 +35,7 @@ class CharGenData implements IBuildListed
 {
 	
 	public var char:CharSheet;
+	
 	
 	
 	static public inline var INT_MAX:Int = 2147483647;
@@ -61,6 +64,7 @@ class CharGenData implements IBuildListed
 		// Categories
 		this.categories = getNewCharGenCategories();
 		this.categories[CATEGORY_BNB].pcp = 4;
+		this.categories[CATEGORY_PROFECIENCIES].pcp = 6; // for testing
 		
 		// ............
 		
@@ -75,7 +79,50 @@ class CharGenData implements IBuildListed
 		
 		initSocialClassesBenefits();
 		
+		// Schools and profs
+		initSchools();
+		
 	}
+	
+	function initSchools():Void {
+		
+		schoolLevelCosts = School.getLevels();
+		var accum:Int;
+		
+		accum =  schoolLevelCosts[0];
+		for (i in 1...schoolLevelCosts.length) {
+			accum +=  schoolLevelCosts[i];
+			schoolLevelCosts[i] = accum;
+		}
+		
+		talentsAvailable = School.getTalentAdds();
+		
+		accum =  talentsAvailable[0];
+		for (i in 1...talentsAvailable.length) {
+			accum +=  talentsAvailable[i];
+			talentsAvailable[i] = accum;
+		}
+		
+		superiorsAvailable = School.getSuperiorAdds();
+		
+		accum =  superiorsAvailable[0];
+		for (i in 1...superiorsAvailable.length) {
+			accum +=  superiorsAvailable[i];
+			superiorsAvailable[i] = accum;
+		}
+		
+		schoolAssignList = [];
+		var schoolList = Schools.getList();
+		for (i in 0...schoolList.length) {
+			var s = schoolList[i];
+			schoolAssignList.push({
+				school:s,
+				bonuses:s.getSchoolBonuses(char)
+			});
+		}
+	}
+	
+	
 	
 	function initBoons():Void {
 		var boonList:Array<Boon> = Boons.getList();
@@ -810,7 +857,7 @@ class CharGenData implements IBuildListed
 	}
 	public var checkoutSchool(get, never):String; 
 	function get_checkoutSchool():String {
-		return "0"; 
+		return (char.school != null && char.school.costMoney != null ?  char.school.costMoney.getLabel() : "0"); 
 	}
 	
 	public var checkoutInventory(get, never):String; 
@@ -821,7 +868,7 @@ class CharGenData implements IBuildListed
 	
 	public var moneyLeftStr(get,never):String; // TODO:
 	inline function get_moneyLeftStr():String {  
-		return  socialClassList[wealthIndex].socialClass.money.tempCalc().addValues(this.liquidity, 0, 0).getLabel(); 
+		return  socialClassList[wealthIndex].socialClass.money.tempCalc().addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).getLabel(); 
 	}
 
 	public var liquidity(get, never):Int; 
@@ -1303,6 +1350,8 @@ class CharGenData implements IBuildListed
 	}
 	
 	
+	
+	
 	public var SkillPoints(get, never):Int;
 	function get_SkillPoints():Int {
 		return (categories[CATEGORY_SKILLS].pcp-1) * 3;	
@@ -1322,6 +1371,7 @@ class CharGenData implements IBuildListed
 	function get_maxSkillPacketsAllowed():Int {
 		return Math.floor( (totalSkillPointsProvided - individualSkillsSpent) / 3);
 	}
+
 	
 	public var maxIndividualSkillsSpendable(get, never):Int;
 	function get_maxIndividualSkillsSpendable():Int {
@@ -1421,9 +1471,188 @@ class CharGenData implements IBuildListed
 	var profCoreListMelee:Array<Int> = [];
 	var profCoreListRanged:Array<Int> = [];
 	
+	var schoolAssignList:Array<SchoolAssign>;
+	var schoolLevelCosts:Array<Int>;
+	var talentsAvailable:Array<Int>;
+	var superiorsAvailable:Array<Int>;
+	
+	public function selectSchoolAssign(s:SchoolAssign):Void {
+		if (s != null) {
+			char.school = s.school;
+			char.schoolBonuses = s.bonuses;
+			
+		}
+		else {
+			char.school = null;
+			char.schoolBonuses = null;
+		}
+	}
+	
+	public function canStillSpendSchool(remainingPoints:Int):Bool {
+		var affordMin:Int = 0;
+		
+		if (char.school == null ) {
+			if (ProfPoints == 0) return false;
+			return true;
+		}
+		else {
+			var lv = char.schoolLevel + 1;
+			if (lv <= School.MAX_LEVELS) {
+				affordMin = schoolLevelCosts[lv - 1];
+			}
+			/*  // not relavant i feel..
+			var profCost = profArcCost;
+			if (profCost != 0 && profCost < affordMin ) {
+				affordMin = profCost;
+			}
+			*/
+		}
+		return affordMin > 0 && remainingPoints >= affordMin;
+	}
+	
+	
+	public var hasSchool(get, never):Bool;
+	inline function get_hasSchool():Bool {
+		return char.school != null;	
+	}
+	
+	public var schoolProfLevel(get, never):Int;
+	inline function get_schoolProfLevel():Int {
+		return hasSchool ? char.schoolLevel : 0;	
+	}
+	
+	public var schoolTags(get, never):Array<String>;
+	inline function get_schoolTags():Array<String> {
+		return hasSchool  && char.schoolBonuses != null ? char.schoolBonuses.getTags() : [];	
+	}
+	
+
+	
 	public var ProfPoints(get, never):Int;
 	inline function get_ProfPoints():Int {
 		return (categories[CATEGORY_PROFECIENCIES].pcp-1) * 3;	
+	}
+	
+	public var totalAvailProfSlots(get, never):Int;
+	inline function get_totalAvailProfSlots ():Int {
+		return hasSchool ? char.school.profLimit : 0;
+	}
+	
+	public var profArcCost(get, never):Int;
+	inline function get_profArcCost():Int {
+		return  isHuman ? 0 : 3;
+	}
+	
+	public var schoolArcCost(get, never):Int;
+	inline function get_schoolArcCost():Int {
+		return  hasSchool ? char.school.costArc : 0;
+	}
+	
+	public var profExpenditure(get, never):Int;
+	function get_profExpenditure():Int {
+		return  profArcCost * totalProfecienciesBought;
+	}
+	
+	public var totalProfSlotExpenditure(get, never):Int;
+	inline function get_totalProfSlotExpenditure():Int {
+		var c:Int = profArcCost;
+		return c * profCoreListRanged.length + c * profCoreListMelee.length;
+	}
+	
+	
+	public var maxAvailableProfSlots(get, never):Int;
+	inline function get_maxAvailableProfSlots():Int {
+		return hasSchool ? char.school.profLimit : 0;
+	}
+	
+	public var maxMeleeProfSlots(get, never):Int;
+	function get_maxMeleeProfSlots():Int {
+		var r =  maxAvailableProfSlots - profCoreListRanged.length;
+		var c = profArcCost;
+		//if (c > 0) {
+			var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure  - profCoreListRanged.length * c;
+			if (c > 0) {
+				trace(rm + " FOR :" + c);
+				
+				rm = Math.floor(rm/c);
+				if (rm < 0) rm = 0;
+				if (rm < r) r = rm;
+			}
+		//}
+		return hasSchool ? r < 0 ? 0 : r 
+		: 0;
+	}
+	
+	public var maxRangedProfSlots(get, never):Int;
+	function get_maxRangedProfSlots():Int {
+		var r =  maxAvailableProfSlots - profCoreListMelee.length;
+		var c = profArcCost;
+		//if (c > 0) {
+			var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure - profCoreListMelee.length * c;
+			if (c > 0) {
+				
+				rm = Math.floor(rm/c);
+				if (rm < 0) rm = 0;
+				if (rm < r) r = rm;
+			}
+		//}
+		return hasSchool ? r < 0 ? 0 : r 
+		: 0;
+	}
+
+	public var maxTalentSlots(get, never):Int;
+	function get_maxTalentSlots():Int {
+		var r = char.schoolLevel > 0 ? talentsAvailable[char.schoolLevel-1] : 0;
+		return hasSchool ? r : 0;
+	}
+	
+	public var maxSuperiorSlots(get, never):Int;
+	function get_maxSuperiorSlots():Int {
+		var r = char.schoolLevel > 0 ? superiorsAvailable[char.schoolLevel-1] : 0;
+		return hasSchool ? r : 0;
+	}
+	
+	public var maxMasterySlots(get, never):Int;
+	function get_maxMasterySlots():Int {
+		var r = char.schoolLevel >= School.MASTERY_LEVEL ? 1 : 0;
+	
+		return hasSchool ? r : 0;
+	}
+	
+	public var validAffordCurrentSchool(get, never):Bool;
+	function get_validAffordCurrentSchool():Bool {
+		return hasSchool ? char.school.canAffordWith(ProfPoints) : true;
+	}
+
+	public var totalProfecienciesBought(get, never):Int;  // under school
+	function get_totalProfecienciesBought():Int {
+		return  maxClampedMeleeProfs + maxClampedRangedProfs;
+	}
+	public var maxClampedMeleeProfs(get, never):Int;
+	inline function get_maxClampedMeleeProfs():Int {
+		return LibUtil.minI_(maxMeleeProfSlots, profCoreListMelee.length);
+	
+	}
+	public var maxClampedRangedProfs(get, never):Int;
+	inline function get_maxClampedRangedProfs():Int {
+		return LibUtil.minI_(maxRangedProfSlots, profCoreListRanged.length);
+	}
+	
+
+	public var levelsExpenditure(get, never):Int;
+	inline function get_levelsExpenditure():Int {
+		return char.school != null && char.schoolLevel > 0 ? schoolLevelCosts[char.schoolLevel - 1] : 0;
+	}
+	
+	public var totalProfArcExpenditure(get, never):Int;
+	inline function get_totalProfArcExpenditure():Int {
+		return totalProfecienciesBought * profArcCost;
+	}
+	
+	
+	public var profPointsLeft(get, never):Int;
+	inline function get_profPointsLeft():Int {
+		return ProfPoints  - totalProfArcExpenditure - schoolArcCost - levelsExpenditure;
 	}
 	
 	
@@ -1446,11 +1675,24 @@ class CharGenData implements IBuildListed
 	function get_traceProfCoreMeleeCurrent():Array<String> {
 		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreMelee(), char.profsMelee);
 	}
-
-
+	
+	public var traceProfCoreRangedCount(get, never):Int;
+	function get_traceProfCoreRangedCount():Int {
+		return Profeciency.getCountOfArrayProfs(Profeciency.getCoreRanged(), char.profsRanged);
+	}
+	
+	public var traceProfCoreMeleeCount(get, never):Int;
+	function get_traceProfCoreMeleeCount():Int {
+		return Profeciency.getCountOfArrayProfs(Profeciency.getCoreMelee(), char.profsMelee);
+	}
 
 	
-	
+	function saveFinaliseSchoolProfs():Void {
+		char.schoolLevel = schoolProfLevel;
+		char.masteryManueverNotes = char.masteryManueverNotes.slice(0, maxMasterySlots);
+		char.superiorManueverNotes = char.superiorManueverNotes.slice(0, maxSuperiorSlots);
+		char.talentNotes = char.talentNotes.slice(0, maxTalentSlots);
+	}
 
 
 
@@ -1480,6 +1722,12 @@ typedef SocialBoonAssign = {
 typedef WarningDef = {
 	var warn:Bool;
 	var remain:Int;
+}
+
+
+typedef SchoolAssign = {
+	var school:School;
+	var bonuses:SchoolBonuses;
 }
 
 

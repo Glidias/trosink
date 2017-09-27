@@ -25,6 +25,7 @@ class UI
 		LibUtil.setField(dyn, FieldString.NAME, new FieldString()); 
 		LibUtil.setField(dyn, FieldTextArea.NAME, new FieldTextArea()); 
 		LibUtil.setField(dyn, SingleSelection.NAME, new SingleSelection());
+		LibUtil.setField(dyn, SingleSelectionStr.NAME, new SingleSelectionStr());
 		LibUtil.setField(dyn, SingleBitSelection.NAME, new SingleBitSelection());
 		
 		LibUtil.setField(dyn, MoneyField.NAME, new MoneyField());
@@ -50,6 +51,7 @@ class UI
 			"String":FieldString.NAME,
 			"textarea":FieldTextArea.NAME,
 			"SingleSelection":SingleSelection.NAME,
+			"SingleSelectionStr":SingleSelectionStr.NAME,
 			"SingleBitSelection":SingleBitSelection.NAME,
 			
 			"HitLocationSelector":HitLocationSelector.NAME,
