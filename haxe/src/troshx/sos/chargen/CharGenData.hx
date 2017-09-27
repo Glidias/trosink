@@ -64,7 +64,7 @@ class CharGenData implements IBuildListed
 		// Categories
 		this.categories = getNewCharGenCategories();
 		this.categories[CATEGORY_BNB].pcp = 4;
-		this.categories[CATEGORY_PROFECIENCIES].pcp = 6; // for testing
+		//this.categories[CATEGORY_PROFECIENCIES].pcp = 6; // for testing
 		
 		// ............
 		
