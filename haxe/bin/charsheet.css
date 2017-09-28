@@ -185,11 +185,15 @@ td.w-span-tools .pop-widget {
 /* td.w-coverage related */
 td.w-coverage .pop-widget {
 	width:200%;
+	min-width:400px;
 }
 td.w-coverage .coverage-list {
 	-webkit-columns: 100px 2; /* Chrome, Safari, Opera */
     -moz-columns: 100px 2; /* Firefox */
     columns: 100px 2;
+}
+td.w-coverage .coverage-list .symbols {
+	font-size:11px;
 }
 td.w-coverage .coverage-list .symbols label:nth-of-type(1) {
 	vertical-align:top;

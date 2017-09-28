@@ -1,5 +1,5 @@
 <div class="coverage-list">
 	<div v-for="(li, i) in hitLocations" :key="i">
-		<label><input type="checkbox" v-on:click="checkboxHandler($event.target, i)" :checked="item.coverage[li.get_uid()]!=null"></input>{{i+1}}. {{li.name}}</label> &nbsp; <span class="symbols" v-if="item.coverage[li.get_uid()]!=null"><label>ϕ</label><input type="checkbox" v-on:click="innerCheckboxHandler($event.target, i, 0)" :checked="isInnerChecked(i,0)"></input><label>*</label><input type="checkbox" v-on:click="innerCheckboxHandler($event.target, i, 1)" :checked="isInnerChecked(i,1)"></input></span>
+		<label><input type="checkbox" v-on:click="checkboxHandler($event.target, i)" :checked="item.coverage[li.get_uid()]!=null"></input>{{i+1}}. {{li.name}}</label> &nbsp; <span class="symbols" v-if="item.coverage[li.get_uid()]!=null"><label>ϕ</label><input type="checkbox" v-on:click="innerCheckboxHandler($event.target, i, 0)" :checked="isInnerChecked(i,0)"></input><label>*</label><input type="checkbox" v-on:click="innerCheckboxHandler($event.target, i, 1)" :checked="isInnerChecked(i,1)"></input><label>t</label><input type="checkbox" v-on:click="innerCheckboxHandler($event.target, i, 2)" :checked="isInnerChecked(i,2)"></input></span>
 	</div>
 </div>

@@ -13,6 +13,7 @@ class ArmorSpecial
 	public static inline var MAIL:Int = (1 << 1);
 	public static inline var TEXTILE:Int = (1 << 2);
 	public static inline var BULLETPROOF:Int = (1 << 3);
+	public static inline var MOVABLE:Int = (1 << 4);
 	
 	@:flag public var restrictsBreathing:Int = 0;
 	

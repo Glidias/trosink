@@ -166,7 +166,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			var ider = hitLocations[i].id;
 			var specs:Int = LibUtil.field(coverage, ider);
 			if (specs != null) {
-				arr.push((i+1) + ( (specs & Armor.WEAK_SPOT)!=0 ? Armor.WEAK_SPOT_SYMBOL : "") + ( (specs & Armor.HALF)!=0 ? Armor.HALF_SYMBOL : "")  );
+				arr.push((i + 1) + ( (specs & Armor.WEAK_SPOT) != 0 ? Armor.WEAK_SPOT_SYMBOL : "") +  ( (specs & Armor.THRUST_ONLY) != 0 ? Armor.THRUST_ONLY_SYMBOL : "") + ( (specs & Armor.HALF) != 0 ? Armor.HALF_SYMBOL : "")
+				);
 			}
 			
 		}

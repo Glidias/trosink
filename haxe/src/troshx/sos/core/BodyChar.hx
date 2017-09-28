@@ -7,14 +7,14 @@ import troshx.util.LibUtil;
  */
 class BodyChar
 {
-	public var name:String;
+	public var name(default,null):String;
 	
 	// Typically melee target zones
-	public var targetZones:Array<TargetZone>;
-	public var thrustStartIndex:Int; // at what index point along the targetZones does it consider it as thrusting zones?
+	public var targetZones(default,null):Array<TargetZone>;
+	public var thrustStartIndex(default,null):Int; // at what index point along the targetZones does it consider it as thrusting zones?
 	
 	// Missile-specific target hit locations
-	public var missileHitLocations:Array<Int>;  // Random D10 roll index -> Hit Location
+	public var missileHitLocations(default,null):Array<Int>;  // Random D10 roll index -> Hit Location
 	
 	// Damage tables of Hit Location Index -> Damage Level Index -> WoundDef
 	//public var partsDamageCut:Array<Array<WoundDef>>;   
@@ -27,9 +27,13 @@ class BodyChar
 	//public var coldDamages:Array<WoundDef>;  //  Damage Level Index -> WoundDef
 	
 	
-	public var hitLocationHash:Dynamic<Int> = null; // JS/Vue only the hash of hit location  from uids of given wounds for quick lookup of indices to hit Locations
+	public var hitLocationHash(default,null):Dynamic<Int> = null; // JS/Vue only the hash of hit location  from uids of given wounds for quick lookup of indices to hit Locations
 	
-	public var hitLocations:Array<HitLocation>; // list of indexed hit location name entries from highest to lowest for armor coverage/target-zone access
+	public var hitLocations(default,null):Array<HitLocation>; // list of indexed hit location name entries from highest to lowest for armor coverage/target-zone access
+	
+	// to be baked from thrustStartIndex
+	public var swingMask(default,null):Int;
+	public var thrustMask(default,null):Int;
 	
 	function new() 	{
 		
@@ -46,7 +50,19 @@ class BodyChar
 		for ( i in 0...hitLocations.length) {
 			LibUtil.setField( obj, hitLocations[i].uid, i);
 		}
+		
+		
 		hitLocationHash = obj;
+		
+		thrustMask = 0;
+		for ( i in thrustStartIndex...targetZones.length) {
+			thrustMask |= (1 << i);
+		}
+		
+		swingMask = 0;
+		for ( i in 0...thrustStartIndex) {
+			swingMask |= (1 << i);
+		}
 	}
 	
 	
