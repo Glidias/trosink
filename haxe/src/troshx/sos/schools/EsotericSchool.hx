@@ -1,9 +1,12 @@
 package troshx.sos.schools;
 
+import troshx.sos.bnb.Banes.CompleteMonster;
+import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.Money;
 import troshx.sos.core.School;
 import troshx.sos.sheets.CharSheet;
+import troshx.util.LibUtil;
 
 /**
  * ...
@@ -16,6 +19,13 @@ class EsotericSchool extends School
 	{
 		super("Esoteric School", 3, 5);
 		costMoney = Money.create(15, 0, 0);
+	}
+	
+	static var TEST:CompleteMonster;  
+	override public function customRequire(char:CharSheet):Bool {
+		var test:CompleteMonster = (TEST != null ? TEST : (TEST = new CompleteMonster()));
+		var testAssign:BaneAssign = char.banes.findById(test.uid);
+		return testAssign == null || testAssign.rank == 0;
 	}
 	
 	override public function getSchoolBonuses(charSheet:CharSheet):SchoolBonuses {
@@ -38,6 +48,7 @@ class EsotericSchoolBonuses extends SchoolBonuses {
 		super();
 	}
 	
+
 	override public function getTags():Array<String> {
 		var arr:Array<String> = [];
 		var flags:Int = this.flags;

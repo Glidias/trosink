@@ -91,9 +91,16 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 	public function contains(item:T):Bool {
 		return hashContains(item);
 	}
+	inline public function containsId(ider:String):Bool {
+		return Reflect.hasField(hash, ider);
+	}
 	
 	function hashContains(item:T):Bool {
 		return Reflect.hasField(hash, item.uid);
+	}
+	
+	public inline function findById(id:String):T {
+		return Reflect.field(hash, id);
 	}
 	
 	function listContains(item:T):Bool {

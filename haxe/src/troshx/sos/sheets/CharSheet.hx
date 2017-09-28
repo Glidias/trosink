@@ -167,18 +167,20 @@ class CharSheet implements IBuildListed
 	
 	
 	
-	var boons:HashedArray<BoonAssign> = new HashedArray<BoonAssign>();
-	var banes:HashedArray<BaneAssign> =  new HashedArray<BaneAssign>();
+	public var boons(default, never) :HashedArray<BoonAssign>= new HashedArray<BoonAssign>();
+	public var banes(default, never):HashedArray<BaneAssign> =  new HashedArray<BaneAssign>();
 	public var boonsArray(get, never):Array<BoonAssign>;
 	inline function get_boonsArray():Array<BoonAssign> {
 		return boons.list;
 	}
-	public function addBoon(assign:BoonAssign):Void {
+	public inline function addBoon(assign:BoonAssign):Void {
 		boons.add(assign);
 	}
-	public function removeBoon(assign:BoonAssign):Void {
+	
+	public inline function removeBoon(assign:BoonAssign):Void {
 		boons.delete(assign);
 	}
+	
 	
 	public var banesArray(get, never):Array<BaneAssign>;
 	inline function get_banesArray():Array<BaneAssign> {

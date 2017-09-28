@@ -108,14 +108,14 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		}
 	}
 	
-	// can current school be afforded with base Profeciency Points?
+	// can current school be afforded with base Profeciency Points and school accepts character?
 	@:watch function watch_validAffordCurrentSchool(newValue:Bool, oldValue:Bool):Void {
 		if (!newValue) {
 			 // we assume first school in list is always affordable in this context and is always downgradable towards
 			this.selectSchoolAssign(this.schoolAssignList[0]);
 		}
 	}
-	
+
 	
 	
 	@:computed function get_notBankrupt():Bool {
@@ -178,8 +178,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	
 	var validAffordCurrentSchool(get, never):Bool;
 	function get_validAffordCurrentSchool():Bool {
-		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) : true;
+		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) && char.school.customRequire(char) : true;
 	}
+	
 	
 	
 	function getBnBSlug(name:String):String {
