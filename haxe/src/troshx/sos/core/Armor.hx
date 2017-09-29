@@ -60,9 +60,10 @@ class Armor extends Item
 	
 	override public function addTagsToStrArr(arr:Array<String>):Void {
 		super.addTagsToStrArr(arr);
-		if (pp > 0 ) {
-			arr.push("PP -" + pp);
+		if (helmet) {
+			arr.push("Helmet"+(pp > 0 ? " PP -"+pp : "")+":");
 		}
+		
 		var flags:Int = specialFlags;
 		
 		if (flags != 0) {

@@ -3,9 +3,12 @@ import haxe.Serializer;
 import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import js.html.InputElement;
+import troshx.sos.core.BodyChar;
 import troshx.sos.core.Armor;
+import troshx.sos.core.ArmorSpecial;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
 import troshx.sos.core.Item;
@@ -15,6 +18,7 @@ import troshx.sos.core.Profeciency;
 import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.core.WeaponCustomise;
+import troshx.sos.vue.input.MixinInput;
 import troshx.sos.vue.widgets.BaseItemWidget.BaseItemWidgetProps;
 import troshx.util.LibUtil;
 
@@ -29,23 +33,38 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [ MixinInput.getInstance() ];
 	}
 	
 	override function Data():WTagsData {
 		return {
 			meleeSpecialCache:null,
 			missileSpecialCache:null,
+			armorSpecialCache:null,
 			customise: null,
 			customMeleeCache:null,
 			restoreOriginal:false,
 			
+			//layerCoverageBits:0
 		}
 	}
 	
 	override function Mounted():Void { 
 		updateWeaponStates();
+		//updateArmorStates();
 		//trace(Type.getClassName(CustomMelee));	
+		
 	}
+	
+	/*
+	function updateArmorStates():Void {
+		var armor = this.armor;
+		if (armor != null && armor.special!=null) {
+			armor.special.layerCoverage &= layerCoverageBits;
+		}
+	}
+	*/
+
 	
 	function updateWeaponStates():Void  // imperative upadtes
 	{
@@ -172,6 +191,12 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 		return arr;
 	}
 	
+	@:computed function get_armorFlags():Array<String> {
+		var arr:Array<String> = [ ];
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.ArmorSpecial", true);
+		return arr;
+	}
+	
 	@:computed function get_customMeleeFlags():Array<String> {
 		var arr:Array<String> = [ ];
 		Item.pushFlagLabelsToArr(false, "troshx.sos.core.WeaponCustomise:CustomMelee", true, ":flag");
@@ -216,6 +241,71 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	
 		return Item.labelizeCamelCaseArr( missileVarNames);
 		
+	}
+	
+	///*
+	@:computed function get_layerCoverageFlags():Array<CoverageFlag> {
+		var armor = this.armor;
+		
+		if (armor == null) return null;
+		var body:BodyChar = armor.special != null && armor.special.otherBodyType != null ? armor.special.otherBodyType : BodyChar.getInstance(); 
+	
+		var arr:Array<CoverageFlag> = [];
+		var fields = Reflect.fields(armor.coverage);
+		for (i in 0...fields.length) {
+			var f = fields[i];
+			var id = LibUtil.field(body.hitLocationHash, f);
+			arr.push({
+				label: body.hitLocations[id].name,
+				value: (1 << id),
+				index:id
+			});
+		}
+		arr.sort(sortCoverageFlag);
+		return arr;
+	}
+
+	
+	@:computed function get_layerCoverageBits():Int {
+		
+		var a =layerCoverageFlags;
+		var bits = 0;
+		for (i in 0...a.length) {
+			bits |= a[i].value;
+		}
+		return bits;
+
+	}
+
+	/*
+	@:watch function watch_armorSpecialLayer(newValue:Int):Void {
+		var armor = this.armor;
+		if (armor.special != null) {
+			if (newValue <=0) { // sync?
+				armor.special.layerCoverage = 0; 
+				
+			}
+		}
+	}
+	*/
+
+	
+	function sortCoverageFlag(a:CoverageFlag, b:CoverageFlag):Int {
+		if (a.value < b.value) return -1;
+		else if (a.value > b.value) return 1;
+		return 0;
+	}
+	
+//	*/
+/*
+	function getLayerLabelFor(ider:String):Void {
+		var body = bodyForArmor;
+		LibUtil.field(body.hitLocationHash, ider);
+	}
+	*/
+	
+	@:computed function get_bodyForArmor():BodyChar {
+		return armor.special.otherBodyType != null ? armor.special.otherBodyType : BodyChar.getInstance();
 	}
 
 	
@@ -286,6 +376,20 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	}
 	
 	
+	function onArmorSpecialCheck(cb:InputElement) {
+		var armor = this.armor;
+		if ( cb.checked ) {
+			
+			armor.special = armor.special != null ? armor.special : armorSpecialCache != null ? armorSpecialCache  : new ArmorSpecial();
+		
+		}
+		else {
+			armorSpecialCache = armor.special;
+			armor.special = null;
+		}
+	}
+	
+	
 	function onWeapSpecialCheck(cb:InputElement, ranged:Bool) {
 		if ( cb.checked ) {
 			if (ranged) {
@@ -325,12 +429,16 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 typedef WTagsData = {
 	var meleeSpecialCache:MeleeSpecial;
 	var missileSpecialCache:MissileSpecial;
+	var armorSpecialCache:ArmorSpecial;
 	
 	var customise:WeaponCustomise;
 	
 	var customMeleeCache:CustomMelee;
 	
+	
 	var restoreOriginal:Bool;
+	
+	
 }
 
 
@@ -344,3 +452,10 @@ Variant button? (2H/1H)  (circular depedency?)  check if variant has complehant 
 
 
 */
+
+typedef CoverageFlag = {
+	var label:String;
+	var value:Int;
+	var index:Int;
+	
+}

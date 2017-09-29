@@ -10,7 +10,6 @@ import troshx.util.LibUtil;
  */
 class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 {
-	
 
 	public function new() 
 	{

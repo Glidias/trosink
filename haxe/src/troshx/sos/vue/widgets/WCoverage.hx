@@ -35,6 +35,9 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 		}
 		else {
 			Vue.delete(armor.coverage, ider); 
+			if (armor.special != null ) {
+				armor.special.layerCoverage &= ~(1 << i);
+			}
 		}
 	}
 	
@@ -67,10 +70,6 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 			Vue.set(armor.coverage, ider, curValue&(~(1<<flagIndex)) );
 		}
 	}
-	
-	
-	
-	
 	
 	override function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");

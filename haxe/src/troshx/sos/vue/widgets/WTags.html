@@ -156,4 +156,30 @@
 		</div>
 		<hr/>
 	</div>
+						
+	<div v-if="armor!=null">
+		<div><label><input type="checkbox" v-model="item.helmet"></input> Is Helmet</label></div>
+		<div v-if="item.helmet">
+			<div><label>Perception Penalty (PP): <InputInt :obj="item" :min="0" prop="pp" /></label></div>
+		</div>
+		<hr/>
+		
+		<div>-Armor Flags:-</div>
+		<div v-for="(li, i) in armorFlags" :key="i" style="display:inline-block;margin-right:3px">
+			<label><input type="checkbox" :checked="(shiftIndex(i)&item.specialFlags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'specialFlags')" :value="shiftIndex(i)"></input>{{li}}</label>
+		</div>
+		<hr/>
+		<div><label><input type="checkbox" v-on:click="onArmorSpecialCheck($event.target)" :checked="item.special!=null"></input><i>ArmorSpecial?</i></label></div>
+		<div v-if="item.special">
+			<div><label>Layer: <InputInt :obj="item.special" prop="layer" :min="0"  /></label></div>
+			<div v-if="item.special.layer > 0 && layerCoverageFlags.length > 0">
+				<label>Layer coverages: <i>(leave blank for all)</i> {{layerCoverageBits}}</label>
+				<div><label  v-for="li in layerCoverageFlags" :key="li.value"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special, 'layerCoverage')" :checked="(li.value&item.special.layerCoverage)!=0"></input>{{li.index}}:{{li.label}}</label></div>
+			</div>
+				
+			<div><label>Restricts breathing: <InputInt :obj="item.special" prop="restrictsBreathing" :min="0" /></label></div>
+		<hr/>	
+		</div>
+			
+	</div>
 </div>

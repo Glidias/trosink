@@ -1,6 +1,5 @@
 package troshx.sos.core;
 import troshx.sos.core.ArmorSpecial.HitModifiers;
-import troshx.sos.core.ArmorSpecial.Layering;
 import troshx.util.LibUtil;
 
 /**
@@ -9,15 +8,17 @@ import troshx.util.LibUtil;
  */
 class ArmorSpecial 
 {
-	public static inline var HARD:Int = (1 << 0);
-	public static inline var MAIL:Int = (1 << 1);
-	public static inline var TEXTILE:Int = (1 << 2);
-	public static inline var BULLETPROOF:Int = (1 << 3);
-	public static inline var MOVABLE:Int = (1 << 4);
+	public static inline var MOVABLE:Int = (1 << 0);
+	public static inline var HARD:Int = (1 << 1);
+	public static inline var MAIL:Int = (1 << 2);
+	public static inline var TEXTILE:Int = (1 << 3);
+	public static inline var BULLETPROOF:Int = (1 << 4);
+	
 	
 	@:flag public var restrictsBreathing:Int = 0;
 	
-	public var layer:Layering = null;
+	public var layer:Int = 0;
+	public var layerCoverage:Int = 0;  
 	
 	public var modifiers:Array<HitModifiers> = null;
 	
@@ -53,8 +54,15 @@ class ArmorSpecial
 			}		
 		}
 		*/
-		if (layer != null) {
-			layer.addTagsToStrArr(arr, bodyChar);
+		if (layer > 0) {
+			if (layerCoverage != 0) {
+				var myArr:Array<String> = [];
+				bodyChar.pushHitLocationNamesToStrArrByMask(myArr, layerCoverage);	
+				arr.push( 'Layer'+(myArr.length > 0 ? "s" : "")+' ${layer} (${myArr.join(", ")})' );
+			}
+			else {
+				arr.push('Layer ${layer}');
+			}
 		}
 		
 		if (modifiers != null) {
@@ -63,34 +71,17 @@ class ArmorSpecial
 				modifier.addTagsToStrArr(arr, bodyChar);
 			}
 		}
-
-	}
-	
-}
-
-class Layering {
-	
-	public var value:Int = 1;
-	
-	// when this is set, it must imperatively mask& with it's parent armor's coverage
-	// for the sake of sanity..
-	public var coverage:Int = 0;  
-	
-	public function new() {
 		
+		
+		
+
 	}
 	
-	inline public function addTagsToStrArr(arr:Array<String>, bodyChar:BodyChar)  {
-		if (coverage != 0) {
-			var myArr:Array<String> = [];
-			bodyChar.pushHitLocationNamesToStrArrByMask(arr, coverage);	
-			arr.push( 'Layers ${value} ("+${myArr.join(", ")}+")' );
-		}
-		else {
-			arr.push('Layer ${value}');
-		}
-	}
+	
+	
 }
+
+
 
 class HitModifiers {
 	

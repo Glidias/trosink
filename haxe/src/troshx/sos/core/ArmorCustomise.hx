@@ -9,7 +9,7 @@ class ArmorCustomise implements IUid
 {
 	public var name:String = "";
 	
-	public var hitLocationAllAVModifiers:Dynamic<Float> = null;
+	public var hitLocationAllAVModifiers:Dynamic<Int> = null;
 	public var uid(get, null):String;
 
 	public function new() 
@@ -17,7 +17,7 @@ class ArmorCustomise implements IUid
 		
 	}
 	
-	function get_uid():String 
+	inline function get_uid():String 
 	{
 		return name;
 	}
