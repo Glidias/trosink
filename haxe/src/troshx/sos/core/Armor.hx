@@ -26,7 +26,11 @@ class Armor extends Item
 	public static inline var WEAK_SPOT_SYMBOL:String = "ϕ"; //☄
 	public static inline var THRUST_ONLY_SYMBOL:String = "t"; 
 	
-	public var helmet:Bool = false;
+	public static inline var SUPERSCRIPT_MINUS:String = "⁻";
+	public static inline var SUPERSCRIPT_PLUS:String = "⁺";
+	//public static inline var SUPERSCRIPT_NUM_BASE:Int = 
+	public static inline var SUPERSCRIPT_NUMBERS:String = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+	
 	
 	public var pp:Int = 0;
 	
@@ -36,9 +40,12 @@ class Armor extends Item
 	// using this will uniquely identify the armor
 	public var customise:ArmorCustomise = null;
 	
+	
 	function new() 
 	{
 		super();
+
+		
 		
 	}
 	public static function createEmptyInstance():Armor {
@@ -60,8 +67,8 @@ class Armor extends Item
 	
 	override public function addTagsToStrArr(arr:Array<String>):Void {
 		super.addTagsToStrArr(arr);
-		if (helmet) {
-			arr.push("Helmet"+(pp > 0 ? " PP -"+pp : "")+":");
+		if (pp > 0) {
+			arr.push("PP -"+pp);
 		}
 		
 		var flags:Int = specialFlags;
@@ -73,6 +80,13 @@ class Armor extends Item
 			special.addTagsToStrArr(arr);
 		}
 
+		if (customise != null) {
+			customise.addTagsToStrArr(arr);
+		}
+	}
+	
+	override function get_label():String {
+		return name + (customise != null ? " *"+(customise.name != null ? customise.name : customise.uid)+"*" : ""); 
 	}
 	
 	override public function getTypeLabel():String {

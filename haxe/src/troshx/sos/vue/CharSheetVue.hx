@@ -154,8 +154,22 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	
+	function getSuperscriptNum(ref:String, value:Int):String {
+		var str = Std.string(value);
+		var result:String = value >= 0 ? Armor.SUPERSCRIPT_PLUS : Armor.SUPERSCRIPT_MINUS;
+		
+		for (i in (value < 0 ? 1 : 0)...str.length) {
+			result += ref.charAt( Std.parseInt(str.charAt(i)) );
+		}
+		return result;
+	}
 	
-	function getCoverage(coverage:Dynamic<Int>, body:BodyChar=null):String {  // todo: return string representation
+	function getCoverage(armor:Armor, body:BodyChar = null):String {  // todo: return string representation
+		var coverage = armor.coverage;
+		var superscriptDigits:String = Armor.SUPERSCRIPT_NUMBERS;
+		var gotSuperScript:Bool =armor.customise != null && armor.customise.hitLocationAllAVModifiers != null;
+		var avModifiers = gotSuperScript ? armor.customise.hitLocationAllAVModifiers : null;
+		
 		if (body == null) {
 			body = BodyChar.getInstance();
 		}
@@ -166,7 +180,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			var ider = hitLocations[i].id;
 			var specs:Int = LibUtil.field(coverage, ider);
 			if (specs != null) {
-				arr.push((i + 1) + ( (specs & Armor.WEAK_SPOT) != 0 ? Armor.WEAK_SPOT_SYMBOL : "") +  ( (specs & Armor.THRUST_ONLY) != 0 ? Armor.THRUST_ONLY_SYMBOL : "") + ( (specs & Armor.HALF) != 0 ? Armor.HALF_SYMBOL : "")
+				arr.push((i + 1) + ( (specs & Armor.WEAK_SPOT) != 0 ? Armor.WEAK_SPOT_SYMBOL : "") +  ( (specs & Armor.THRUST_ONLY) != 0 ? Armor.THRUST_ONLY_SYMBOL : "") + ( (specs & Armor.HALF) != 0 ? Armor.HALF_SYMBOL : "") + (gotSuperScript && LibUtil.field(avModifiers, ider)!=null ? getSuperscriptNum(superscriptDigits, LibUtil.field(avModifiers, ider)) : "" )
 				);
 			}
 			
@@ -314,16 +328,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	
 	
-	function executeArmorEntry():Bool {
-		
-		if ( this.armorEntry.isValid() )  {
-			this.char.inventory.wornArmor.push( armorEntry.e );
-			this.armorEntry.reset();
-			this.itemTransitionName = "fade"; // or something else?
-			return true;
-		}
-		return false;
-	}
+	
 	
 	
 	
@@ -454,7 +459,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	@:watch function on_armorEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
-			executeArmorEntry();
+			executeEquipEntry(this.armorEntry, "armor");
+			
 		}
 	}
 
@@ -475,7 +481,7 @@ class CharSheetVueData  {
 	var miscItemEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("item") );
 	
 	// worn armor
-	var armorEntry:ArmorEntry = new ArmorEntry();
+	var armorEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("armor") );
 
 	// save/load copy box data
 	var copyToClipboard:String = "";
@@ -532,25 +538,7 @@ class RowEntry<E:(IValidable, Constructible<Dynamic>)> implements IValidable imp
 	}
 }
 
-class ArmorEntry implements IValidable implements IFocusFlags {
-	
-	public var e:Armor;
-	public var focusedFlags:Int = 0;
-	
-	public function new():Void {
-		e =Armor.createEmptyInstance();
-	}
-	
-	public function reset():Void {
-		e = Armor.createEmptyInstance();
-	}
-	
-	public function isValid():Bool {
-		return e.name != null && StringTools.trim(e.name) != "";
-		
-	}
-	
-}
+
 
 class RowReadyEntry implements IValidable implements IFocusFlags {
 
@@ -576,6 +564,9 @@ class RowReadyEntry implements IValidable implements IFocusFlags {
 		}
 		else if ( Reflect.hasField(e, "shield") ) {
 			itemToValidate =  LibUtil.as(Reflect.field(e, "shield"), Shield);
+		}
+		else if (Reflect.hasField(e, "armor")) {
+			itemToValidate =  LibUtil.as(Reflect.field(e, "armor"), Armor);
 		}
 		else if ( Reflect.hasField(e, "item") ) {
 			itemToValidate = LibUtil.as( Reflect.field(e, "item"), Item);

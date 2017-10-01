@@ -24,7 +24,7 @@ class Inventory
 	public var dropPack:Bool = false;	// flag to indicate if pack is dropped at one's feet
 	
 	// TODO: Armor should allow for both sides or multiples via ArmorAssign
-	public var wornArmor(default,never):Array<Armor> = [];	// any worn armor items
+	public var wornArmor(default,never):Array<ArmorAssign> = [];	// any worn armor items
 	
 	public var equipedNonMeleeItems(default, never):Array<ItemAssign> = [];  // any readied/equiped non-melee items or pocketed items
 	public var shields(default,never):Array<ShieldAssign> = [];	// melee shields carried or held
@@ -243,9 +243,10 @@ class Inventory
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
-	public function dropWornArmor(armor:Armor, doDestroy:Bool=false):Void {
-		wornArmor.splice(wornArmor.indexOf(armor), 1);
-		if (!doDestroy) _shiftItem(armor, PREFER_UNHELD_DROPPED, 1);
+	public function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Void {
+		var ind:Int;
+		wornArmor.splice(ind = wornArmor.indexOf(alreadyEquiped), 1);
+		if (!doDestroy) _shiftItem(alreadyEquiped.armor, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(wornArmor, ind, "armor") );
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
 	}
 	
@@ -255,6 +256,7 @@ class Inventory
 		_shiftItem(alreadyEquiped.shield, PREFER_UNHELD_PACKED, 1);
 		dispatchSignal(InventorySignal.PackItem);
 	}
+	
 	public function packMiscItem(alreadyEquiped:ItemAssign):Void {
 		var ind:Int;
 		equipedNonMeleeItems.splice( ind= equipedNonMeleeItems.indexOf(alreadyEquiped), 1  );
@@ -268,9 +270,10 @@ class Inventory
 		dispatchSignal(InventorySignal.PackItem);
 	}
 	
-	public function packWornArmor(armor:Armor):Void {
-		wornArmor.splice(wornArmor.indexOf(armor), 1);
-		_shiftItem(armor, PREFER_UNHELD_PACKED, 1);
+	public function packWornArmor(alreadyEquiped:ArmorAssign):Void {
+		var ind:Int;
+		wornArmor.splice(ind = wornArmor.indexOf(alreadyEquiped), 1);
+		_shiftItem(alreadyEquiped.armor, PREFER_UNHELD_PACKED, 1, getAttachmentArray(wornArmor, ind, "armor"));
 		dispatchSignal(InventorySignal.PackItem);
 	}
 
@@ -330,7 +333,7 @@ class Inventory
 		var weaponAssign:WeaponAssign;
 		var shieldAssign:ShieldAssign;
 		var itemAssign:ItemAssign;
-		var armorAssign:Armor;
+		var armorAssign:ArmorAssign;
 		
 		if (Std.is(item, Weapon)) {
 			
@@ -342,7 +345,7 @@ class Inventory
 		}
 		else if (Std.is(item, Armor)) {
 
-			wornArmor.push( armorAssign = LibUtil.as(item, Armor) );
+			wornArmor.push( readyAssign =  armorAssign = {key:UID_COUNT++, attached:false, armor:LibUtil.as(item, Armor), held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
 		}
 		else {
 			equipedNonMeleeItems.push(readyAssign =  itemAssign= {key:UID_COUNT++, attached:false,  item:item, held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
@@ -363,6 +366,9 @@ class Inventory
 		else if (type == "shield") {
 			return shields;
 		}
+		else if (type == "armor") {
+			return wornArmor;
+		}
 		else {
 			return equipedNonMeleeItems;
 		}
@@ -372,7 +378,8 @@ class Inventory
 		var weaponAssign:WeaponAssign;
 		var shieldAssign:ShieldAssign;
 		var itemAssign:ItemAssign;
-
+		var armorAssign:ArmorAssign;
+		
 		if (type == "weapon") {
 			return weaponAssign = {
 				weapon:new Weapon(),
@@ -388,6 +395,14 @@ class Inventory
 				held:0, unheld:0, unheldRemark:"",
 				key:UID_COUNT++
 			};
+		}
+		else if (type == "armor") {
+			return armorAssign  = {
+				armor:Armor.createEmptyInstance(),
+				attached:false,
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++	
+			}
 		}
 		else {
 			return itemAssign = {
@@ -431,7 +446,11 @@ typedef ItemAssign = {
 typedef WeaponAssign = {
 	> ReadyAssign,
 	weapon:Weapon,
-	
+}
+
+typedef ArmorAssign = {
+	> ReadyAssign,
+	armor:Armor,
 }
 
 typedef ShieldAssign = {

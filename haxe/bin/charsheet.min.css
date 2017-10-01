@@ -42,11 +42,14 @@ td.w-coverage .coverage-list .symbols{font-size:11px;}
 td.w-coverage .legend{margin-top:15px;}
 td.w-coverage .legend label{margin-left:5px;}
 td.w-coverage .coverage-list .symbols label:nth-of-type(1){vertical-align:top;}
+td.w-coverage>input{}
 td.w-unheld .pop-widget{width:100%;}
 td.w-prof.got-custom .pop-widget{min-width:400px;}
 td.w-ammo-spawner>a{color:inherit;}
 td.w-firearm-name .pop-widget{width:100%;}
 td.w-tags .pop-widget{min-width:200px;max-height:300px;overflow:auto;}
+td.w-tags .pop-widget label.active{text-decoration:underline;}
+td.w-tags .pop-widget label{display:inline-block;}
 .widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
 .widget-prof .columner{width:50%;float:left;}
 .chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}

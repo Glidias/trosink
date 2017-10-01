@@ -199,6 +199,8 @@ class Weapon extends Item
 	
 	
 	
+	
+	
 	public function setSingleProfIndex(index:Int):Void {
 		profs = (1 << index);
 	}

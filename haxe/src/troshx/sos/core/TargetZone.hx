@@ -25,8 +25,6 @@ class TargetZone
 		}
 		return zb;
 	}
-	
-	
 
 	
 	public function recalcWeightsTotal():Void
@@ -60,4 +58,6 @@ class TargetZone
 	{
 		
 	}
+	
+
 }

@@ -45,6 +45,10 @@ class Item
 	public static inline var GP:Int = 2;
 	public var unit:Int = 1;
 	
+	public function normalize():Void {
+		
+	}
+	
 	public function setWeightCost<T>(weight:Float, cost:Int, costCurrency:Int):T {
 		this.weight = weight;
 		this.cost = cost;
@@ -76,6 +80,13 @@ class Item
 		}
 		if (Type.getClass(this) != Weapon && (flags & FLAG_TWO_HANDED) != 0  ) {
 			arr.push("Two-Handed");
+		}
+		
+		if  ( (flags & EYE_CORRECTIVE) != 0 ) {
+			arr.push("Eye-Corrective");
+		}
+		if  ( (flags & CRUTCH) != 0 ) {
+			arr.push("Crutch");
 		}
 	}
 	
@@ -255,6 +266,59 @@ class Item
 		return macro $b{block};
 	}
 	
+	
+	
+	
+	public static macro function pushFlagEqualLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false, metadataLbl:String=null, prefix:String=""):Expr {  // todo when needed: metadata support
+	
+		var fields = null;
+		if (moduleStr != null) {
+			fields = MacroUtil.getFieldsFromModule(moduleStr, true);
+		}
+		if (fields == null) fields =   Context.getLocalClass().get().statics.get();
+		
+		var block:Array<Expr> = [];
+	
+		var count:Int = 0;
+		for ( i in 0...fields.length) {
+			var f = fields[i];
+			if (metadataLbl!=null && !MacroUtil.hasMetaTag(f.meta.get(), metadataLbl))  {
+				continue;
+			}
+			var metaLabel:String = null;
+			
+			if (metadataLbl != null) {
+				var m = MacroUtil.getMetaTagEntry(f.meta.get(), metadataLbl);
+				if (m != null) {
+					if (m.params == null || m.params.length == 0) {
+						//Context.error("Please specify string as parameter.", f.pos);
+						metaLabel = labelizeAllCaps(f.name);
+					}
+					else {
+						var mp = m.params[0].expr;
+						switch( mp ) {
+							case EConst(CString(s)):
+								metaLabel = s;
+							default:
+							Context.error("Please specify string literal as parameter.", f.pos);
+						}
+					}
+				}	
+			}
+			var fieldName:String = f.name;
+			switch(f.kind) {
+				case FVar(VarAccess.AccInline, VarAccess.AccNever):
+					
+					if (labelize )  block.push( macro { if ( flags == $i{fieldName} )  arr.push($v{ metaLabel != null ? prefix+metaLabel : prefix+labelizeAllCaps(fieldName) }); } );
+					else block.push( macro {  arr.push($v{ metaLabel!=null ? prefix+metaLabel : (noLabelizeCapitalCase ? prefix+labelizeAllCaps(fieldName) : prefix+fieldName )  }); } );
+					count++;
+					
+				default:
+			}
+			//trace(f.kind);
+		}
+		return macro $b{block};
+	}
 	
 	
 	public static macro function pushFlagAbbrToArr(labelize:Bool = true, capitalize:Bool = false, moduleStr:String = null):Expr {

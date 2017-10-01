@@ -101,13 +101,13 @@
 			<div>-Weapon Personalisation?-</div>
 			<i>Have current item inserted into list first before being able to register a new customisation.</i>
 		</div>
-		<div v-if="isEnteredItem">
+		<div v-else>
 			<div>-Weapon Personalisation-</div>
 			
 			<div v-if="customise != null">
 				<label>Customisation Name:</label><input type="text" v-model="currentCustomise.name"></input>
 			</div>
-			<div v-if="customise==null">
+			<div v-else>
 				<label>Name:</label><input type="text" v-on:blur="setCustomiseNameInput($event.target)" :value="currentCustomise.name"></input>
 			</div>
 			
@@ -142,7 +142,7 @@
 			<div v-if="customise != null">
 				<button v-on:click="assignWeaponCustomisation()" :disabled="!canRegisterCustomisation">Register Customisation &gt;&gt;</button>
 			</div>	
-			<div v-if="customise == null">
+			<div v-else>
 				<i>Weapon has been customised.</i>
 			
 				<br/>
@@ -158,12 +158,9 @@
 	</div>
 						
 	<div v-if="armor!=null">
-		<div><label><input type="checkbox" v-model="item.helmet"></input> Is Helmet</label></div>
-		<div v-if="item.helmet">
-			<div><label>Perception Penalty (PP): <InputInt :obj="item" :min="0" prop="pp" /></label></div>
-		</div>
+		<div>-Headgear-related:-</div>
+		<div><label>Perception Penalty (PP): <InputInt :obj="item" :min="0" prop="pp" /></label></div>
 		<hr/>
-		
 		<div>-Armor Flags:-</div>
 		<div v-for="(li, i) in armorFlags" :key="i" style="display:inline-block;margin-right:3px">
 			<label><input type="checkbox" :checked="(shiftIndex(i)&item.specialFlags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'specialFlags')" :value="shiftIndex(i)"></input>{{li}}</label>
@@ -174,12 +171,61 @@
 			<div><label>Layer: <InputInt :obj="item.special" prop="layer" :min="0"  /></label></div>
 			<div v-if="item.special.layer > 0 && layerCoverageFlags.length > 0">
 				<label>Layer coverages: <i>(leave blank for all)</i> {{layerCoverageBits}}</label>
-				<div><label  v-for="li in layerCoverageFlags" :key="li.value"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special, 'layerCoverage')" :checked="(li.value&item.special.layerCoverage)!=0"></input>{{li.index}}:{{li.label}}</label></div>
+				<div><label  v-for="li in layerCoverageFlags" :key="li.value"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special, 'layerCoverage')" :checked="(li.value&item.special.layerCoverage)!=0"></input>{{li.index+1}}:{{li.label}}</label></div>
 			</div>
 				
 			<div><label>Restricts breathing: <InputInt :obj="item.special" prop="restrictsBreathing" :min="0" /></label></div>
-		<hr/>	
+			<br/>
+			<div><label><input type="checkbox" v-on:click="onArmorLocationSpecificSpecialCheck($event.target)" :checked="item.special.hitModifier!=null"></input>Location/Zone-specific modifier?<i v-show="item.special.hitModifier != null"> Provides...</i></label></div>
+			<div v-if="item.special.hitModifier!=null">
+				<div><label>Multiplied of AV: <InputNumber :step="0.5" :min="0" :obj="item.special.hitModifier" prop="multiplyAV" /></label></div>
+				<div><label>Added/Subtracted AV: <InputInt :obj="item.special.hitModifier" prop="addAV" /></label></div>
+				<div><label :class="{active:item.special.hitModifier.locationMask!=0}"><b>Hit Locations:</b> </label>{{layerCoverageFlags.length!=0 ? "" : " - "}}<label v-for="li in layerCoverageFlags" :key="li.id"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special.hitModifier, 'locationMask')" :checked="(li.value&item.special.hitModifier.locationMask)!=0"></input>{{li.index+1}}:{{li.label}}</label></div>
+				<div><label :class="{active:item.special.hitModifier.targetZoneMask!=0}"><b>Target Zones:</b> </label></div>
+				<div class="label" :class="{active:modifyAllSwinging}"><label></label>Swinging Target Zones: <label><i>All?</i><input type="checkbox"  v-on:click="checkboxMaskHandler($event.target, swingMask, item.special.hitModifier, 'targetZoneMask')" :checked="modifyAllSwinging"></input></label></div>
+				<div><label v-for="li in targetZoneFlags" :key="li.id"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special.hitModifier, 'targetZoneMask')" :checked="(li.value&item.special.hitModifier.targetZoneMask)!=0"></input>{{li.index+1}}:{{li.label}}</label></div>
+				<div class="label" :class="{active:modifyAllThrusting}">Thrusting Target Zones: <label><i>All?</i><input type="checkbox" v-on:click="checkboxMaskHandler($event.target, thrustMask, item.special.hitModifier, 'targetZoneMask')" :checked="modifyAllThrusting"></input></label></div>
+				<div><label v-for="li in targetZoneFlags2" :key="li.id"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special.hitModifier, 'targetZoneMask')" :checked="(li.value&item.special.hitModifier.targetZoneMask)!=0"></input>{{li.index+1}}:{{li.label}}</label></div>
+				
+			</div>
+
+
 		</div>
+		<hr/>	
+		<div v-if="currentArmorCustomise!=null">
+			<div v-if="!isEnteredItem">
+				<div>-Armor State/Customisation-</div>
+				<i>Have current item inserted into list first before being able to register a new customisation.</i>
+			</div>
+			<div v-else>
+				<div>-Armor State/Customisation-</div>
+				<div v-if="customiseArmor != null">
+					<label>State/Customisation Name:</label><input type="text" v-model="currentArmorCustomise.name"></input>
+				</div>
+				<div v-else>
+					<label>Name:</label><input type="text" v-on:blur="setArmorCustomiseNameInput($event.target)" :value="currentArmorCustomise.name"></input>	
+				</div>
+			</div>
+			
+			<div><label>Crest: <select number v-model.number="currentArmorCustomise.crest"><option :value="0"></option><option v-for="(li,i) in armorCrestLabels" :key="i+1" :value="i+1">{{li}}</option></select></label></div>
+			<div><label><i>Reduced/Crushed AVs:</i></label></div>
+			<div><label  v-for="li in layerCoverageFlags" :key="li.id"><InputInt v-on:input.native="crushAVInputHandler($event.target, li)" :max="0" :obj="hitLocationDummy" :prop="li.id" /> {{li.index+1}}:{{li.label}}</label></div>
+			<div v-if="customiseArmor != null">		
+				<button v-on:click="assignArmorCustomisation()" :disabled="!canRegisterArmorCustomisation">Register Customisation &gt;&gt;</button>
+			</div>
+			<div v-else>	
+				<i>Armor has been altered.</i>
+				<br/>	
+				<div>
+					<label><i>Restore original?</i></label><input type="checkbox" v-model="restoreOriginal"></input><br/><br/>
+				</div>
+				<div v-if="restoreOriginal" >
+					<button v-on:click="doRestoreOriginalArmor()">Confirm Restore Original</button>
+				</div>	
+			</div>
+		</div>
+				
+		<hr/>
 			
 	</div>
 </div>

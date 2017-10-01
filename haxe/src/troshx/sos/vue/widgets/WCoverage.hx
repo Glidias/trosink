@@ -37,7 +37,14 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 			Vue.delete(armor.coverage, ider); 
 			if (armor.special != null ) {
 				armor.special.layerCoverage &= ~(1 << i);
+				if (armor.special.hitModifier != null) {
+					armor.special.hitModifier.locationMask &= ~(1 << i);
+				}
 			}
+			if (armor.customise != null && armor.customise.hitLocationAllAVModifiers!=null) {
+				Vue.delete( armor.customise.hitLocationAllAVModifiers, ider);
+			}
+			
 		}
 	}
 	
@@ -50,7 +57,7 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 	}
 	
 	@:computed inline function get_armor():Armor {
-		return cast item;
+		return LibUtil.as(item, Armor);
 	}
 	
 	function isInnerChecked(i:Int, flagIndex:Int):Bool {

@@ -33,7 +33,21 @@ class BodyChar
 	
 	// to be baked from thrustStartIndex
 	public var swingMask(default,null):Int;
-	public var thrustMask(default,null):Int;
+	public var thrustMask(default, null):Int;
+	
+	public inline function isSwingingAll(mask:Int):Bool {
+		return (mask & swingMask) == swingMask;
+	}
+	public inline function isThrustingAll(mask:Int):Bool {
+		return (mask & thrustMask) == thrustMask;
+	}
+	
+	public inline function isSwingingOnly(mask:Int):Bool {
+		return mask == swingMask;
+	}
+	public inline function isThrustingOnly(mask:Int):Bool {
+		return mask == thrustMask;
+	}
 	
 	function new() 	{
 		
@@ -102,6 +116,68 @@ class BodyChar
 		return new BodyChar();
 	}
 	
+	public function getDescLabelTargetZone(zoneIndex:Int):String {
+		var isThrusting:Bool  = zoneIndex >= thrustStartIndex;
+		var t = targetZones[zoneIndex];
+		return (t.description != "" ? t.description + " to" : (isThrusting ? "Thrust to" : "Swing to") ) + " " +t.name;
+	}
+	
+	
+	public function getDescLabelsTargetZoneMask(mask:Int):Array<String> {
+		var arr:Array<String> = [];
+		for (i in 0...targetZones.length) {
+			if ( ((1 << i) & mask) != 0 ) arr.push( getDescLabelTargetZone(i) );
+		}
+		return arr;
+	}
+	
+	
+	public function getTitleLabelsTargetZoneMask(mask:Int):Array<String> {
+		var arr:Array<String> = [];
+		for (i in 0...targetZones.length) {
+			var t =  targetZones[i];
+			if ( ((1 << i) & mask) != 0 ) arr.push( t.name + (t.description != "" ? " ("+t.description+")" : "" ) );
+		}
+		return arr;
+	}
+	
+	public function describeTargetZones(mask:Int):String {
+		var str:String = "";
+		var swinging:Int = mask & swingMask;
+		var thrusting:Int = mask & thrustMask;
+		if (swinging == swingMask && thrusting == thrustMask) {
+			return "all swinging and thrusting attacks";
+		}
+		if (swinging != 0) {
+			if (swinging == swingMask) {
+				str += "all Swinging attacks";
+			}
+			else {
+				str += "Swinging attacks to the "+getTitleLabelsTargetZoneMask(swinging).join(", ");
+			}
+		}
+		if (thrusting != 0) {
+			if (swinging != 0) {
+				str += " and ";
+			}
+			if (thrusting == thrustMask) {
+				str += "all Thrusting attacks";
+			}
+			else {
+				str += "Thrusting attacks to the "+getTitleLabelsTargetZoneMask(thrusting).join(", ");
+			}
+		}
+		
+		return str;
+	}
+	
+	public function getLabelsHitLocationMask(mask:Int):Array<String> {
+		var arr:Array<String> = [];
+		for (i in 0...hitLocations.length) {
+			if ( ((1 << i) & mask) != 0 ) arr.push( hitLocations[i].name );
+		}
+		return arr;
+	}
 	
 	// For Armor
 	public function pushHitLocationNamesToStrArrByMask(arr:Array<String>, mask:Int):Void {
@@ -129,8 +205,8 @@ class Humanoid implements IBodyHitZones {
 	
 	// Melee Target zones
 	
-	@:targetZone("Head", [], [], 0, "Downward swing") public static inline var SWING_DOWNWARD_HEAD = 0;
-	@:targetZone("Head", [], [], 0, "Upward swing") public static inline var SWING_UPWARD_HEAD:Int = 1;
+	@:targetZone("Head", [], [], 0, "Downward Swing") public static inline var SWING_DOWNWARD_HEAD = 0;
+	@:targetZone("Head", [], [], 0, "Upward Swing") public static inline var SWING_UPWARD_HEAD:Int = 1;
 	@:targetZone("Neck", [], []) public static inline var SWING_NECK:Int = 2;
 	@:targetZone("Torso", [], []) public static inline var SWING_TORSO:Int = 3;
 	@:targetZone("Upper Arm", [], []) public static inline var SWING_UPPER_ARM:Int = 4;
