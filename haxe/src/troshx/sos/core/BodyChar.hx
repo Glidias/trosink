@@ -11,7 +11,8 @@ class BodyChar
 	
 	// Typically melee target zones
 	public var targetZones(default,null):Array<TargetZone>;
-	public var thrustStartIndex(default,null):Int; // at what index point along the targetZones does it consider it as thrusting zones?
+	public var thrustStartIndex(default, null):Int; // at what index point along the targetZones does it consider it as thrusting zones?
+	public var rearStartIndex(default, null):Int; //  at what index point along the hitLocations does it consider it as rear zones?
 	
 	// Missile-specific target hit locations
 	public var missileHitLocations(default,null):Array<Int>;  // Random D10 roll index -> Hit Location
@@ -34,6 +35,10 @@ class BodyChar
 	// to be baked from thrustStartIndex
 	public var swingMask(default,null):Int;
 	public var thrustMask(default, null):Int;
+	
+	public function getNewHitLocationsFrontSlice():Array<HitLocation> {
+		return hitLocations.slice(0, rearStartIndex);
+	}
 	
 	public inline function isSwingingAll(mask:Int):Bool {
 		return (mask & swingMask) == swingMask;
@@ -94,6 +99,7 @@ class BodyChar
 		bodyChar.targetZones = Humanoid.getNewTargetZones();
 		bodyChar.hitLocations = Humanoid.getNewHitLocations();
 		bodyChar.thrustStartIndex = Humanoid.thrustStartIndex;
+		bodyChar.rearStartIndex = Humanoid.rearStartIndex;
 		
 		// todo; remaining damage tables for actual game.
 		bodyChar.missileHitLocations = [];
@@ -249,6 +255,7 @@ class Humanoid implements IBodyHitZones {
 	@:hitLocation("","",true) public static inline var FOREARM:Int = 16;
 	@:hitLocation("","",true) public static inline var HAND:Int = 17;
 	
+	public static inline var rearStartIndex:Int = 18;
 	@:hitLocation public static inline var UPPER_BACK:Int = 18;
 	@:hitLocation public static inline var LOWER_BACK:Int = 19;
 	

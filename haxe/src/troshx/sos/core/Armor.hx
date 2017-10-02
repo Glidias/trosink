@@ -16,7 +16,73 @@ class Armor extends Item
 	
 	// generic armor coverage hash by string id.
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
-	
+
+	public inline function writeAVVAluesTo(values:Dynamic<AV3>, body:BodyChar, targetZoneMask:Int=0):Void {
+		for (f in Reflect.fields(coverage)) {
+			var cur:AV3 = LibUtil.field(values, f);
+			var flags = LibUtil.field(coverage, f);
+		
+			var hitLocationId:String = f;
+			var hitLocationMask:Int = (1 << LibUtil.field(body.hitLocationHash, hitLocationId));
+			var multiplier:Float = (flags & HALF) != 0 ? 0.5 : 1;
+			var adder:Int = 0;
+				
+			if (hitLocationMask != 0 && special != null && special.hitModifier != null) {
+				if ( targetZoneMask == 0 && special.hitModifier.targetZoneMask==0  && (special.hitModifier.locationMask & hitLocationMask) != 0 ) {
+					//trace("IN...");
+					// apply modifiers
+					if (special.hitModifier.multiplyAV < 1 && special.hitModifier.multiplyAV < multiplier) {
+						multiplier = special.hitModifier.multiplyAV; 
+					}
+					if (special.hitModifier.multiplyAV > 1 && special.hitModifier.multiplyAV > multiplier) {
+						multiplier = special.hitModifier.multiplyAV; 
+					}
+					
+					adder += special.hitModifier.addAV;	
+				}
+				
+				// Assumption warning: if targetZoneMask !=0 , we assume hitLocationMask also !=0 and is supplied
+				if ( targetZoneMask != 0 && (special.hitModifier.targetZoneMask & targetZoneMask) != 0 && (special.hitModifier.locationMask == 0 || (special.hitModifier.locationMask & hitLocationMask) != 0 ) ) {
+					
+					// apply modifiers
+					if (special.hitModifier.multiplyAV < 1 && special.hitModifier.multiplyAV < multiplier) {
+						multiplier = special.hitModifier.multiplyAV; 
+					}
+					if (special.hitModifier.multiplyAV > 1 && special.hitModifier.multiplyAV > multiplier) {
+						multiplier = special.hitModifier.multiplyAV; 
+					}
+					
+					adder += special.hitModifier.addAV;
+					
+				}
+			}
+			
+			
+				
+			if (hitLocationMask!=0 && customise != null && customise.hitLocationAllAVModifiers != null && LibUtil.field(customise.hitLocationAllAVModifiers, hitLocationId) != null ) {
+				adder += LibUtil.field(customise.hitLocationAllAVModifiers, hitLocationId);
+			}
+			
+			var avc:Int = Std.int(AVC * multiplier) + adder;
+			var avp:Int = Std.int(AVP * multiplier) + adder;
+			var avb:Int = Std.int(AVB * multiplier) + adder;
+		
+			
+			if (avc < 0) avc = 0;
+			if (avp < 0) avp = 0;
+			if (avb < 0) avb = 0;
+			
+			if (avc > cur.avc) {
+				cur.avc = avc;
+			}
+			if (avp > cur.avp) {
+				cur.avp = avp;
+			}
+			if (avb > cur.avb) {
+				cur.avb = avb;
+			}
+		}
+	}
 
 	@:coverage public static inline var WEAK_SPOT:Int = (1 << 0);
 	@:coverage public static inline var HALF:Int = (1 << 1);
@@ -93,4 +159,10 @@ class Armor extends Item
 		return "Armor";
 	}
 	
+}
+
+typedef AV3 = {
+	var avc:Int;
+	var avp:Int;
+	var avb:Int;
 }

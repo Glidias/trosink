@@ -166,6 +166,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return result;
 	}
 	
+	
+	
 	function getCoverage(armor:Armor, body:BodyChar = null):String {  // todo: return string representation
 		var coverage = armor.coverage;
 		var superscriptDigits:String = Armor.SUPERSCRIPT_NUMBERS;
@@ -178,7 +180,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		var arr:Array<String> = [];
 		var hitLocations = body.hitLocations;
 		var fields = Reflect.fields(coverage);
-		for (i in 0...hitLocations.length) {
+		for (i in 0...body.rearStartIndex) {
 			var ider = hitLocations[i].id;
 			var specs:Int = LibUtil.field(coverage, ider);
 			if (specs != null) {
@@ -271,6 +273,43 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	
+	@:computed function get_coverageHitLocations():Array<HitLocation> {
+		return this.char.body.getNewHitLocationsFrontSlice();
+	}
+	
+	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {
+		var ch = coverageHitLocations;
+		var dyn:Dynamic<AV3> = {};
+		//trace("Hit dummy set up...");
+		for (i in 0...ch.length) {
+			var h = ch[i];
+			LibUtil.setField(dyn, h.id, { avp:0, avc:0, avb:0 }); 
+		}
+		return dyn;
+	}
+	
+	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
+		var armors:Array<ArmorAssign> = char.inventory.wornArmor;
+		var values:Dynamic<AV3>  = this.hitLocationZeroAVValues;
+		var ch = coverageHitLocations;
+		var body:BodyChar = char.body;
+
+		for (i in 0...ch.length) {
+			var ider = ch[i].id;
+			var cur = LibUtil.field(values, ider);
+			cur.avc = 0;
+			cur.avp = 0;
+			cur.avb = 0;
+		}
+		
+		for (i in 0...armors.length) {
+			var a:Armor = armors[i].armor;
+			a.writeAVVAluesTo(values, body);
+		}
+	
+		
+		return values;
+	}
 	
 	function test():Void {
 		trace("TEST");

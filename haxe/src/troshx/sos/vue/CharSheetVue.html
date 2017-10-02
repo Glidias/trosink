@@ -108,11 +108,11 @@
 						<option value="2">Large</option>
 					</select>
 				</td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 				<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="i" :showWidget="isVisibleWidget('shield', 'td-unheld', i)" />
 				<td>
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
-				
 				<td>
 					<a href="javascript:;" v-on:click="char.inventory.packEquipedShield(entry)">Pack</a>
 					<a href="javascript:;" v-on:click="char.inventory.dropEquipedShield(entry)">Drop</a>
@@ -134,6 +134,7 @@
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(shieldEntry.e.shield)" :index="-1" :showWidget="(shieldEntry.focusedFlags & (32|(1<<21))) !=0" :entry="shieldEntry.e" :requestCurWidget="requestCurWidget"
 				v-on:focus-in-row="focusInRowField(shieldEntry, 32)" v-on:focus-out-row="focusOutRowField(shieldEntry, 32)" v-on:focus-widget="focusInRowField(shieldEntry, (1<<21))" />
 				<td><input type="text" v-model="shieldEntry.e.unheldRemark" v-on:focus="focusInRowField(shieldEntry,64)" v-on:blur="focusOutRowField(shieldEntry,64)"></input></td>	
+				
 			</tr>
 		</tbody>
 	</table>
@@ -579,15 +580,16 @@
 							<td>AVC</td>
 							<td>AVP<span v-show="false"> ↢</span></td>
 							<td>AVB</td>
+							<td>sAV	<span class="shield-icon-inv">☗</span></td>
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="(li, i) in char.body.hitLocations">
+						<tr v-for="(li, i) in coverageHitLocations">
 							<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>
 							<td>{{i+1}}. {{li.name}}</td>
-							<td><input type="number" readonly :value="0"></input></td>
-							<td><input type="number" readonly :value="0"></input></td>
-							<td><input type="number" readonly :value="0"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb"></input></td>
 						</tr>
 					</tbody>
 				</table>
@@ -595,8 +597,11 @@
 			<div style="display:inline-block;vertical-align:top;margin-left:8px;">
 				<div><i class="consider">Consider against:</i></div>
 				<br/>
-				<div><label><input type="checkbox"></input>Crushing weapon</label></div>
-				<div><label><input type="checkbox"></input>Non-Firearm Missile weapon ↢</label></div>
+				<div><label><input type="checkbox"></input>Crushing attack</label></div>
+				<div><label><input type="checkbox"></input>Non-Firearm Missile attack ↢</label></div>
+				<div><label><input type="checkbox"></input> Melee Targeting: </label><select number>
+					<option :value="-1"></option>
+				</select></div>
 				<br/>
 				<div><i>Result:</i></div>
 				<i class="cta" v-show="false">&lt;- Click on table cells to inspect result.</i>

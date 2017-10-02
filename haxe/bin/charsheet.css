@@ -179,7 +179,12 @@ td.gotbtn.focus > button {
 	position:relative;
 	padding-top:15px;
 }
-
+.inventory .shield-icon-inv {
+	transform:scaleY(-1);
+	display:inline-block;
+	position:relative;
+	transform-origin:center center;
+}
 .inventory .popup-overlay {
 	position:absolute;
 	width:100%;
