@@ -41,7 +41,6 @@ class Armor extends Item
 					adder += special.hitModifier.addAV;	
 				}
 				
-				// Assumption warning: if targetZoneMask !=0 , we assume hitLocationMask also !=0 and is supplied
 				if ( targetZoneMask != 0 && (special.hitModifier.targetZoneMask & targetZoneMask) != 0 && (special.hitModifier.locationMask == 0 || (special.hitModifier.locationMask & hitLocationMask) != 0 ) ) {
 					
 					// apply modifiers
