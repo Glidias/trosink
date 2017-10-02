@@ -2,6 +2,7 @@ package troshx.sos.vue;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
+import js.html.InputElement;
 import troshx.sos.core.Armor;
 import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
@@ -38,6 +39,16 @@ class TDWidgetHolder extends VComponent<NoneT, TDWidgetHolderProps>
 			WSpanTools.NAME => new WSpanTools(),
 			WTags.NAME => new WTags(),
 		];
+	}
+	
+	function focusInputText():Void {
+		_vEmit('focus-in-row');
+		_vEmit("focus-widget-value", value);
+	}
+
+	
+	@:watch function watch_value(newValue:Dynamic):Void {
+		_vEmit("focus-widget-value", value);
 	}
 	
 

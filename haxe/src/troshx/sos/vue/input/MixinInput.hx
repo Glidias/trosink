@@ -23,7 +23,8 @@ class MixinInput extends VComponent<NoneT,NoneT>
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
 			InputInt.NAME => new InputInt(),
-			InputNumber.NAME => new InputNumber()
+			InputNumber.NAME => new InputNumber(),
+			InputString.NAME => new InputString()
 		];
 	}
 	

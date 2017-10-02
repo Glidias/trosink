@@ -124,7 +124,7 @@ class WornWith {
 	{
 		if (name == "") return;
 		if (layer == USE_AV_SELF || layer == USE_AV_OTHER) {
-			arr.push( "When worn with "+name+" use "+(layer == USE_AV_SELF ? curArmor.name : name ) + " AV value instead" );
+			arr.push( "When worn with "+name+": Use "+(layer == USE_AV_SELF ? "own" : name ) + " AV value instead" );
 		}
 		else {
 			arr.push( "Can be worn with "+name + " for Layer "+layer );

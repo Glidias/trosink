@@ -55,9 +55,8 @@ class BaseNumMixin extends VComponent<NoneT, BaseNumProps>
 		if (input.value == "") return;
 		var max = this.max;
 		var min = this.min;
-		
+
 		var result:Float =  floating ? input.valueAsNumber : Std.int(input.valueAsNumber); // Std.parseInt( (~/[^0-9]/g).replace( input.value, '') );
-		
 		if (result == null || Math.isNaN(result) ) {
 			input.valueAsNumber =  LibUtil.field(obj, prop);
 			return;

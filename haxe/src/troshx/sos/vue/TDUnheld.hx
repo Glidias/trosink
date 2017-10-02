@@ -37,7 +37,7 @@ class TDUnheld extends VComponent<TDUnheldData, TDUnheldProps>
 		
 	
 		input.value = this.entry.unheldRemark;
-		emit('focus-in-row');
+		_vEmit('focus-in-row');
 	}
 	
 	inline function setValidNameOfInput(inputElement:InputElement):Void {

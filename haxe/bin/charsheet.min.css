@@ -27,8 +27,10 @@ td.gotbtn>button.active{border:2px solid orange;}
 td.gotbtn.focus>input{width:calc(100% - 24px);}
 td.gotbtn>button{display:none;}
 td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;position:absolute;right:0;top:0;}
-.inventory{position:relative;}
+.inventory{position:relative;padding-top:15px;}
 .inventory .popup-overlay{position:absolute;width:100%;height:100%;top:0;left:0;z-index:50;background-color:rgba(0,0,0,.3);}
+.inventory .focus-value-bar{width:100%;position:fixed;top:0px;height:auto;left:0;}
+.inventory .focus-value-bar input{height:100%;display:block;width:100%;margin:0;font-size:12px;padding:4px;box-sizing:border-box;}
 .inventory .popup-overlay .modal{}
 td.weight{width:40px;}
 td.munition-type{width:100px;}

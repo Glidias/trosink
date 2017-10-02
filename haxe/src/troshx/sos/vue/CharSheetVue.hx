@@ -14,6 +14,7 @@ import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
 import troshx.sos.core.BodyChar;
+import troshx.sos.vue.input.MixinInput;
 
 import troshx.sos.core.Armor;
 import troshx.sos.core.Crossbow;
@@ -59,6 +60,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [ MixinInput.getInstance() ];
 	}
 	
 	override public function Data():CharSheetVueData {
@@ -224,6 +226,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	inline function clearWidgets():Void {
 		this.curWidgetRequest.type = "";
 		this.curWidgetRequest.index = 0;
+		this.focusValueText = "";
 	}
 	
 	inline function stopPropagation(e:Event):Void {
@@ -239,6 +242,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	inline function requestCurWidget(type:String,index:Int):Void {
 		this.curWidgetRequest.type = type;
 		this.curWidgetRequest.index = index;
+		
 	}
 	
 	inline function isVisibleWidget(section:String, type:String, index:Int):Bool {
@@ -280,8 +284,12 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	function focusInRowField(targ:IFocusFlags, mask:Int) {
 		targ.focusedFlags = mask;
 		if (mask < 20) clearWidgets();
-		
-		
+
+	}
+	
+	function focusWidgetValue(value:String):Void {
+
+		this.focusValueText = value;
 	}
 	
 	function executeQtyEntry(qtyEntry:RowEntry<ItemQty>, tarInventoryList:IDMatchArray<Dynamic>):Bool {
@@ -503,9 +511,13 @@ class CharSheetVueData  {
 	};
 	
 	var itemTransitionName:String = "fade";
+	var focusValueText:String = "";
 	
 	// to factor this out later
 	@:vueInclude var char:CharSheet = new CharSheet();
+	
+	
+	
 	
 	public function new() {
 		

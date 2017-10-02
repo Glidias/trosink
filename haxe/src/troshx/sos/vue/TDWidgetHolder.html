@@ -1,5 +1,5 @@
 <td class="w-holder" v-on:click.stop="" :class="[{gotbtn:index>=0, focus:index>=0},widgetTagName]">
-	<input type="text" :class="{focusable:index<0}" readonly :value="value" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')"></input>
+	<input type="text" :class="{focusable:index<0}" readonly :value="value" v-on:focus="focusInputText" v-on:blur="emit('focus-out-row')"></input>
 	<button v-if="index>=0" :class="{active:showWidget}" v-on:click="requestCurWidgetButton(widgetName,index)">[|]</button>
 	<div class="pop-widget" v-if="showWidget"  v-on:click.stop="" v-on:touchstart.stop="emit('focus-widget')" v-on:mousedown.stop="emit('focus-widget')">
 		<div :is="widgetTagName" :entry="entry" :item="item"  :entryIndex="index" v-bind="widgetProps" :parentAttr="$attrs">

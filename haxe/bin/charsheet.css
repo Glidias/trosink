@@ -142,6 +142,7 @@ td.gotbtn.focus > button {
 
 .inventory {
 	position:relative;
+	padding-top:15px;
 }
 
 .inventory .popup-overlay {
@@ -153,6 +154,25 @@ td.gotbtn.focus > button {
 	z-index:50;
 	background-color:rgba(0,0,0,.3);
 }
+
+.inventory .focus-value-bar {
+	width:100%;
+	position:fixed;
+	top:0px;
+	height:auto;
+	
+	left:0;
+}
+.inventory .focus-value-bar input {
+	height:100%;
+	display:block;
+	width:100%;
+	margin:0;
+	font-size:12px;
+	padding:4px;
+	box-sizing:border-box;
+}
+
 
 .inventory .popup-overlay .modal {
 	
@@ -257,7 +277,6 @@ td.w-tags .pop-widget label {
 	float:left;
 	
 }
-
 
 /* Character gen */
 
