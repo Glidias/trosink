@@ -25,9 +25,14 @@ class Armor extends Item
 			var hitLocationId:String = f;
 			var hitLocationMask:Int = (1 << LibUtil.field(body.hitLocationHash, hitLocationId));
 			var multiplier:Float = (flags & HALF) != 0 ? 0.5 : 1;
+			if ( (flags & THRUST_ONLY) != 0 && (body.thrustMask & targetZoneMask) == 0  ) {
+				multiplier = 0;
+			}
+		
 			var adder:Int = 0;
+			
 				
-			if (hitLocationMask != 0 && special != null && special.hitModifier != null) {
+			if (hitLocationMask != 0 && special != null && special.hitModifier != null && multiplier !=0 ) {
 				if ( targetZoneMask == 0 && special.hitModifier.targetZoneMask==0  && (special.hitModifier.locationMask & hitLocationMask) != 0 ) {
 					//trace("IN...");
 					// apply modifiers
