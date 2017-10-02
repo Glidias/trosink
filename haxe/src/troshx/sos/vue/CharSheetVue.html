@@ -550,8 +550,8 @@
 			</tr>
 			<tr class="entry-row" :key="-1">
 				<td><input type="text" v-model="armorEntry.e.armor.name" v-on:focus="focusInRowField(armorEntry,1)" v-on:blur="focusOutRowField(armorEntry,1)"></input></td>
-				<td><input type="number" number min="0"v-model.number="armorEntry.e.armor.AVC" v-on:focus="focusInRowField(armorEntry,2)" v-on:blur="focusOutRowField(armorEntry,2)"></input></td>
-				<td><input type="number" number min="0"v-model.number="armorEntry.e.armor.AVP" v-on:focus="focusInRowField(armorEntry,4)" v-on:blur="focusOutRowField(armorEntry,4)"></input></td>
+				<td><input type="number" number min="0" v-model.number="armorEntry.e.armor.AVC" v-on:focus="focusInRowField(armorEntry,2)" v-on:blur="focusOutRowField(armorEntry,2)"></input></td>
+				<td><input type="number" number min="0" v-model.number="armorEntry.e.armor.AVP" v-on:focus="focusInRowField(armorEntry,4)" v-on:blur="focusOutRowField(armorEntry,4)"></input></td>
 				<td><input type="number" number min="0" v-model.number="armorEntry.e.armor.AVB" v-on:focus="focusInRowField(armorEntry,8)" v-on:blur="focusOutRowField(armorEntry,8)"></input></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="coverage" widgetTagName="w-coverage" :value="getCoverage(armorEntry.e.armor)" :index="-1" :showWidget="(armorEntry.focusedFlags & (16|(1<<20))) !=0" :entry="armorEntry.e.armor" :requestCurWidget="requestCurWidget"
 					v-on:focus-in-row="focusInRowField(armorEntry, 16)" v-on:focus-out-row="focusOutRowField(armorEntry, 16)" v-on:focus-widget="focusInRowField(armorEntry, (1<<20))" />
@@ -567,8 +567,57 @@
 	
 	
 	<hr/>
-		<h4>Overall Armor Coverage:</h4>	
-		todo..
+		
+		<div class="overall-armor-coverage">
+			<h4>Overall Armor Coverage:</h4>	
+			<div style="display:inline-block;vertical-align:top;">
+				<table border="1" class="table-coverage">
+					<thead>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>AVC</td>
+							<td>AVP<span v-show="false"> ↢</span></td>
+							<td>AVB</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(li, i) in char.body.hitLocations">
+							<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>
+							<td>{{i+1}}. {{li.name}}</td>
+							<td><input type="number" readonly :value="0"></input></td>
+							<td><input type="number" readonly :value="0"></input></td>
+							<td><input type="number" readonly :value="0"></input></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div style="display:inline-block;vertical-align:top;margin-left:8px;">
+				<div><i class="consider">Consider against:</i></div>
+				<br/>
+				<div><label><input type="checkbox"></input>Crushing weapon</label></div>
+				<div><label><input type="checkbox"></input>Non-Firearm Missile Weapons ↢</label></div>
+				<br/>
+				<div><i>Result:</i></div>
+				<i class="cta" v-show="false">&lt;- Click on table cells to inspect result.</i>
+				<br/>
+				<div v-show="true">
+					<span class="outline-dominant">AV Armor(s) protecting:</span>
+					<ul>
+						<li></li>
+					</ul>
+					<span class="outline-layer">Layer(s) protecting:</span>
+					<ul>
+						<li></li>
+					</ul>
+					<span class="outline-crushed">Crushed Armor:</span>
+					<ul>
+						<li></li>
+					</ul>
+					<div></div>
+				</div>
+			</div>
+		</div>
 	<hr/>
 	<button v-on:click="saveSheet()">Save Sheet</button>
 	

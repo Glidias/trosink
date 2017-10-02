@@ -341,7 +341,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	
-	
+	function getHitLocationMaskNameOf(index:Int):String {
+		return "";
+	}
 	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");

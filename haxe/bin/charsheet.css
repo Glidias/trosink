@@ -76,6 +76,40 @@ tr.entry-row {
 
 
 }
+tr.outline-layer {
+	outline:#99FFAA solid 2px;
+}
+tr.outline-dominant {
+	outline:#99FFFF solid 2px;
+}
+tr.outline-crushed {
+	outline:#ff6666 solid 2px;
+}
+span.outline-dominant:after {
+	display:inline-block;
+	content:'';
+	width:8px;
+	height:8px;
+	margin-left:5px;
+	background-color:#99ffff;
+}
+span.outline-layer:after {
+	display:inline-block;
+	content:'';
+	width:8px;
+	margin-left:5px;
+	height:8px;
+	background-color:#99ffAA;
+}
+span.outline-crushed:after {
+	display:inline-block;
+	content:'';
+	margin-left:5px;
+	width:8px;
+	height:8px;
+	background-color:#ff6666;
+}
+
 tr.entry-row > td > input,  tr.entry-row > td > select {
 	background-color:#fffeef;
 }
@@ -83,6 +117,7 @@ tr.entry-row > td > input,  tr.entry-row > td > select {
 thead tr {
 	background-color:#f9f9f9;
 }
+
 
 thead td.held {
 	width:90px;
@@ -173,6 +208,22 @@ td.gotbtn.focus > button {
 	box-sizing:border-box;
 }
 
+.inventory .table-coverage input {
+	width:35px;
+}
+.inventory .overall-armor-coverage label {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; /* Webkit */
+	-moz-user-select: none;    /* Firefox */
+	-ms-user-select: none;     /* IE 10  */
+
+	/* Currently not supported in Opera but will be soon */
+	-o-user-select: none;
+	user-select: none;  
+}
+.inventory .table-coverage input:focus {
+	background-color:#99FFFF;
+}
 
 .inventory .popup-overlay .modal {
 	
