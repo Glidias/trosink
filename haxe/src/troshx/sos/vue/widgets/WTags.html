@@ -173,9 +173,14 @@
 				<label>Layer coverages: <i>(leave blank for all)</i> {{layerCoverageBits}}</label>
 				<div><label  v-for="li in layerCoverageFlags" :key="li.value"><input type="checkbox" v-on:click="checkboxHandler($event.target, li.index, item.special, 'layerCoverage')" :checked="(li.value&item.special.layerCoverage)!=0"></input>{{li.index+1}}:{{li.label}}</label></div>
 			</div>
-				
 			<div><label>Restricts breathing: <InputInt :obj="item.special" prop="restrictsBreathing" :min="0" /></label></div>
 			<br/>
+			<div><label><input type="checkbox" v-on:click="onArmorWornWithCheck($event.target)" :checked="item.special.wornWith!=null"></input>Worn With modifer?</label></div>
+			<div v-if="item.special.wornWith!=null">
+				<div><label>Other Armor Name: <input type="text" v-model="item.special.wornWith.name"></input></label></div>
+				<div>Layer: <i>("0" for AV Self, "-1" for AV Other)</i></div>
+				<div><label>Layer: <InputInt :min="-1" :obj="item.special.wornWith" prop="layer" /></label></div>
+			</div>
 			<div><label><input type="checkbox" v-on:click="onArmorLocationSpecificSpecialCheck($event.target)" :checked="item.special.hitModifier!=null"></input>Location/Zone-specific modifier?<i v-show="item.special.hitModifier != null"> Provides...</i></label></div>
 			<div v-if="item.special.hitModifier!=null">
 				<div><label>Multiplied of AV: <InputNumber :step="0.5" :min="0" :obj="item.special.hitModifier" prop="multiplyAV" /></label></div>

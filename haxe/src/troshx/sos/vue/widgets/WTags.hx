@@ -47,6 +47,7 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 			customMeleeCache:null,
 			customiseArmor:null,
 			restoreOriginal:false,
+			armorWornWith:null,
 
 			
 			//layerCoverageBits:0
@@ -573,6 +574,18 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 		}
 	}
 	
+	function onArmorWornWithCheck(cb:InputElement) {
+		var armor = this.armor;
+		if ( cb.checked ) {
+			armor.special.wornWith = armor.special.wornWith != null ? armor.special.wornWith : armorWornWith != null ? armorWornWith  : new WornWith();
+		}
+		else {
+			armorWornWith = armor.special.wornWith;
+			armor.special.wornWith = null;
+		}
+	}
+	
+	
 	
 	function onArmorLocationSpecificSpecialCheck(cb:InputElement) {
 		// we assume armor is available and armor.special != null
@@ -640,6 +653,7 @@ typedef WTagsData = {
 	var missileSpecialCache:MissileSpecial;
 	
 	var armorSpecialCache:ArmorSpecial;
+	var armorWornWith:WornWith;
 	var armorSpecialHitModifierCache:HitModifier;
 	
 	var customise:WeaponCustomise;

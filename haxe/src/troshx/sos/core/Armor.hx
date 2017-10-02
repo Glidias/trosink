@@ -77,7 +77,7 @@ class Armor extends Item
 			Item.pushFlagLabelsToArr(true, "troshx.sos.core.ArmorSpecial");
 		}
 		if (special != null) {
-			special.addTagsToStrArr(arr);
+			special.addTagsToStrArr(arr, this);
 		}
 
 		if (customise != null) {

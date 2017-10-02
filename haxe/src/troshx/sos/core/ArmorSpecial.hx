@@ -18,7 +18,9 @@ class ArmorSpecial
 	@:flag public var restrictsBreathing:Int = 0;
 	
 	public var layer:Int = 0;
-	public var layerCoverage:Int = 0;  
+	public var layerCoverage:Int = 0;
+	
+	public var wornWith:WornWith = null;
 	
 	public var hitModifier:HitModifier= null;  // Currently, it seems 100% of the armor piece examples provides only a single hit modifier entry
 	//public var modifiers:Array<HitModifiers> = null; // So, can forego using array
@@ -33,7 +35,7 @@ class ArmorSpecial
 		
 	}
 	
-	public function addTagsToStrArr(arr:Array<String>) 
+	public function addTagsToStrArr(arr:Array<String>, curArmor:Armor) 
 	{
 		var instance:ArmorSpecial = this;
 		
@@ -70,6 +72,10 @@ class ArmorSpecial
 			hitModifier.addTagsToStrArr(arr, bodyChar);
 			
 		}
+		
+		if (wornWith != null) {
+			wornWith.addTagsToStrArr(arr, curArmor);
+		}
 
 	}
 	
@@ -97,7 +103,7 @@ class HitModifier {	// Location/target-hit-zone specific modifiers
 		if (locationMask == 0 && swingAll && thrustAll) return;
 		var bothHave:Bool = addAV != 0 && multiplyAV != 1;
 	
-		var damageStr:String = 	multiplyAV == 0 && addAV == 0 ? "No AV" : (addAV < 0 ? "Reduced " : "") + (!bothHave ? multiplyAV != 1 ? (multiplyAV == 0.5 ? "Half AV" : multiplyAV + "x AV") : (addAV > 0 ? "+" : "") + addAV  + " AV": multiplyAV != 0 ? ((addAV > 0 ? "+" : "") + addAV + " AV " + "over " + (multiplyAV == 0.5 ? "Half AV" : multiplyAV + "x AV") ) : addAV > 0 ? "Only " + addAV + " AV" : "+" + ( -addAV) + " damage"   );
+		var damageStr:String = 	multiplyAV == 0 && addAV == 0 ? "No AV" : (addAV < 0 ? "Reduced " : "") + (!bothHave ? multiplyAV != 1 ? (multiplyAV == 0.5 ? "Provides Half AV" : multiplyAV + "x AV") : (addAV > 0 ? "+" : "") + addAV  + " AV": multiplyAV != 0 ? ((addAV > 0 ? "+" : "") + addAV + " AV " + "over " + (multiplyAV == 0.5 ? "Half AV" : multiplyAV + "x AV") ) : addAV > 0 ? "Only " + addAV + " AV" : "+" + ( -addAV) + " damage"   );
 		//bodyChar.nameLocation();
 		arr.push( 
 			damageStr + (targetZoneMask != 0 && !(swingAll && thrustAll) ?  " vs " +bodyChar.describeTargetZones(targetZoneMask) : "") + (locationMask != 0 ?  " on "+bodyChar.getLabelsHitLocationMask(locationMask).join(" ,") :  "")   
@@ -106,3 +112,25 @@ class HitModifier {	// Location/target-hit-zone specific modifiers
 	}
 }
 
+class WornWith {
+	public var name:String = "";
+	public var layer:Int = 0;
+	
+	public function new() {
+		
+	}
+	
+	public function addTagsToStrArr(arr:Array<String>, curArmor:Armor) 
+	{
+		if (name == "") return;
+		if (layer == USE_AV_SELF || layer == USE_AV_OTHER) {
+			arr.push( "When worn with "+name+" use "+(layer == USE_AV_SELF ? curArmor.name : name ) + " AV value instead" );
+		}
+		else {
+			arr.push( "Can be worn with "+name + " for Layer "+layer );
+		}
+	}
+	
+	public static inline var USE_AV_SELF:Int = 0;
+	public static inline var USE_AV_OTHER:Int = -1;
+}
