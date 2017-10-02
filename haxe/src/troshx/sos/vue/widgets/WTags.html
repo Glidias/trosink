@@ -212,22 +212,25 @@
 				</div>
 			</div>
 			
-			<div><label>Crest: <select number v-model.number="currentArmorCustomise.crest"><option :value="0"></option><option v-for="(li,i) in armorCrestLabels" :key="i+1" :value="i+1">{{li}}</option></select></label></div>
-			<div><label><i>Reduced/Crushed AVs:</i></label></div>
-			<div><label  v-for="li in layerCoverageFlags" :key="li.id"><InputInt v-on:input.native="crushAVInputHandler($event.target, li)" :max="0" :obj="hitLocationDummy" :prop="li.id" /> {{li.index+1}}:{{li.label}}</label></div>
-			<div v-if="customiseArmor != null">		
-				<button v-on:click="assignArmorCustomisation()" :disabled="!canRegisterArmorCustomisation">Register Customisation &gt;&gt;</button>
-			</div>
-			<div v-else>	
-				<i>Armor has been altered.</i>
-				<br/>	
-				<div>
-					<label><i>Restore original?</i></label><input type="checkbox" v-model="restoreOriginal"></input><br/><br/>
+			<div v-if="isEnteredItem">
+				<div><label>Crest: <select number v-model.number="currentArmorCustomise.crest"><option :value="0"></option><option v-for="(li,i) in armorCrestLabels" :key="i+1" :value="i+1">{{li}}</option></select></label></div>
+				<div v-if="layerCoverageFlags.length!=0"><label><i>Reduced/Crushed AVs:</i></label></div>
+				<div><label  v-for="li in layerCoverageFlags" :key="li.id"><InputInt v-on:input.native="crushAVInputHandler($event.target, li)" :max="0" :obj="hitLocationDummy" :prop="li.id" /> {{li.index+1}}:{{li.label}}</label></div>
+				<div v-if="customiseArmor != null">		
+					<button v-on:click="assignArmorCustomisation()" :disabled="!canRegisterArmorCustomisation">Register Customisation &gt;&gt;</button>
 				</div>
-				<div v-if="restoreOriginal" >
-					<button v-on:click="doRestoreOriginalArmor()">Confirm Restore Original</button>
-				</div>	
+				<div v-else>	
+					<i>Armor has been altered.</i>
+					<br/>	
+					<div>
+						<label><i>Restore original?</i></label><input type="checkbox" v-model="restoreOriginal"></input><br/><br/>
+					</div>
+					<div v-if="restoreOriginal" >
+						<button v-on:click="doRestoreOriginalArmor()">Confirm Restore Original</button>
+					</div>	
+				</div>
 			</div>
+				
 		</div>
 				
 		<hr/>

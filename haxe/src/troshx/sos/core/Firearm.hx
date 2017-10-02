@@ -85,10 +85,9 @@ class FiringMechanism extends Item
 	}
 }
 
+//  class to set up official ammo. Custom weapon ammo may simply be a weapon with isAmmo == true
 class Ammunition extends Weapon
 {
-
-
 	// todo: specials as a series of hard modifiers
 	
 	public function new(name:String="", catchChance:Int=0, id:String="") 
@@ -96,6 +95,7 @@ class Ammunition extends Weapon
 
 		super(id, name);
 		stuckChance = catchChance;	
+		ranged = true;
 		isAmmo = true;
 		profs = (1 << Profeciency.R_FIREARM);
 	}

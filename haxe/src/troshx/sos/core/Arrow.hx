@@ -25,6 +25,7 @@ class Arrow extends Weapon
 		super(id, name);
 		stuckChance = catchChance;
 		isAmmo = true;
+		ranged = true;
 		profs = (1 << Profeciency.R_BOW) | (1 << Profeciency.R_CROSSBOW);
 	}
 	
@@ -49,7 +50,7 @@ class Arrow extends Weapon
 		
 		a[BROADHEAD] = f = new Arrow("Broadhead", 5).setWeightCost(0, 2, Item.SP).setUnit(20);
 		f.damageM = -1;
-		f.missileSpecial == new MissileSpecial();
+		f.missileSpecial = new MissileSpecial();
 		f.missileSpecial.winged = 2;
 		
 		

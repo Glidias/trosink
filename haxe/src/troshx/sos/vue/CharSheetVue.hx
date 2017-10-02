@@ -328,6 +328,9 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	
 	
+	function addAmmo(ammo:Weapon):Void {
+		this.char.inventory.weapons.push( Inventory.getReadyAssignOf(ammo) );
+	}
 	
 	
 	

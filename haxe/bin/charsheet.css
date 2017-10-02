@@ -221,6 +221,17 @@ td.w-prof.got-custom .pop-widget {
 td.w-ammo-spawner > a {
 	color:inherit;
 }
+.w-ammo-spawner span {
+	display:inline-block;
+	margin-right:10px;
+	
+}
+.w-ammo-spawner span button {
+	min-width:22px;
+}
+.w-ammo-spawner span:last-child {
+	margin-right:0;
+}
 td.w-firearm-name .pop-widget {
 	width:100%;
 }

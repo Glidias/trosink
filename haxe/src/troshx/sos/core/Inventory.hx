@@ -374,6 +374,46 @@ class Inventory
 		}
 	}
 	
+	public static function getReadyAssignOf(item:Item):Dynamic {
+		var weaponAssign:WeaponAssign;
+		var shieldAssign:ShieldAssign;
+		var itemAssign:ItemAssign;
+		var armorAssign:ArmorAssign;
+		
+		if (Std.is(item, Weapon)) {
+			return weaponAssign = {
+				weapon:cast item,
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++,
+				attached:false
+			};
+		}
+		else if (Std.is(item, Shield)) {
+			return shieldAssign= {
+				shield:cast item,
+				attached:false,
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++
+			};
+		}
+		else if (Std.is(item, Armor)) {
+			return armorAssign  = {
+				armor:cast item,
+				attached:false,
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++	
+			}
+		}
+		else {
+			return itemAssign = {
+				item:item,
+				attached:false,
+				held:0, unheld:0, unheldRemark:"",
+				key:UID_COUNT++
+			};
+		}
+	}
+	
 	public static function getEmptyReadyAssign(type:String):Dynamic {  // Dynamic no choice??, these types is a real pain sometimes
 		var weaponAssign:WeaponAssign;
 		var shieldAssign:ShieldAssign;

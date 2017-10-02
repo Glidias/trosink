@@ -1,5 +1,5 @@
 <div>
 	<span v-for="(li, i) in list" style="display:inline-block" :key="i">
-		<label style="display:inline-block"><input type="checkbox" :value="shiftIndex(i)" v-on:click="checkboxHandler($event.target, i, item.firearm, 'ammunitions')" :checked="(shiftIndex(i)&item.firearm.ammunitions)!=0"></input>{{li.name}}<span :style="{visibility:(shiftIndex(i)&item.firearm.ammunitions)!=0 ?'visible':'hidden'}">[<a href="javascript:;" v-on:click.prevent.stopPropagation="">+</a>]</span></label>
+		<label style="display:inline-block"><input type="checkbox" :value="shiftIndex(i)" v-on:click="checkboxHandler($event.target, i, item.firearm, 'ammunitions')" :checked="(shiftIndex(i)&item.firearm.ammunitions)!=0"></input>{{li.name}}<span v-if="addAmmoMethod!=null" :style="{visibility:(shiftIndex(i)&item.firearm.ammunitions)!=0 ?'visible':'hidden'}">[<a href="javascript:;" v-on:click.prevent.stopPropagation="addAmmoMethod(li)">+</a>]</span></label>
 	</span>
 </div>

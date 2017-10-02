@@ -10,7 +10,7 @@ import troshx.sos.vue.widgets.BaseItemWidget.BaseItemWidgetProps;
  * Widget to handle available ammunitions for weapon's firearm.
  * @author Glidias
  */
-class WAmmunition extends VComponent<AmmunitionData, BaseItemWidgetProps>
+class WAmmunition extends VComponent<AmmunitionData, AmmunitionProps>
 {
 	public static inline var NAME:String = "w-ammunition";
 
@@ -41,11 +41,18 @@ class WAmmunition extends VComponent<AmmunitionData, BaseItemWidgetProps>
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
 	
-	
+	@:computed function get_addAmmoMethod():Ammunition->Void {
+		return this.addAmmo != null ? this.addAmmo : this.parentAttr.addAmmo;
+	}
 	
 }
 
 
 typedef AmmunitionData = {
 	var list:Array<Ammunition>;
+}
+
+typedef AmmunitionProps = {
+	>BaseItemWidgetProps,
+	@:prop({required:false}) @:optional var addAmmo:Ammunition->Void;
 }
