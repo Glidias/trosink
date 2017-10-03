@@ -22,11 +22,113 @@ class Shield extends Item
 	public var strapType:Int = 0;
 	@:strap("Arm-Strap") public static inline var STRAP_ARM:Int = 0; // currently hardcoded in UI
 	@:strap("Shoulder-Strap") public static inline var STRAP_SHOULDER:Int = 1;
-	
+
 	
 	// Depreciated, refactor this to Shield special if really needed?
 	//public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
-
+	
+	public static inline var POSITION_LOW:Int = 0;
+	public static inline var POSITION_HIGH:Int = 1;
+	
+	public static function getHighCoverage():Array<Dynamic<Bool>> {
+		return [{
+			// whole head
+			"upperHead":true,
+			"lowerHead":true,
+			"face":true,
+			
+			"neck":true,
+			"shoulder":true,
+			
+			// shield arm
+			//"elbow":true,
+			"forearm":true,
+			"hand":true
+		},
+		{
+			// whole head
+			"upperHead":true,
+			"lowerHead":true,
+			"face":true,
+			
+			"neck":true,
+			"shoulder":true,
+			
+			// shield arm
+			"elbow":true,	// include elbow for medium?
+			"forearm":true,
+			"hand":true,
+			
+			"chest":true	
+			
+		},
+		{
+			// whole head
+			"upperHead":true,
+			"lowerHead":true,
+			"face":true,
+			
+			"neck":true,
+			"shoulder":true,
+			
+			// arm
+			"upperArm":true,
+			"elbow":true,
+			"forearm":true,
+			"hand":true,
+			
+			"chest":true,
+			"belly":true,
+			"side":true,
+		}
+		];
+	}
+	
+	public static function getLowCoverage():Array<Dynamic<Bool>> {
+		return [{
+			"chest":true,
+			"belly":true,
+			
+			// shield arm
+			//"elbow":true,
+			"forearm":true,
+			"hand":true
+		},
+		{
+			"chest":true,
+			"belly":true,
+			"side":true,
+			"groin":true,
+			"hip":true,
+			
+			// shield arm
+			"elbow":true,
+			"forearm":true,
+			"hand":true,
+			
+			"thigh":true,
+		},
+		{	
+			"chest":true, //manual missing this?
+	
+			"belly":true,
+			"side":true,
+			"groin":true,
+			"hip":true,
+			
+			"neck":true,
+			
+			// shield arm
+			"elbow":true,
+			"forearm":true,
+			"hand":true,
+			
+			"knee":true,
+			"thigh":true,
+		}
+		];
+	}
+	
 	
 	
 	public function new() 

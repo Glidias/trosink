@@ -452,6 +452,14 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 								results.armorsLayer.push(comparisonLayeredArmor[i].armor);
 							}
 						}
+						var ind:Int;
+						if (results.armorsProtectable.length == 1 && (ind = results.armorsLayer.indexOf(results.armorsProtectable[0])  )>=0 ) {
+							comparisonLayeredArmor.splice(ind, 1);
+						}
+					
+						if (results.armorsProtectable.length >=2 && results.armorsLayer.length == 1 && (ind = results.armorsProtectable.indexOf(results.armorsLayer[0] ) )>=0 ) {
+							results.armorsProtectable.splice(ind, 1);
+						}
 					}
 					
 					
@@ -505,6 +513,13 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 		
 		
+	}
+	
+	@:computed function get_shieldAVHigherOrEqual():Bool {
+		var calculating = this.calcAVColumn != 0;
+		var shield:Shield = carriedShield;
+		var av = this.calcArmorResults.layer + this.calcArmorResults.av;
+		return calculating && shield != null && shield.AV > av;
 	}
 	
 	static var SAMPLE_AV:AV3 = {avc:0, avp:0, avb:0};
@@ -665,7 +680,19 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed function get_carriedShield():Shield {
-		return null;
+		return this.char.inventory.findHeldShield();
+	}
+	
+	@:computed function get_shieldSizeLabels():Array<String> {
+		var arr:Array<String> = [];
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Shield", true, ":size");
+		return arr;
+	}
+	
+	@:computed function get_shieldCoverage():Dynamic<Bool> {
+		var shield = this.carriedShield;
+		var index:Int = shield != null ? shield.size : 0; 
+		return this.char.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
 	}
 	
 	// computed proxy to inventory filtered lists
@@ -758,7 +785,8 @@ class CharSheetVueData  {
 	
 	var popupIndex:Int = -1;
 	
-	
+	var shieldLowProfiles:Array<Dynamic<Bool>> = Shield.getLowCoverage();
+	var shieldHighProfiles:Array<Dynamic<Bool>> = Shield.getHighCoverage();
 	
 	var damageTypeSuffixes:Array<String> = DamageType.getFlagVarNames();
 	

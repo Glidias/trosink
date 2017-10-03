@@ -81,6 +81,22 @@ class Inventory
 		getSignaler().dispatch(signal);
 	}
 	
+	public function findHeldShield():Shield 
+	{
+		for (i in 0...shields.length) {
+			if ( shields[i].held == HELD_OFF ) {
+				return shields[i].shield;
+			}
+		}
+		for (i in 0...shields.length) {
+			if (shields[i].held != 0) {
+				return shields[i].shield;
+			}
+		}
+		return null;
+	}
+	
+	public var shieldPosition:Int = Shield.POSITION_LOW;
 	
 	public function getWeildableWeaponsTypeFiltered(ranged:Bool, ?profs:Int):Array<WeaponAssign> {
 		var arr = [];

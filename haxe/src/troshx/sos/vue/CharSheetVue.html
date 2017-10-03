@@ -102,10 +102,10 @@
 				<td><input type="number" v-model.number="entry.shield.blockTN" number min="0"></input></td>
 				<td><input type="number" step="0.5" v-model.number="entry.shield.weight" number min="0"></input></td>
 				<td>
-					<select v-model.number="entry.shield.size ">
-						<option value="0">Small</option>
-						<option value="1">Medium</option>
-						<option value="2">Large</option>
+					<select number v-model.number="entry.shield.size ">
+						<option :value="0">Small</option>
+						<option :value="1">Medium</option>
+						<option :value="2">Large</option>
 					</select>
 				</td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
@@ -126,9 +126,9 @@
 				<td><input type="number" v-on:focus="focusInRowField(shieldEntry, 8)" v-on:blur="focusOutRowField(shieldEntry, 8)" v-model.number="shieldEntry.e.shield.weight" number min="0"></input></td>
 				<td>
 					<select v-model.number="shieldEntry.e.shield.size" v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)">
-						<option value="0">Small</option>
-						<option value="1">Medium</option>
-						<option value="2">Large</option>
+						<option :value="0">Small</option>
+						<option :value="1">Medium</option>
+						<option :value="2">Large</option>
 					</select>
 				</td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(shieldEntry.e.shield)" :index="-1" :showWidget="(shieldEntry.focusedFlags & (32|(1<<21))) !=0" :entry="shieldEntry.e" :requestCurWidget="requestCurWidget"
@@ -164,14 +164,14 @@
 				<td-hands :entry="entry" />
 				<td>
 					<select number v-model.number="entry.weapon.reach">
-						<option value="1">HA</option>
-						<option value="2">H</option>
-						<option value="3">S</option>
-						<option value="4">M</option>
-						<option value="5">L</option>
-						<option value="6">VL</option>
-						<option value="7">EL</option>
-						<option value="8">LL</option>
+						<option :value="1">HA</option>
+						<option :value="2">H</option>
+						<option :value="3">S</option>
+						<option :value="4">M</option>
+						<option :value="5">L</option>
+						<option :value="6">VL</option>
+						<option :value="7">EL</option>
+						<option :value="8">LL</option>
 					</select>
 				</td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-atk" widgetTagName="w-melee-atk" :widgetProps="{thrusting:false}" :value="getSwingAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
@@ -194,7 +194,7 @@
 				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="weaponEntry.e" :weapon="weaponEntry.e.weapon" section="meleeWeap" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 				<td-hands :entry="weaponEntry.e"  v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry,4)" />
 				<td>
-					<select number v-model="weaponEntry.e.weapon.reach"  v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)">
+					<select number v-model.number="weaponEntry.e.weapon.reach"  v-on:focus="focusInRowField(weaponEntry,8)" v-on:blur="focusOutRowField(weaponEntry,8)">
 						<option value="1">HA</option>
 						<option value="2">H</option>
 						<option value="3">S</option>
@@ -571,6 +571,14 @@
 		
 		<div class="overall-armor-coverage">
 			<h4>Overall Armor Coverage:</h4>	
+			<div v-if="carriedShield!=null">Held Shield: <b>{{carriedShield.name}}</b> <span class="shield-icon-inv">☗</span></div>
+			<div v-if="carriedShield!=null">Size: <b>{{shieldSizeLabels[carriedShield.size]}}</b></div>
+			<div><label>Prefered Shield Position:
+				<select v-model.number="char.inventory.shieldPosition">
+					<option :value="0">Low</option>
+					<option :value="1">High</option>
+				</select>	
+			</label> <span v-show="carriedShield==null"> (if held)</span></div>
 			<div style="display:inline-block;vertical-align:top;">
 				<table border="1" class="table-coverage">
 					<thead>
@@ -580,7 +588,7 @@
 							<td>AVC</td>
 							<td>AVP<span v-show="calcArmorNonFirearmMissile"> ↢</span></td>
 							<td>AVB</td>
-							<td v-show="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
+							<td v-if="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
 						</tr>
 					</thead>
 					<tbody>
@@ -590,7 +598,7 @@
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(1, i)" v-on:blur="focusOutAVColumnRowIndex(1,i)"></input></td>
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(2, i)" v-on:blur="focusOutAVColumnRowIndex(2,i)"></input></td>
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(3, i)" v-on:blur="focusOutAVColumnRowIndex(3,i)"></input></td>
-							<td v-show="carriedShield!=null"></td>
+							<td v-if="carriedShield!=null" v-show="shieldCoverage[li.id]" class="td-shield" :class="{active:calcAVRowIndex==i && shieldAVHigherOrEqual }">{{ carriedShield.AV }}</td>
 						</tr>
 					</tbody>
 				</table>

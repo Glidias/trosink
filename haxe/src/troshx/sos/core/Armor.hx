@@ -256,6 +256,7 @@ typedef ArmorCalcResults = {
 	var layer:Int;
 	var av:Int;
 	
+	
 	var armorsProtectable:Array<Armor>;
 	var armorsLayer:Array<Armor>; //@:optional 
 	var armorsCrushable:Array<Armor>; //@:optional 

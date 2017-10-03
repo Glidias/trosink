@@ -195,6 +195,10 @@ td.gotbtn.focus > button {
 	background-color:rgba(0,0,0,.3);
 }
 
+.inventory .td-shield.active {
+	background-color:#99FFFF;
+}
+
 .inventory .focus-value-bar {
 	width:100%;
 	position:fixed;
