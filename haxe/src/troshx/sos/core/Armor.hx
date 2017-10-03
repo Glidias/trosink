@@ -232,7 +232,7 @@ class Armor extends Item
 	{
 		var result:Int = special != null && special.layer != 0 ? ((special.layerCoverage == 0 || (special.layerCoverage & locMask) != 0) ? 1 : 0) * special.layer : 0;
 		if ( layerMask !=0 &&  special.wornWith.layer > 0) {
-			if (special.wornWith.layer > result) special.wornWith.layer = result;
+			if (special.wornWith.layer > result) result = special.wornWith.layer;
 		}
 		return result;
 	}
