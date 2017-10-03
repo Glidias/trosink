@@ -578,18 +578,19 @@
 							<td></td>
 							<td></td>
 							<td>AVC</td>
-							<td>AVP<span v-show="false"> ↢</span></td>
+							<td>AVP<span v-show="calcArmorNonFirearmMissile"> ↢</span></td>
 							<td>AVB</td>
-							<td>sAV	<span class="shield-icon-inv">☗</span></td>
+							<td v-show="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(li, i) in coverageHitLocations">
 							<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>
 							<td>{{i+1}}. {{li.name}}</td>
-							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc"></input></td>
-							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp"></input></td>
-							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(1, i)" v-on:blur="focusOutAVColumnRowIndex(1,i)"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(2, i)" v-on:blur="focusOutAVColumnRowIndex(2,i)"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(3, i)" v-on:blur="focusOutAVColumnRowIndex(3,i)"></input></td>
+							<td v-show="carriedShield!=null"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -597,29 +598,33 @@
 			<div style="display:inline-block;vertical-align:top;margin-left:8px;">
 				<div><i class="consider">Consider against:</i></div>
 				<br/>
-				<div><label><input type="checkbox"></input>Crushing attack</label></div>
-				<div><label><input type="checkbox"></input>Non-Firearm Missile attack ↢</label></div>
-				<div><label><input type="checkbox"></input> Melee Targeting: </label><select number>
-					<option :value="-1"></option>
+				<div><label><input type="checkbox" v-model="calcArmorCrushing"></input>Crushing attack</label></div>
+				<div><label><input type="checkbox" v-model="calcArmorNonFirearmMissile"></input>Non-Firearm Missile attack ↢</label></div>
+				<div><label :class="{disabled:calcArmorNonFirearmMissile}" :style="{'pointer-events':calcArmorNonFirearmMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
+					<option :value="i" v-for="(li, i) in char.body.targetZones">{{ char.body.getDescLabelTargetZone(i) }}</option>
 				</select></div>
 				<br/>
-				<div><i>Result:</i></div>
-				<i class="cta" v-show="false">&lt;- Click on table cells to inspect result.</i>
+				<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>
+				<i class="cta" v-show="calcAVColumn==0">&lt;- Focus-click on table cells to inspect result.</i>
 				<br/>
-				<div v-show="true">
-					<span class="outline-dominant">AV Armor(s) protecting:</span>
-					<ul>
-						<li></li>
+				<div v-show="calcAVColumn!=0">
+					<div><span class="outline-dominant">AV Armor protecting: <b>{{ calcArmorResults.av }} AV</b></span></div>
+					<ul v-show="hasArmorResultProtecting">
+						<li v-for="li in calcArmorResults.armorsProtectable">{{ li.name }}</li>
 					</ul>
-					<span class="outline-layer">Layer(s) protecting:</span>
-					<ul>
-						<li></li>
+					<br v-show="!hasArmorResultProtecting" />
+					<div><span class="outline-layer">Layer protecting: <b>+{{ calcArmorResults.layer }} AV</b></span></div>
+					<ul v-show="hasArmorResultLayers">
+						<li v-for="li in calcArmorResults.armorsLayer">{{ li.name }}</li>
 					</ul>
-					<span class="outline-crushed">Crushed Armor:</span>
-					<ul>
-						<li></li>
-					</ul>
-					<div></div>
+					<br v-show="!hasArmorResultLayers" />
+					<div v-show="calcArmorCrushing">
+						<div><span class="outline-crushed">Crushable Hard Armor: <b><span v-show="!hasArmorCrushables"> <i>none</i></span></b></span></div>
+						<ul v-show="hasArmorCrushables">
+							<li v-for="li in calcArmorResults.armorsCrushable">{{ li.name }}</li>
+						</ul>
+					</div>
+					
 				</div>
 			</div>
 		</div>

@@ -226,6 +226,9 @@ td.gotbtn.focus > button {
 	-o-user-select: none;
 	user-select: none;  
 }
+.inventory .overall-armor-coverage select:disabled {
+	opacity:.25;
+}
 .inventory .table-coverage input:focus {
 	background-color:#99FFFF;
 }

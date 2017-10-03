@@ -53,11 +53,22 @@ class TargetZone
 		return parts[result];
 	}
 	
+	public function getHitAreaMask():Int
+	{
+		var msk:Int = 0;
+		for (i in 0...parts.length) {
+			msk |= (1 << parts[i]);
+		}
+		return msk;
+	}
+	
+
+	
 
 	public function new() 
 	{
 		
 	}
 	
-
+	
 }

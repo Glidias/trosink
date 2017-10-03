@@ -1,6 +1,7 @@
 package troshx.sos.core;
 //import troshx.ds.HashedArray;
 //import troshx.ds.IDMatchArray;
+import troshx.sos.core.ArmorSpecial.WornWith;
 import troshx.util.LibUtil;
 
 /**
@@ -16,14 +17,15 @@ class Armor extends Item
 	
 	// generic armor coverage hash by string id.
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
+	
+	public function writeAVsAtLocation(body:BodyChar, hitLocationId:String, hitLocationMask:Int, result:AV3, layerMask:Int, nonFirearmMissile:Bool, targetZoneMask:Int, includeCrushedAVS:Bool):Bool {
+		var flags = LibUtil.field(coverage, hitLocationId);
 
-	public inline function writeAVVAluesTo(values:Dynamic<AV3>, body:BodyChar, targetZoneMask:Int=0):Void {
-		for (f in Reflect.fields(coverage)) {
-			var cur:AV3 = LibUtil.field(values, f);
-			var flags = LibUtil.field(coverage, f);
-		
-			var hitLocationId:String = f;
-			var hitLocationMask:Int = (1 << LibUtil.field(body.hitLocationHash, hitLocationId));
+			
+			if ( (layerMask & hitLocationMask) != 0 && special.wornWith.layer == WornWith.USE_AV_OTHER) {
+				return false;
+			}
+			
 			var multiplier:Float = (flags & HALF) != 0 ? 0.5 : 1;
 			if ( (flags & THRUST_ONLY) != 0 && (body.thrustMask & targetZoneMask) == 0  ) {
 				multiplier = 0;
@@ -61,14 +63,15 @@ class Armor extends Item
 				}
 			}
 			
-			
 				
-			if (hitLocationMask!=0 && customise != null && customise.hitLocationAllAVModifiers != null && LibUtil.field(customise.hitLocationAllAVModifiers, hitLocationId) != null ) {
+			if (includeCrushedAVS && hitLocationMask!=0 && customise != null && customise.hitLocationAllAVModifiers != null && LibUtil.field(customise.hitLocationAllAVModifiers, hitLocationId) != null ) {
 				adder += LibUtil.field(customise.hitLocationAllAVModifiers, hitLocationId);
 			}
 			
+			var multiplierP:Float = (nonFirearmMissile && (specialFlags & ArmorSpecial.TEXTILE) != 0) ? multiplier * 2 : multiplier; 
+			
 			var avc:Int = Std.int(AVC * multiplier) + adder;
-			var avp:Int = Std.int(AVP * multiplier) + adder;
+			var avp:Int = Std.int(AVP * multiplierP) + adder;
 			var avb:Int = Std.int(AVB * multiplier) + adder;
 		
 			
@@ -76,16 +79,64 @@ class Armor extends Item
 			if (avp < 0) avp = 0;
 			if (avb < 0) avb = 0;
 			
-			if (avc > cur.avc) {
-				cur.avc = avc;
+			result.avc = avc;
+			result.avp = avp;
+			result.avb = avb;
+			
+			return true;
+	}
+	
+	static var TEMPAVS:AV3;
+
+	//inline
+	public function writeAVVAluesTo(values:Dynamic<AV3>, body:BodyChar, layerMask:Int, nonFirearmMissile:Bool, targetZoneMask:Int):Void {
+		var tempAvs;
+		if (TEMPAVS == null) TEMPAVS = {avc:0, avp:0, avb:0};
+		tempAvs = TEMPAVS;
+		
+		for (f in Reflect.fields(coverage)) {
+			var cur:AV3 = LibUtil.field(values, f);
+			
+			var hitLocationId:String = f;
+			var hitLocationMask:Int = (1 << LibUtil.field(body.hitLocationHash, hitLocationId));
+			
+			if (!writeAVsAtLocation(body, hitLocationId, hitLocationMask, tempAvs, layerMask, nonFirearmMissile, targetZoneMask, true) ) {
+				continue;
 			}
-			if (avp > cur.avp) {
-				cur.avp = avp;
+			
+			if (tempAvs.avc > cur.avc) {
+				cur.avc = tempAvs.avc;
 			}
-			if (avb > cur.avb) {
-				cur.avb = avb;
+			if (tempAvs.avp > cur.avp) {
+				cur.avp = tempAvs.avp;
+			}
+			if (tempAvs.avb > cur.avb) {
+				cur.avb = tempAvs.avb;
 			}
 		}
+	}
+	
+	
+	public function checkFubarCrushed(body:BodyChar, targetZoneMask:Int, damageType:Int):Bool {
+		var tempAvs;
+		if (TEMPAVS == null) TEMPAVS = {avc:0, avp:0, avb:0};
+		tempAvs = TEMPAVS;
+		
+		for (f in Reflect.fields(coverage)) {
+			
+			
+			var hitLocationId:String = f;
+			var hitLocationMask:Int = (1 << LibUtil.field(body.hitLocationHash, hitLocationId));
+			
+			if (!writeAVsAtLocation(body, hitLocationId, hitLocationMask, tempAvs, 0, false, targetZoneMask, true) ) {
+				continue;
+			}
+			var chk:Int = damageType == DamageType.CUTTING ? tempAvs.avc :  damageType == DamageType.PIERCING ? tempAvs.avp : tempAvs.avb;
+			
+			if (chk != 0) return false;
+		}
+		
+		return true;
 	}
 
 	@:coverage public static inline var WEAK_SPOT:Int = (1 << 0);
@@ -117,6 +168,14 @@ class Armor extends Item
 
 		
 		
+	}
+	
+	public function getCoverageMask(body:BodyChar):Int {
+		var mask:Int = 0;
+		for (f in Reflect.fields(coverage)) {
+			mask |= ( 1 << LibUtil.field( body.hitLocationHash, f) );
+		}
+		return mask;
 	}
 	public static function createEmptyInstance():Armor {
 		var armor:Armor = new Armor();
@@ -163,10 +222,42 @@ class Armor extends Item
 		return "Armor";
 	}
 	
+	/**
+	 * 
+	 * @param	locMask	hit location masked index
+	 * @param	layerMask any overlapping areas (if any) with special other particular armor piece...
+	 * @return
+	 */
+	public inline function getLayerValueAt(locMask:Int, layerMask:Int):Int 
+	{
+		var result:Int = special != null && special.layer != 0 ? ((special.layerCoverage == 0 || (special.layerCoverage & locMask) != 0) ? 1 : 0) * special.layer : 0;
+		if ( layerMask !=0 &&  special.wornWith.layer > 0) {
+			if (special.wornWith.layer > result) special.wornWith.layer = result;
+		}
+		return result;
+	}
+	
+
+	
+	
 }
 
 typedef AV3 = {
 	var avc:Int;
 	var avp:Int;
 	var avb:Int;
+}
+
+
+typedef ArmorCalcResults = {
+	var hitLocationIndex:Int;
+	var damageType:Int;
+	
+	var layer:Int;
+	var av:Int;
+	
+	var armorsProtectable:Array<Armor>;
+	var armorsLayer:Array<Armor>; //@:optional 
+	var armorsCrushable:Array<Armor>; //@:optional 
+	
 }

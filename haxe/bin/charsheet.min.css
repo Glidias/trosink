@@ -40,6 +40,7 @@ td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;positi
 .inventory .focus-value-bar input{height:100%;display:block;width:100%;margin:0;font-size:12px;padding:4px;box-sizing:border-box;}
 .inventory .table-coverage input{width:35px;}
 .inventory .overall-armor-coverage label{-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none;}
+.inventory .overall-armor-coverage select:disabled{opacity:.25;}
 .inventory .table-coverage input:focus{background-color:#99FFFF;}
 .inventory .popup-overlay .modal{}
 td.weight{width:40px;}

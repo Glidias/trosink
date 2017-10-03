@@ -13,7 +13,10 @@ import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
 import msignal.Signal.Signal1;
+import troshx.sos.core.ArmorSpecial;
+import troshx.sos.core.ArmorSpecial.WornWith;
 import troshx.sos.core.BodyChar;
+import troshx.sos.core.TargetZone;
 import troshx.sos.vue.input.MixinInput;
 
 import troshx.sos.core.Armor;
@@ -192,6 +195,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 		return arr.join("-");
 	}
+
 	
 	function getTags(item:Item):String {
 		var arr:Array<String> = [];
@@ -288,12 +292,43 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return dyn;
 	}
 	
+	@:computed function get_shouldCalcMeleeAiming():Bool {
+		return !calcArmorNonFirearmMissile && calcArmorMeleeTargeting;
+	}
+	
+	@:computed inline function get_targetingZoneMask():Int {
+		var i:Int = this.calcMeleeTargetingZoneIndex;
+		return shouldCalcMeleeAiming ? (1<<i) : 0;
+	}
+	
+	@:computed inline function get_hasArmorResultProtecting():Bool {
+		return this.calcArmorResults.armorsProtectable.length != 0;
+	}
+	@:computed inline function get_hasArmorResultLayers():Bool {
+		return this.hasArmorResultProtecting && this.calcArmorResults.armorsLayer.length != 0;
+	}
+	@:computed inline function get_hasArmorCrushables():Bool {
+		return this.calcArmorResults.armorsCrushable.length != 0;
+	}
+	
+	
+	function isDisabledHitLocation(i:Int):Bool {
+		return shouldCalcMeleeAiming && ( (1 << i) & targetZoneHitAreaMasks[calcMeleeTargetingZoneIndex] ) == 0;
+	}
+	
+	@:computed inline function get_targetZoneHitAreaMasks():Array<Int> {
+		return this.char.body.getTargetZoneHitAreaMasks();
+	}
+	
+	
 	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
 		var armors:Array<ArmorAssign> = char.inventory.wornArmor;
 		var values:Dynamic<AV3>  = this.hitLocationZeroAVValues;
 		var ch = coverageHitLocations;
 		var body:BodyChar = char.body;
 
+		var targMask:Int = targetingZoneMask;
+		
 		for (i in 0...ch.length) {
 			var ider = ch[i].id;
 			var cur = LibUtil.field(values, ider);
@@ -304,11 +339,178 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 		for (i in 0...armors.length) {
 			var a:Armor = armors[i].armor;
-			a.writeAVVAluesTo(values, body);
+			var layerMask:Int = 0;
+
+			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
+				layerMask = char.inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+			}
+			a.writeAVVAluesTo(values, body, layerMask, this.calcArmorNonFirearmMissile, targMask);
 		}
-	
 		
 		return values;
+	}
+	
+	function sortArmorLayers(a:ArmorLayerCalc, b:ArmorLayerCalc):Int {
+	  if (a.layer < b.layer) return -1;
+	  else if (a.layer > b.layer) return 1;
+	  return 0;
+	} 
+
+	function calcAVColumnRowIndex(columnNum:Int, rowIndex:Int):Void {
+		this.calcAVColumn = columnNum;
+		this.calcAVRowIndex = rowIndex;
+		
+		
+		// perfrorm calculation
+		
+		var hitLocArmorValues = this.hitLocationArmorValues;
+		var coverageLocs = coverageHitLocations;
+		var hitLocationId:String = coverageLocs[rowIndex].id;
+		var hitLocationMask:Int = (1 << rowIndex);
+		var curRow:AV3 = LibUtil.field( hitLocArmorValues, hitLocationId);
+		
+		var results:ArmorCalcResults = this.calcArmorResults;
+		results.damageType = columnNum - 1;
+		results.hitLocationIndex = rowIndex;
+		results.layer = 0;
+		results.av = columnNum == 1 ? curRow.avc : columnNum == 2  ? curRow.avp : curRow.avb;
+		
+		results.armorsLayer = [];
+		results.armorsProtectable = [];
+		results.armorsCrushable = [];
+			
+	
+		
+		// else look for armors whose computed AVs at hit location is tabulated to match results.av
+		var sampleAV:AV3 = SAMPLE_AV;
+		var armorList = char.inventory.wornArmor;
+		var body:BodyChar = char.body;
+		var targetingZoneMask:Int = this.targetingZoneMask;
+		
+
+		if (results.av != 0) {  // av found at location, find dominant armors and layers
+			var comparisonLayerMasks:Array<Int>  = [];  // temp for case to layers
+		
+			for (i in 0...armorList.length) {
+				var a:Armor = armorList[i].armor;
+				if (LibUtil.field(a.coverage, hitLocationId) == null) {
+					comparisonLayerMasks.push(0);
+					continue;
+				}
+			
+				var layerMask:Int = 0;
+				
+				if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
+					layerMask = char.inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+				}
+				comparisonLayerMasks.push(layerMask);
+				
+				
+				if ( a.writeAVsAtLocation(body, hitLocationId, hitLocationMask, sampleAV, layerMask, this.calcArmorNonFirearmMissile, targetingZoneMask, true) ) {
+					var compareAV:Int =  columnNum == 1 ? sampleAV.avc : columnNum == 2  ? sampleAV.avp : sampleAV.avb;
+					
+					if (compareAV == results.av) {
+						results.armorsProtectable.push(a);
+					}
+					
+				}
+			}
+			
+			if (results.armorsProtectable.length != 0)  {
+				
+				// now, find highest possible layers
+				var highest:Int = 0;
+				
+				
+				var comparisonLayeredArmor:Array<ArmorLayerCalc> = [];
+				
+				for (i in 0...armorList.length) {
+					var a:Armor = armorList[i].armor;
+					if (LibUtil.field(a.coverage, hitLocationId) == null) continue;
+					
+					var c = a.getLayerValueAt(hitLocationMask, comparisonLayerMasks[i]);
+					// get layer value of armor.. get highest layer value among all to be sorted later on
+					if (c > 0) {
+						comparisonLayeredArmor.push({armor:a, layer:c});
+					}	
+				}
+				
+				if (comparisonLayeredArmor.length > 0) {
+				
+
+					haxe.ds.ArraySort.sort(comparisonLayeredArmor, sortArmorLayers);
+
+					if (results.armorsProtectable.length == 1 && results.armorsProtectable[0]== comparisonLayeredArmor[comparisonLayeredArmor.length-1].armor) {
+						comparisonLayeredArmor.pop();
+					}
+					if (comparisonLayeredArmor.length > 0) {
+						results.layer = comparisonLayeredArmor[comparisonLayeredArmor.length - 1].layer;
+						
+						var i = comparisonLayeredArmor.length;
+						while(--i > -1) {
+							if (comparisonLayeredArmor[i].layer == results.layer) {
+								results.armorsLayer.push(comparisonLayeredArmor[i].armor);
+							}
+						}
+					}
+					
+					
+					
+				
+				}
+			
+			}
+			
+		}
+		
+		
+		if (!this.calcArmorCrushing) return;
+		
+		// , find highest possible crushables
+
+		var i:Int;
+		var highest:Int = 0;
+		var crushableSortList:Array<ArmorLayerCalc> = [];
+		
+		for (i in 0...armorList.length) {
+			var a:Armor = armorList[i].armor;
+			if ( (a.specialFlags & ArmorSpecial.HARD) == 0 || LibUtil.field(a.coverage, hitLocationId) == null ) {
+				continue;
+			}
+			
+			if (a.customise != null && a.customise.hitLocationAllAVModifiers != null && a.checkFubarCrushed(body, targetingZoneMask, columnNum - 1) ) {
+				continue;
+			}
+			
+			if ( a.writeAVsAtLocation(body, hitLocationId, hitLocationMask, sampleAV, 0, false, targetingZoneMask, false) ) {
+				var compareAV:Int =  columnNum == 1 ? sampleAV.avc : columnNum == 2  ? sampleAV.avp : sampleAV.avb;
+				crushableSortList.push({
+					layer:compareAV,
+					armor:a
+				});
+			}
+
+		}
+		if (crushableSortList.length > 0) {
+			haxe.ds.ArraySort.sort(crushableSortList, sortArmorLayers);
+			highest = crushableSortList[crushableSortList.length - 1].layer;
+			
+			i = crushableSortList.length;
+			while(--i > -1) {
+				if (highest == crushableSortList[i].layer) results.armorsCrushable.push(crushableSortList[i].armor);
+				
+			}
+		}
+		
+		
+		
+		
+	}
+	
+	static var SAMPLE_AV:AV3 = {avc:0, avp:0, avb:0};
+	
+	function focusOutAVColumnRowIndex(columnNum:Int, rowIndex:Int):Void {
+		Timer.delay(function() { if (this.calcAVColumn == columnNum && this.calcAVRowIndex == rowIndex) this.calcAVColumn = 0; } , 0);
 	}
 	
 	function test():Void {
@@ -373,6 +575,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return false;
 	}
 	
+
 	
 	
 	function addAmmo(ammo:Weapon):Void {
@@ -386,6 +589,12 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");
+	}
+	
+	
+	
+	inline function shiftIndex(i:Int):Int {
+		return (1 << i);
 	}
 	
 	// computed
@@ -455,6 +664,10 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return this.armorEntry.focusedFlags != 0 || hasPopup;
 	}
 	
+	@:computed function get_carriedShield():Shield {
+		return null;
+	}
+	
 	// computed proxy to inventory filtered lists
 	
 	@:computed function get_filteredMelee():Array<WeaponAssign>  {
@@ -515,6 +728,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			
 		}
 	}
+	
+	
 
 	
 
@@ -543,6 +758,8 @@ class CharSheetVueData  {
 	
 	var popupIndex:Int = -1;
 	
+	
+	
 	var damageTypeSuffixes:Array<String> = DamageType.getFlagVarNames();
 	
 	var curWidgetRequest:WidgetItemRequest = {
@@ -553,6 +770,26 @@ class CharSheetVueData  {
 	
 	var itemTransitionName:String = "fade";
 	var focusValueText:String = "";
+	
+	// armor hit calculator
+	var calcArmorNonFirearmMissile:Bool = false;
+	var calcArmorCrushing:Bool = false;
+	var calcArmorMeleeTargeting:Bool = false;
+	var calcMeleeTargetingZoneIndex:Int = 0;
+	
+	var calcAVColumn:Int = 0;
+	var calcAVRowIndex:Int = 0;
+	
+	var calcArmorResults:ArmorCalcResults = {
+		hitLocationIndex:0,
+		damageType: 0,
+		layer:0,
+		av:0,
+	
+		armorsProtectable:[],
+		armorsLayer:[],
+		armorsCrushable:[],
+	}
 	
 	// to factor this out later
 	@:vueInclude var char:CharSheet = new CharSheet();
@@ -652,3 +889,7 @@ class RowReadyEntry implements IValidable implements IFocusFlags {
 }
 	
 	
+typedef ArmorLayerCalc = {
+	var armor:Armor;
+	var layer:Int;
+}

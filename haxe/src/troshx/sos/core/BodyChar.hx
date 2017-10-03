@@ -122,6 +122,15 @@ class BodyChar
 		return new BodyChar();
 	}
 	
+	public function getTargetZoneHitAreaMasks():Array<Int> {
+		var masks:Array<Int> = [];
+		for (i in 0...targetZones.length) {
+			var t = targetZones[i];
+			masks.push( t.getHitAreaMask() );
+		}
+		return masks;
+	}
+
 	public function getDescLabelTargetZone(zoneIndex:Int):String {
 		var isThrusting:Bool  = zoneIndex >= thrustStartIndex;
 		var t = targetZones[zoneIndex];
@@ -185,7 +194,7 @@ class BodyChar
 		return arr;
 	}
 	
-	// For Armor
+	// For Armor (may refactor this to armor class)
 	public function pushHitLocationNamesToStrArrByMask(arr:Array<String>, mask:Int):Void {
 		for (i in 0...hitLocations.length) {
 			if ( (mask & (1 << i)) != 0) {
@@ -207,31 +216,35 @@ class BodyChar
 	
 }
 
+
+
+// Defaults
+
 class Humanoid implements IBodyHitZones {
 	
 	// Melee Target zones
 	
-	@:targetZone("Head", [], [], 0, "Downward Swing") public static inline var SWING_DOWNWARD_HEAD = 0;
-	@:targetZone("Head", [], [], 0, "Upward Swing") public static inline var SWING_UPWARD_HEAD:Int = 1;
-	@:targetZone("Neck", [], []) public static inline var SWING_NECK:Int = 2;
-	@:targetZone("Torso", [], []) public static inline var SWING_TORSO:Int = 3;
-	@:targetZone("Upper Arm", [], []) public static inline var SWING_UPPER_ARM:Int = 4;
-	@:targetZone("Lower Arm", [], []) public static inline var SWING_LOWER_ARM:Int = 5;
-	@:targetZone("Upper Leg", [], []) public static inline var SWING_UPPER_LEG:Int = 6;
-	@:targetZone("Lower Leg", [], []) public static inline var SWING_LOWER_LEG:Int = 7;
-	@:targetZone("Groin", [], []) public static inline var SWING_GROIN:Int = 8;
+	@:targetZone("Head", [], [SHOULDER, LOWER_HEAD, FACE, UPPER_HEAD], 0, "Downward Swing") public static inline var SWING_DOWNWARD_HEAD = 0;
+	@:targetZone("Head", [], [CHEST, NECK, LOWER_HEAD, FACE], 0, "Upward Swing") public static inline var SWING_UPWARD_HEAD:Int = 1;
+	@:targetZone("Neck", [], [SHOULDER, NECK, LOWER_HEAD, FACE]) public static inline var SWING_NECK:Int = 2;
+	@:targetZone("Torso", [], [BELLY, SIDE, CHEST]) public static inline var SWING_TORSO:Int = 3;
+	@:targetZone("Upper Arm", [], [ELBOW, UPPER_ARM, SHOULDER]) public static inline var SWING_UPPER_ARM:Int = 4;
+	@:targetZone("Lower Arm", [], [HAND, FOREARM, ELBOW]) public static inline var SWING_LOWER_ARM:Int = 5;
+	@:targetZone("Upper Leg", [], [KNEE, THIGH, HIP]) public static inline var SWING_UPPER_LEG:Int = 6;
+	@:targetZone("Lower Leg", [], [FOOT, SHIN, KNEE]) public static inline var SWING_LOWER_LEG:Int = 7;
+	@:targetZone("Groin", [], [THIGH, GROIN, BELLY]) public static inline var SWING_GROIN:Int = 8;
 	
 	public static inline var thrustStartIndex:Int = 9;
 	
-	@:targetZone("Head", [], []) public static inline var THRUST_HEAD:Int = 9;
-	@:targetZone("Neck", [], []) public static inline var THRUST_NECK:Int = 10;
-	@:targetZone("Chest", [], []) public static inline var THRUST_CHEST:Int = 11;
-	@:targetZone("Belly", [], []) public static inline var THRUST_BELLY:Int = 12;
-	@:targetZone("Upper Arm", [], []) public static inline var THRUST_UPPER_ARM:Int = 13;
-	@:targetZone("Lower Arm", [], []) public static inline var THRUST_LOWER_ARM:Int = 14;
-	@:targetZone("Groin", [], []) public static inline var THRUST_GROIN:Int = 15;
-	@:targetZone("Upper Leg", [], []) public static inline var THRUST_UPPER_LEG:Int = 16;
-	@:targetZone("Lower Leg", [], []) public static inline var THRUST_LOWER_LEG:Int = 17;
+	@:targetZone("Head", [], [NECK, FACE, UPPER_HEAD]) public static inline var THRUST_HEAD:Int = 9;
+	@:targetZone("Neck", [], [CHEST, NECK, FACE]) public static inline var THRUST_NECK:Int = 10;
+	@:targetZone("Chest", [], [BELLY, CHEST, SHOULDER, NECK]) public static inline var THRUST_CHEST:Int = 11;
+	@:targetZone("Belly", [], [GROIN, HIP, SIDE, BELLY]) public static inline var THRUST_BELLY:Int = 12;
+	@:targetZone("Upper Arm", [], [ELBOW, UPPER_ARM, SHOULDER]) public static inline var THRUST_UPPER_ARM:Int = 13;
+	@:targetZone("Lower Arm", [], [HAND, FOREARM, ELBOW]) public static inline var THRUST_LOWER_ARM:Int = 14;
+	@:targetZone("Groin", [], [THIGH, GROIN, BELLY]) public static inline var THRUST_GROIN:Int = 15;
+	@:targetZone("Upper Leg", [], [KNEE, THIGH, HIP]) public static inline var THRUST_UPPER_LEG:Int = 16;
+	@:targetZone("Lower Leg", [], [FOOT, SHIN, KNEE]) public static inline var THRUST_LOWER_LEG:Int = 17;
 	
 	// Hit locations
 	

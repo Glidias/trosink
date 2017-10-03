@@ -327,6 +327,19 @@ class Inventory
 
 	}
 	
+	
+	public function layeredWearingMaskWith(a:Armor, name:String, body:BodyChar):Int
+	{
+		for (i in 0...wornArmor.length) {
+			var ar = wornArmor[i].armor;
+			if (ar.name == name) {
+				
+				return (a.getCoverageMask(body) & ar.getCoverageMask(body));
+			}
+		}
+		return 0;
+	}
+	
 	function equipItem(item:Item, unheldRemark:String = null):Dynamic {
 		var unheld:Int = 0;
 		var readyAssign:Dynamic = null;
