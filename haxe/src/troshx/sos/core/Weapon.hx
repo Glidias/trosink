@@ -108,13 +108,6 @@ class Weapon extends Item
 		return this;
 	}
 	
-	public function sanity():Void {
-		if (!ranged) {
-			firearm = null;
-			crossbow = null;
-		}
-	}
-	
 	public inline function isAttachment():Bool {
 		var m = (meleeFlags & MeleeSpecial.WEAPON_ATTACHMENT) != 0;
 		var r = (missileFlags & MissileSpecial.CHEAT_ATTACHMENT) != 0;
