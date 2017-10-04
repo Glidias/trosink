@@ -17,6 +17,8 @@ class Armor extends Item
 	
 	// generic armor coverage hash by string id.
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
+	var _coverageValues:Array<Int>;
+	//var _hitLocationAVModifiers:Array<Int>; // yagni, any Armor with ArmorCustomise is considered always unique usually
 	
 	public function writeAVsAtLocation(body:BodyChar, hitLocationId:String, hitLocationMask:Int, result:AV3, layerMask:Int, nonFirearmMissile:Bool, targetZoneMask:Int, includeCrushedAVS:Bool):Bool {
 		var flags = LibUtil.field(coverage, hitLocationId);
@@ -168,6 +170,58 @@ class Armor extends Item
 
 		
 		
+	}
+	
+	override public function normalize():Item {
+		if (coverage == null) coverage = {};
+		var bodyChar:BodyChar = special != null && special.otherBodyType != null ? special.otherBodyType : BodyChar.getInstance();
+
+		var tempSpecial:ArmorSpecial = special;
+		var tempCoverage:Dynamic<Int> = coverage;
+		coverage = null;
+		special  = null;
+		
+		
+		var fakeMe:Armor = cast serializeClone();	// remove all dynamic hashes on fakeMe and reflect via array
+		fakeMe._coverageValues = [];
+		//fakeMe._hitLocationAVModifiers = customise != null && customise.hitLocationAllAVModifiers!=null ?  [] : null;
+		for (i in 0...bodyChar.hitLocations.length) {
+			var ider = bodyChar.hitLocations[i].id;
+			if ( LibUtil.field( tempCoverage, ider) != null ) {
+				fakeMe._coverageValues.push( i );
+				fakeMe._coverageValues.push( LibUtil.field(tempCoverage, ider) );
+			}
+			else {
+				fakeMe._coverageValues.push( 0 );
+				fakeMe._coverageValues.push( 0 );
+			}
+			/*
+			if (fakeMe._hitLocationAVModifiers != null) {
+				if ( LibUtil.field( fakeMe.customise.hitLocationAllAVModifiers, ider) != null ) {
+					fakeMe._hitLocationAVModifiers.push( i );
+					fakeMe._hitLocationAVModifiers.push( LibUtil.field(fakeMe.customise.hitLocationAllAVModifiers, ider) );
+				}
+				else {
+					fakeMe._hitLocationAVModifiers.push( 0 );
+					fakeMe._hitLocationAVModifiers.push( 0 );
+				}
+			}
+			*/
+		}
+		
+		/*
+		if (fakeMe._hitLocationAVModifiers != null) {
+			fakeMe.customise.hitLocationAllAVModifiers = null;
+		}
+		*/
+		
+		if (tempSpecial != null){
+			special = tempSpecial;
+			fakeMe.special = tempSpecial;
+		}
+		coverage = tempCoverage;
+		
+		return fakeMe;
 	}
 	
 	public function getCoverageMask(body:BodyChar):Int {

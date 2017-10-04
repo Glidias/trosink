@@ -1,4 +1,6 @@
 package troshx.sos.core;
+import haxe.Serializer;
+import haxe.Unserializer;
 import troshx.sos.macro.MacroUtil;
 
 #if macro
@@ -72,6 +74,12 @@ class Item
 		this.id = id != null ? id : "Item_" + UID_COUNT++;
 		this.name = name;
 		
+	}
+	
+	public function serializeClone():Item {
+		var serializer:Serializer = new Serializer();
+		serializer.serialize(this);
+		return new Unserializer(serializer.toString()).unserialize();
 	}
 	
 	public function addTagsToStrArr(arr:Array<String>):Void {

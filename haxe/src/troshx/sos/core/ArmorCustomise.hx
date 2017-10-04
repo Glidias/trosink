@@ -24,6 +24,8 @@ class ArmorCustomise implements IUid
 		
 	}
 	
+	
+	
 	public function addTagsToStrArr(arr:Array<String>):Void
 	{
 		var flags:Int = crest;
