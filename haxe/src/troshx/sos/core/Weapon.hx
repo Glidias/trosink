@@ -26,8 +26,7 @@ class Weapon extends Item
 	public static inline var REACH_EL:Int = 7;
 	public static inline var REACH_LL:Int = 8;
 	
-	
-	public var variant:Weapon = null;	// default secondary fire options
+	public var variant:Weapon = null;	// used to hold 1h variant
 	
 	public var atnS:Int = 0;
 	public var atnT:Int = 0;
@@ -71,6 +70,42 @@ class Weapon extends Item
 	public function new(id:String= "", name:String = "" ) 
 	{
 		super(id, name);
+	}
+	
+	override public function normalize():Item {
+		if (ranged) {
+			if (!isBow()) {
+				requiredStr = 0;
+			}
+			
+			// reset melee
+			meleeFlags = 0;
+			meleeSpecial = null;
+			atnS = 0;
+			atnT = 0;
+			dtn = 0;
+			guard = 0;
+			damageS = 0;
+			damageT = 0;
+			damageTypeS = DamageType.CUTTING;
+			damageTypeT  = DamageType.PIERCING;
+			variant = null;
+			reach = 4;
+			
+		}
+		else {
+			// reset missile
+			missileFlags = 0;
+			missileSpecial = null;
+			stuckChance = 0;
+			requiredStr = 0;
+			firearm = null;
+			crossbow = null;
+			isAmmo = false;
+			damageTypeM = DamageType.PIERCING;
+			
+		}
+		return this;
 	}
 	
 	public function sanity():Void {

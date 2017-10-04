@@ -89,14 +89,16 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	
 	override function Mounted():Void {
 
-		if (this.weapon.profs == 0) this.weapon.profs = 1;
+		if (this.weapon.profs == 0) {
+			this.weapon.profs = !this.weapon.ranged ? (1<<Profeciency.M_1H_SWORD) : (1<<Profeciency.R_BOW);
+		}
 	}
 	
 	function onProfSelectChange(e:Event, weapon:Weapon):Void {
+	
 		var dyn:Dynamic = e.target;
-		var htmlElem:HtmlElement = dyn;
-		var val:Int = dyn.value;
-
+		var htmlElem:SelectElement = dyn;
+		var val:Int = Std.parseInt(htmlElem.value);
 		
 		if (val == 0) {
 			var index:Int = Std.parseInt(htmlElem.getAttribute("data-index"));

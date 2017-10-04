@@ -1,5 +1,5 @@
 <td v-on:click.stop="" class="w-holder w-prof" :class="{'got-custom':gotCustom}">
-	<select ref="selectDom" :value="get_weaponOptionValue()" :valuetrace="weaponOptionValue" number data-type="profs" :data-index="index" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onProfSelectChange($event, weapon)">
+	<select ref="selectDom" :value="get_weaponOptionValue()" number data-type="profs" :data-index="index" v-on:focus="emit('focus-in-row')" v-on:blur="emit('focus-out-row')" v-on:change="onProfSelectChange($event, weapon)">
 		<option v-if="showSelectMultipleFirst" :selected="false" style="color:grey;" value="0" :key="-999">select multiple...</option>
 		<option selected v-if="gotCustomMultiCheck" :value="get_weaponOptionValue()">
 			{{ multiSelectedOptionLabel }}

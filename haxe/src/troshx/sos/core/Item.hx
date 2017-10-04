@@ -45,8 +45,8 @@ class Item
 	public static inline var GP:Int = 2;
 	public var unit:Int = 1;
 	
-	public function normalize():Void {
-		
+	public function normalize():Item {
+		return this;
 	}
 	
 	public function setWeightCost<T>(weight:Float, cost:Int, costCurrency:Int):T {

@@ -125,6 +125,24 @@ class Inventory
 		}
 		return arr;
 	}
+	
+	function compareItemsEq(a:Item, b:Item):Bool {
+		var as:Serializer = new Serializer();
+		var bs:Serializer = new Serializer();
+		as.serialize(a);
+		bs.serialize(b);
+		/*
+		var astr = as.toString();
+		var bstr = bs.toString();
+		if (astr != bstr) {
+			trace(astr);
+			trace(bstr);
+		}
+		
+		return astr == bstr;
+		*/
+		return(as.toString() == bs.toString());
+	}
 
 	/**
 	 * 
@@ -145,7 +163,8 @@ class Inventory
 				if (preferedUnheld == PREFER_UNHELD_PACKED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
-					if ( (m = packed.getMatchingItem(q)) != null && m.item != q.item ) {
+					if ( (m = packed.getMatchingItem(q)) != null && m.item != q.item && !compareItemsEq(m.item.normalize(), q.item.normalize()) ) {
+						
 						
 						return false;
 					}
@@ -156,7 +175,7 @@ class Inventory
 				else if (preferedUnheld == PREFER_UNHELD_DROPPED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
-					if ( (m=dropped.getMatchingItem(q))!=null && m.item != q.item ) {
+					if ( (m=dropped.getMatchingItem(q))!=null && m.item != q.item && !compareItemsEq(m.item.normalize(), q.item.normalize()) ) {
 						
 						return false;
 					}
