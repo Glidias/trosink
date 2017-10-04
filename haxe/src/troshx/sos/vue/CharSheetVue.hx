@@ -179,15 +179,35 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		}
 		
 		closeOverwriteModal();
-	}
-	function cancelOverwriteItem():Void {
-		closeOverwriteModal();
+		_vRefs.overwriteItemWarning.close();
 	}
 	
-	inline function closeOverwriteModal():Void {
+	function confirmQtyMultipleSend():Void {
+		
+		//
+		if (itemToOverwriteToPacked) {
+			packItemEntryFromGround(this.itemQtyMultiple, this.itemQtyMultiple.qty);
+		}
+		else {
+			dropItemEntryFromPack(this.itemQtyMultiple, this.itemQtyMultiple.qty);
+		}
+		
+		
+		closeMultipleQtyItem();
+		_vRefs.itemQtyMultipleModal.close();
+	}
+	
+	inline function closeMultipleQtyItem(canceling:Bool=false):Void {
+		itemQtyMultiple = null;
+		
+	}
+	
+	inline function closeOverwriteModal(canceling:Bool=false):Void {
 		itemToOverwriteWith = null;
-		privateData.dynArray = null;
-		privateData.origQtyItem = null;
+		if (!canceling) {
+			privateData.dynArray = null;
+			privateData.origQtyItem = null;
+		}
 	}
 	
 	@:watch function watch_itemToOverwriteWith(newValue:ItemQty):Void {
@@ -200,20 +220,40 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		}
 	}
 	
+	@:watch function watch_itemQtyMultiple(newValue:ItemQty):Void {
+		if (newValue != null) {
+			_vRefs.itemQtyMultipleModal.open();
+		}
+		else {
+			_vRefs.itemQtyMultipleModal.close();
+		}
+	}
+	
 	
 	// inventory proxy methods with additional vue checks
-	function packItemEntryFromGround(itemQ:ItemQty):Void {
-		itemToOverwriteWith = this.char.inventory.packItemEntryFromGround(itemQ);
+	function packItemEntryFromGround(itemQ:ItemQty, qty:Int = 0):Void {
 		itemToOverwriteToPacked = true;
+		if (qty == 0 && itemQ.qty > 1) {
+			itemQtyMultipleMax = itemQ.qty;
+			itemQtyMultiple = itemQ.getQtyCopy(itemQ.qty);
+			return;
+		}
+		itemToOverwriteWith = this.char.inventory.packItemEntryFromGround(itemQ, qty);
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = itemQ;
 			privateData.dynArray = null;
 		}
 	}
 	
-	function dropItemEntryFromPack(itemQ:ItemQty):Void {
-		itemToOverwriteWith = this.char.inventory.dropItemEntryFromPack(itemQ);
+	function dropItemEntryFromPack(itemQ:ItemQty, qty:Int = 0):Void {
 		itemToOverwriteToPacked = false;
+		if (qty == 0 && itemQ.qty > 1) {
+			itemQtyMultipleMax = itemQ.qty;
+			itemQtyMultiple = itemQ.getQtyCopy(itemQ.qty);
+			return;
+			
+		}
+		itemToOverwriteWith = this.char.inventory.dropItemEntryFromPack(itemQ, qty);
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = itemQ;
 			privateData.dynArray = null;
@@ -964,6 +1004,9 @@ class CharSheetVueData  {
 	var itemToOverwriteWith:ItemQty = null;
 	var itemToOverwriteToPacked:Bool = false;
 	var itemToOverwriteWithChecked:Bool = false;
+	
+	var itemQtyMultiple:ItemQty = null;
+	var itemQtyMultipleMax:Int = 1;
 	
 	var privateData:InventoryVuePrivate = {};
 	

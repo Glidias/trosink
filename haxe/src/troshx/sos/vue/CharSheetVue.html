@@ -13,9 +13,9 @@
 	</div>
 		
 	<sweet-modal ref="overwriteItemWarning">
-		<div  v-if="itemToOverwriteWith!=null">
+		<div  v-if="itemToOverwriteWith!=null" v-on:close="closeOverwriteModal()">
 			<div>
-			The item{{itemToOverwriteWith.qty > 1 ? "s":""}} <b>"{{ itemToOverwriteWith.get_uid()}}"</b><b v-show="itemToOverwriteWith.qty>1">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? "pack" : "drop" }} appears <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }} with the same label! Either confirm you with to overwrite the existing item(s) {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? "packing" : "dropping" }} it!.
+			The item{{itemToOverwriteWith.qty > 1 ? "s":""}} <b>"{{ itemToOverwriteWith.get_uid()}}"</b><b v-show="itemToOverwriteWith.qty>1">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? "pack" : "drop" }} appears <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }} with the same label! Either confirm you with to overwrite the existing item(s) {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? "packing" : "dropping" }} it.
 			</div>
 			<br/>
 			<div>
@@ -23,8 +23,23 @@
 				<br/>
 				<button slot="button" :disabled="!itemToOverwriteWithChecked" v-on:click="confirmOverwriteItem()">Confirm Overwrite</button>
 				<br/>
-				<button slot="button" v-on:click="itemToOverwriteWith=null">Cancel</button>
+				<button slot="button" v-on:click="closeOverwriteModal(true)">Cancel</button>
 			</div>
+		</div>
+	</sweet-modal>
+			
+	<sweet-modal ref="itemQtyMultipleModal" v-on:close="closeMultipleQtyItem()">
+		<div v-if="itemQtyMultiple!=null">
+			<div>
+				How much of <b>{{itemQtyMultiple.get_uid()}}</b><b>({{itemQtyMultipleMax}})</b> do you wish to {{ itemToOverwriteToPacked ? "pack" : "drop" }}?
+			</div>
+			<br/>
+			<div>
+				<InputInt type="number" :obj="itemQtyMultiple" prop="qty" :min="1" :max="itemQtyMultipleMax" />
+			</div>
+			<br/>
+			<button slot="button" v-on:click="confirmQtyMultipleSend()">Confirm</button>
+			<button slot="button" v-on:click="closeMultipleQtyItem(true)">Cancel</button>
 		</div>
 	</sweet-modal>
 	

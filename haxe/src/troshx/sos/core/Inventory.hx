@@ -205,8 +205,9 @@ class Inventory
 
 	
 	// imperative case functions
-	public function packItemEntryFromGround(itemQ:ItemQty):ItemQty {
-		var qty:Int = itemQ.qty;
+	public function packItemEntryFromGround(itemQ:ItemQty, qty:Int=0):ItemQty {
+		if (qty == 0) qty = itemQ.qty;
+		else itemQ = itemQ.getQtyCopy(qty);
 		
 		var s:ItemQty = _shiftItem(itemQ.item, PREFER_UNHELD_PACKED, qty);
 		if (s !=null) {
@@ -217,8 +218,10 @@ class Inventory
 		return null;
 	}
 	
-	public function dropItemEntryFromPack(itemQ:ItemQty):ItemQty {
-		var qty:Int = itemQ.qty;
+	public function dropItemEntryFromPack(itemQ:ItemQty, qty:Int=0):ItemQty {
+		if (qty == 0) qty = itemQ.qty;
+		else itemQ = itemQ.getQtyCopy(qty);
+		
 		var s:ItemQty = _shiftItem(itemQ.item, PREFER_UNHELD_DROPPED, qty);
 		if (s !=null) {
 			return s;

@@ -26,6 +26,12 @@ class ItemQty implements IUid implements IUpdateWith<ItemQty> implements IValida
 		this.qty = qty;
 	}
 	
+	public function getQtyCopy(qty:Int):ItemQty {
+		var qtyer:ItemQty = new ItemQty(item, qty);
+		qtyer.attachments = attachments;
+		return qtyer;
+	}
+	
 	public function getAttachmentsId():String {
 		var str:String = "";
 		for (i in 0...attachments.length) {
