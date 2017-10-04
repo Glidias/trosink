@@ -38,9 +38,11 @@ class InputNameQty extends VComponent<NoneT, InputNameQtyProps>
 		
 		var tarName:String = StringTools.trim( inputElement.value);
 		var updated:Bool = false;
-		if ( tarName != "" ) {
+		if ( tarName != "" && (customValidateName == null || customValidateName(tarName, itemQty))  ) {
+			
 			this.itemQty.item.name = tarName;
 			updated = true;
+			
 		}
 		inputElement.value = label;
 		if (updated) emit("updated");
@@ -56,4 +58,5 @@ class InputNameQty extends VComponent<NoneT, InputNameQtyProps>
 
 typedef InputNameQtyProps = {
 	var itemQty:ItemQty;
+	@:optional var customValidateName:String->ItemQty->Bool;
 }

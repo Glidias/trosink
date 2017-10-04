@@ -3,6 +3,16 @@
 
 	<h2>Inventory</h2>
 	
+	<div if="true">
+		<div class="tallycta"><label><input type="checkbox" v-model="userShowTally"></input><i>Tally?</i></label></div>
+	</div>
+	<div class="checkout" v-if="showTally">
+		<div><b>Tally:</b> <i>(excluding dropped)</i></div>
+		<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>
+		<div>Total Weight: <b>{{ totalWeight }}</b></div>
+	</div>
+	
+	
 	<h4>Dropped:</h4>
 	<table border="1">
 		<thead>
@@ -16,13 +26,13 @@
 		</thead>
 		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('dropped', $event)" v-on:touchstart.native="setCurWidgetSection('dropped', $event)">
 			
-			<tr v-for="entry in char.inventory.dropped.list" :key="entry.item.get_uid()">
-				<td><input-name-qty :itemQty="entry" v-on:updated="onInputNameUpdated" /></td>
+			<tr v-for="(entry,i) in char.inventory.dropped.list" :key="entry.item.get_uid()">
+				<td><input-name-qty :itemQty="entry" v-on:updated="onInputNameUpdated" :customValidateName="validateQtyNameDropped" /></td>
 				<td><input type="number" v-model.number="entry.qty" number min="1"></input></td>
 				<td><input type="number" step="0.5" v-model.number="entry.item.weight" number min="0"></input></td>
 				<td>{{ entry.item.getTypeLabel() }}</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packItemEntryFromGround(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="packItemEntryFromGround(entry)">Pack</a>
 					<a href="javascript:;" v-on:click="char.inventory.equipItemEntryFromGround(entry)">Equip</a>
 					<a href="javascript:;" v-on:click="char.inventory.deleteDropped(entry)">Delete</a>
 				</td>
@@ -56,14 +66,14 @@
 			</tr>
 		</thead>
 		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('packed', $event)" v-on:touchstart.native="setCurWidgetSection('packed', $event)">
-			<tr v-for="entry in char.inventory.packed.list" :key="entry.item.get_uid()">
-				<td><input-name-qty :itemQty="entry" v-on:updated="onInputNameUpdated" /></td>
+			<tr v-for="(entry,i) in char.inventory.packed.list" :key="entry.item.get_uid()">
+				<td><input-name-qty :itemQty="entry" v-on:updated="onInputNameUpdated" :customValidateName="validateQtyNamePacked" /></td>
 				<td><input type="number" v-model.number="entry.qty" number min="1"></input></td>
 				<td><input type="number" step="0.5" v-model.number="entry.item.weight" number min="0"></input></td>
 				<td>{{ entry.item.getTypeLabel() }}</td>
 
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.dropItemEntryFromPack(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropItemEntryFromPack(entry)">Drop</a>
 					<a href="javascript:;" v-on:click="char.inventory.equipItemEntryFromPack(entry)">Equip</a>
 					<a href="javascript:;" v-on:click="char.inventory.deletePacked(entry)">Delete</a>
 				</td>
@@ -114,9 +124,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedShield(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedShield(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedShield(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedShield(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedShield(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedShield(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-1">
@@ -184,9 +194,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" v-if="weaponEntry.e.weapon.isMelee()" :key="-1">
@@ -254,9 +264,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" v-if="weaponEntry.e.weapon.isBow()" :key="-2">
@@ -304,9 +314,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-3" v-if="weaponEntry.e.weapon.isCrossbow()">
@@ -359,9 +369,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-4" v-if="weaponEntry.e.weapon.isFirearm()">
@@ -412,9 +422,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-5" v-if="weaponEntry.e.weapon.isThrowing() || weaponEntry.e.weapon.isSling()">
@@ -460,9 +470,9 @@
 				<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('ammo', 'td-unheld', itemIndex)" />
 				<td class="voidna"></td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packEquipedWeapon(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropEquipedWeapon(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedWeapon(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-6" v-if="weaponEntry.e.weapon.isAmmunition()">
@@ -504,9 +514,9 @@
 					<select-held :entry="entry" :inventory="char.inventory" />
 				</td>
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packMiscItem(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropMiscItem(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropMiscItem(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packMiscItem(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropMiscItem(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropMiscItem(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-1">
@@ -544,9 +554,9 @@
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.armor)" :index="i" :showWidget="isVisibleWidget('armor','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
 				
 				<td>
-					<a href="javascript:;" v-on:click="char.inventory.packWornArmor(entry)">Pack</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropWornArmor(entry)">Drop</a>
-					<a href="javascript:;" v-on:click="char.inventory.dropWornArmor(entry, true)">Delete</a>
+					<a href="javascript:;" v-on:click="packWornArmor(entry)">Pack</a>
+					<a href="javascript:;" v-on:click="dropWornArmor(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropWornArmor(entry, true)">Delete</a>
 				</td>
 			</tr>
 			<tr class="entry-row" :key="-1">

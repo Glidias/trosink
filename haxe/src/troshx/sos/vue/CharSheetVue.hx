@@ -16,6 +16,7 @@ import msignal.Signal.Signal1;
 import troshx.sos.core.ArmorSpecial;
 import troshx.sos.core.ArmorSpecial.WornWith;
 import troshx.sos.core.BodyChar;
+import troshx.sos.core.Money;
 import troshx.sos.core.TargetZone;
 import troshx.sos.vue.input.MixinInput;
 
@@ -156,6 +157,45 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	function onBaseInventoryClick(e:Event):Void {
 		clearWidgets();
+	}
+	
+	
+	// inventory proxy methods with additional vue checks
+	function packItemEntryFromGround(itemQ:ItemQty):Void {
+		this.char.inventory.packItemEntryFromGround(itemQ);
+	}
+	
+	function dropItemEntryFromPack(itemQ:ItemQty):Void {
+		this.char.inventory.dropItemEntryFromPack(itemQ);
+	}
+	
+	function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Void {  // Not applicable for shield
+		this.char.inventory.dropEquipedShield(alreadyEquiped, doDestroy);
+	}
+	function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Void {
+		this.char.inventory.dropMiscItem(alreadyEquiped, doDestroy);
+	}
+	function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Void {
+		this.char.inventory.dropEquipedWeapon(alreadyEquiped, doDestroy);
+	}
+	
+	function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Void {
+		this.char.inventory.dropWornArmor(alreadyEquiped, doDestroy);
+	}
+	
+	function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
+		this.char.inventory.packEquipedShield(alreadyEquiped);
+	}
+	
+	function packMiscItem(alreadyEquiped:ItemAssign):Void {
+		this.char.inventory.packMiscItem(alreadyEquiped);
+	}
+	function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
+		this.char.inventory.packEquipedWeapon(alreadyEquiped);
+	}
+	
+	function packWornArmor(alreadyEquiped:ArmorAssign):Void {
+		this.char.inventory.packWornArmor(alreadyEquiped);
 	}
 	
 	
@@ -560,6 +600,36 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return false;
 	}
 	
+	function validateQtyName(name:String, itemQty:ItemQty, isPacked:Bool):Bool {
+		
+		var matchArr:IDMatchArray<ItemQty> = isPacked ?  this.char.inventory.packed : this.char.inventory.dropped;
+		var testItem:Item =  itemQty.item;
+		var lastName:String = testItem.name;
+		testItem.name = name;
+		var testId:String = itemQty.uid;
+		testItem.name = lastName;
+		for (i in 0...matchArr.list.length) {
+			var it = matchArr.list[i];
+			if (it == itemQty) {
+				continue;
+			}
+			if (it.uid == testId) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	function validateQtyNamePacked(name:String, itemQty:ItemQty):Bool {
+		return validateQtyName(name, itemQty, true);
+	}
+	
+	function validateQtyNameDropped(name:String, itemQty:ItemQty):Bool {
+		return validateQtyName(name, itemQty, false);
+	}
+	
+	
 	function executeEquipEntry(equipEntry:RowReadyEntry, typeId:String):Bool {
 		
 		if ( equipEntry.isValid() )  {
@@ -695,6 +765,28 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		return this.char.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
 	}
 	
+	@:computed function get_totalCostMoney():Money {
+		return char.inventory.calculateTotalCost();
+	}
+	
+	@:computed function get_totalCostGP():Int {
+		return this.totalCostMoney.gp;
+	}
+	@:computed function get_totalCostSP():Int {
+		return this.totalCostMoney.sp;
+	}
+	@:computed function get_totalCostCP():Int {
+		return this.totalCostMoney.cp;
+	}
+	
+	@:computed function get_totalWeight():Float {
+		return char.inventory.calculateTotalWeight();
+	}
+	
+	@:computed function get_showTally():Bool {  // may include other props
+		return this.userShowTally;
+	}
+	
 	// computed proxy to inventory filtered lists
 	
 	@:computed function get_filteredMelee():Array<WeaponAssign>  {
@@ -773,6 +865,8 @@ class CharSheetVueData  {
 	var shieldEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("shield") );
 	var weaponEntry:RowReadyEntry= new RowReadyEntry( Inventory.getEmptyReadyAssign("weapon") );
 	var miscItemEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("item") );
+	
+	var userShowTally:Bool = true;
 	
 	// worn armor
 	var armorEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("armor") );

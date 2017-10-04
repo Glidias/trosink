@@ -132,7 +132,7 @@ class Inventory
 	 * @param	preferedUnheld  0 - Auto, >0 any prefered unheld value,  -1: ignore internal for equippng item,  -2 destroy internal
 	 * @return
 	 */
-	function _shiftItem(item:Item, preferedUnheld:Int, qty:Int=1, attachments:Array<Item>=null):Void {
+	function _shiftItem(item:Item, preferedUnheld:Int, qty:Int=1, attachments:Array<Item>=null):Bool {
 		
 		if (qty <= 0) qty = 1;
 		
@@ -141,21 +141,34 @@ class Inventory
 		if (preferedUnheld > 0) {
 			if (preferedUnheld != PREFER_UNHELD_EQUIPPED) {  // would != the case of existingHeldItem.unheld already remain requipped
 				var q:ItemQty;
+				var m:ItemQty;
 				if (preferedUnheld == PREFER_UNHELD_PACKED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
+					if ( (m = packed.getMatchingItem(q)) != null && m.item != q.item ) {
+						
+						return false;
+					}
 					packed.add( q );
+					return true;
 					
 				}
 				else if (preferedUnheld == PREFER_UNHELD_DROPPED) {
 					q = new ItemQty(item, qty);
 					q.attachments = attachments;
+					if ( (m=dropped.getMatchingItem(q))!=null && m.item != q.item ) {
+						
+						return false;
+					}
 					dropped.add( q );
+					return true;
 				}
 				else {
 					trace("Unaccounted prefered unheld case: " + preferedUnheld);
+					return false;
 				}
 			}
+			return true;
 		}
 		else if (preferedUnheld < 0) {  
 			// no unheld state saved, item completely demolished to the void
@@ -168,36 +181,33 @@ class Inventory
 				packed.splicedAgainst( delItem );
 			}
 				//;
+			return true;
 		}
+		return false;
 	}
 
 	
 	// imperative case functions
-	public function packItemEntryFromGround(itemQ:ItemQty):Void {
+	public function packItemEntryFromGround(itemQ:ItemQty):Bool {
 		var qty:Int = itemQ.qty;
+		
+		
+		if (!_shiftItem(itemQ.item, PREFER_UNHELD_PACKED, qty)) {
+			return false;
+		}
 		dropped.splicedAgainst(itemQ);
 		dispatchSignal(InventorySignal.PackItem);
-		_shiftItem(itemQ.item, PREFER_UNHELD_PACKED, qty);
-		
+		return true;
 	}
 	
-	/*
-	public function holdItemEntryFromGround(itemQ:ItemQty, remark:String=""):Void {
-		var itemReady = equipItemEntryFromGround(itemQ, remark);
-		if (itemReady != null) {
-			var weapon:Weapon = LibUtil.as(itemReady, Weapon);
-			var shield:Shield = Std.is(itemReady, Shield);
-		
-			holdEquiped(itemReady, isShield ? (isShield HELD_OFF : weapon.twoHanded);
-		}
-	}
-	*/
-	
-	public function dropItemEntryFromPack(itemQ:ItemQty):Void {
+	public function dropItemEntryFromPack(itemQ:ItemQty):Bool {
 		var qty:Int = itemQ.qty;
+		if (!_shiftItem(itemQ.item, PREFER_UNHELD_DROPPED, qty)) {
+			return false;
+		}
 		packed.splicedAgainst(itemQ);
-		_shiftItem(itemQ.item, PREFER_UNHELD_DROPPED, qty);
 		dispatchSignal(InventorySignal.DropItem);
+		return true;
 	}
 	
 	public function equipItemEntryFromGround(itemQ:ItemQty, remark:String=""):ReadyAssign {
@@ -220,6 +230,83 @@ class Inventory
 		dispatchSignal(InventorySignal.HoldItem);
 	}
 	
+	public function calculateTotalWeight(forceIncludePacked:Bool=false, forceIncludeDropped:Bool=false):Float {
+		var w:Float = 0;
+		
+		if (forceIncludeDropped) {
+			for (i in 0...dropped.length) {
+				w += dropped.list[i].item.weight * dropped.list[i].qty;
+			}
+		}
+		if (!dropPack || forceIncludePacked ) {
+			for (i in 0...packed.length) {
+				w += packed.list[i].item.weight * packed.list[i].qty;
+			}
+		}
+		
+		for (i in 0...wornArmor.length) {
+			w += wornArmor[i].armor.weight;
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			w += equipedNonMeleeItems[i].item.weight;
+		}
+		for (i in 0...shields.length) {
+			w += shields[i].shield.weight;
+		}
+		for (i in 0...weapons.length) {
+			w += weapons[i].weapon.weight;
+		}
+	
+		return w;
+	}
+	
+	static var MONEY_CALC_CACHE:Array<Int> = [0,0,0];
+	static var MONEY_REF:Money = new Money();
+	
+	public function calculateTotalCost(forceIncludeDropped:Bool = false):Money {
+		var item:Item;
+		var qtyAssign:ItemQty;
+		var calcCache:Array<Int> = MONEY_CALC_CACHE;
+		calcCache[Item.CP] = 0;
+		calcCache[Item.SP] = 0;
+		calcCache[Item.GP] = 0;
+		
+		
+		if (forceIncludeDropped) {
+			for (i in 0...dropped.length) {
+				qtyAssign = dropped.list[i];
+				calcCache[qtyAssign.item.costCurrency] += qtyAssign.item.cost * qtyAssign.qty;
+			}
+		}
+		for (i in 0...packed.length) {
+			qtyAssign = packed.list[i];
+			calcCache[qtyAssign.item.costCurrency] += qtyAssign.item.cost * qtyAssign.qty;
+		}
+		
+		for (i in 0...wornArmor.length) {
+			item = wornArmor[i].armor;
+			calcCache[item.costCurrency] += item.cost;
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			item = equipedNonMeleeItems[i].item;
+			calcCache[item.costCurrency] += item.cost;
+		}
+		for (i in 0...shields.length) {
+			item = shields[i].shield;
+			calcCache[item.costCurrency] += item.cost;
+		}
+		for (i in 0...weapons.length) {
+			item = weapons[i].weapon;
+			calcCache[item.costCurrency] += item.cost;
+		}
+		
+		var moneyRef:Money = MONEY_REF;
+		
+		
+		moneyRef.matchWithValues(calcCache[Item.GP], calcCache[Item.SP], calcCache[Item.CP]);
+		return moneyRef.changeToHighest();
+	}
+	
 	function sortBetweenAttachmentItems(ao:Item, bo:Item):Int
 	{
 		var a = ao.label.toLowerCase();
@@ -240,57 +327,89 @@ class Inventory
 		return newArr;
 	}
 	
-	public function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Void {  // Not applicable for shield
-		
-		shields.splice( shields.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.shield, PREFER_UNHELD_DROPPED, 1);
+	public function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Bool {  // Not applicable for shield
+		var ind:Int= shields.indexOf(alreadyEquiped);
+		if (!doDestroy) {
+			if (!_shiftItem(alreadyEquiped.shield, PREFER_UNHELD_DROPPED, 1)) {
+				return false;
+			}
+		}
+		shields.splice(ind , 1 );
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
+		return true;
 	}
-	public function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Void {
-		var ind:Int;
-		equipedNonMeleeItems.splice( ind=equipedNonMeleeItems.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.item, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(equipedNonMeleeItems, ind, "item") );
+	public function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Bool {
+		var ind:Int = equipedNonMeleeItems.indexOf(alreadyEquiped);
+		if (!doDestroy) {
+			if (!_shiftItem(alreadyEquiped.item, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(equipedNonMeleeItems, ind, "item") )) {
+				return false;
+			}
+		}
+		equipedNonMeleeItems.splice( ind, 1 );
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
+		return true;
 	}
-	public function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Void {
-		var ind:Int;
-		weapons.splice( ind=weapons.indexOf(alreadyEquiped), 1 );
-		if (!doDestroy) _shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(weapons, ind, "weapon"));
+	public function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Bool {
+		var ind:Int = weapons.indexOf(alreadyEquiped);
+		if (!doDestroy) {
+			if (!_shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(weapons, ind, "weapon")) ) {
+				return false;
+			}
+		}
+		weapons.splice( ind, 1 );
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
+		return true;
 	}
 	
-	public function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Void {
-		var ind:Int;
-		wornArmor.splice(ind = wornArmor.indexOf(alreadyEquiped), 1);
-		if (!doDestroy) _shiftItem(alreadyEquiped.armor, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(wornArmor, ind, "armor") );
+	public function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Bool {
+		var ind:Int = wornArmor.indexOf(alreadyEquiped);
+		if (!doDestroy) {
+			if ( !_shiftItem(alreadyEquiped.armor, PREFER_UNHELD_DROPPED, 1, getAttachmentArray(wornArmor, ind, "armor") ) ) {
+				return false;
+			}
+		}
+		wornArmor.splice(ind, 1);
 		dispatchSignal(doDestroy ? InventorySignal.DeleteItem : InventorySignal.DropItem);
+		return true;
 	}
 	
-	public function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
-		
-		shields.splice( shields.indexOf(alreadyEquiped), 1 );
-		_shiftItem(alreadyEquiped.shield, PREFER_UNHELD_PACKED, 1);
+	public function packEquipedShield(alreadyEquiped:ShieldAssign):Bool {
+		var ind:Int = shields.indexOf(alreadyEquiped);
+		if (!_shiftItem(alreadyEquiped.shield, PREFER_UNHELD_PACKED, 1)) {
+			return false;
+		}
+		shields.splice( ind, 1 );
 		dispatchSignal(InventorySignal.PackItem);
+		return true;
 	}
 	
-	public function packMiscItem(alreadyEquiped:ItemAssign):Void {
-		var ind:Int;
-		equipedNonMeleeItems.splice( ind= equipedNonMeleeItems.indexOf(alreadyEquiped), 1  );
-		_shiftItem(alreadyEquiped.item, PREFER_UNHELD_PACKED,  1, getAttachmentArray(equipedNonMeleeItems, ind, "item"));
+	public function packMiscItem(alreadyEquiped:ItemAssign):Bool {
+		var ind:Int = equipedNonMeleeItems.indexOf(alreadyEquiped);
+		if (!_shiftItem(alreadyEquiped.item, PREFER_UNHELD_PACKED,  1, getAttachmentArray(equipedNonMeleeItems, ind, "item"))) {
+			return false;
+		}
+		equipedNonMeleeItems.splice( ind , 1  );
 		dispatchSignal(InventorySignal.PackItem);
+		return true;
 	}
-	public function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
-		var ind:Int;
-		weapons.splice( ind= weapons.indexOf(alreadyEquiped), 1 );
-		_shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_PACKED, 1, getAttachmentArray(weapons, ind, "weapon"));
+	public function packEquipedWeapon(alreadyEquiped:WeaponAssign):Bool {
+		var ind:Int = weapons.indexOf(alreadyEquiped);
+		if (!_shiftItem(alreadyEquiped.weapon, PREFER_UNHELD_PACKED, 1, getAttachmentArray(weapons, ind, "weapon"))) {
+			return false;
+		}
+		weapons.splice( ind, 1 );
 		dispatchSignal(InventorySignal.PackItem);
+		return true;
 	}
 	
-	public function packWornArmor(alreadyEquiped:ArmorAssign):Void {
-		var ind:Int;
-		wornArmor.splice(ind = wornArmor.indexOf(alreadyEquiped), 1);
-		_shiftItem(alreadyEquiped.armor, PREFER_UNHELD_PACKED, 1, getAttachmentArray(wornArmor, ind, "armor"));
+	public function packWornArmor(alreadyEquiped:ArmorAssign):Bool {
+		var ind:Int =  wornArmor.indexOf(alreadyEquiped);
+		if (!_shiftItem(alreadyEquiped.armor, PREFER_UNHELD_PACKED, 1, getAttachmentArray(wornArmor, ind, "armor"))) {
+			return false;
+		}
+		wornArmor.splice(ind , 1);
 		dispatchSignal(InventorySignal.PackItem);
+		return true;
 	}
 
 	public function deletePacked(itemQty:ItemQty):Void {

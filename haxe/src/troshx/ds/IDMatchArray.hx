@@ -87,7 +87,7 @@ class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 	}
 	
 	
-	function getMatchingItem(item:T):T {
+	public function getMatchingItem(item:T):T {
 		for (i in 0...list.length) {
 			var a = list[i];
 			if (a.uid == item.uid) {

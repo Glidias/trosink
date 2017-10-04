@@ -39,6 +39,12 @@ class Money
 		cp = other.cp;
 		return this;
 	}
+	public function matchWithValues(g:Int, s:Int, c:Int):Money {
+		gp = g;
+		sp = s;
+		cp = c;
+		return this;
+	}
 	
 	
 	inline public function isNegative():Bool {
