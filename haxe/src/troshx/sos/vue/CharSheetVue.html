@@ -11,6 +11,22 @@
 		<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>
 		<div>Total Weight: <b>{{ totalWeight }}</b></div>
 	</div>
+		
+	<sweet-modal ref="overwriteItemWarning">
+		<div  v-if="itemToOverwriteWith!=null">
+			<div>
+			The item{{itemToOverwriteWith.qty > 1 ? "s":""}} <b>"{{ itemToOverwriteWith.get_uid()}}"</b><b v-show="itemToOverwriteWith.qty>1">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? "pack" : "drop" }} appears <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }} with the same label! Either confirm you with to overwrite the existing item(s) {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? "packing" : "dropping" }} it!.
+			</div>
+			<br/>
+			<div>
+				<div><label><input type="checkbox" v-model="itemToOverwriteWithChecked"></input> <i>Confirm Overwrite?</i></label></div>
+				<br/>
+				<button slot="button" :disabled="!itemToOverwriteWithChecked" v-on:click="confirmOverwriteItem()">Confirm Overwrite</button>
+				<br/>
+				<button slot="button" v-on:click="itemToOverwriteWith=null">Cancel</button>
+			</div>
+		</div>
+	</sweet-modal>
 	
 	
 	<h4>Dropped:</h4>

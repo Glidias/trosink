@@ -65,6 +65,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	{
 		super();
 		untyped this.mixins = [ MixinInput.getInstance() ];
+
 	}
 	
 	override public function Data():CharSheetVueData {
@@ -160,42 +161,140 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	
+	
+	// item overwrite warning
+	function confirmOverwriteItem():Void {
+		
+		var tarArray = itemToOverwriteToPacked ? this.char.inventory.packed : this.char.inventory.dropped;
+		tarArray.add(itemToOverwriteWith);
+		var itemQty:ItemQty = tarArray.getMatchingItem(itemToOverwriteWith);
+		itemQty.item = itemToOverwriteWith.item;
+		itemQty.attachments = itemToOverwriteWith.attachments;
+		if (privateData.dynArray != null) {
+			privateData.dynArray.splice( privateData.dynArray.indexOf(privateData.dynAssign) , 1);
+		}
+		else {
+			var srcArray = itemToOverwriteToPacked ? this.char.inventory.dropped : this.char.inventory.packed;
+			srcArray.splicedAgainst( privateData.origQtyItem);
+		}
+		
+		closeOverwriteModal();
+	}
+	function cancelOverwriteItem():Void {
+		closeOverwriteModal();
+	}
+	
+	inline function closeOverwriteModal():Void {
+		itemToOverwriteWith = null;
+		privateData.dynArray = null;
+		privateData.origQtyItem = null;
+	}
+	
+	@:watch function watch_itemToOverwriteWith(newValue:ItemQty):Void {
+		if (newValue != null) {
+			itemToOverwriteWithChecked = false;
+			_vRefs.overwriteItemWarning.open();
+		}
+		else {
+			_vRefs.overwriteItemWarning.close();
+		}
+	}
+	
+	
 	// inventory proxy methods with additional vue checks
 	function packItemEntryFromGround(itemQ:ItemQty):Void {
-		this.char.inventory.packItemEntryFromGround(itemQ);
+		itemToOverwriteWith = this.char.inventory.packItemEntryFromGround(itemQ);
+		itemToOverwriteToPacked = true;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = itemQ;
+			privateData.dynArray = null;
+		}
 	}
 	
 	function dropItemEntryFromPack(itemQ:ItemQty):Void {
-		this.char.inventory.dropItemEntryFromPack(itemQ);
+		itemToOverwriteWith = this.char.inventory.dropItemEntryFromPack(itemQ);
+		itemToOverwriteToPacked = false;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = itemQ;
+			privateData.dynArray = null;
+		}
 	}
 	
 	function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Void {  // Not applicable for shield
-		this.char.inventory.dropEquipedShield(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.char.inventory.dropEquipedShield(alreadyEquiped, doDestroy);
+		itemToOverwriteToPacked = false;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.shields;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Void {
-		this.char.inventory.dropMiscItem(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.char.inventory.dropMiscItem(alreadyEquiped, doDestroy);
+		itemToOverwriteToPacked = false;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.equipedNonMeleeItems;
+			privateData.dynAssign = alreadyEquiped;
+		}
+		
 	}
 	function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Void {
-		this.char.inventory.dropEquipedWeapon(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.char.inventory.dropEquipedWeapon(alreadyEquiped, doDestroy);
+		itemToOverwriteToPacked = false;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.weapons;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	
 	function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Void {
-		this.char.inventory.dropWornArmor(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.char.inventory.dropWornArmor(alreadyEquiped, doDestroy);
+		itemToOverwriteToPacked = false;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.wornArmor;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	
 	function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
-		this.char.inventory.packEquipedShield(alreadyEquiped);
+		itemToOverwriteWith = this.char.inventory.packEquipedShield(alreadyEquiped);
+		itemToOverwriteToPacked = true;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.shields;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	
 	function packMiscItem(alreadyEquiped:ItemAssign):Void {
-		this.char.inventory.packMiscItem(alreadyEquiped);
+		itemToOverwriteWith = this.char.inventory.packMiscItem(alreadyEquiped);
+		itemToOverwriteToPacked = true;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.equipedNonMeleeItems;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
-		this.char.inventory.packEquipedWeapon(alreadyEquiped);
+		itemToOverwriteWith = this.char.inventory.packEquipedWeapon(alreadyEquiped);
+		itemToOverwriteToPacked = true;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.weapons;
+		}
 	}
 	
 	function packWornArmor(alreadyEquiped:ArmorAssign):Void {
-		this.char.inventory.packWornArmor(alreadyEquiped);
+		itemToOverwriteWith = this.char.inventory.packWornArmor(alreadyEquiped);
+		itemToOverwriteToPacked = true;
+		if (itemToOverwriteWith != null) {
+			privateData.origQtyItem = null;
+			privateData.dynArray = this.char.inventory.wornArmor;
+			privateData.dynAssign = alreadyEquiped;
+		}
 	}
 	
 	
@@ -861,6 +960,13 @@ class CharSheetVueData  {
 	var droppedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
 	var packedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
 	
+	// confirm to overwrite above
+	var itemToOverwriteWith:ItemQty = null;
+	var itemToOverwriteToPacked:Bool = false;
+	var itemToOverwriteWithChecked:Bool = false;
+	
+	var privateData:InventoryVuePrivate = {};
+	
 	// equiped items entry
 	var shieldEntry:RowReadyEntry = new RowReadyEntry( Inventory.getEmptyReadyAssign("shield") );
 	var weaponEntry:RowReadyEntry= new RowReadyEntry( Inventory.getEmptyReadyAssign("weapon") );
@@ -924,6 +1030,14 @@ class CharSheetVueData  {
 	}
 
 }
+
+typedef InventoryVuePrivate = {
+	@:optional var dynArray:Array<Dynamic>;
+	@:optional var dynAssign:Dynamic;
+	@:optional var origQtyItem:ItemQty;
+	
+}
+
 typedef WidgetItemRequest = {
 	var section:String;
 	var type:String;
