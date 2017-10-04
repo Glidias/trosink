@@ -41,9 +41,10 @@ class Shield extends Item
 			"shoulder":true,
 			
 			// shield arm
-			//"elbow":true,
-			"forearm":true,
-			"hand":true
+			"upperArm":false,
+			"elbow":false,
+			"forearm":false,
+			"hand":false
 		},
 		{
 			// whole head
@@ -55,9 +56,10 @@ class Shield extends Item
 			"shoulder":true,
 			
 			// shield arm
-			"elbow":true,	// include elbow for medium?
-			"forearm":true,
-			"hand":true,
+			"upperArm":false,
+			"elbow":false,
+			"forearm":false,
+			"hand":false,
 			
 			"chest":true	
 			
@@ -90,9 +92,10 @@ class Shield extends Item
 			"belly":true,
 			
 			// shield arm
-			//"elbow":true,
-			"forearm":true,
-			"hand":true
+			"upperArm":false,
+			"elbow":false,
+			"forearm":false,
+			"hand":false
 		},
 		{
 			"chest":true,
@@ -102,9 +105,10 @@ class Shield extends Item
 			"hip":true,
 			
 			// shield arm
-			"elbow":true,
-			"forearm":true,
-			"hand":true,
+			"upperArm":false,
+			"elbow":false,
+			"forearm":false,
+			"hand":false,
 			
 			"thigh":true,
 		},
@@ -119,9 +123,10 @@ class Shield extends Item
 			"neck":true,
 			
 			// shield arm
-			"elbow":true,
-			"forearm":true,
-			"hand":true,
+			"upperArm":false,
+			"elbow":false,
+			"forearm":false,
+			"hand":false,
 			
 			"knee":true,
 			"thigh":true,

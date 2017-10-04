@@ -598,7 +598,7 @@
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(1, i)" v-on:blur="focusOutAVColumnRowIndex(1,i)"></input></td>
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(2, i)" v-on:blur="focusOutAVColumnRowIndex(2,i)"></input></td>
 							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(3, i)" v-on:blur="focusOutAVColumnRowIndex(3,i)"></input></td>
-							<td v-if="carriedShield!=null" v-show="shieldCoverage[li.id]" class="td-shield" :class="{active:calcAVRowIndex==i && shieldAVHigherOrEqual }">{{ carriedShield.AV }}</td>
+							<td v-if="carriedShield!=null" v-show="shieldCoverage[li.id]!=null" class="td-shield" :class="{active:calcAVRowIndex==i && shieldAVHigherOrEqual }">{{ shieldCoverage[li.id] ===false ? "~" : ""}}{{ carriedShield.AV }}</td>
 						</tr>
 					</tbody>
 				</table>
