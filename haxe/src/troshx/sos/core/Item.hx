@@ -1,9 +1,10 @@
 package troshx.sos.core;
 import haxe.Serializer;
 import haxe.Unserializer;
-import troshx.sos.macro.MacroUtil;
+
 
 #if macro
+import troshx.sos.macro.MacroUtil;
 import haxe.ds.StringMap;
 import haxe.macro.ExprTools;
 import haxe.macro.Context;
