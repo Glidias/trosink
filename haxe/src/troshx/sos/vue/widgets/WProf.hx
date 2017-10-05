@@ -136,9 +136,12 @@ class WProf extends VComponent<WProfData, WProfProps>
 			}
 			
 			if ( ( weap.profs & Item.getInstanceFlagsOf(Profeciency, R_FIREARM)) !=0 ) {
-				if (weap.firearm == null) weap.firearm = new Firearm();
+				if (weap.firearm == null) {
+					weap.firearm = new Firearm();
+				}
 				
 			}
+			
 		}
 		else {
 			weap.isAmmo = false;

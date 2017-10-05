@@ -17,6 +17,8 @@ select {
 	font-family:Arial;
 }
 
+
+
 td input[type='text'] {
 	position:relative;
 	width:100%;
@@ -179,11 +181,21 @@ td.gotbtn.focus > button {
 	position:relative;
 	padding-top:15px;
 }
+.inventory .tally-zone {
+	float:left;
+}
+.inventory .save-drop-zone {
+	float:right;
+}
+
 .inventory .shield-icon-inv {
 	transform:scaleY(-1);
 	display:inline-block;
 	position:relative;
 	transform-origin:center center;
+}
+.inventory textarea.savebox {
+	min-height:60px;
 }
 .inventory .popup-overlay {
 	position:absolute;

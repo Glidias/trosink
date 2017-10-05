@@ -4,6 +4,8 @@ import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
 import troshx.sos.core.DamageType;
 import troshx.sos.core.Item;
+import troshx.sos.vue.input.MixinInput;
+
 import troshx.sos.vue.widgets.BaseItemWidget.BaseItemWidgetProps;
 
 /**
@@ -17,6 +19,7 @@ class WMeleeAtk extends VComponent<NoneT, MeleeAtkProps>
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [ MixinInput.getInstance() ];
 	
 	}
 	

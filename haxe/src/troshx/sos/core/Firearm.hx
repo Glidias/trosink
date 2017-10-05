@@ -97,6 +97,7 @@ class Ammunition extends Weapon
 		stuckChance = catchChance;	
 		ranged = true;
 		isAmmo = true;
+		this.firearm = new Firearm();
 		profs = (1 << Profeciency.R_FIREARM);
 	}
 	

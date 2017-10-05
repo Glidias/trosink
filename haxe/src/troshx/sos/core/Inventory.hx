@@ -19,7 +19,11 @@ import troshx.util.LibUtil;
  */
 class Inventory 
 {
-	public var dropped(default, never):IDMatchArray<ItemQty> = new IDMatchArray<ItemQty>(); // any items directly below one's feet
+	public var dropped(default, null):IDMatchArray<ItemQty> = new IDMatchArray<ItemQty>(); // any items directly below one's feet
+	public function setNewDroppedList(list:IDMatchArray<ItemQty>):Void {
+		this.dropped = list;
+	}
+	
 	public var packed(default, never):IDMatchArray<ItemQty> = new IDMatchArray<ItemQty>();	// any items packed in one's bag or something...
 	public var dropPack:Bool = false;	// flag to indicate if pack is dropped at one's feet
 	
@@ -78,6 +82,8 @@ class Inventory
 	function dispatchSignal(signal:InventorySignal):Void {
 		getSignaler().dispatch(signal);
 	}
+	
+	
 	
 	public function findHeldShield():Shield 
 	{
@@ -279,6 +285,34 @@ class Inventory
 		}
 	
 		return w;
+	}
+	
+	public function normalizeDroppedItems():Void {
+		for (i in 0...dropped.length) {
+			dropped.list[i].item.normalize();
+		}
+	}
+	
+	public function normalizeAllItems():Void {
+		for (i in 0...dropped.length) {
+			dropped.list[i].item.normalize();
+		}
+		for (i in 0...packed.length) {
+			packed.list[i].item.normalize();
+		}
+		
+		for (i in 0...wornArmor.length) {
+			wornArmor[i].armor.normalize();
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			equipedNonMeleeItems[i].item.normalize();
+		}
+		for (i in 0...shields.length) {
+			shields[i].shield.normalize();
+		}
+		for (i in 0...weapons.length) {
+			weapons[i].weapon.normalize();
+		}
 	}
 	
 	static var MONEY_CALC_CACHE:Array<Int> = [0,0,0];

@@ -6,23 +6,23 @@
 			<label><input type="checkbox" v-model="firearm.double"></input>Double</label>&nbsp;&nbsp;&nbsp;
 		</span>
 		<span>
-			<label><input type="number" number v-model.number="firearm.multishot" style="width:40px"></input>Multishot</label>&nbsp;&nbsp;&nbsp;
+			<label><InputInt :obj="firearm" prop="multishot" style="width:40px" /></input>Multishot</label>&nbsp;&nbsp;&nbsp;
 		</span>
 		<span>
-			<label><input type="number" number v-model.number="firearm.magazine" style="width:40px"></input>Magazine</label>&nbsp;&nbsp;&nbsp;
+			<label><InputInt :obj="firearm" prop="magazine" style="width:40px" />Magazine</label>&nbsp;&nbsp;&nbsp;
 		</span>
 		<span>
-			<label><input type="number" number v-model.number="firearm.revolver" style="width:40px"></input>Revolver</label>&nbsp;&nbsp;&nbsp;
+			<label><InputInt :obj="firearm" prop="revolver" style="width:40px" />Revolver</label>&nbsp;&nbsp;&nbsp;
 		</span>
 		<span>
-			<label><input type="number" number v-model.number="firearm.highCaliber" style="width:40px"></input>High Caliber</label>&nbsp;&nbsp;&nbsp;
+			<label><InputInt :obj="firearm" prop="highCaliber" style="width:40px" /></input>High Caliber</label>&nbsp;&nbsp;&nbsp;
 		</span>
 	</div>
 	<div>
 		-Item:-
 		<div>
 			<label>Cost:</label><br/>
-			<input type="number" number step="1" min="0" v-model.number="item.cost" style="width:40%;display:inline-block"></input><select number v-model.number="item.costCurrency" style="width:50%;display:inline-block">
+			<InputInt :step="1" :min="0" :obj="item" prop="cost" style="width:40%;display:inline-block" /><select number v-model.number="item.costCurrency" style="width:50%;display:inline-block">
 				<option value="0">cp</option>
 				<option value="1">sp</option>
 				<option value="2">gp</option>
@@ -49,7 +49,7 @@
 			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weapon.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
 			<div v-if="item.meleeSpecial">
 				<div v-for="(li, i) in meleeVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" min="0" number v-model.number="item.meleeSpecial[meleeVarNames[i]]"></input>
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="item.meleeSpecial" :prop="meleeVarNames[i]" />
 					<div style="clear:both"></div>
 				</div>
 			</div>
@@ -63,7 +63,7 @@
 			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, true)" :checked="weapon.missileSpecial!=null"><i>MissileSpecial?</i></input></label>
 			<div v-if="item.missileSpecial">
 				<div v-for="(li, i) in missileVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" min="0" number v-model.number="item.missileSpecial[missileVarNames[i]]"></input>
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="item.missileSpecial" :prop="missileVarNames[i]" />
 					<div style="clear:both"></div>
 				</div>
 			</div>
@@ -84,13 +84,13 @@
 		<div v-if="firearmAmmo">
 			-Firearm Ammo Modifiers-
 			<div>
-				<label><input type="number" number v-model.number="weapon.firearm.load"></input>Load</label>
+				<label><InputInt :obj="weapon.firearm" prop="load" />Load</label>
 			</div>
 		</div>
 		<div v-if="crossbowAmmo">
 			-Crossbow Ammo Modifiers-
 			<div>
-				<label><input type="number" number v-model.number="weapon.crossbow.span"></input>Span</label>
+				<label><InputInt :obj="weapon.crossbow" prop="span" />Span</label>
 			</div>
 		</div>
 		<hr/>
@@ -120,7 +120,7 @@
 					
 				<div v-if="currentCustomise.melee != null">
 					<div v-for="(li, i) in customMeleeIntVarLabels" :key="i">
-						<label style="width:50%; float:left;display:block;">{{ li }}: </label><input style="width:50%;float:left;display:block;max-width:40px" type="number" number min="0" v-model.number="currentCustomise.melee[customMeleeIntVars[i]]"></input>
+						<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="currentCustomise.melee" :prop="customMeleeIntVars[i]" />
 						<div style="clear:both"></div>
 					</div>
 					<div v-show="currentCustomise.melee.integratedPistol >=1">

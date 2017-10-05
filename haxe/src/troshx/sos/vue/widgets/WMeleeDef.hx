@@ -1,5 +1,6 @@
 package troshx.sos.vue.widgets;
 import haxevx.vuex.util.VHTMacros;
+import troshx.sos.vue.input.MixinInput;
 
 /**
  * Widget to handle melee DTN and Guard
@@ -12,6 +13,7 @@ class WMeleeDef extends BaseItemWidget
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [ MixinInput.getInstance() ];
 	}
 	
 

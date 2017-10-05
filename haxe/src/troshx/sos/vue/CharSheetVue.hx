@@ -132,6 +132,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	
 	public function saveSheet():String {
+		this.char.inventory.normalizeAllItems();
+		
 		var serializer = new Serializer();
 		serializer.useCache = true;
 		//serializer.useEnumIndex = true;
@@ -149,6 +151,32 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 	
 	}
+	
+	public function loadDropList(contents:String = null):Void {
+		this.char.inventory.normalizeDroppedItems();
+		
+		if (contents == null) contents = this.copyToClipboardDropList;
+	
+		this.char.inventory.getSignaler().removeAll();
+		var unserializer:Unserializer = new Unserializer(contents);
+	
+		this.char.inventory.setNewDroppedList(  unserializer.unserialize() );
+		
+		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+	}
+	
+	public function saveDropList():String {
+		var serializer = new Serializer();
+		serializer.useCache = true;
+	
+		serializer.serialize(this.char.inventory.dropped);
+		
+		var output:String = serializer.toString();
+		this.copyToClipboardDropList = output;
+		
+		return output;
+	}
+	
 	
 	// inventory Methods
 	
@@ -1022,6 +1050,7 @@ class CharSheetVueData  {
 
 	// save/load copy box data
 	var copyToClipboard:String = "";
+	var copyToClipboardDropList:String = "";
 	
 	var coreMeleeProfs:Array<Profeciency> = Profeciency.getCoreMelee();
 	var coreRangedProfs:Array<Profeciency> = Profeciency.getCoreRanged();

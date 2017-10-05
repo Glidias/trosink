@@ -1,13 +1,13 @@
 <div>
 	<div style="width:50%;display:inline-block">
 		<label>TN:<br/>
-			<input type="number" number step="1" v-if="!thrusting" v-model.number="item.atnS" style="width:100%"></input>
-			<input type="number" number step="1" v-if="thrusting" v-model.number="item.atnT" style="width:100%"></input>
+			<InputInt v-if="!thrusting" :obj="item" prop="atnS" style="width:100%"/>
+			<InputInt v-if="thrusting" :obj="item" prop="atnT" style="width:100%"/>
 		</label>
 	</div><div style="width:50%;display:inline-block">
 		<label>Damage:<br/>
-			<input type="number" number step="1" v-if="!thrusting" v-model.number="item.damageS" style="width:100%"></input>
-			<input type="number" number step="1" v-if="thrusting" v-model.number="item.damageT" style="width:100%"></input>
+			<InputInt v-if="!thrusting" :obj="item" prop="damageS" style="width:100%" />
+			<InputInt v-if="thrusting" :obj="item" prop="damageT" style="width:100%" />
 		</label>
 	</div>
 	<div>

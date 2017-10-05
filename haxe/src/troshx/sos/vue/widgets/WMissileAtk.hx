@@ -1,6 +1,7 @@
 package troshx.sos.vue.widgets;
 import haxevx.vuex.util.VHTMacros;
 import troshx.sos.core.DamageType;
+import troshx.sos.vue.input.MixinInput;
 
 /**
  * Widget to handle missile TN and damage for missile weapons
@@ -14,6 +15,7 @@ class WMissileAtk extends BaseItemWidget
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [ MixinInput.getInstance() ];
 	}	
 	
 	@:computed function get_damageTypeLabels():Array<String> {

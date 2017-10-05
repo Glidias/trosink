@@ -1,11 +1,11 @@
 <div>
 	<div style="width:50%;display:inline-block">
 		<label>DTN:<br/>
-			<input type="number" number step="1" v-model.number="item.dtn" style="width:100%"></input>
+			<InputInt :obj="item" prop="dtn" style="width:100%"></InputInt>
 		</label>
 	</div><div style="width:50%;display:inline-block">
 		<label>Guard:<br/>
-			<input type="number" number step="1" v-model.number="item.guard" style="width:100%"></input>
+			<InputInt :obj="item" prop="guard" style="width:100%"></InputInt>
 		</label>
 	</div>
 </div>
