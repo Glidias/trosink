@@ -12,7 +12,7 @@ import troshx.sos.core.Inventory.ReadyAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Weapon;
-import troshx.sos.vue.CharSheetVue.WidgetItemRequest;
+import troshx.sos.vue.InventoryVue.WidgetItemRequest;
 import troshx.sos.vue.widgets.WProf;
 
 /**

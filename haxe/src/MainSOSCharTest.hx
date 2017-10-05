@@ -1,6 +1,6 @@
 package;
 import haxevx.vuex.core.VxBoot;
-import troshx.sos.vue.CharSheetVue;
+import troshx.sos.vue.InventoryStandalone;
 
 /**
  * ...
@@ -17,7 +17,7 @@ class MainSOSCharTest
 	}
 	
 	function new() {
-		boot.startVueWithRootComponent( "#app", new CharSheetVue());
+		boot.startVueWithRootComponent( "#app", new InventoryStandalone());
 		VxBoot.notifyStarted();
 	}
 	

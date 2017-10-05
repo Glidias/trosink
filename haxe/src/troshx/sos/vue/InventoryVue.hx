@@ -44,8 +44,7 @@ import troshx.sos.vue.widgets.WTags;
 
 import troshx.ds.IDMatchArray;
 import troshx.ds.IValidable;
-import troshx.sos.vue.CharSheetVue.IFocusFlags;
-import troshx.sos.vue.CharSheetVue.RowReadyEntry;
+
 import troshx.util.LibUtil;
 import troshx.sos.core.Weapon;
 
@@ -58,18 +57,17 @@ import troshx.sos.core.Inventory;
  * @author Glidias
  */
 @:expose
-class CharSheetVue extends VComponent<CharSheetVueData, NoneT> 
+class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps> 
 {
 
 	public function new() 
 	{
 		super();
 		untyped this.mixins = [ MixinInput.getInstance() ];
-
 	}
 	
-	override public function Data():CharSheetVueData {
-		return new CharSheetVueData();
+	override public function Data():InventoryVueData {
+		return new InventoryVueData();
 	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
@@ -99,7 +97,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	override public function Created():Void {
 		
-		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+		this.inventory.getSignaler().add(onInventorySignalReceived);
 	}
 	
 	// internal methods
@@ -118,58 +116,54 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	// standard Methods
 	
 
-	
-	public function loadSheet(contents:String = null):Void {
-		if (contents == null) contents = this.copyToClipboard;
-	
-		this.char.inventory.getSignaler().removeAll();
-		var unserializer:Unserializer = new Unserializer(contents);
-	
-		this.char = unserializer.unserialize();
-		
-		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+	public function loadSheet():Void {
+		_vEmit("loadSheet", this.copyToClipboard);
 	}
 	
+	@:watch function watch_inventory(newValue:Inventory, oldValue:Inventory):Void {
+		oldValue.getSignaler().removeAll();
+		newValue.getSignaler().add(onInventorySignalReceived);
+	}
 	
 	public function saveSheet():String {
-		this.char.inventory.normalizeAllItems();
+		this.inventory.normalizeAllItems();
 		
 		var serializer = new Serializer();
 		serializer.useCache = true;
 		//serializer.useEnumIndex = true;
 		
 		//this.char
-		var oldSignaler = this.char.inventory.getSignaler();
-		this.char.inventory.setSignaler(null);
-		serializer.serialize(this.char);
+		var oldSignaler = this.inventory.getSignaler();
+		this.inventory.setSignaler(null);
+		serializer.serialize(this.inventory);
 		
 		
 		var output:String = serializer.toString();
 		this.copyToClipboard = output;
-		this.char.inventory.setSignaler(oldSignaler);
+		this.inventory.setSignaler(oldSignaler);
 		return output;
-		
 	
 	}
 	
+	
 	public function loadDropList(contents:String = null):Void {
-		this.char.inventory.normalizeDroppedItems();
+		this.inventory.normalizeDroppedItems();
 		
 		if (contents == null) contents = this.copyToClipboardDropList;
 	
-		this.char.inventory.getSignaler().removeAll();
+		this.inventory.getSignaler().removeAll();
 		var unserializer:Unserializer = new Unserializer(contents);
 	
-		this.char.inventory.setNewDroppedList(  unserializer.unserialize() );
+		this.inventory.setNewDroppedList(  unserializer.unserialize() );
 		
-		this.char.inventory.getSignaler().add(onInventorySignalReceived);
+		this.inventory.getSignaler().add(onInventorySignalReceived);
 	}
 	
 	public function saveDropList():String {
 		var serializer = new Serializer();
 		serializer.useCache = true;
 	
-		serializer.serialize(this.char.inventory.dropped);
+		serializer.serialize(this.inventory.dropped);
 		
 		var output:String = serializer.toString();
 		this.copyToClipboardDropList = output;
@@ -193,7 +187,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	// item overwrite warning
 	function confirmOverwriteItem():Void {
 		
-		var tarArray = itemToOverwriteToPacked ? this.char.inventory.packed : this.char.inventory.dropped;
+		var tarArray = itemToOverwriteToPacked ? this.inventory.packed : this.inventory.dropped;
 		tarArray.add(itemToOverwriteWith);
 		var itemQty:ItemQty = tarArray.getMatchingItem(itemToOverwriteWith);
 		itemQty.item = itemToOverwriteWith.item;
@@ -202,7 +196,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			privateData.dynArray.splice( privateData.dynArray.indexOf(privateData.dynAssign) , 1);
 		}
 		else {
-			var srcArray = itemToOverwriteToPacked ? this.char.inventory.dropped : this.char.inventory.packed;
+			var srcArray = itemToOverwriteToPacked ? this.inventory.dropped : this.inventory.packed;
 			srcArray.splicedAgainst( privateData.origQtyItem);
 		}
 		
@@ -266,7 +260,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			itemQtyMultiple = itemQ.getQtyCopy(itemQ.qty);
 			return;
 		}
-		itemToOverwriteWith = this.char.inventory.packItemEntryFromGround(itemQ, qty);
+		itemToOverwriteWith = this.inventory.packItemEntryFromGround(itemQ, qty);
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = itemQ;
 			privateData.dynArray = null;
@@ -281,7 +275,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			return;
 			
 		}
-		itemToOverwriteWith = this.char.inventory.dropItemEntryFromPack(itemQ, qty);
+		itemToOverwriteWith = this.inventory.dropItemEntryFromPack(itemQ, qty);
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = itemQ;
 			privateData.dynArray = null;
@@ -289,78 +283,78 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):Void {  // Not applicable for shield
-		itemToOverwriteWith = this.char.inventory.dropEquipedShield(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.inventory.dropEquipedShield(alreadyEquiped, doDestroy);
 		itemToOverwriteToPacked = false;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.shields;
+			privateData.dynArray = this.inventory.shields;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
 	function dropMiscItem(alreadyEquiped:ItemAssign, doDestroy:Bool = false):Void {
-		itemToOverwriteWith = this.char.inventory.dropMiscItem(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.inventory.dropMiscItem(alreadyEquiped, doDestroy);
 		itemToOverwriteToPacked = false;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.equipedNonMeleeItems;
+			privateData.dynArray = this.inventory.equipedNonMeleeItems;
 			privateData.dynAssign = alreadyEquiped;
 		}
 		
 	}
 	function dropEquipedWeapon(alreadyEquiped:WeaponAssign, doDestroy:Bool = false):Void {
-		itemToOverwriteWith = this.char.inventory.dropEquipedWeapon(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.inventory.dropEquipedWeapon(alreadyEquiped, doDestroy);
 		itemToOverwriteToPacked = false;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.weapons;
+			privateData.dynArray = this.inventory.weapons;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
 	
 	function dropWornArmor(alreadyEquiped:ArmorAssign, doDestroy:Bool = false):Void {
-		itemToOverwriteWith = this.char.inventory.dropWornArmor(alreadyEquiped, doDestroy);
+		itemToOverwriteWith = this.inventory.dropWornArmor(alreadyEquiped, doDestroy);
 		itemToOverwriteToPacked = false;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.wornArmor;
+			privateData.dynArray = this.inventory.wornArmor;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
 	
 	function packEquipedShield(alreadyEquiped:ShieldAssign):Void {
-		itemToOverwriteWith = this.char.inventory.packEquipedShield(alreadyEquiped);
+		itemToOverwriteWith = this.inventory.packEquipedShield(alreadyEquiped);
 		itemToOverwriteToPacked = true;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.shields;
+			privateData.dynArray = this.inventory.shields;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
 	
 	function packMiscItem(alreadyEquiped:ItemAssign):Void {
-		itemToOverwriteWith = this.char.inventory.packMiscItem(alreadyEquiped);
+		itemToOverwriteWith = this.inventory.packMiscItem(alreadyEquiped);
 		itemToOverwriteToPacked = true;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.equipedNonMeleeItems;
+			privateData.dynArray = this.inventory.equipedNonMeleeItems;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
 	function packEquipedWeapon(alreadyEquiped:WeaponAssign):Void {
-		itemToOverwriteWith = this.char.inventory.packEquipedWeapon(alreadyEquiped);
+		itemToOverwriteWith = this.inventory.packEquipedWeapon(alreadyEquiped);
 		itemToOverwriteToPacked = true;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.weapons;
+			privateData.dynArray = this.inventory.weapons;
 		}
 	}
 	
 	function packWornArmor(alreadyEquiped:ArmorAssign):Void {
-		itemToOverwriteWith = this.char.inventory.packWornArmor(alreadyEquiped);
+		itemToOverwriteWith = this.inventory.packWornArmor(alreadyEquiped);
 		itemToOverwriteToPacked = true;
 		if (itemToOverwriteWith != null) {
 			privateData.origQtyItem = null;
-			privateData.dynArray = this.char.inventory.wornArmor;
+			privateData.dynArray = this.inventory.wornArmor;
 			privateData.dynAssign = alreadyEquiped;
 		}
 	}
@@ -485,7 +479,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	
 	@:computed function get_coverageHitLocations():Array<HitLocation> {
-		return this.char.body.getNewHitLocationsFrontSlice();
+		return this.body.getNewHitLocationsFrontSlice();
 	}
 	
 	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {
@@ -524,15 +518,16 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed inline function get_targetZoneHitAreaMasks():Array<Int> {
-		return this.char.body.getTargetZoneHitAreaMasks();
+		return this.body.getTargetZoneHitAreaMasks();
 	}
 	
 	
+	
 	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
-		var armors:Array<ArmorAssign> = char.inventory.wornArmor;
+		var armors:Array<ArmorAssign> = inventory.wornArmor;
 		var values:Dynamic<AV3>  = this.hitLocationZeroAVValues;
 		var ch = coverageHitLocations;
-		var body:BodyChar = char.body;
+		var body:BodyChar = this.body;
 
 		var targMask:Int = targetingZoneMask;
 		
@@ -549,7 +544,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 			var layerMask:Int = 0;
 
 			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
-				layerMask = char.inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+				layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
 			}
 			a.writeAVVAluesTo(values, body, layerMask, this.calcArmorNonFirearmMissile, targMask);
 		}
@@ -590,8 +585,8 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 		
 		// else look for armors whose computed AVs at hit location is tabulated to match results.av
 		var sampleAV:AV3 = SAMPLE_AV;
-		var armorList = char.inventory.wornArmor;
-		var body:BodyChar = char.body;
+		var armorList = inventory.wornArmor;
+		var body:BodyChar = this.body;
 		var targetingZoneMask:Int = this.targetingZoneMask;
 		
 
@@ -608,7 +603,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 				var layerMask:Int = 0;
 				
 				if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
-					layerMask = char.inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+					layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
 				}
 				comparisonLayerMasks.push(layerMask);
 				
@@ -769,7 +764,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	function validateQtyName(name:String, itemQty:ItemQty, isPacked:Bool):Bool {
 		
-		var matchArr:IDMatchArray<ItemQty> = isPacked ?  this.char.inventory.packed : this.char.inventory.dropped;
+		var matchArr:IDMatchArray<ItemQty> = isPacked ?  this.inventory.packed : this.inventory.dropped;
 		var testItem:Item =  itemQty.item;
 		var lastName:String = testItem.name;
 		testItem.name = name;
@@ -800,7 +795,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	function executeEquipEntry(equipEntry:RowReadyEntry, typeId:String):Bool {
 		
 		if ( equipEntry.isValid() )  {
-			var tarList = this.char.inventory.getEquipedAssignList(typeId);
+			var tarList = this.inventory.getEquipedAssignList(typeId);
 			var lastWeap = equipEntry.getWeapon();
 			tarList.push( equipEntry.e );
 			var newAssign = Inventory.getEmptyReadyAssign(typeId);
@@ -831,7 +826,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	
 	function addAmmo(ammo:Weapon):Void {
-		this.char.inventory.weapons.push( Inventory.getReadyAssignOf(ammo) );
+		this.inventory.weapons.push( Inventory.getReadyAssignOf(ammo) );
 	}
 	
 	
@@ -917,7 +912,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed function get_carriedShield():Shield {
-		return this.char.inventory.findHeldShield();
+		return this.inventory.findHeldShield();
 	}
 	
 	@:computed function get_shieldSizeLabels():Array<String> {
@@ -929,11 +924,11 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	@:computed function get_shieldCoverage():Dynamic<Bool> {
 		var shield = this.carriedShield;
 		var index:Int = shield != null ? shield.size : 0; 
-		return this.char.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
+		return this.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
 	}
 	
 	@:computed function get_totalCostMoney():Money {
-		return char.inventory.calculateTotalCost();
+		return inventory.calculateTotalCost();
 	}
 	
 	@:computed function get_totalCostGP():Int {
@@ -947,32 +942,36 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	}
 	
 	@:computed function get_totalWeight():Float {
-		return char.inventory.calculateTotalWeight();
+		return inventory.calculateTotalWeight();
 	}
 	
 	@:computed function get_showTally():Bool {  // may include other props
 		return this.userShowTally;
 	}
 	
+	@:computed function get_body():BodyChar {
+		return this.bodyChar != null ? this.bodyChar : BodyChar.getInstance();
+	}
+	
 	// computed proxy to inventory filtered lists
 	
 	@:computed function get_filteredMelee():Array<WeaponAssign>  {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(false);
+		return this.inventory.getWeildableWeaponsTypeFiltered(false);
 	}
 	@:computed function get_filteredCrossbow():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW ) );
+		return this.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW ) );
 	}
 	@:computed function get_filteredFirearm():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_FIREARM ) );
+		return this.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, R_FIREARM ) );
 	}
 	@:computed function get_filteredBow():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_BOW] ) );
+		return this.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_BOW] ) );
 	}
 	@:computed function get_filteredThrowing():Array<WeaponAssign>   {
-		return this.char.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_THROWING, R_SLING] ) );
+		return this.inventory.getWeildableWeaponsTypeFiltered(true, Item.getInstanceFlagsOf(Profeciency, [R_THROWING, R_SLING] ) );
 	}
 	@:computed function get_filteredAmmo():Array<WeaponAssign>   {
-		return this.char.inventory.ammoFiltered;
+		return this.inventory.ammoFiltered;
 	}
 	
 	
@@ -980,13 +979,13 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 	
 	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
-			executeQtyEntry(this.packedEntry, this.char.inventory.packed);
+			executeQtyEntry(this.packedEntry, this.inventory.packed);
 		}
 	}
 	
 	@:watch function on_droppedEntryGotFocus(newValue:Bool, oldValue:Bool) {
 		if (!newValue) {
-			executeQtyEntry(this.droppedEntry, this.char.inventory.dropped);
+			executeQtyEntry(this.droppedEntry, this.inventory.dropped);
 		}
 	}
 	
@@ -1021,7 +1020,7 @@ class CharSheetVue extends VComponent<CharSheetVueData, NoneT>
 
 }
 
-class CharSheetVueData  {
+class InventoryVueData  {
 	
 
 	// dropped/packed item misc entry
@@ -1092,7 +1091,7 @@ class CharSheetVueData  {
 	}
 	
 	// to factor this out later
-	@:vueInclude var char:CharSheet = new CharSheet();
+	//@:vueInclude var char:CharSheet = new CharSheet();
 	
 	
 	
@@ -1194,10 +1193,18 @@ class RowReadyEntry implements IValidable implements IFocusFlags {
 
 		return itemToValidate.name != null && StringTools.trim(itemToValidate.name) != "";
 	}
+	
+
 }
 	
 	
 typedef ArmorLayerCalc = {
 	var armor:Armor;
 	var layer:Int;
+}
+
+typedef InventoryVueProps = {
+	@:prop({required:true}) var inventory:Inventory;
+	@:prop({required:false, 'default':true}) @:optional var showArmorCoverage:Bool;
+	@:prop({required:false}) @:optional var bodyChar:BodyChar;
 }

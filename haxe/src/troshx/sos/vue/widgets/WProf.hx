@@ -8,7 +8,7 @@ import troshx.sos.core.Firearm;
 import troshx.sos.core.Item;
 import troshx.sos.core.Weapon;
 import troshx.sos.core.Profeciency;
-import troshx.sos.vue.CharSheetVue.WidgetItemRequest;
+import troshx.sos.vue.InventoryVue.WidgetItemRequest;
 import troshx.sos.vue.widgets.BaseItemWidget.BaseItemWidgetProps;
 import troshx.util.LibUtil;
 
