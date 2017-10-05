@@ -60,6 +60,8 @@ import troshx.sos.core.Inventory;
 class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps> 
 {
 
+	public static inline var LABEL_YOUR:String = "Your";
+	
 	public function new() 
 	{
 		super();
@@ -123,6 +125,9 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	@:watch function watch_inventory(newValue:Inventory, oldValue:Inventory):Void {
 		oldValue.getSignaler().removeAll();
 		newValue.getSignaler().add(onInventorySignalReceived);
+		
+		this.itemTransitionName = "";
+		Vue.nextTick(resetItemTransitionName);
 	}
 	
 	public function saveSheet():String {
@@ -521,7 +526,13 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return this.body.getTargetZoneHitAreaMasks();
 	}
 	
+	@:computed function get_isYourInventory():Bool {
+		return inventoryLabel == LABEL_YOUR;
+	}
 	
+	@:computed function get_whoseInventoryPrefix():String {
+		return inventoryLabel != null ? inventoryLabel != LABEL_YOUR ? inventoryLabel+"'s " : LABEL_YOUR+ " " : "";
+	}
 	
 	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
 		var armors:Array<ArmorAssign> = inventory.wornArmor;
@@ -1207,4 +1218,6 @@ typedef InventoryVueProps = {
 	@:prop({required:true}) var inventory:Inventory;
 	@:prop({required:false, 'default':true}) @:optional var showArmorCoverage:Bool;
 	@:prop({required:false}) @:optional var bodyChar:BodyChar;
+	
+	@:prop({required:false}) var inventoryLabel:String;
 }

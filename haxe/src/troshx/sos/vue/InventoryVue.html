@@ -1,6 +1,6 @@
 <div class="inventory" v-on:click="onBaseInventoryClick">
 
-	<h2>Inventory</h2>
+	<h2>{{whoseInventoryPrefix}}Inventory</h2>
 	
 	<div class="tally-zone">
 		<div>
@@ -11,20 +11,25 @@
 			<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>
 			<div>Total Weight: <b>{{ totalWeight }}</b></div>
 		</div>
+		<slot name="exitBtn"></slot>
 	</div>	
 		
-	<div class="save-drop-zone">
-		<br/>
-		<div><button v-on:click="saveDropList()">Save Dropped Zone</button></div>
-		<textarea class="savebox" character-set="UTF-8" v-model="copyToClipboardDropList"></textarea>
-		<div><button v-on:click="loadDropList()">Load Dropped Zone</button></div>
-	</div>
+	<div class="manage-multi-zone">
+		<slot name="loadNewTabZone"></slot>
+		<div class="save-drop-zone">
+			<div>
+				<div><button v-on:click="saveDropList()">Save Dropped Zone</button></div>
+				<textarea class="savebox" character-set="UTF-8" v-model="copyToClipboardDropList"></textarea>
+				<div><button v-on:click="loadDropList()">Load Dropped Zone</button></div>
+			</div>
+		</div>
+	</div>	
 	<div style="clear:both"></div>	
 			
 	<sweet-modal ref="overwriteItemWarning">
 		<div  v-if="itemToOverwriteWith!=null" v-on:close="closeOverwriteModal()">
 			<div>
-			The item{{itemToOverwriteWith.qty > 1 ? "s":""}} <b>"{{ itemToOverwriteWith.get_uid()}}"</b><b v-show="itemToOverwriteWith.qty>1">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? "pack" : "drop" }} appears <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }} with the same label! Either confirm you with to overwrite the existing item(s) {{  itemToOverwriteToPacked ? "in your pack" : "on the ground" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? "packing" : "dropping" }} it.
+			The item{{itemToOverwriteWith.qty > 1 ? "s":""}} <b>"{{ itemToOverwriteWith.get_uid()}}"</b><b v-show="itemToOverwriteWith.qty>1">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? "pack" : "drop" }} might be <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? "in "+(isYourInventory ? "your" : "the")+" pack" : "on the ground" }} with the same label! Either confirm to overwrite the existing item(s) {{  itemToOverwriteToPacked ? "in "+(isYourInventory ? "your" : "the")+" pack" : "on the ground" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? "packing" : "dropping" }} it.
 			</div>
 			<br/>
 			<div>
@@ -93,11 +98,14 @@
 		</tbody>
 	</table>
 	
+	<hr/>
+				
+	<slot name="tabList"></slot>
+			
+	<h4>Packed: <label style="font-size:10px">Drop?</label><input type="checkbox" v-model="inventory.dropPack"></input></h4>				
 	
 	
-	<h4>Packed: <label style="font-size:10px">Drop?</label><input type="checkbox" v-model="inventory.dropPack"></input></h4>
-	
-	<table border="1">
+	<table border="1" style="display:inline-block">
 		<thead>
 			<tr>
 				<td>Item Name</td>
@@ -689,7 +697,7 @@
 			</div>
 		</div>
 	<hr/>
-	<button v-on:click="saveSheet()">Save Inventory</button> <i>(also includes Dropped items)</i>
+	<button v-on:click="saveSheet()">Save Inventory</button> <i>(also includes Dropped zone)</i>
 	
 	<div>
 		<br/>

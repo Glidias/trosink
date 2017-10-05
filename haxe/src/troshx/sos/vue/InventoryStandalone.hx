@@ -14,17 +14,12 @@ import troshx.util.LibUtil;
  */
 class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 {
-	
-
-	public function new() 
+	public function new(theComp:VComponent<Dynamic,Dynamic>) 
 	{
 		super();
-	}
-	
-	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
-		return [
-			"comp" => new InventoryVue()
-		];
+		untyped this.components = {
+			"comp":theComp
+		};
 	}
 	
 	public function loadSheet(contents:String):Void {
