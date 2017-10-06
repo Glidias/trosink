@@ -1,0 +1,21 @@
+<div>	
+	<comp :inventory="inventories[0]">
+		<button class="exit-btn" slot="exitBtn">&lt;&lt; Back</button>
+		
+		<div class="open-new-tab-zone" slot="loadNewTabZone">
+			<div>
+				<textarea class="openbox" character-set="UTF-8" v-model="clipboardContents"></textarea>
+				<div><button v-on:click="loadNewTab()">Load Inventory in New Tab</button><i><br/>(excludes drop zone)</i></div>
+			</div>
+		</div>
+		
+		<div class="tab-list" slot="tabList">
+			<label><input type="radio" name="tabname"></input>Label1</label>
+			<label><input type="radio" name="tabname"></input>Label2</label>
+			<label><input type="radio" name="tabname"></input>Label3</label>
+			<label><input type="radio" name="tabname"></input>Label4</label>
+			<label><input type="radio" name="tabname"></input>Label5</label>
+			<button class="close-btn">[X] Close</button>
+		</div>
+	</comp>
+</div>
