@@ -51,13 +51,13 @@ class SeveredLimbAssign extends BaneAssign
 	}
 	
 	
-	@:level1 public static inline var HAND:Int = Humanoid.HAND; 
-	@:level2 public static inline var LOWER_ARM:Int = Humanoid.LOWER_ARM; 
+	@:level1 public static inline var HAND:Int = (1 << Humanoid.HAND); 
+	@:level2 public static inline var LOWER_ARM:Int = (1 << Humanoid.FOREARM) | (1 << Humanoid.HAND); 
 	@:level3 public static inline var FULL_ARM:Int = Humanoid.FULL_ARM; 
 	
-	@:level1 public static inline var FOOT:Int = Humanoid.FOOT; 
-	@:level2 public static inline var LOWER_LEG:Int = Humanoid.LOWER_LEG; 
-	@:level3 public static inline var FULL_LEG:Int = Humanoid.FULL_LEG; 
+	@:level1 public static inline var FOOT:Int = (1<<Humanoid.FOOT); 
+	@:level2 public static inline var LOWER_LEG:Int = (1<<Humanoid.SHIN) | (1 << Humanoid.FOOT); 
+	@:level3 public static inline var FULL_LEG:Int =  Humanoid.FULL_LEG;
 	
 	public static inline var LEVEL_1_AREAS:Int = HAND | FOOT;
 	public static inline var LEVEL_2_AREAS:Int = LOWER_ARM | LOWER_LEG;

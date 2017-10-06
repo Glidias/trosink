@@ -1218,6 +1218,5 @@ typedef InventoryVueProps = {
 	@:prop({required:true}) var inventory:Inventory;
 	@:prop({required:false, 'default':true}) @:optional var showArmorCoverage:Bool;
 	@:prop({required:false}) @:optional var bodyChar:BodyChar;
-	
 	@:prop({required:false}) var inventoryLabel:String;
 }

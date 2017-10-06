@@ -10,6 +10,7 @@ import troshx.sos.chargen.CharGenData;
 import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
+import troshx.sos.core.Inventory;
 import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
@@ -204,7 +205,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
 			
 			ArrayOf.NAME => new ArrayOf(),
-			ArrayOfBits.NAME => new ArrayOfBits()
+			ArrayOfBits.NAME => new ArrayOfBits(),
+			
+			"inventory" => new InventoryManager()
 		];
 	}
 	

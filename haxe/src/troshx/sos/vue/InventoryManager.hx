@@ -10,11 +10,10 @@ import troshx.sos.core.Inventory;
  */
 class InventoryManager extends VComponent<InventoryManagerData, InventoryManagerProps>
 {
-
-
 	public function new() 
 	{
 		super();
+		untyped this["inheritAttrs"] = false;
 	}
 	
 	override function Data():InventoryManagerData {
