@@ -42,8 +42,8 @@ td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;positi
 .inventory .shield-icon-inv{transform:scaleY(-1);display:inline-block;position:relative;transform-origin:center center;}
 .inventory .tab-list{background-color:white;}
 .inventory .tab-list .close-btn{float:right;display:block;margin:5px;}
-.inventory .tab-list label{display:inline-block;margin-right:8px;padding:5px;cursor:pointer;}
-.inventory .tab-list label.selected{background-color:#f3f5f6;}
+.inventory .tab-list label{display:inline-block;padding:5px 10px;cursor:pointer;}
+.inventory .tab-list label.selected{background-color:#e3f5f6;}
 .inventory .tab-list label:hover{background-color:#f9f9f9;}
 .inventory .tab-list label:last-child{margin-right:0;}
 .inventory textarea.savebox{min-height:60px;}

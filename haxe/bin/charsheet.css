@@ -224,12 +224,12 @@ td.gotbtn.focus > button {
 }
 .inventory .tab-list label {
 	display:inline-block;
-	margin-right:8px;
-	padding:5px;
+
+	padding:5px 10px;
 	cursor:pointer;
 }
 .inventory .tab-list label.selected {
-	background-color:#f3f5f6;
+	background-color:#e3f5f6;
 }
 .inventory .tab-list label:hover {
 	background-color:#f9f9f9;

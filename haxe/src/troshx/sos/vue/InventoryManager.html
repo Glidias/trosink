@@ -1,6 +1,6 @@
 <div>	
-	<comp :inventory="inventories[0]">
-		<button class="exit-btn" slot="exitBtn">&lt;&lt; Back</button>
+	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable">
+		<button class="exit-btn" slot="exitBtn" v-if="backBtnCallback!=null">&lt;&lt; Back</button>
 		
 		<div class="open-new-tab-zone" slot="loadNewTabZone">
 			<div>
@@ -9,13 +9,10 @@
 			</div>
 		</div>
 		
-		<div class="tab-list" slot="tabList">
-			<label><input type="radio" name="tabname"></input>Label1</label>
-			<label><input type="radio" name="tabname"></input>Label2</label>
-			<label><input type="radio" name="tabname"></input>Label3</label>
-			<label><input type="radio" name="tabname"></input>Label4</label>
-			<label><input type="radio" name="tabname"></input>Label5</label>
-			<button class="close-btn">[X] Close</button>
+		<div v-for="" class="tab-list" slot="tabList">
+			<label :class="{selected:curInventoryIndex==i}" v-for="(li, i) in tabs"><input type="radio" v-on:click="curInventoryIndex=i" name="tabname" :checked="curInventoryIndex==i"></input>{{li.tabName}}</label>
+			<button class="close-btn" v-show="curInventoryIndex!=0" v-on:click="closeBtnClick">[X] Close</button>
 		</div>
+
 	</comp>
 </div>

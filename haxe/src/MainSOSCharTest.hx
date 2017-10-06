@@ -1,5 +1,6 @@
 package;
 import haxevx.vuex.core.VxBoot;
+import haxevx.vuex.native.Vue;
 import troshx.sos.vue.InventoryManager;
 import troshx.sos.vue.InventoryStandalone;
 
@@ -19,7 +20,7 @@ class MainSOSCharTest
 	}
 	
 	function new() {
-	
+
 		boot.startVueWithRootComponent( "#app", new InventoryStandalone(new InventoryManager()));
 		VxBoot.notifyStarted();
 	}

@@ -158,8 +158,27 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	
 		this.inventory.getSignaler().removeAll();
 		var unserializer:Unserializer = new Unserializer(contents);
-	
-		this.inventory.setNewDroppedList(  unserializer.unserialize() );
+		
+		var dyn:Dynamic = null;
+		var okay:Bool = true;
+		try {
+			dyn = unserializer.unserialize();
+		}
+		catch (e:Dynamic) {
+			trace(e);
+			Browser.alert("Sorry, failed to unserialize string to dropped zone!");
+			okay = false;
+			
+		
+		}
+		if (okay) {
+			if (!Std.is(dyn, IDMatchArray)) {
+				trace(dyn);
+				Browser.alert("Sorry, unserialized object isn't of dropped zone IDMatchArray type!");
+				okay = false;
+			}
+		}
+		if ( okay) this.inventory.setNewDroppedList( dyn);
 		
 		this.inventory.getSignaler().add(onInventorySignalReceived);
 	}
@@ -531,7 +550,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 	
 	@:computed function get_whoseInventoryPrefix():String {
-		return inventoryLabel != null ? inventoryLabel != LABEL_YOUR ? inventoryLabel+"'s " : LABEL_YOUR+ " " : "";
+		return inventoryLabel != null ? inventoryLabel != LABEL_YOUR ? inventoryLabel+(includeOwnerSlash ? "'s " : " ") : LABEL_YOUR+ " " : "";
 	}
 	
 	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
@@ -1218,5 +1237,8 @@ typedef InventoryVueProps = {
 	@:prop({required:true}) var inventory:Inventory;
 	@:prop({required:false, 'default':true}) @:optional var showArmorCoverage:Bool;
 	@:prop({required:false}) @:optional var bodyChar:BodyChar;
-	@:prop({required:false}) var inventoryLabel:String;
+	@:prop({required:false}) @:optional var inventoryLabel:String;
+	@:prop({required:false, 'default':false}) @:optional var includeOwnerSlash:Bool;
+	@:prop({required:false, 'default':true}) @:optional var saveAvailable:Bool;
+	@:prop({required:false, 'default':true}) @:optional var loadAvailable:Bool;
 }

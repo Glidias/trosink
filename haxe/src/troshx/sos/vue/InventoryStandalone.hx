@@ -5,6 +5,7 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue.CreateElement;
 import haxevx.vuex.native.Vue.VNode;
+import js.Browser;
 import troshx.sos.core.Inventory;
 import troshx.util.LibUtil;
 
@@ -22,14 +23,32 @@ class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 		};
 	}
 	
-	public function loadSheet(contents:String):Void {
-		var newInventory:Dynamic = new Unserializer(contents).unserialize();
+	public function getNewInventory(contents:String):Inventory {
+		var newInventory:Dynamic;
 		
-		if (!Std.is(newInventory, Inventory) ) {
-			trace(newInventory);
-			throw "Serialized Inventory not valid!";
+		try {
+			newInventory = new Unserializer(contents).unserialize();
 		}
-		this.inventory = LibUtil.as(newInventory, Inventory);
+		catch (e:Dynamic) {
+			trace(e);
+			Browser.alert("Sorry, failed to unserialize save-content string!");
+			return null;
+		}
+		if (!Std.is(newInventory, Inventory) ) {
+		
+			trace(newInventory);
+			Browser.alert("Sorry, unserialized type isn't Inventory!");
+			return null;
+		}
+		return LibUtil.as(newInventory, Inventory);
+	}
+	
+	
+	
+	public function loadSheet(contents:String):Void {
+		var chk:Inventory = getNewInventory(contents);
+		if (chk == null) return;
+		this.inventory = chk;
 		
 	}
 	
@@ -49,3 +68,4 @@ class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 typedef InventoryStandaloneData = {
 	var inventory:Inventory;
 }
+

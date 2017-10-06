@@ -102,7 +102,7 @@
 				
 	<slot name="tabList"></slot>
 			
-	<h4>Packed: <label style="font-size:10px">Drop?</label><input type="checkbox" v-model="inventory.dropPack"></input></h4>				
+	<h4>Packed: <label style="font-size:10px">Drop?<input type="checkbox" v-model="inventory.dropPack"></input></label></h4>				
 	
 	
 	<table border="1" style="display:inline-block">
@@ -697,14 +697,14 @@
 			</div>
 		</div>
 	<hr/>
-	<button v-on:click="saveSheet()">Save Inventory</button> <i>(also includes Dropped zone)</i>
+	<div v-show="saveAvailable"><button v-on:click="saveSheet()">Save Inventory</button> <i>(also includes Dropped zone)</i></div>
 	
-	<div>
+	<div v-show="saveAvailable || loadAvailable">
 		<br/>
 		<textarea class="savebox" character-set="UTF-8" v-model="copyToClipboard"></textarea>
 	</div>
 				
-	<button v-on:click="loadSheet()">Load Inventory</button>
+	<div v-show="loadAvailable"><button v-on:click="loadSheet()">Load Inventory</button> <i>(also replaces Dropped zone)</i></div>
 			
 			
 	<div class="focus-value-bar"><input type="text" :value="focusValueText" readonly></input></div>
