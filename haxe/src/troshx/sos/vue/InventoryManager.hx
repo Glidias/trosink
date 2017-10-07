@@ -5,6 +5,8 @@ import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import troshx.sos.core.Inventory;
+import troshx.sos.vue.treeview.TreeView;
+import troshx.sos.vue.widgets.GingkoTreeBrowser;
 import troshx.util.LibUtil;
 
 /**
@@ -30,7 +32,8 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [
-			"comp" => new InventoryVue()
+			"comp" => new InventoryVue(),
+			"tree-browser" => new GingkoTreeBrowser()
 		];
 	}
 	

@@ -1,4 +1,9 @@
-<div>	
+<div>
+	<br/>
+	<br/>
+	<tree-browser/>
+	<hr/>
+	
 	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable">
 		<button class="exit-btn" slot="exitBtn" v-if="backBtnCallback!=null">&lt;&lt; Back</button>
 		

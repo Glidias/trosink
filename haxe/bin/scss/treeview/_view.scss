@@ -1,0 +1,55 @@
+// General view styling.
+// @author Alejandro Mostajo <http://about.me/amostajo>
+// @copyright 10Quality <http://www.10quality.com>
+// @license MIT
+// @version 1.0.0
+
+.treeview
+{
+    position: relative;
+    overflow: auto;
+    height: 140px;
+	
+	-webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+
+    &.inner
+    {
+        border: none;
+        height: auto;
+        max-height: none;
+    }
+
+    .node
+    {
+        display: inline-block;
+    }
+
+    .children
+    {
+        overflow: hidden;
+
+        .margin
+        {
+            display: inline-block;
+            width: 20px;
+        }
+
+        .nodes
+        {
+            display: inline-block;
+        }
+    }
+
+    span.icon
+    {
+        width: 20px;
+        display: inline-block;
+        text-align: center;
+    }
+}

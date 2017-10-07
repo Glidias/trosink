@@ -5,6 +5,7 @@ import troshx.sos.vue.InventoryManager;
 import troshx.sos.vue.InventoryStandalone;
 
 
+
 /**
  * ...
  * @author Glidias
@@ -20,6 +21,7 @@ class MainSOSCharTest
 	}
 	
 	function new() {
+
 
 		boot.startVueWithRootComponent( "#app", new InventoryStandalone(new InventoryManager()));
 		VxBoot.notifyStarted();

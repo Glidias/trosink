@@ -6,6 +6,7 @@ import troshx.sos.events.SOSEvent;
 import troshx.sos.events.SOSNotification;
 import troshx.sos.schools.Schools;
 import troshx.sos.vue.CharGen;
+import troshx.sos.vue.treeview.TreeView;
 import troshx.sos.vue.uifields.UI;
 
 /**
