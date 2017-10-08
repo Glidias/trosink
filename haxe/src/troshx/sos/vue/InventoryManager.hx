@@ -2,8 +2,10 @@ package troshx.sos.vue;
 import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import js.Browser;
+import js.html.ButtonElement;
 import troshx.sos.core.Inventory;
 import troshx.sos.vue.treeview.TreeView;
 import troshx.sos.vue.widgets.GingkoTreeBrowser;
@@ -26,7 +28,8 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 			extraInventories:[],
 			clipboardContents:"",
 			curInventoryIndex:0,
-			newTabCounter:0
+			newTabCounter:0,
+			showBrowser:false
 		}
 	}
 	
@@ -53,6 +56,17 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 		}
 	}
 	
+	function openFromTreeBrowser(contents:String, filename:String, disableCallback:Void->Void):Void {
+		
+
+		loadNewTab(contents, filename);
+		
+	}
+	
+	
+	
+
+	
 	@:watch function watch_inventory(newValue:Inventory):Void {
 		// sync tabs dropped list if inventory changes
 		for (i in 0...extraInventories.length) {
@@ -62,6 +76,12 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 	
 	@:computed function get_tabs():Array<InventoryTab> {
 		return [{inventory:this.inventory, tabName:firstTabName}].concat(extraInventories);
+	}
+	
+	@:computed function get_availableTypes():Dynamic<Bool> {
+		return {
+			"troshx.sos.core.Inventory": true
+		};
 	}
 	
 	function getNewInventory(contents:String):Inventory {
@@ -84,19 +104,33 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 		return LibUtil.as(newInventory, Inventory);
 	}
 	
+	function loadNewTabClick():Void {
 	
+		loadNewTab();
+	}
 	
-	function loadNewTab():Void {
-		var inventory:Inventory = getNewInventory(clipboardContents);
+	function loadNewTab(contents:String = null, tabName:String=null):Void {
+		if (contents == null) contents = clipboardContents;
+		var inventory:Inventory = getNewInventory(contents);
 		if (inventory == null) return;
+		
 		
 		inventory.setNewDroppedList(this.inventory.dropped);
 		
 		extraInventories.push({
 			inventory:inventory,
-			tabName:"New Tab ("+ (++newTabCounter) + ")"
+			tabName: (tabName != null ? validateTabName(tabName) : "New Tab ("+ (++newTabCounter) + ")" )
 		});
 		curInventoryIndex = extraInventories.length;
+	}
+	
+	function validateTabName(tabName:String):String {
+		var curTabs = tabs;
+		for (i in 0...curTabs.length) {
+			if ( curTabs[i].tabName == tabName) return tabName + " (" + (++newTabCounter) + ")";
+		}
+		
+		return tabName;
 	}
 	
 	
@@ -111,6 +145,7 @@ typedef InventoryManagerData = {
 	var clipboardContents:String;
 	var curInventoryIndex:Int;
 	var newTabCounter:Int;
+	var showBrowser:Bool;
 }
 
 typedef InventoryManagerProps = {

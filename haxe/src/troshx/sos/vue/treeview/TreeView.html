@@ -1,13 +1,13 @@
 <div class="treeview" :class="classname">
     <div class="node-data"
-        v-for="(node, index) in model" :key="uid"
+        v-for="(node, index) in model" :key="index"  v-if="filterNodeHandler == null || filterNodeHandler(node, parentNode)"
     >
-		<div class="node" v-if="filterNodeHandler == null || filterNodeHandler(node)"
+		<div class="node"
             :class="getNodeClass(node, index)"
             @click.prevent="select(index, node[valuename])"
 >
             <span class="icon node-parent-toggled"
-                v-show="areValidNodes(node[children]) && isOpened(index)"
+                v-show="validNodeHandler(node[children], node) && isOpened(index)"
             >
                 <svg viewBox="0 0 35 35" v-if="getCustomIcon == null || getCustomIcon(node ,1)===false">
                     <g transform="translate(0,-1017.3621)">
@@ -18,8 +18,8 @@
                 </svg>
 				<span class="custom-icon opened" v-else>{{getCustomIcon(node, 1)}}</span>
             </span>
-            <span class="icon node-parent"
-                v-show="areValidNodes(node[children]) && !isOpened(index)"
+            <span class="icon node-parent" style="cursor:pointer"
+                v-show="validNodeHandler(node[children], node) && !isOpened(index)"
             >
                 <svg width="14" height="14" viewBox="0 0 35 35" v-if="getCustomIcon == null || getCustomIcon(node ,0)===false">
                     <g transform="translate(0,-1017.3621)">
@@ -29,8 +29,8 @@
                 </svg>
 				<span class="custom-icon closed" v-else>{{getCustomIcon(node, 0)}}</span>
             </span>
-            <span class="icon node"
-                v-if="!areValidNodes(node[children])"
+            <span class="icon node" style="cursor:pointer"
+                v-if="!validNodeHandler(node[children], node)"
             >
                 <svg width="8" height="8" viewBox="0 0 35 35" v-if="getCustomIcon == null || getCustomIcon(node ,2)===false">
                     <g transform="translate(0,-1017.3622)">
@@ -41,21 +41,27 @@
             </span>
             <label v-html="customLabelHandler == null ? node[labelname] : customLabelHandler(node[labelname])"></label>
         </div>
-        <div v-if="areValidNodes(node[children])"
+        <div v-if="validNodeHandler(node[children], node)"
             class="children"
             v-show="isOpened(index)"
         >
             <div class="margin"></div>
             <div class="nodes">
-                <treeview :id="id"
+                <treeview 
 					:value="value"
 					@update:value="bubbleValueHandler"
+					@treeview_click="bubbleClickHandler"
 					:labelname="labelname"
                     :valuename="valuename"
                     :children="children"
                     :model="node[children]"
                     :parent.once="index"
+					:parentNode.once="node"
                     classname="inner"
+					:getCustomClass="getCustomClass"
+					:getCustomIcon="getCustomIcon"
+					:filterNodeHandler="filterNodeHandler"
+					:customLabelHandler="customLabelHandler"
                 ></treeview>
             </div>
         </div>

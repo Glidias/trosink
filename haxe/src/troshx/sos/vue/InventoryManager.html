@@ -1,7 +1,7 @@
 <div>
 	<br/>
 	<br/>
-	<tree-browser/>
+	<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" v-if="showBrowser" />
 	<hr/>
 	
 	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable">
@@ -9,8 +9,9 @@
 		
 		<div class="open-new-tab-zone" slot="loadNewTabZone">
 			<div>
+				<div class="show-browser-cta"><label><input type="checkbox" v-model="showBrowser"></input>Show File Tree Browser?</label></div>
 				<textarea class="openbox" character-set="UTF-8" v-model="clipboardContents"></textarea>
-				<div><button v-on:click="loadNewTab()">Load Inventory in New Tab</button><i><br/>(excludes drop zone)</i></div>
+				<div><button v-on:click="loadNewTabClick">Load Inventory in New Tab</button><i><br/>(excludes drop zone)</i></div>
 			</div>
 		</div>
 		

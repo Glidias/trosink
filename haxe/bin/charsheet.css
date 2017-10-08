@@ -16,7 +16,13 @@ select {
 	font-size:12px;
 	font-family:Arial;
 }
-
+.gingko-tree .markdown-view {
+	background-color:white;
+	border:1px solid black;
+	box-sizing:border-box;
+	max-height:250px;
+	overflow:auto;
+}
 
 
 td input[type='text'] {
@@ -205,6 +211,10 @@ td.gotbtn.focus > button {
 	margin-right:30px;
 	background-color:white;
 	padding:10px;
+}
+
+.inventory .open-new-tab-zone .show-browser-cta {
+	margin-bottom:10px;
 }
 
 .inventory .shield-icon-inv {
