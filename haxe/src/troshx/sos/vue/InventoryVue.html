@@ -9,7 +9,9 @@
 		<div class="checkout" v-if="showTally">
 			<div><b>Tally:</b> <i>(excluding dropped)</i></div>
 			<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>
+			<div v-if="maxCostCopper!=null" :class="{exceeded:exceededCost}">Max Cost: <b>{{ maxCostGP }}gp  {{ maxCostSP }}sp {{ maxCostCP }}cp</b> ({{moneyLeftStr}} remaining)</div>
 			<div>Total Weight: <b>{{ totalWeight }}</b></div>
+			<div v-if="maxWeight!=null" :class="{exceeded:exceededWeight}">Max Weight: <b>{{ maxWeight }}</b> ({{weightRemaining}} remaining)</div>
 		</div>
 		<slot name="exitBtn"></slot>
 	</div>	

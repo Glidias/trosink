@@ -4,8 +4,8 @@
 	<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" v-if="showBrowser" />
 	<hr/>
 	
-	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable">
-		<button class="exit-btn" slot="exitBtn" v-if="backBtnCallback!=null">&lt;&lt; Back</button>
+	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable" v-bind="$attrs" :maxCostCopper="curInventoryIndex == 0 ? maxCostCopper : null" :maxWeight="curInventoryIndex == 0 ? maxWeight : null">
+		<button class="exit-btn" slot="exitBtn" v-if="backBtnCallback!=null" v-on:click="backBtnCallback()">&lt;&lt; Back</button>
 		
 		<div class="open-new-tab-zone" slot="loadNewTabZone">
 			<div>

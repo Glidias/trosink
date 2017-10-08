@@ -104,6 +104,45 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	
 	// internal methods
 	
+	
+	// money calc
+	
+	@:computed function get_copperMaxToPieces():Money {
+		if (privateData.money == null) privateData.money = new Money();
+		return privateData.money.matchWithValues(0, 0, maxCostCopper).changeToHighest();
+	}
+	
+	@:computed function get_moneyLeft():Money {
+		if (privateData.moneyLeft == null) privateData.moneyLeft = new Money();
+		return privateData.moneyLeft.matchWith(this.copperMaxToPieces).subtractAgainst(this.totalCostMoney);
+	}
+	@:computed function get_moneyLeftStr():String {
+		return moneyLeft.getLabel();
+	}
+	@:computed function get_exceededCost():Bool {
+		return moneyLeft.isNegative();
+	}
+	
+	@:computed function get_weightRemaining():Float {
+		return maxWeight - totalWeight;
+	}
+	@:computed function get_exceededWeight():Bool {
+		return weightRemaining < 0;
+	}
+	
+	@:computed function get_maxCostGP():Int {
+		return copperMaxToPieces.gp;	
+	}
+	@:computed function get_maxCostSP():Int {
+		return copperMaxToPieces.sp;	
+	}
+	@:computed function get_maxCostCP():Int {
+		return copperMaxToPieces.cp;	
+	}
+	
+
+	
+	
 	function onInventorySignalReceived(e:InventorySignal) 
 	{
 		switch(e ) {
@@ -1005,6 +1044,8 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 	
 	
+	
+	
 	// watchers
 	
 	@:watch function on_packedEntryGotFocus(newValue:Bool, oldValue:Bool) {
@@ -1051,7 +1092,6 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 }
 
 class InventoryVueData  {
-	
 
 	// dropped/packed item misc entry
 	var droppedEntry:RowEntry<ItemQty> = new RowEntry<ItemQty>();
@@ -1124,8 +1164,6 @@ class InventoryVueData  {
 	//@:vueInclude var char:CharSheet = new CharSheet();
 	
 	
-	
-	
 	public function new() {
 		
 	}
@@ -1136,7 +1174,8 @@ typedef InventoryVuePrivate = {
 	@:optional var dynArray:Array<Dynamic>;
 	@:optional var dynAssign:Dynamic;
 	@:optional var origQtyItem:ItemQty;
-	
+	@:optional var money:Money;
+	@:optional var moneyLeft:Money;
 }
 
 typedef WidgetItemRequest = {
@@ -1241,4 +1280,7 @@ typedef InventoryVueProps = {
 	@:prop({required:false, 'default':false}) @:optional var includeOwnerSlash:Bool;
 	@:prop({required:false, 'default':true}) @:optional var saveAvailable:Bool;
 	@:prop({required:false, 'default':true}) @:optional var loadAvailable:Bool;
+	
+	@:prop({required:false}) @:optional var maxCostCopper:Int;
+	@:prop({required:false}) @:optional var maxWeight:Float;
 }

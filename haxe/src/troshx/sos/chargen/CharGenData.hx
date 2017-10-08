@@ -36,6 +36,9 @@ class CharGenData implements IBuildListed
 	
 	public var char:CharSheet;
 	
+	// more for vue..actually
+	var insideInventory:Bool = false;
+	
 	
 	
 	static public inline var INT_MAX:Int = 2147483647;
@@ -47,7 +50,7 @@ class CharGenData implements IBuildListed
 		return showBnBs ||  totalBnBScore<0;
 	}
 	
-
+	
 	
 	public function new(charSheet:CharSheet=null) 
 	{
@@ -650,12 +653,12 @@ class CharGenData implements IBuildListed
 		return c;
 	}
 	
-	inline function wealthAssetsWorthLen():Int {
+	public inline function wealthAssetsWorthLen():Int {
 		var len:Int = wealthAssets.length;
 		var max = maxWealthAssets;
 		return ( len >= max ? max : len);
 	}
-	function wealthAssetsWorth():Int {
+	public function wealthAssetsWorth():Int {
 		var c:Int = 0;
 		var len:Int = wealthAssetsWorthLen();
 		for (i in 0...len) {
@@ -833,63 +836,11 @@ class CharGenData implements IBuildListed
 	}
 	
 	
-	// CHECKOUT  
-	public var moneyAvailable(get,never):Money;
-	inline function get_moneyAvailable():Money {
-		return socialClassList[wealthIndex].socialClass.money;
-	}
 	
-	
-	public var moneyAvailableStr(get,never):String;
-	inline function get_moneyAvailableStr():String {
-		return moneyAvailable.getLabel();
-	}
-	
-
-	
-	public var checkoutBonuses(get, never):String; 
-	function get_checkoutBonuses():String {
-		return "0"; 
-	}
-
-	public var checkoutPenalties(get, never):String; 
-	function get_checkoutPenalties():String {
-		return "0"; 
-	}
-	public var checkoutSchool(get, never):String; 
-	function get_checkoutSchool():String {
-		return (char.school != null && char.school.costMoney != null ?  char.school.costMoney.getLabel() : "0"); 
-	}
-	
-	public var checkoutInventory(get, never):String; 
-	function get_checkoutInventory():String {
-		return "0"; 
-	}
 	
 	
 	var tempMoneyLeft:Money;
-	
-	public var moneyLeft(get, never):Money;
-	inline function get_moneyLeft():Money {
-		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
-		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO );
-	}
-	
-	public var moneyLeftStr(get,never):String; // TODO:
-	inline function get_moneyLeftStr():String {  
-		return  moneyLeft.changeToHighest().getLabel(); 
-	}
 
-	public var liquidity(get, never):Int; 
-	inline function get_liquidity():Int {
-		var len:Int = wealthAssetsWorthLen();
-		return CharSheet.getTotalLiquidity(wealthAssets, len); 
-	}
-	
-	public var liquidityStr(get, never):String; 
-	function get_liquidityStr():String {
-		return Money.getLabelWith(this.liquidity, 0,0);
-	}
 	
 	
 	public function isValidAll(showWarnings:Bool=false):Bool { 

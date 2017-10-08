@@ -3,6 +3,8 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
+import js.Browser;
+import js.html.HtmlElement;
 import js.html.SelectElement;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
@@ -13,6 +15,7 @@ import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
+import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
@@ -39,8 +42,7 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		super();
 	}
 	
-	
-	
+
 	override function Data():CharGenData {
 		return new CharGenData();
 	}
@@ -124,6 +126,29 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return !moneyLeft.isNegative(); 
 	}
 	
+		
+	var moneyLeft(get, never):Money;
+	function get_moneyLeft():Money {
+		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
+		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).subtractAgainst(inventoryCost);
+	}
+	
+	var moneyLeftStr(get,never):String; 
+	inline function get_moneyLeftStr():String {  
+		return  moneyLeft.changeToHighest().getLabel(); 
+	}
+
+	var liquidity(get, never):Int; 
+	inline function get_liquidity():Int {
+		var len:Int = wealthAssetsWorthLen();
+		return CharSheet.getTotalLiquidity(wealthAssets, len); 
+	}
+	
+	var liquidityStr(get, never):String; 
+	function get_liquidityStr():String {
+		return Money.getLabelWith(this.liquidity, 0,0);
+	}
+	
 	@:computed function get_totalDraftedProfSlots():Int {
 		return profCoreListRanged.length  + profCoreListMelee.length;
 	}
@@ -182,12 +207,69 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) && char.school.customRequire(char) : true;
 	}
 	
+	var inventoryCost(get, never):Money;
+	function get_inventoryCost():Money {
+		return char.inventory.calculateTotalCost();
+	}
+	
+	// CHECKOUT  (for the interest of performance, need to move this section out to Vue instead)
+	
+	var moneyAvailable(get,never):Money;
+	inline function get_moneyAvailable():Money {
+		return socialClassList[wealthIndex].socialClass.money;
+	}
+	
+	var moneyAvailableStr(get,never):String;
+	inline function get_moneyAvailableStr():String {
+		return moneyAvailable.getLabel();
+	}
+	
+	var checkoutBonuses(get, never):String; 
+	function get_checkoutBonuses():String {
+		return "0"; 
+	}
+
+	var checkoutPenalties(get, never):String; 
+	function get_checkoutPenalties():String {
+		return "0"; 
+	}
+	var checkoutSchool(get, never):String; 
+	function get_checkoutSchool():String {
+		return (char.school != null && char.school.costMoney != null ?  char.school.costMoney.getLabel() : "0"); 
+	}
+	
+	var checkoutInventory(get, never):String; 
+	function get_checkoutInventory():String {
+		return inventoryCost.getLabel(); 
+	}
+	
+	
+	function exitInventory():Void {
+		
+		insideInventory = false;
+		Vue.nextTick( function() {
+			var htmlElement:HtmlElement = _vRefs.checkoutHeader;
+			Browser.window.scroll({top:htmlElement.offsetTop});
+		});
+	}
+	
+	
+	function proceedToInventory():Void {
+		
+
+		insideInventory = true;
+		
+		Vue.nextTick( function() {
+			var htmlElement:HtmlElement = _vRefs.inventoryHolder;
+			Browser.window.scroll({top:htmlElement.offsetTop});
+		});
+	}
 	
 	
 	function getBnBSlug(name:String):String {
 		return BoonBaneApplyDetails.getSlug(name);
 	}
-	
+
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [

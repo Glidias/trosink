@@ -35,9 +35,10 @@ td.gotbtn.focus>input{width:calc(100% - 24px);}
 td.gotbtn>button{display:none;}
 td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;position:absolute;right:0;top:0;}
 .inventory{position:relative;padding-top:15px;min-width:598px;}
-.inventory .exit-btn{margin-top:5px;}
+.inventory .exit-btn{margin-top:5px;border:2px solid yellow;}
 .inventory .tally-zone{display:inline-block;}
 .inventory .manage-multi-zone{float:right;}
+.inventory .checkout .exceeded{color:red;}
 .inventory .save-drop-zone{display:inline-block;margin-left:15px;margin-bottom:15px;}
 .inventory .open-new-tab-zone{display:inline-block;margin-left:15px;margin-right:30px;background-color:white;padding:10px;}
 .inventory .open-new-tab-zone .show-browser-cta{margin-bottom:10px;}
@@ -84,6 +85,7 @@ td.w-tags .pop-widget label{display:inline-block;}
 .widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
 .widget-prof .columner{width:50%;float:left;}
 .chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.chargen.in-inventory{margin-top:45px;}
 .chargen h2 .valuer{font-size:11px;}
 .chargen h3 .legend{font-size:11px;font-weight:normal;margin-left:20px;}
 .chargen .gen-col{display:inline-block;vertical-align:top;margin-right:15px;}

@@ -153,6 +153,9 @@ typedef InventoryManagerProps = {
 	@:prop({required:false, "default":"Current"}) @:optional var firstTabName:String;
 	@:prop({required:false}) @:optional var backBtnCallback:Void->Void;
 	@:prop({required:false, 'default':true}) @:optional var loadAvailable:Bool;
+	
+	@:prop({required:false}) @:optional var maxCostCopper:Int;
+	@:prop({required:false}) @:optional var maxWeight:Float;
 }
 
 typedef InventoryTab = {

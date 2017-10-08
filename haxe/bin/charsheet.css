@@ -190,6 +190,7 @@ td.gotbtn.focus > button {
 }
 .inventory .exit-btn {
 	margin-top:5px;
+	border:2px solid yellow;
 }
 .inventory .tally-zone {
 	display:inline-block;
@@ -200,6 +201,11 @@ td.gotbtn.focus > button {
 	float:right;
 	
 }
+
+.inventory .checkout .exceeded {
+	color:red;
+}
+
 .inventory .save-drop-zone {
 	display:inline-block;
 	margin-left:15px;
@@ -417,6 +423,10 @@ td.w-tags .pop-widget label {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+}
+
+.chargen.in-inventory {
+	margin-top:45px;
 }
 
 .chargen h2 .valuer {

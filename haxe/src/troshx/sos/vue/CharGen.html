@@ -1,7 +1,7 @@
-<div class="chargen">
+<div class="chargen" :class="{'in-inventory':insideInventory}">
 	<h1>Song of Swords: Character Creation</h1>
 	
-	<div class="chargen__body">
+	<div class="chargen__body" v-if="!insideInventory">
 		
 		<section class="gen-general" id="gen-general">
 			<div><label>Name:<input type="text" v-model="char.name"></input></label></div>
@@ -145,6 +145,8 @@
 			
 		<hr/>
 		
+		
+	
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
 			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':profPointsLeft>0 && canStillSpendSchool(profPointsLeft) }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
 			<div class="select-school">
@@ -186,23 +188,19 @@
 			
 		<hr/>
 			
-		<section class="gen-checkout">
+		<section class="gen-checkout" ref="checkoutHeader">
 			<h2>Checkout <span class="legend valuer">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span><span class="invalid" v-show="!notBankrupt" style="color:red"> &nbsp;Bankrupt!</span></h2>
 			<div class="checkout">
 				<div class="cash">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>
 			</div>
 			<div class="inventory-section">
-				<button :disabled="true">&#10064; Proceed to Inventory &gt;&gt;</button>
+				<button v-on:click="proceedToInventory()" v-show="!insideInventory">&#10064; Proceed to Inventory &gt;&gt;</button>
 			</div>
 		</section>
-			
-	
+		<hr/>
 	</div>
-				
-	
-	
-	<hr/>
-	<div class="chargen__footer">
+			
+	<div class="chargen__footer" v-if="!insideInventory">
 		<section class="wounds" v-show="false">
 			<h2>Wounds</h2>
 		</section>
@@ -215,7 +213,11 @@
 			<div><label>Glory:</label><textarea v-model="char.arcGlory"></textarea></div>
 			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw"></textarea></div>
 		</section>
-		<button>Save Character</button>
+		<hr/>
+		<button :disabled="true">Save Character!</button>
 	</div>
 	
+	<div ref="inventoryHolder">
+		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" />	
+	</div>
 </div>
