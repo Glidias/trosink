@@ -703,7 +703,7 @@
 	
 	<div v-show="saveAvailable || loadAvailable">
 		<br/>
-		<textarea class="savebox" character-set="UTF-8" v-model="copyToClipboard"></textarea>
+		<textarea class="savebox" character-set="UTF-8" v-model="copyToClipboard" :readonly="!loadAvailable"></textarea>
 	</div>
 				
 	<div v-show="loadAvailable"><button v-on:click="loadSheet()">Load Inventory</button> <i>(also replaces Dropped zone)</i></div>
