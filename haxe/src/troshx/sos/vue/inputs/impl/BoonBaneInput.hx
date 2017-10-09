@@ -142,14 +142,17 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		if (oldValue > 0) { // start from "ON"
 			if (newValue <= 0) {
 				_vEmit("removeBB", bba, isBane);
+				return;
 			}
 		}
 		else {  // start from "OFF"
 			if (newValue > 0) {
 				_vEmit("addBB", bba, isBane);
+				return;
 			}
 		}
 		
+		_vEmit("updateRankBB", bba, isBane, newValue, oldValue);
 	}
 	
 	@:computed function get_cost():Int {

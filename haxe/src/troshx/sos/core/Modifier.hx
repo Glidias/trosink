@@ -44,6 +44,22 @@ class Modifier
 	public static inline var STARTING_MONEY:Int = 17;
 	public static inline var STARTING_GRIT:Int = 18;
 	
+	public static inline var TOTAL_SLOTS:Int = 19;
+	
+	public static function getStaticModifierSlots():Array<Array<StaticModifier>> {
+		var a = [];
+		for (i in 0...TOTAL_SLOTS) {
+			a[i] = [];
+		}
+		return a;
+	}
+	public static function getSituationalModifierSlots():Array<Array<SituationalCharModifier>> {
+		var a = [];
+		for (i in 0...TOTAL_SLOTS) {
+			a[i] = [];
+		}
+		return a;
+	}
 	
 	// These are context-specific modifiers for per-Manuever context with CharSheet
 	//public static inline var MANUEVER_TN:Int = 3;
@@ -79,8 +95,11 @@ class StaticModifier
 		return me;
 	}
 	
-	public inline function getModifiedValue(value:Float):Float {
-		return value * multiply + add;
+	public inline function getModifiedValueMultiply(value:Float):Float {
+		return value * multiply;
+	}
+	public inline function getModifiedValueAdd(value:Float):Float {
+		return value + add;
 	}
 }
 
@@ -95,7 +114,10 @@ class SituationalCharModifier
 	}
 	
 	
-	public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
+	public function getModifiedValueMultiply(char:CharSheet, base:Float, value:Float):Float {
+		return value;
+	}
+	public function getModifiedValueAdd(char:CharSheet, base:Float, value:Float):Float {
 		return value;
 	}
 	

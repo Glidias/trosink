@@ -71,11 +71,11 @@ class CrippedLimbMOBModifier extends SituationalCharModifier {
 		this.current = current;
 		
 	}
-	override public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
+	override public function getModifiedValueMultiply(char:CharSheet, base:Float, value:Float):Float {
 		if ( (current.affectedLimbs & CrippledLimbAssign.BOTH_LEGS) != 0) {
-			// house rule, both legs == 0.25  instead of .5 MOB penalty
+			// house rule, both legs == 0.25  instead of .5 MOB penaltyyh
 			var multipler = current.affectedLimbs == CrippledLimbAssign.BOTH_LEGS ? .25 : .5;
-			var mob = char.MOB;
+			var mob = base; // char.MOB;
 			return  mob * multipler < value ? mob * multipler : value;
 		}
 		return value;

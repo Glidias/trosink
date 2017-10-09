@@ -74,8 +74,11 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 		this.current = current;
 		
 	}
-	override public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
+	override public function getModifiedValueMultiply(char:CharSheet, base:Float, value:Float):Float {
+	
 		if ( (current.affectedLimbs & BrokenLimbAssign.BOTH_LEGS) != 0) {
+			//var rank:Int = current.rank;
+			//var qty:Int = current.qty;
 			// house rule, both legs == 0.25  instead of .5 MOB penalty
 				
 			var equipedItems = char.inventory.equipedNonMeleeItems;
@@ -98,7 +101,7 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 			else {  // has some crutches held...
 				affected &= ~crutchesHeld; // heal some affected
 				
-				var mob = char.MOB;
+				var mob = base;
 				var multiplier = affected == 0 ? 0.25 : 0.125;  // if crutches didn't deal against all effected limbs fully, multiplier reduced 
 				
 				return mob * multiplier < value ? mob * multiplier : value;

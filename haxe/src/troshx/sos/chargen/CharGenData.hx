@@ -1046,6 +1046,11 @@ class CharGenData implements IBuildListed
 		}
 	}
 	
+	public function updateRankBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool, newValue:Int, oldValue:Int):Void {
+		//trace("AA");
+	}
+	
+	
 	
 	var categoryBnB(get, never):CategoryPCP;
 		function get_categoryBnB():CategoryPCP 

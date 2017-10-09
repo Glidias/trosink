@@ -17,20 +17,34 @@ class BadEyes extends Bane {
 		super("Bad Eyes", [4, 6]);
 		channels = BoonBane.__GOOD_EYES__BAD_EYES;
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		
-		var mod:BadEyesModifier = new BadEyesModifier();
+	
+	}
+
+	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
+		return  new BadEyesAssign();
+	}
+}
+
+class BadEyesAssign extends BaneAssign {
+	public function new() {
+		super();
+		var mod:BadEyesModifier = new BadEyesModifier(this);
 		situationalModifiers = [
 			mod,
 			mod
 		];
 	}
+	
 }
 
 class BadEyesModifier extends SituationalCharModifier {
-	public function new() {
+	var current:BadEyesAssign;
+	public function new(current:BadEyesAssign) {
+		this.current = current;
 		super(Modifier.ATTR_PER);
 	}
-	override public function getModifiedValue(char:CharSheet, rank:Int, qty:Int, value:Float):Float {
+	override public function getModifiedValueAdd(char:CharSheet, base:Float, value:Float):Float {
+		var rank:Int = current.rank;
 		var equipedItems = char.inventory.equipedNonMeleeItems;
 		var gotSpecs:Bool = false;
 		for (i in 0...equipedItems.length) {
