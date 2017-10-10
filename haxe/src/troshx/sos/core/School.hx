@@ -78,21 +78,21 @@ class School
 	}
 	
 	// these modifiers are for returning a specific value for hardcoded cases
-	public var staticModifiers(default, null):Array<StaticModifier>;
-	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
+	public var staticModifiers(default, null):StaticModifier;
+	public var situationalModifiers(default, null):SituationalCharModifier;
 	
 	// these modifiers are only triggered upon events
-	public var eventBasedModifiers(default, null):Array<EventModifierBinding>;
+	public var eventBasedModifiers(default, null):EventModifierBinding;
 
 }
 
 class SchoolBonuses implements IBuildUIFields {
 
 	
-	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
+	public var situationalModifiers(default, null):SituationalCharModifier;
 	
 	// these modifiers are only triggered upon events
-	public var eventBasedModifiers(default, null):Array<EventModifierBinding>;
+	public var eventBasedModifiers(default, null):EventModifierBinding;
 	
 
 	public function getUIFields():Array<Dynamic> {

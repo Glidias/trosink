@@ -13,6 +13,7 @@ import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.Inventory;
+import troshx.sos.core.Modifier;
 import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet;
@@ -118,36 +119,6 @@ class CharGen extends VComponent<CharGenData,NoneT>
 			this.selectSchoolAssign(this.schoolAssignList[0]);
 		}
 	}
-
-	
-	
-	@:computed function get_notBankrupt():Bool {
-		
-		return !moneyLeft.isNegative(); 
-	}
-	
-		
-	var moneyLeft(get, never):Money;
-	function get_moneyLeft():Money {
-		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
-		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).subtractAgainst(inventoryCost);
-	}
-	
-	var moneyLeftStr(get,never):String; 
-	inline function get_moneyLeftStr():String {  
-		return  moneyLeft.changeToHighest().getLabel(); 
-	}
-
-	var liquidity(get, never):Int; 
-	inline function get_liquidity():Int {
-		var len:Int = wealthAssetsWorthLen();
-		return CharSheet.getTotalLiquidity(wealthAssets, len); 
-	}
-	
-	var liquidityStr(get, never):String; 
-	function get_liquidityStr():String {
-		return Money.getLabelWith(this.liquidity, 0,0);
-	}
 	
 	@:computed function get_totalDraftedProfSlots():Int {
 		return profCoreListRanged.length  + profCoreListMelee.length;
@@ -206,13 +177,63 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	function get_validAffordCurrentSchool():Bool {
 		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) && char.school.customRequire(char) : true;
 	}
+
+	// CHECKOUT  (for the interest of performance, need to move this section out to Vue instead)
+	
+	@:computed function get_notBankrupt():Bool {
+		
+		return !moneyLeft.isNegative(); 
+	}
+	
+		
+	var moneyLeft(get, never):Money;
+	function get_moneyLeft():Money {
+		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
+		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(this.liquidity, 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).subtractAgainst(inventoryCost).addValues(0,0,startingMoneyBonusCP).subtractValues(0,0,startingMoneyPenaltyCP);
+	}
+	
+	var moneyLeftStr(get,never):String; 
+	inline function get_moneyLeftStr():String {  
+		return  moneyLeft.changeToHighest().getLabel(); 
+	}
+
+	var liquidity(get, never):Int; 
+	inline function get_liquidity():Int {
+		var len:Int = wealthAssetsWorthLen();
+		return CharSheet.getTotalLiquidity(wealthAssets, len); 
+	}
+	
+	var liquidityStr(get, never):String; 
+	function get_liquidityStr():String {
+		return Money.getLabelWith(this.liquidity, 0,0);
+	}
+	
+	
+	static var STARTING_MONEY_MOD:Money;
+	var startingMoneyModifiedCP(get, never):Int;
+	public function get_startingMoneyModifiedCP():Int {
+		var sample = STARTING_MONEY_MOD != null ? STARTING_MONEY_MOD : (STARTING_MONEY_MOD = new Money());
+		sample._resetToZero();
+		var baseCP = this.moneyAvailable.getCPValue();
+		return Std.int( this.char.getModifiedValue(Modifier.STARTING_MONEY, this.moneyAvailable.getCPValue() ) ) - baseCP;
+	}
+	
+	
+	var startingMoneyBonusCP(get, never):Int;
+	public function get_startingMoneyBonusCP():Int {
+		return startingMoneyModifiedCP > 0 ? startingMoneyModifiedCP : 0;
+	}
+	
+	var startingMoneyPenaltyCP(get, never):Int;
+	public function get_startingMoneyPenaltyCP():Int {
+		return startingMoneyModifiedCP < 0 ? -startingMoneyModifiedCP : 0;
+	}
+	
 	
 	var inventoryCost(get, never):Money;
 	function get_inventoryCost():Money {
 		return char.inventory.calculateTotalCost();
 	}
-	
-	// CHECKOUT  (for the interest of performance, need to move this section out to Vue instead)
 	
 	var moneyAvailable(get,never):Money;
 	inline function get_moneyAvailable():Money {
@@ -226,12 +247,13 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	
 	var checkoutBonuses(get, never):String; 
 	function get_checkoutBonuses():String {
-		return "0"; 
+		
+		return startingMoneyBonusCP!= 0 ? Money.ZERO.tempCalc().matchWithValues(0,0,startingMoneyBonusCP).changeToHighest().getLabel() : "0"; 
 	}
 
 	var checkoutPenalties(get, never):String; 
 	function get_checkoutPenalties():String {
-		return "0"; 
+		return startingMoneyPenaltyCP != 0 ? Money.ZERO.tempCalc().matchWithValues(0,0,startingMoneyPenaltyCP).changeToHighest().getLabel() : "0"; 
 	}
 	var checkoutSchool(get, never):String; 
 	function get_checkoutSchool():String {

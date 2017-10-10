@@ -912,7 +912,8 @@ class CharGenData implements IBuildListed
 	public function resetBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
 		//trace("REMOVING:" + bba + " , " + isBane);
 		if (isBane) {
-			//char.removeBane(cast bba);
+			//char.mayRemoveBane(cast bba);  // this is done elsewhere
+			
 			var bane:Bane = cast bba.getBoonOrBane();
 			var ba;
 			var i = baneAssignList.indexOf(cast bba);
@@ -944,8 +945,9 @@ class CharGenData implements IBuildListed
 			CharGenData.dynSetArray(this.boonAssignList, i, ba );
 			if (ba.rank > 0) {
 				i = char.boonsArray.indexOf(boonAssign);
+				var oldBA = char.boonsArray[i];
 				CharGenData.dynSetArray(char.boonsArray, i, ba );
-				
+				char.boonAssignReplaced(ba, oldBA);
 			}
 		}
 	}
@@ -1048,6 +1050,12 @@ class CharGenData implements IBuildListed
 	
 	public function updateRankBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool, newValue:Int, oldValue:Int):Void {
 		//trace("AA");
+		if (isBane) {
+			char.baneRankUpdated(cast bba, newValue, oldValue);
+		}
+		else {
+			char.boonRankUpdated(cast bba, newValue, oldValue);
+		}
 	}
 	
 	
@@ -1074,6 +1082,8 @@ class CharGenData implements IBuildListed
 	public inline function get_maxBanePointsEarnable():Int {
 		return BnBpoints < 0 ? BaneAssign.MAX_BANE_EARNABLE - BnBpoints : BaneAssign.MAX_BANE_EARNABLE;
 	}
+	
+	
 	
 	public var totalBanePointsEarned(get, never):Int;
 	public function get_totalBanePointsEarned():Int {

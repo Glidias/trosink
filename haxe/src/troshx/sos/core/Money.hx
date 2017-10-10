@@ -186,6 +186,20 @@ class Money
 		
 		return this;
 	}
+	
+	public inline function _resetToZero():Void
+	{
+		sp = 0;
+		cp = 0;
+		gp = 0;
+	}
+	public function resetToZero():Money
+	{
+		sp = 0;
+		cp = 0;
+		gp = 0;
+		return this;
+	}
 
 	
 	

@@ -14,9 +14,7 @@ class Soldier extends School
 	public function new() 
 	{
 		super("Soldier", 10, 1);
-		staticModifiers = [
-			StaticModifier.create(Modifier.STARTING_GRIT, 2)
-		];
+		staticModifiers = StaticModifier.create(Modifier.STARTING_GRIT, 2);
 	}
 	
 	override public function getSchoolBonuses(charSheet:CharSheet):SchoolBonuses {

@@ -139,6 +139,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	}
 	
 	@:watch function watch_current(newValue:Int, oldValue:Int):Void {
+		_vEmit("updateRankBB", bba, isBane, newValue, oldValue);
 		if (oldValue > 0) { // start from "ON"
 			if (newValue <= 0) {
 				_vEmit("removeBB", bba, isBane);
@@ -152,7 +153,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 			}
 		}
 		
-		_vEmit("updateRankBB", bba, isBane, newValue, oldValue);
+		
 	}
 	
 	@:computed function get_cost():Int {
