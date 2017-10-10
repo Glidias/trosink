@@ -205,6 +205,7 @@ class CharSheet implements IBuildListed
 			removeBane(assign);
 		}
 	}
+	
 	public function boonRankUpdated(assign:BoonAssign, newRank:Int, oldRank:Int):Void {
 		if (oldRank > 0) {
 			if (assign.boon.staticModifiers!=null && assign.boon.staticModifiers.length >=oldRank)  removeStaticModifier(assign.boon.staticModifiers[oldRank-1]);
@@ -217,6 +218,7 @@ class CharSheet implements IBuildListed
 			if (assign.situationalModifiers!=null && assign.situationalModifiers.length >=newRank) addSituationalModifier(assign.situationalModifiers[newRank - 1]);
 		}
 	}
+
 	public function baneRankUpdated(assign:BaneAssign, newRank:Int, oldRank:Int):Void {
 		if (oldRank > 0) {
 			if (assign.bane.staticModifiers!=null && assign.bane.staticModifiers.length >=oldRank)  removeStaticModifier(assign.bane.staticModifiers[oldRank-1]);
@@ -229,6 +231,14 @@ class CharSheet implements IBuildListed
 			if (assign.situationalModifiers!=null && assign.situationalModifiers.length >=newRank) addSituationalModifier(assign.situationalModifiers[newRank - 1]);
 		}
 	}
+	
+	public function boonRankCanceledChange(assign:BoonAssign, newCanceled:Bool, oldCanceled:Bool):Void {  // specific to char gen only..
+		boonRankUpdated(assign, newCanceled ? 0 : assign.rank, oldCanceled ? 0 : assign.rank);
+	}
+	public function baneRankCanceledChange(assign:BaneAssign, newCanceled:Bool, oldCanceled:Bool):Void {  // specific to char gen only..
+		baneRankUpdated(assign, newCanceled ? 0 : assign.rank, oldCanceled ? 0 : assign.rank);
+	}
+	
 	public function boonAssignReplaced(newAssign:BoonAssign, oldAssign:BoonAssign):Void { // specific to char gen only..
 		if (oldAssign.boon.staticModifiers!=null && oldAssign.boon.staticModifiers.length >=oldAssign.rank) removeStaticModifier(oldAssign.boon.staticModifiers[oldAssign.rank-1]);
 		if (oldAssign.boon.situationalModifiers!=null && oldAssign.boon.situationalModifiers.length >=oldAssign.rank) removeSituationalModifier(oldAssign.boon.situationalModifiers[oldAssign.rank-1]);

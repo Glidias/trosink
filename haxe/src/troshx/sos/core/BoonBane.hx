@@ -122,26 +122,15 @@ class Bane extends BoonBane  {
 
 class BoonBaneAssign implements IBuildUIFields implements IUid 
 {
-	public var rank(default, set):Int;
+	public var rank:Int;
 	//public var qty:Int;
 	
 	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
 	
 	public var ingame:Bool = false;
 	public var _forcePermanent:Bool = false;
-	public var _canceled(default, set):Bool = false;
+	public var _canceled:Bool = false;
 	public var _minRequired:Int = 0;
-
-	public inline function set_rank(val:Int):Int {
-		rank = val;
-		return val;
-	}
-	
-	public inline function set__canceled(val:Bool):Bool {
-		_canceled = val;
-		return val;
-	}
-	
 	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;

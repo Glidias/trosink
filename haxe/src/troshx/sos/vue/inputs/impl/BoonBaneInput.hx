@@ -33,6 +33,14 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	
 
 	
+	@:computed function get_canceled():Bool {
+		return bba._canceled;
+	}
+	
+	@:watch function watch_canceled(newValue:Bool, oldValue:Bool):Void {
+		_vEmit("updateCanceledBB", bba, isBane, newValue, oldValue);
+	}
+	
 	@:computed function get_showReset():Bool {
 		var costArr = bb.costs;
 		var cc = this.cost;
@@ -152,9 +160,9 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 				return;
 			}
 		}
-		
-		
 	}
+	
+	
 	
 	@:computed function get_cost():Int {
 		return bba.getCost(bba.rank);
