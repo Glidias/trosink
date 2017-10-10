@@ -107,7 +107,7 @@
 				<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
 				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
 				<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>
-				<div>Recovery Rate Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmountBase!=recoveryRateAmount" class="baseshow">({{cha}})</i></div>
+				<div>Recovery Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmount!=recoveryRateAmountBase" class="baseshow">({{recoveryRateAmountBase}})</i></div>
 				<br/>
 				<div><b>Reach</b>: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
 			</div>
