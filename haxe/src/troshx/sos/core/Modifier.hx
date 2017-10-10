@@ -39,12 +39,14 @@ class Modifier
 	public static inline var REACH:Int = 14;
 	public static inline var MP:Int = 15;
 	
+	public static inline var CAR_END:Int = 16;
+
 	// Character generation modifiers
-	public static inline var STARTING_WEALTH:Int = 16;
-	public static inline var STARTING_MONEY:Int = 17;
-	public static inline var STARTING_GRIT:Int = 18;
+	public static inline var STARTING_WEALTH:Int = 17;
+	public static inline var STARTING_MONEY:Int = 18;
+	public static inline var STARTING_GRIT:Int = 19;
 	
-	public static inline var TOTAL_SLOTS:Int = 19;
+	public static inline var TOTAL_SLOTS:Int = 20;
 	
 	public static function getStaticModifierSlots():Array<Array<StaticModifier>> {
 		var a = [];

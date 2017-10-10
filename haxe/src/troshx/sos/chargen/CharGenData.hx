@@ -19,6 +19,7 @@ import troshx.sos.core.Skill;
 import troshx.sos.core.SocialClass;
 import troshx.sos.races.Races;
 import troshx.sos.schools.Schools;
+import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
 import troshx.util.LibUtil;
 
 
@@ -69,7 +70,7 @@ class CharGenData implements IBuildListed
 		this.categories = getNewCharGenCategories();
 		this.categories[CATEGORY_BNB].pcp = 4;
 		//this.categories[CATEGORY_PROFECIENCIES].pcp = 6; // for testing
-		
+
 		// ............
 		
 		// Boones and banes

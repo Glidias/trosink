@@ -76,16 +76,16 @@
 		<hr/>
 			
 		<section class="gen-attributes" id="gen-attributes">
-			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0" style="color:green">Ok!</span></h2>
+			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0 || negativeOrZeroStat}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0 && !negativeOrZeroStat" style="color:green">Ok!</span></h2>
 			<div class="gen-col">
-				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="strength != STR" :class="[STR<strength ? 'lower' : 'higher']">{{STR}}</span></div>
-				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="agility != AGI" :class="[AGI<agility ? 'lower' : 'higher']">{{AGI}}</span></div>
-				<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="endurance != END" :class="[END<endurance ? 'lower' : 'higher']">{{END}}</span></div>
-				<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="health != HLT" :class="[HLT<health ? 'lower' : 'higher']">{{HLT}}</span></div>
-				<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="willpower != WIP" :class="[WIP<willpower ? 'lower' : 'higher']">{{WIP}}</span></div>
-				<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="wit != WIT" :class="[WIT<wit ? 'lower' : 'higher']">{{WIT}}</span></div>
-				<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="intelligence != INT" :class="[INT<intelligence ? 'lower' : 'higher']">{{INT}}</span></div>
-				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher']">{{PER}}</span></div>
+				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="strength != STR" :class="[STR<strength ? 'lower' : 'higher', {'zero-neg':STR<=0} ]">{{STR}}</span></div>
+				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="agility != AGI" :class="[AGI<agility ? 'lower' : 'higher', {'zero-neg':AGI<=0}]">{{AGI}}</span></div>
+				<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="endurance != END" :class="[END<endurance ? 'lower' : 'higher', {'zero-neg':END<=0}]">{{END}}</span></div>
+				<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="health != HLT" :class="[HLT<health ? 'lower' : 'higher', {'zero-neg':HLT<=0}]">{{HLT}}</span></div>
+				<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="willpower != WIP" :class="[WIP<willpower ? 'lower' : 'higher', {'zero-neg':WIP<=0}]">{{WIP}}</span></div>
+				<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="wit != WIT" :class="[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]">{{WIT}}</span></div>
+				<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="intelligence != INT" :class="[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]">{{INT}}</span></div>
+				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]">{{PER}}</span></div>
 			</div>
 			<div class="gen-col">
 				<div><b>ADR</b> (Adriotness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
@@ -103,6 +103,12 @@
 			<div class="gen-col">
 				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i></div>
 				<div> <i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b></div>
+				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
+				<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>
+				<div>Recovery Rate: <span><b>{{recoveryRate}}x</b></span></div>
+				<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
+				<br/>
+				<div><b>Reach</b>: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
 			</div>
 		</section>
 

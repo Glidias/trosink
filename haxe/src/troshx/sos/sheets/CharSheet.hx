@@ -7,6 +7,8 @@ import troshx.sos.core.Modifier.StaticModifier;
 import troshx.sos.core.Race;
 import troshx.sos.core.SocialClass;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
+import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
+
 
 import troshx.sos.core.BodyChar;
 
@@ -437,8 +439,8 @@ class CharSheet implements IBuildListed
 
 	
 	public var encumbranceLvl(get, never):Int;
-	public var recoveryRate(get, never):Int;
-	public var exhaustionRate(get, never):Int;
+	public var recoveryRate(get, never):Float;
+	public var exhaustionRate(get, never):Float;
 	public var skillPenalty(get, never):Int;
 
 
@@ -505,13 +507,14 @@ class CharSheet implements IBuildListed
 	}
 	
 	inline function get_MOB():Int 
-	{
-		return clampIntZero(getModifiedValue(Modifier.CMP_MOB, mob));
+	{	
+		var row = encumbranceLvlRow;
+		return row.mobMult* clampIntZero((getModifiedValue(Modifier.CMP_MOB, mob)) + row.mob + fatiqueMobPenalty);
 	}
 	
 	inline function get_CAR():Int 
 	{
-		return clampIntZero(getModifiedValue(Modifier.CMP_CAR, car));
+		return clampIntZero(getModifiedValue(Modifier.CMP_CAR, clampIntZero(getModifiedValue(Modifier.CAR_END, car)) ));
 	}
 	
 	inline function get_CHA():Int 
@@ -532,6 +535,7 @@ class CharSheet implements IBuildListed
 	{
 		return Std.int(willpower / 2);
 	}
+	
 	
 	
 	
@@ -568,7 +572,8 @@ class CharSheet implements IBuildListed
 	}
 	
 	inline function get_CP():Int {
-		return clampIntZero(getModifiedValue(Modifier.CP, baseCP));
+		var row = encumbranceLvlRow;
+		return row.cpMult * clampIntZero( (getModifiedValue(Modifier.CP, baseCP)) + row.cp + fatiqueCPPenalty );
 	}
 	
 	inline function get_meleeCP():Int 
@@ -586,23 +591,58 @@ class CharSheet implements IBuildListed
 		return arcPointsAccum - arcSpent;
 	}
 	
-	// todo
+	
 	function get_skillPenalty():Int 
 	{
-		return 0;
+		return encumbranceLvlRow.skill + fatiqueSkillPenalty;
 	}
 	
-	function get_recoveryRate():Int 
+	function get_recoveryRate():Float 
+	{
+		return clampIntZero(encumbranceLvlRow.recovery + END); 
+	}
+	
+	public var encumbranceLvlRow(get, never):EncumbranceRow;
+	function get_encumbranceLvlRow():EncumbranceRow 
+	{
+		var tabler =  EncumbranceTable.getTable();
+		return tabler[encumbranceLvl>=tabler.length ? tabler.length - 1 : encumbranceLvl < 0 ? 0 : encumbranceLvl];
+	}
+	
+	
+	inline function get_encumbranceLvl():Int 
+	{
+		return Math.floor(totalWeight/CAR);
+	}
+	
+	public var encumberedBeyond(get, never):Bool;
+	inline function get_encumberedBeyond():Bool 
+	{
+		return encumbranceLvl >= 5;
+	}
+	
+
+	function get_exhaustionRate():Float 
+	{
+		return encumbranceLvlRow.exhaustion;
+	}
+	
+	
+	// todo: for game charsheet only
+	public var fatiqueSkillPenalty(get, never):Int;
+	inline function get_fatiqueSkillPenalty():Int 
 	{
 		return 0;
 	}
 	
-	function get_encumbranceLvl():Int 
+	public var fatiqueMobPenalty(get, never):Int;
+	inline function get_fatiqueMobPenalty():Int 
 	{
 		return 0;
 	}
 	
-	function get_exhaustionRate():Int 
+	public var fatiqueCPPenalty(get, never):Int;
+	inline function get_fatiqueCPPenalty():Int 
 	{
 		return 0;
 	}

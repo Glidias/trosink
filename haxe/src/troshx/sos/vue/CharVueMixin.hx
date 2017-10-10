@@ -1,7 +1,11 @@
 package troshx.sos.vue;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import troshx.sos.core.Inventory;
+import troshx.sos.core.Modifier;
+import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
+import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
 
 /**
  * Common charsheet related derived attributes cached by vue proxy, boilerplate.
@@ -31,14 +35,29 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed  function get_encumbered():Bool   { return this.totalWeight >= this.CAR;  }
 	
 	@:computed  function get_totalWeight():Float   { return this.char.totalWeight;  }
-	@:computed  function get_encumberanceLvl():Int   { return this.char.encumbranceLvl;  }
-
+	@:computed  function get_encumbranceLvl():Int   { return this.char.encumbranceLvl;  }
+	
+	@:computed function get_offhandWeapon():Weapon {
+		return char.inventory.getOffhandWeapon();
+	}
+	@:computed function get_masterWeapon():Weapon {
+		return char.inventory.getMasterWeapon();
+	}
+	
+	@:computed function get_reachBase():Int {
+		return Inventory.getReachBetween(offhandWeapon, masterWeapon);
+	}
+	@:computed function get_reach():Int {
+		return Std.int( char.getModifiedValue(Modifier.REACH, reachBase) );
+	}
+	
 	// derived 
 	@:computed function get_adr():Int { return this.char.adr;  }
 	@:computed  function get_mob():Int   { return this.char.mob;  }
 	@:computed  function get_car():Int  { return this.char.car;  }
 	@:computed  function get_cha():Int  { return this.char.cha;  }
 	@:computed  function get_tou():Int   { return this.char.tou;  }
+	
 
 	// derived with mods
 	@:computed  function get_ADR():Int {
@@ -89,6 +108,12 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed function get_WIT():Int { return this.char.WIT;  } 
 	@:computed function get_INT():Int { return this.char.INT;  } 
 	@:computed function get_PER():Int { return this.char.PER;  } 
+	
+	@:computed function get_negativeOrZeroStat():Bool {
+		return this.STR <= 0 || this.AGI <= 0 || this.END <= 0 	 || this.AGI <= 0 || this.HLT <= 0 
+		|| this.WIP  <= 0 || this.WIT <= 0 || this.INT <= 0 || this.PER <= 0;
+		//|| this.ADR <= 0 || this.MOB <= 0 || this.CAR <= 0 || this.CHA <= 0 || this.TOU  <= 0;
+	}
 	
 	// raw without modifiers
 	@:computed function get_strength():Int { return this.char.strength;  } 
@@ -152,18 +177,26 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		return this.char.arcPointsAvailable;
 	}
 	
+	@:computed function get_encumbranceLvlRow():EncumbranceRow
+	{
+		return this.char.encumbranceLvlRow;
+	}
+	
+	@:computed function get_encumberedBeyond():Bool {
+		return this.char.encumberedBeyond;
+	}
 
 	@:computed function get_skillPenalty():Int 
 	{
 		return this.char.skillPenalty;
 	}
 	
-	@:computed function get_recoveryRate():Int 
+	@:computed function get_recoveryRate():Float 
 	{
 		return this.char.recoveryRate;
 	}
 	
-	@:computed function get_exhaustionRate():Int 
+	@:computed function get_exhaustionRate():Float 
 	{
 		return this.char.exhaustionRate;
 	}

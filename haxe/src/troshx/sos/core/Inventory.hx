@@ -83,6 +83,39 @@ class Inventory
 		getSignaler().dispatch(signal);
 	}
 	
+	/*
+	public function getReach():Int {
+		for (i in 0...weapons.length) {
+		
+		}
+	}
+	*/
+	
+	public function getOffhandWeapon():Weapon {
+		for (i in 0...weapons.length) {
+			if (weapons[i].held == HELD_OFF) {
+				return weapons[i].weapon;
+			}
+		}
+		return null;
+	}
+	public function getMasterWeapon():Weapon {
+		for (i in 0...weapons.length) {
+			if (( weapons[i].held & HELD_MASTER) != 0) {
+				return weapons[i].weapon;
+			}
+		}
+		return null;
+	}
+	
+	public function getReach():Int {
+		return getReachBetween(getMasterWeapon(), getOffhandWeapon());
+	}
+	
+	public static inline function getReachBetween(w:Weapon, w2:Weapon):Int {
+		return LibUtil.maxI(w != null ? w.reach : 1, w2 != null ? w2.reach : 1);
+	}
+	
 	
 	
 	public function findHeldShield():Shield 
@@ -281,7 +314,7 @@ class Inventory
 			w += shields[i].shield.weight;
 		}
 		for (i in 0...weapons.length) {
-			w += weapons[i].weapon.weight;
+			w += weapons[i].held == 0 ? weapons[i].weapon.weight : 0;
 		}
 	
 		return w;

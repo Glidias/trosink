@@ -119,16 +119,6 @@ class FacialDeformity extends Bane {
 	}
 }
 
-class Fat extends Bane {
-	public function new() {
-		super("Fat", [5]);
-		// -2 to endurance when determining fatque
-		
-		staticModifiers = [
-			StaticModifier.create(Modifier.CMP_MOB, -2)
-		];
-	}
-}
 
 
 class Frail extends Bane {
@@ -230,13 +220,7 @@ class Short extends Bane {
 	}
 }
 
-class Skinny extends Bane {
-	public function new() {
-		
-		super("Skinny", [3]);
-		// CAR reduced by 1 hard??
-	}
-}
+
 
 class TechnologicallyImpaired extends Bane {
 	public function new() {

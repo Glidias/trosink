@@ -18,6 +18,8 @@ import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
+
+
 import troshx.sos.vue.inputs.impl.AttributeInput;
 import troshx.sos.vue.inputs.impl.BoonBaneInput;
 import troshx.sos.vue.inputs.impl.CategoryPCPInput;

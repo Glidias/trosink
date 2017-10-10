@@ -7,7 +7,7 @@ import troshx.sos.races.Races.Orredin;
 import troshx.sos.races.Races.Zell;
 
 /**
- * ...
+ * // TOOD:skill modifiers for fairness, and named tags for those modifiers, and all other modifiers for Races
  * @author Glidias
  */
 class Races
@@ -52,7 +52,10 @@ class Goblin extends Race {
 		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_STR, -1),
 			StaticModifier.create(Modifier.ATTR_AGI, 1),
-			StaticModifier.create(Modifier.ATTR_PER, 1)
+			StaticModifier.create(Modifier.ATTR_PER, 1),
+			// stuff for goblins
+			StaticModifier.create(Modifier.CMP_MOB, -2),	
+			StaticModifier.create(Modifier.REACH, -2)	
 		]);
 	}
 }
@@ -61,7 +64,9 @@ class Dwarf extends Race {
 		super("Dwarf");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_END, 2),
-			StaticModifier.create(Modifier.ATTR_HLT, 1)
+			StaticModifier.create(Modifier.ATTR_HLT, 1),
+			// stuff for dwarfs
+			StaticModifier.create(Modifier.CMP_TOU, 1)
 		]);
 	}
 }

@@ -429,6 +429,10 @@ td.w-tags .pop-widget label {
 .modified-attribute.lower {
 	color:brown;
 }
+.modified-attribute.zero-neg {
+	font-weight:bold;
+	color:red;
+}
 
 .chargen .gen-attributes .baseshow {
 	margin-left:5px;
