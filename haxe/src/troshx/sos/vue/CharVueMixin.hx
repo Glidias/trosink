@@ -195,6 +195,17 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	{
 		return this.char.recoveryRate;
 	}
+	var recoveryRateAmountBase(get, never):Float;
+	function get_recoveryRateAmountBase():Float 
+	{
+		return recoveryRate * END; 
+	}
+	
+	var recoveryRateAmount(get, never):Float;
+	function get_recoveryRateAmount():Float 
+	{
+		return  char.clampIntZero(recoveryRate * char.getModifiedValue(Modifier.FATIQUE_END, END) ); 
+	}
 	
 	@:computed function get_exhaustionRate():Float 
 	{

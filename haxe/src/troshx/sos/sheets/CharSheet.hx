@@ -540,7 +540,7 @@ class CharSheet implements IBuildListed
 	
 	
 	
-	function clampIntZero(val:Float):Int {
+	public function clampIntZero(val:Float):Int {
 		var r = Std.int(val);
 		return r < 0 ? 0 : r;
 	}
@@ -599,8 +599,9 @@ class CharSheet implements IBuildListed
 	
 	function get_recoveryRate():Float 
 	{
-		return clampIntZero(encumbranceLvlRow.recovery + END); 
+		return clampIntZero(encumbranceLvlRow.recovery); 
 	}
+	
 	
 	public var encumbranceLvlRow(get, never):EncumbranceRow;
 	function get_encumbranceLvlRow():EncumbranceRow 

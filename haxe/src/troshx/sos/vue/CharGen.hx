@@ -273,6 +273,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	}
 	
 	
+	
+	
 	function exitInventory():Void {
 		
 		insideInventory = false;
