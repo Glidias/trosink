@@ -199,11 +199,10 @@ td.gotbtn.focus > button {
 
 .inventory .manage-multi-zone {
 	float:right;
-	
 }
 
 .inventory .checkout .exceeded {
-	color:red;
+	color:brown;
 }
 
 .inventory .save-drop-zone {
@@ -424,6 +423,24 @@ td.w-tags .pop-widget label {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
+.modified-attribute.higher {
+	color:green;
+}
+.modified-attribute.lower {
+	color:brown;
+}
+
+.chargen .gen-attributes .baseshow {
+	margin-left:5px;
+}
+
+.chargen input+.modified-attribute {
+	margin-left:5px;
+}
+.chargen .got-pain {
+	color:brown;
+	font-weight:bold;
+}
 
 .chargen.in-inventory {
 	margin-top:45px;
@@ -537,6 +554,10 @@ section.gen-bnb .bane-tags .gen-comp-bb.selected {
 section.gen-checkout .inventory {
 	margin-top:10px;
 }
+section.gen-checkout .carry .encumbered {
+	color:brown;
+}
+
 section.gen-bnb .boon-tags .gen-comp-bb.selected.canceled {
 	background-color:rgba(100,100,100,.2);
 }

@@ -127,7 +127,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return maxWeight - totalWeight;
 	}
 	@:computed function get_exceededWeight():Bool {
-		return weightRemaining < 0;
+		return weightRemaining <= 0;
 	}
 	
 	@:computed function get_maxCostGP():Int {

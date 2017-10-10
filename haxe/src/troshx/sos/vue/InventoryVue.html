@@ -11,7 +11,7 @@
 			<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>
 			<div v-if="maxCostCopper!=null" :class="{exceeded:exceededCost}">Max Cost: <b>{{ maxCostGP }}gp  {{ maxCostSP }}sp {{ maxCostCP }}cp</b> ({{moneyLeftStr}} remaining)</div>
 			<div>Total Weight: <b>{{ totalWeight }}</b></div>
-			<div v-if="maxWeight!=null" :class="{exceeded:exceededWeight}">Max Weight: <b>{{ maxWeight }}</b> ({{weightRemaining}} remaining)</div>
+			<div v-if="maxWeight!=null" :class="{exceeded:exceededWeight}">Weight Threshold: <b>{{ totalWeight }}</b> / <b>{{ maxWeight }}</b> (~~{{weightRemaining}})</div>
 		</div>
 		<slot name="exitBtn"></slot>
 	</div>	

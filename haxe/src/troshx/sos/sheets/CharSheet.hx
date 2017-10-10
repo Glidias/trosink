@@ -31,7 +31,23 @@ class CharSheet implements IBuildListed
 	
 	
 	public var name:String = "";
-	public var race:Race = null;
+	public var race(default, set):Race = null;
+	function set_race(r:Race):Race {
+		var oldR = this.race;
+		if ( oldR != r) {
+			//r.staticModifiers;
+			if (oldR != null ) {
+				removeStaticModifier(oldR.staticModifiers);
+				removeSituationalModifier(oldR.situationalModifiers);
+			}
+			if (r != null ) {
+				addStaticModifier(r.staticModifiers);
+				addSituationalModifier(r.situationalModifiers);
+			}
+			this.race = r;
+		}
+		return r;
+	}
 	
 	public var gender:Int = 0; 
 	@:gender("Male") public static inline var GENDER_MALE:Int = 0;
@@ -57,27 +73,33 @@ class CharSheet implements IBuildListed
 	
 	
 	public var STR(get, never):Int;	// strength
-	function get_STR():Int { return Math.floor(getModifiedValue(Modifier.ATTR_STR, strength));  } 
+	function get_STR():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_STR, strength));  } 
 	public var AGI(get, never):Int;	// agility
-	function get_AGI():Int { return Math.floor(getModifiedValue(Modifier.ATTR_AGI, agility));  } 
+	function get_AGI():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_AGI, agility));  } 
 	public var END(get, never):Int;	// endurance
-	function get_END():Int { return Math.floor(getModifiedValue(Modifier.ATTR_END, endurance));  } 
+	function get_END():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_END, endurance));  } 
 	public var HLT(get, never):Int;	// health
-	function get_HLT():Int { return Math.floor(getModifiedValue(Modifier.ATTR_HLT, health));  } 
+	function get_HLT():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_HLT, health));  } 
 	public var WIP(get, never):Int;	// willpower
-	function get_WIP():Int { return Math.floor(getModifiedValue(Modifier.ATTR_WIL, willpower));  } 
+	function get_WIP():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_WIL, willpower));  } 
 	public var WIT(get, never):Int;	// wit
-	function get_WIT():Int { return Math.floor(getModifiedValue(Modifier.ATTR_WIT, wit));  } 
+	function get_WIT():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_WIT, wit));  } 
 	public var INT(get, never):Int;	// intelligence
-	function get_INT():Int { return Math.floor(getModifiedValue(Modifier.ATTR_INT, intelligence));  } 
+	function get_INT():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_INT, intelligence));  } 
 	public var PER(get, never):Int;	// perception
-	function get_PER():Int { return Math.floor(getModifiedValue(Modifier.ATTR_PER, perception));  } 
+	function get_PER():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_PER, perception));  } 
 
-	public var ADR(get, never):Int;	// Adroitness
-	public var MOB(get, never):Int;	// Mobility
-	public var CAR(get, never):Int;	// Carry
-	public var CHA(get, never):Int;	// Charisma
-	public var TOU(get, never):Int;	// Toughness
+	public var adr(get, never):Int;	// Adroitness
+	public var mob(get, never):Int;	// Mobility
+	public var car(get, never):Int;	// Carry
+	public var cha(get, never):Int;	// Charisma
+	public var tou(get, never):Int;	// Toughness
+	
+	public var ADR(get, never):Int;	// Adroitness (with mods)
+	public var MOB(get, never):Int;	// Mobility  (with mods)
+	public var CAR(get, never):Int;	// Carry  (with mods)
+	public var CHA(get, never):Int;	// Charisma  (with mods)
+	public var TOU(get, never):Int;	// Toughness  (with mods)
 	
 	public var SDB(get, never):Int;	// Strength Damange Bonus
 	
@@ -85,8 +107,38 @@ class CharSheet implements IBuildListed
 	public var baseGrit(get, never):Int;
 	public var gritAccum:Int = 0;
 	
-	public var school:School = null;
-	public var schoolBonuses:SchoolBonuses = null;
+	public var school(default,set):School = null;
+	function set_school(r:School):School {
+		var oldR = this.school;
+		if ( oldR != r) {
+			if (oldR != null ) {
+				removeStaticModifier(oldR.staticModifiers);
+				removeSituationalModifier(oldR.situationalModifiers);
+			}
+			if (r != null ) {
+				addStaticModifier(r.staticModifiers);
+				addSituationalModifier(r.situationalModifiers);
+			}
+			this.school = r;
+		}
+		return r;
+	}
+	public var schoolBonuses(default,set):SchoolBonuses = null;
+	function set_schoolBonuses(r:SchoolBonuses):SchoolBonuses {
+		var oldR = this.schoolBonuses;
+		if ( oldR != r) {
+			if (oldR != null ) {
+				removeSituationalModifier(oldR.situationalModifiers);
+			}
+			if (r != null ) {
+				addSituationalModifier(r.situationalModifiers);
+			}
+			this.schoolBonuses = r;
+		}
+		return r;
+	}
+	
+	
 	public var schoolLevel:Int = 0;
 	public var profsMelee:Int = 0;	// core melee profiecy mask
 	public var profsRanged:Int = 0;	// core ranged profiecy mask
@@ -102,10 +154,11 @@ class CharSheet implements IBuildListed
 	public var labelSchool(get, never):String;
 	
 	public var schoolCP(get, never):Int;
+	public var baseCP(get, never):Int;
+	public var CP(get, never):Int;
 	public var meleeCP(get, never):Int;
 	
 	public var fatique:Int = 0;
-	public var miscCPBonus:Int = 0;
 	
 	public var totalPain(get, never):Int;
 	public var totalBloodLost(get, never):Int;
@@ -343,7 +396,8 @@ class CharSheet implements IBuildListed
 	public var arcFlaw:String = "";
 	
 	public var inventory:Inventory = new Inventory();
-	
+	public var totalWeight(get, never):Float;
+	inline function get_totalWeight():Float { return  inventory.calculateTotalWeight(); } 
 	
 	public var body:BodyChar = BodyChar.getInstance();
 	var wounds:Array<Wound> = [];
@@ -380,13 +434,15 @@ class CharSheet implements IBuildListed
 	}
 	
 		
-	// todo:
+
+	
 	public var encumbranceLvl(get, never):Int;
 	public var recoveryRate(get, never):Int;
 	public var exhaustionRate(get, never):Int;
 	public var skillPenalty(get, never):Int;
-	public var mobWithMods(get, never):Int;
-	
+
+
+	public var startingGrit(get, never):Int;
 	
 	public function new() 
 	{
@@ -419,30 +475,57 @@ class CharSheet implements IBuildListed
 		return c;
 	}
 	
-	
-	inline function get_ADR():Int 
+	inline function get_adr():Int 
 	{
 		return Std.int( (agility + wit) / 2);
 	}
 	
-	inline function get_MOB():Int 
+	inline function get_mob():Int 
 	{
 		return Std.int( (strength + agility + endurance) / 2 ) ;
 	}
 	
-	inline function get_CAR():Int 
+	inline function get_car():Int 
 	{
 		return strength + endurance;
 	}
 	
-	inline function get_CHA():Int 
+	inline function get_cha():Int 
 	{
 		return Std.int( (willpower + wit + perception) / 2 );
 	}
+	inline function get_tou():Int 
+	{
+		return 4;
+	}
 	
+	inline function get_ADR():Int 
+	{
+		return clampIntZero(getModifiedValue(Modifier.CMP_ADR, adr));
+	}
+	
+	inline function get_MOB():Int 
+	{
+		return clampIntZero(getModifiedValue(Modifier.CMP_MOB, mob));
+	}
+	
+	inline function get_CAR():Int 
+	{
+		return clampIntZero(getModifiedValue(Modifier.CMP_CAR, car));
+	}
+	
+	inline function get_CHA():Int 
+	{
+		return clampIntZero(getModifiedValue(Modifier.CMP_CHA, cha));
+	}
+	
+	inline function get_startingGrit():Int 
+	{
+		return clampIntZero(getModifiedValue(Modifier.STARTING_GRIT, baseGrit));
+	}
 	inline function get_GRIT():Int 
 	{
-		return baseGrit + gritAccum;
+		return Std.int(startingGrit + gritAccum);
 	}
 	
 	inline function get_baseGrit():Int 
@@ -450,31 +533,47 @@ class CharSheet implements IBuildListed
 		return Std.int(willpower / 2);
 	}
 	
+	
+	
+	
+	function clampIntZero(val:Float):Int {
+		var r = Std.int(val);
+		return r < 0 ? 0 : r;
+	}
+	
 	inline function get_TOU():Int 
 	{
-		return 4;
+		return clampIntZero(getModifiedValue(Modifier.CMP_TOU, tou));
 	}
 	
 	inline function get_SDB():Int 
 	{
-		return Std.int(strength / 2);
+		return Std.int(STR / 2);
 	}
 	
 	inline function get_labelRace():String 
 	{
 		return race != null ? race.name : "Unspecified";
 	}
-	
-	
+
 	
 	inline function get_labelSchool():String 
 	{
 		return school != null ? school.name : "";
 	}
 	
+	
+	inline function get_baseCP():Int {
+		return schoolCP + ADR;
+	}
+	
+	inline function get_CP():Int {
+		return clampIntZero(getModifiedValue(Modifier.CP, baseCP));
+	}
+	
 	inline function get_meleeCP():Int 
 	{
-		return schoolCP + ADR + miscCPBonus - totalPain;
+		return CP - totalPain;
 	}
 	
 	inline function get_schoolCP():Int 
@@ -482,7 +581,12 @@ class CharSheet implements IBuildListed
 		return schoolLevel >= 1 ? schoolLevel + 4 : 0;
 	}
 	
+	function get_arcPointsAvailable():Int 
+	{
+		return arcPointsAccum - arcSpent;
+	}
 	
+	// todo
 	function get_skillPenalty():Int 
 	{
 		return 0;
@@ -503,15 +607,7 @@ class CharSheet implements IBuildListed
 		return 0;
 	}
 	
-	function get_mobWithMods():Int 
-	{
-		return MOB;
-	}
-	
-	function get_arcPointsAvailable():Int 
-	{
-		return arcPointsAccum - arcSpent;
-	}
+
 	
 }
 

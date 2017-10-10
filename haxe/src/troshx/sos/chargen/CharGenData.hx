@@ -399,8 +399,6 @@ class CharGenData implements IBuildListed
 	public inline function selectRaceAt(ti:Int, ri:Int):Void {
 		selectedTierIndex = ti;
 		char.race = raceTierTable[ti][ri];
-
-		
 	}
 	
 	public inline function settleRaceTier():Void {

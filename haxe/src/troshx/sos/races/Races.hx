@@ -2,6 +2,7 @@ package troshx.sos.races;
 import troshx.sos.core.Modifier;
 import troshx.sos.core.Modifier.StaticModifier;
 import troshx.sos.core.Race;
+import troshx.sos.macro.MacroUtil;
 import troshx.sos.races.Races.Orredin;
 import troshx.sos.races.Races.Zell;
 
@@ -48,51 +49,51 @@ class Human extends Race {
 class Goblin extends Race {
 	public function new() {
 		super("Goblin");
-		staticModifiers = [
+		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_STR, -1),
 			StaticModifier.create(Modifier.ATTR_AGI, 1),
 			StaticModifier.create(Modifier.ATTR_PER, 1)
-		];
+		]);
 	}
 }
 class Dwarf extends Race {
 	public function new() {
 		super("Dwarf");
-		staticModifiers = [
+		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_END, 2),
 			StaticModifier.create(Modifier.ATTR_HLT, 1)
-		];
+		]);
 	}
 }
 
 class Zell extends Race {
 	public function new() {
 		super("Zell");
-		staticModifiers = [
+		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_AGI, 1),
 			StaticModifier.create(Modifier.ATTR_PER, 2)
-		];
+		]);
 	}
 }
 
 class Burdinadin extends Race {
 	public function new() {
 		super("Burdinadin");
-		staticModifiers = [
+		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_INT, 1),
 			StaticModifier.create(Modifier.ATTR_AGI, 1)
-		];
+		]);
 	}
 }
 
 class Ohanedin extends Race {
 	public function new() {
 		super("Ohanedin");
-		staticModifiers = [
+		MacroUtil.linkedListFromArray(staticModifiers,  [
 			StaticModifier.create(Modifier.ATTR_STR, 1),
 			StaticModifier.create(Modifier.ATTR_AGI, 1),
 			StaticModifier.create(Modifier.ATTR_PER, 1)
-		];
+		]);
 	}
 }
 

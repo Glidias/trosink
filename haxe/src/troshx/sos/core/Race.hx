@@ -12,9 +12,9 @@ import troshx.sos.core.Modifier.StaticModifier;
 class Race implements IUid
 {
 	public var name:String;
-	public var staticModifiers(default, null):Array<StaticModifier>;
-	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
-	public var eventBasedModifiers(default, null):Array<EventModifierBinding>;
+	public var staticModifiers(default, null):StaticModifier;
+	public var situationalModifiers(default, null):SituationalCharModifier;
+	public var eventBasedModifiers(default, null):EventModifierBinding;
 	
 	public var magic:Bool;
 	public function new(name:String) 

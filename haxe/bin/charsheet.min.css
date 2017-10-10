@@ -38,7 +38,7 @@ td.gotbtn.focus>button{display:block;width:24px;height:100%;line-height:0;positi
 .inventory .exit-btn{margin-top:5px;border:2px solid yellow;}
 .inventory .tally-zone{display:inline-block;}
 .inventory .manage-multi-zone{float:right;}
-.inventory .checkout .exceeded{color:red;}
+.inventory .checkout .exceeded{color:brown;}
 .inventory .save-drop-zone{display:inline-block;margin-left:15px;margin-bottom:15px;}
 .inventory .open-new-tab-zone{display:inline-block;margin-left:15px;margin-right:30px;background-color:white;padding:10px;}
 .inventory .open-new-tab-zone .show-browser-cta{margin-bottom:10px;}
@@ -85,6 +85,11 @@ td.w-tags .pop-widget label{display:inline-block;}
 .widget-prof .listitem.disabled{opacity:.35;pointer-events:none;}
 .widget-prof .columner{width:50%;float:left;}
 .chargen{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.modified-attribute.higher{color:green;}
+.modified-attribute.lower{color:brown;}
+.chargen .gen-attributes .baseshow{margin-left:5px;}
+.chargen input+.modified-attribute{margin-left:5px;}
+.chargen .got-pain{color:brown;font-weight:bold;}
 .chargen.in-inventory{margin-top:45px;}
 .chargen h2 .valuer{font-size:11px;}
 .chargen h3 .legend{font-size:11px;font-weight:normal;margin-left:20px;}
@@ -111,6 +116,7 @@ section.gen-bnb .bane-tags .gen-comp-bb:hover{background-color:rgba(255,192,203,
 section.gen-bnb .boon-tags .gen-comp-bb.selected{background-color:lightblue;}
 section.gen-bnb .bane-tags .gen-comp-bb.selected{background-color:pink;}
 section.gen-checkout .inventory{margin-top:10px;}
+section.gen-checkout .carry .encumbered{color:brown;}
 section.gen-bnb .boon-tags .gen-comp-bb.selected.canceled{background-color:rgba(100,100,100,.2);}
 section.gen-bnb .bane-tags .gen-comp-bb.selected.canceled{background-color:rgba(100,100,100,.2);}
 section.gen-race label.disabled{pointer-events:none;opacity:.5;}

@@ -41,6 +41,9 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	public function new() 
 	{
 		super();
+		untyped this.mixins = [
+			CharVueMixin.getSampleInstance()
+		];
 	}
 	
 

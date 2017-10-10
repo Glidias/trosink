@@ -78,14 +78,31 @@
 		<section class="gen-attributes" id="gen-attributes">
 			<h2>Attributes <span class="valuer" :class="{'still-have':remainingAttributePoints>0}">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class="valuer">(Available: {{availableAttributePoints}}) </span><span class="valid" v-show="remainingAttributePoints==0" style="color:green">Ok!</span></h2>
 			<div class="gen-col">
-				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /></div>
-				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /></div>
+				<div><label>Strength:</label><AttributeInput :obj="char" prop="strength" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="strength != STR" :class="[STR<strength ? 'lower' : 'higher']">{{STR}}</span></div>
+				<div><label>Agility:</label><AttributeInput :obj="char" prop="agility" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="agility != AGI" :class="[AGI<agility ? 'lower' : 'higher']">{{AGI}}</span></div>
+				<div><label>Endurance:</label><AttributeInput :obj="char" prop="endurance" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="endurance != END" :class="[END<endurance ? 'lower' : 'higher']">{{END}}</span></div>
+				<div><label>Health:</label><AttributeInput :obj="char" prop="health" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="health != HLT" :class="[HLT<health ? 'lower' : 'higher']">{{HLT}}</span></div>
+				<div><label>Willpower:</label><AttributeInput :obj="char" prop="willpower" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="willpower != WIP" :class="[WIP<willpower ? 'lower' : 'higher']">{{WIP}}</span></div>
+				<div><label>Wit:</label><AttributeInput :obj="char" prop="wit" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="wit != WIT" :class="[WIT<wit ? 'lower' : 'higher']">{{WIT}}</span></div>
+				<div><label>Intelligence:</label><AttributeInput :obj="char" prop="intelligence" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="intelligence != INT" :class="[INT<intelligence ? 'lower' : 'higher']">{{INT}}</span></div>
+				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher']">{{PER}}</span></div>
+			</div>
+			<div class="gen-col">
+				<div><b>ADR</b> (Adriotness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
+				<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>
+				<div><b>GRIT</b> (Grit): <span class="modified-attribute" :class="[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']"><b>{{GRIT}}</b></span><i v-show="baseGrit!=GRIT" class="baseshow">({{baseGrit}})</i></div>
+			
+				<div><b>MOB</b> (Mobility): <span class="modified-attribute" :class="[MOB==mob ?'base' : MOB<mob ? 'lower' : 'higher']"><b>{{MOB}}</b></span><i v-show="mob!=MOB" class="baseshow">({{mob}})</i></div>
+				<div><b>CAR</b> (Carry): <span class="modified-attribute" :class="[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']"><b>{{CAR}}</b></span><i v-show="car!=CAR" class="baseshow">({{car}})</i></div>
+				
+				<div><b>CHA</b> (Charisma): <span class="modified-attribute" :class="[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']"><b>{{CHA}}</b></span><i v-show="cha!=CHA" class="baseshow">({{cha}})</i></div>
+				
+				<div><i>TOU</i> (Toughness): <span class="modified-attribute" :class="[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']"><b>{{TOU}}</b></span><i v-show="tou!=TOU" class="baseshow">({{tou}})</i></div>
+				
+			</div>
+			<div class="gen-col">
+				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i></div>
+				<div> <i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b></div>
 			</div>
 		</section>
 
@@ -195,6 +212,7 @@
 			<h2>Checkout <span class="legend valuer">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span><span class="invalid" v-show="!notBankrupt" style="color:red"> &nbsp;Bankrupt!</span></h2>
 			<div class="checkout">
 				<div class="cash">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>
+				<div class="carry">Carry: <b :class="{encumbered:encumbered}">{{totalWeight}}</b> / <span class="modified-attribute" :class="[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']"><b>{{CAR}}</b></span></div>
 			</div>
 			<div class="inventory-section">
 				<button v-on:click="proceedToInventory()" v-show="!insideInventory">&#10064; Proceed to Inventory &gt;&gt;</button>
@@ -221,6 +239,6 @@
 	</div>
 	
 	<div ref="inventoryHolder">
-		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" />	
+		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" :maxWeight="CAR" />	
 	</div>
 </div>

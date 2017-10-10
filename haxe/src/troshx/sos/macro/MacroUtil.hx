@@ -250,6 +250,38 @@ class MacroUtil
 		return expr;
 	}
 	
+	public static macro function linkedListFromArray(header:Expr, array:Expr, suffix:Int=-1):Expr {
+		var cp = Context.currentPos();
+		var exprList:Array<Expr> = [];
+		var exprBlock:Expr = {expr:ExprDef.EBlock(exprList), pos:cp };
+		switch (header.expr) {
+			case ExprDef.EConst(CIdent(h)):
+				
+			default:
+				Context.error("Could not resolve header expression:"+header.expr, header.pos );
+		}
+		
+		var varName:String = "_l_" + (suffix >= 0 ? "" + suffix : "");
+		
+		exprList.push({expr:ExprDef.EVars([{name:varName,expr:null, type:null}]), pos:cp } );
+		switch (array.expr) {
+			case ExprDef.EArrayDecl(values):
+				for (i in 0...values.length) {
+					if (i != 0) {
+						exprList.push( macro $i{varName} = $i{varName}.next =  ${values[i]} );
+						//exprList.push({expr:ExprDef.E([{name:va}]), pos:cp } {expr:ExprDef.EVars([{name:varName, expr:header}]), pos:cp } );
+					}
+					else {
+						exprList.push( macro ${header} = $i{varName} = ${values[i]} );
+						//exprList.push({expr:ExprDef.EVars([{name:"_l_", expr:header}]), pos:cp } );
+					}
+				}
+			default:
+				Context.error("Could not resolve array expression:"+array.expr, array.pos );
+		}
+		
+		return macro ${exprBlock};
+	}
 	
 	/**
 	 * Gathers all classes to be instantiated under a given array expression `[...new GatheredClass()]`;
