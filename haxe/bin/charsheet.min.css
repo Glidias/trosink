@@ -125,7 +125,9 @@ section.gen-bnb .bane-tags .gen-comp-bb.force-perm{pointer-events:none;color:bro
 section.gen-bnb .boon-tags .gen-comp-bb.required{color:green;}
 section.gen-bnb .bane-tags .gen-comp-bb.required{color:green;}
 section.gen-social-class .col-social-class{min-width:100px;display:inline-block;}
-section.gen-social-class .wealth-assets{margin-top:10px;}
+section.gen-social-class .wealth-assets,section.gen-social-class .modified-wealth-assets{margin-top:10px;}
+section.gen-social-class .modified-wealth-assets.lower b{color:brown;}
+section.gen-social-class .modified-wealth-assets.high b{color:green;}
 section.gen-social-class .custom-label{margin-bottom:10px;}
 section.gen-social-class .col-wealth{min-width:100px;display:inline-block;}
 section.gen-social-class input{font-family:inherit;font-size:inherit;}

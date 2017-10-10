@@ -10,6 +10,7 @@ import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.Modifier;
 import troshx.sos.core.Money;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Race;
@@ -628,11 +629,17 @@ class CharGenData implements IBuildListed
 		}
 	}
 	
-	public var availableWealthPoints(get,never):Int;
-	inline function get_availableWealthPoints():Int {
+	public var availableWealthPointsBase(get,never):Int;
+	inline function get_availableWealthPointsBase():Int {
 		return socialClassList[wealthIndex].socialClass.wealth;
 	}
 	
+	public var availableWealthPoints(get,never):Int;
+	inline function get_availableWealthPoints():Int {
+		var r =  Math.floor(char.getModifiedValue( Modifier.STARTING_WEALTH, availableWealthPointsBase) );
+		if (r < 0) r = 0;
+		return r;
+	}
 	
 	public var remainingWealthPointsFull(get,never):Int;
 	inline function get_remainingWealthPointsFull():Int {

@@ -178,6 +178,8 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return hasSchool ? char.school.canAffordWith(ProfPoints, moneyAvailable ) && char.school.customRequire(char) : true;
 	}
 
+	
+
 	// CHECKOUT  (for the interest of performance, need to move this section out to Vue instead)
 	
 	@:computed function get_notBankrupt():Bool {

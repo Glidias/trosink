@@ -58,6 +58,9 @@
 					<div class="social-benefit"  v-show="curSelectedSocialClass.maxBoons>= 2"><label>Social Benefit #2: </label><select v-on:change="socialBenefitSelectChangeHandler(2, $event.target.selectedIndex)" :disabled="curSelectedSocialClass.maxBoons<2"><option v-for="(li,i) in socialBenefitChoices" :disabled="socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons>=3 && socialBenefit3.name===li.name)" :selected="li===socialBenefit2" :key="li.label">{{ li.label }}</option></select></div>
 					<div class="social-benefit"  v-show="curSelectedSocialClass.maxBoons>=3"><label>Social Benefit #3: </label><select v-on:change="socialBenefitSelectChangeHandler(3, $event.target.selectedIndex)" :disabled="curSelectedSocialClass.maxBoons<3"><option v-for="(li,i) in socialBenefitChoices" :disabled="socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons >=2 && socialBenefit2.name===li.name)" :selected="li===socialBenefit3" :key="li.label">{{ li.label }}</option></select></div>
 				</div>
+				<div class="modified-wealth-assets" v-show="availableWealthPointsBase!=availableWealthPoints" :class="[availableWealthPoints<availableWealthPointsBase ? 'lower' : 'higher']">
+					<label>Modified Wealth: <b>{{ availableWealthPoints }}W</b></label>
+				</div>
 				<div class="wealth-assets" v-show="availableWealthPoints > 0">
 					<label>Your Wealth Assets: <span class="valuer" v-show="remainingWealthPoints>0" :class="{'still-have':remainingWealthPoints>0}">({{remainingWealthPoints}}  Wealth Point(s) remaining.)</span></label>
 					<ArrayOf of="WealthAssetAssign" :defaultValue="getEmptyWealthAssign" :obj="$data" prop="wealthAssets" :minLength="0" :maxLength="maxWealthAssets" :remainingWealth="remainingWealthPoints" />

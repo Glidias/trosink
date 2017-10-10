@@ -598,9 +598,16 @@ section.gen-social-class .col-social-class {
 	display:inline-block;
 }
 
-section.gen-social-class .wealth-assets {
+section.gen-social-class .wealth-assets, section.gen-social-class .modified-wealth-assets {
 	margin-top:10px;
 }
+section.gen-social-class .modified-wealth-assets.lower b {
+	color:brown;
+}
+section.gen-social-class .modified-wealth-assets.high b {
+	color:green;
+}
+
 section.gen-social-class .custom-label {
 	margin-bottom:10px;
 }
