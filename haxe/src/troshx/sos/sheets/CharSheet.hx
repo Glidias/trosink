@@ -227,7 +227,7 @@ class CharSheet implements IBuildListed
 	public var talents:Array<Talent> = [];
 	
 	
-	
+	public var direPast:Bool = false;  // whether character had a dire past triggered on him during character creation
 	public var boons(default, never) :HashedArray<BoonAssign>= new HashedArray<BoonAssign>();
 	public var banes(default, never):HashedArray<BaneAssign> =  new HashedArray<BaneAssign>();
 	public var boonsArray(get, never):Array<BoonAssign>;

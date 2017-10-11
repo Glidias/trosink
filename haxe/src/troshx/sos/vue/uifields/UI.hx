@@ -32,6 +32,9 @@ class UI
 		LibUtil.setField(dyn, HitLocationSelector.NAME, new HitLocationSelector());
 		LibUtil.setField(dyn, HitLocationMultiSelector.NAME, new HitLocationMultiSelector());
 		LibUtil.setField(dyn, WealthAssetField.NAME, new WealthAssetField());
+		
+		LibUtil.setField(dyn, ButtonCounter.NAME, new ButtonCounter());
+		LibUtil.setField(dyn, ButtonPermaPress.NAME, new ButtonPermaPress());
 		return dyn;
 	}
 	
@@ -57,7 +60,10 @@ class UI
 			"HitLocationSelector":HitLocationSelector.NAME,
 			"HitLocationMultiSelector":HitLocationMultiSelector.NAME,
 			"Money":MoneyField.NAME,
-			"WealthAssetAssign":WealthAssetField.NAME
+			"WealthAssetAssign":WealthAssetField.NAME,
+			
+			"ButtonCounter":ButtonCounter.NAME,
+			"ButtonPermaPress":ButtonPermaPress.NAME
 		};
 	}
 	

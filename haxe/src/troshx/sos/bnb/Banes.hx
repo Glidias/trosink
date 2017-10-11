@@ -114,7 +114,7 @@ class Enemies extends Bane {
 
 class FacialDeformity extends Bane {
 	public function new() {
-		super("Enemies", [2, 4, 8]);
+		super("Facial Deformity", [2, 4, 8]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
 	}
 }
@@ -153,20 +153,6 @@ class Honorable extends Bane {
 	}
 }
 
-
-class DirePast extends Bane
-{
-	public function new() 
-	{
-		super("Dire Past", [0]);
-		// manual missing character creation only...
-		flags = BoonBane.CHARACTER_CREATION_ONLY | BoonBane.CANNOT_BE_REMOVED;  
-	}
-	
-	override function getEmptyAssignInstance(charSheet:CharSheet):BaneAssign {
-		return new BaneNotesAssign();
-	}
-}
 
 class Mute extends Bane {
 	public function new() {

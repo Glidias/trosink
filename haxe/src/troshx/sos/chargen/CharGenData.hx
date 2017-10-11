@@ -4,6 +4,7 @@ import haxe.ds.StringMap;
 import haxevx.vuex.core.IBuildListed;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
+import troshx.sos.bnb.DirePast;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.SkillPacket;
 import troshx.sos.core.BoonBane;
@@ -1150,7 +1151,7 @@ class CharGenData implements IBuildListed
 	
 	public var totalBnBScore(get, never):Int;
 	function get_totalBnBScore():Int {
-		return BnBpoints + totalBanePointsEarned  - totalBoonExpenditure;
+		return BnBpoints + totalBanePointsEarned  - totalBoonExpenditure  + (this.char.direPast ?  DirePast.BONUS_POINTS : 0 );
 	}
 	
 	public var maxBoonsSpendable(get, never):Int;
