@@ -21,6 +21,7 @@ import troshx.sos.core.Money;
 import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
+import troshx.sos.vue.inputs.impl.InputNameLabel;
 
 
 import troshx.sos.vue.inputs.impl.AttributeInput;
@@ -64,6 +65,9 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	}
 	
 	
+	@:computed function get_addressedAs():String {
+		return char.uid;
+	}
 	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
 		var arr = this.boonsArray;
@@ -197,6 +201,10 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	
 	public  function isValidAll(warnings:Array<String> = null):Bool { 
 		var score:Int;
+		
+		if (char.name == "") {
+			warnings.push("Please enter a Character name!");
+		}
 	
 		var r1 = promptSettleRaceTier;
 		if (r1) {
@@ -283,7 +291,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			}
 		}
 		
-		return a && b && c && d && e && f && r2 && r2;
+		return char.name != "" && a && b && c && d && e && f && r2 && r2;
 	}
 	
 	@:computed function get_stillHaveProfSpend():Bool {
@@ -298,6 +306,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		if (isValidAll(warnings)) {
 			if (warnings != null && warnings.length > 0) {
 				// TODO popup box containing warnings
+				Browser.alert(warnings.join("\n"));
 				return;
 			}
 			else {
@@ -312,6 +321,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		else {
 			if (warnings != null && warnings.length > 0) {
 				// popup box containing warnings
+				Browser.alert(warnings.join("\n"));
 			}
 		}
 	}
@@ -473,6 +483,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			SkillPacketInput.NAME => new SkillPacketInput(),
 			SkillLibInput.NAME => new SkillLibInput(),
 			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
+			
+			InputNameLabel.NAME => new InputNameLabel(),
 			
 			ArrayOf.NAME => new ArrayOf(),
 			ArrayOfBits.NAME => new ArrayOfBits(),

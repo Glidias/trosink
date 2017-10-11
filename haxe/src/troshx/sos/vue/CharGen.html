@@ -4,9 +4,14 @@
 	<div class="chargen__body" v-if="!insideInventory && !char.ingame">
 		
 		<section class="gen-general" id="gen-general">
-			<div><label>Name:<input type="text" v-model="char.name"></input></label></div>
+			<div><label>Name:<InputNameLabel :obj="char" prop="name"></InputNameLabel></label></div>
+			<div><label>Title <i>(optional)</i>:<InputNameLabel :obj="char" prop="title"></InputNameLabel></label></div>
+			<div><label>Nickname <i>(optional)</i>:<InputNameLabel :obj="char" prop="nickname"></InputNameLabel></label></div>
+			<div><label>Faction/Assosiation <i>(optional)</i>:<InputNameLabel :obj="char" prop="faction"></InputNameLabel></label></div>
 			<div><label>Gender:</label><select number v-model.number="char.gender"><option :value="0">Male</option><option :value="1">Female</option></select></div>
 			<div><label>Left-handed?:<input type="checkbox" v-model="char.leftHanded"></input></label></div>
+			<br/>
+			<b>{{addressedAs}}</b>
 		</section>
 		
 		<section class="gen-campaign-type">
@@ -243,7 +248,7 @@
 	</div>
 				
 	<div class="chargen__done" v-if="char.ingame">
-		<p>Congratulations. Your character has been created. Copy the loadable stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
+		<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
 		<div><textarea character-set="UTF-8"  readonly="readonly" ref="savedTextArea" v-model="savedCharContents">
 		</textarea><button v-on:click="executeCopyContents()" ref="copyButton">Copy</button><i class="copy-notify" ref="copyNotify" style="display:none">copied!</i></div>
 		<div v-if="exitBtnCallback!=null">

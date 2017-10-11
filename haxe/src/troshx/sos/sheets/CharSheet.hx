@@ -33,6 +33,16 @@ class CharSheet implements IBuildListed
 	
 	
 	public var name:String = "";
+	public var nickname:String = "";
+	public var faction:String = "";
+	public var notes:String = "";
+	public var title:String = "";
+	public var uid(get, never):String;
+	function get_uid():String {
+		return (title != "" ? title+ " ": "") + name + (nickname != "" ? ' "$nickname"' : "") + (faction != "" ? " of "+faction : "");
+	}
+	
+	
 	public var race(default, set):Race = null;
 	function set_race(r:Race):Race {
 		var oldR = this.race;
