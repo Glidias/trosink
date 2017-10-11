@@ -305,7 +305,6 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		var warnings:Array<String> = finalising ? null : [];
 		if (isValidAll(warnings)) {
 			if (warnings != null && warnings.length > 0) {
-				// TODO popup box containing warnings
 				Browser.alert(warnings.join("\n"));
 				return;
 			}
@@ -320,7 +319,6 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		}
 		else {
 			if (warnings != null && warnings.length > 0) {
-				// popup box containing warnings
 				Browser.alert(warnings.join("\n"));
 			}
 		}
