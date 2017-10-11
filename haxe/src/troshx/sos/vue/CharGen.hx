@@ -208,12 +208,12 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	
 		var r1 = promptSettleRaceTier;
 		if (r1) {
-			warnings.push("Race: Please settle Race tier by clicking on the button!");
+			warnings.push("Race: Please Finalise Race tier by clicking on the button!");
 		}
 		
 		var r2 = promptSettleSocialTier;
 		if (r2) {
-			warnings.push("Social Class: Please settle Social class tier by clicking on the button!");
+			warnings.push("Social Class: Please Finalise Social class tier by clicking on the button!");
 		}
 		
 		var a = (score = categoriesRemainingAssignable) >= 0;
