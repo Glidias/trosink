@@ -1,5 +1,6 @@
 package troshx.sos.core;
 import troshx.ds.IDMatchArray;
+import troshx.sos.core.BurdinadinArmory.BurdinadinWeapon;
 import troshx.sos.core.MissileSpecial;
 
 /**
@@ -52,6 +53,8 @@ class Weapon extends Item
 	
 	public var missileFlags:Int = 0;
 	public var missileSpecial:MissileSpecial = null;
+	
+	public var burdinadin:BurdinadinWeapon = null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	

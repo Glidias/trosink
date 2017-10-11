@@ -1,4 +1,6 @@
 package troshx.sos.vue;
+import haxe.Serializer;
+import haxe.Timer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue;
@@ -6,6 +8,7 @@ import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import js.html.HtmlElement;
 import js.html.SelectElement;
+import js.html.TextAreaElement;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
@@ -37,7 +40,7 @@ import troshx.sos.vue.widgets.SkillSubjectCreator;
  * @author Glidias
  */
 @:vueIncludeDataMethods
-class CharGen extends VComponent<CharGenData,NoneT>
+class CharGen extends VComponent<CharGenData,CharGenProps>
 {
 
 	public function new() 
@@ -192,6 +195,160 @@ class CharGen extends VComponent<CharGenData,NoneT>
 		return !moneyLeft.isNegative(); 
 	}
 	
+	public  function isValidAll(warnings:Array<String> = null):Bool { 
+		var score:Int;
+	
+		var r1 = promptSettleRaceTier;
+		if (r1) {
+			warnings.push("Race: Please settle Race tier by clicking on the button!");
+		}
+		
+		var r2 = promptSettleSocialTier;
+		if (r2) {
+			warnings.push("Social Class: Please settle Social class tier by clicking on the button!");
+		}
+		
+		var a = (score = categoriesRemainingAssignable) >= 0;
+		if (warnings != null) {
+			if (a && score > 0) {
+				warnings.push("Categories: You still have PCP to spend on categories.");
+			}
+			if (!a) {
+				warnings.push("Categories: You are at a deficit of Character PCP usage!");
+			}
+		}
+		
+		var b = (score = remainingAttributePoints) >= 0 && untyped !this.negativeOrZeroStat;
+		if (warnings != null) {
+			if (b && score > 0) {
+				warnings.push("Attributes: You still have Attribute points to spend.");
+			}
+			if (!b) {
+				if (untyped this.negativeOrZeroStat)  {
+					warnings.push("Attributes: You aren't allowed to checkout with zero or negative core stat!");
+				}
+				if (score < 0) {
+					warnings.push("Attributes: You are at a deficit of Attribute points!");
+				}
+			}
+		}
+		
+		var c = (score = totalBnBScore) >= 0;
+		if (warnings != null) {
+			if (c && score > 0) {
+				warnings.push("Boons & Banes: You still have B&B points to spend.");
+			}
+			if (!c) {
+				warnings.push("Boons & Banes: You still have a deficit of B&B points!");
+			}
+		}
+		
+		
+		
+		var d = notBankrupt;
+		if (warnings != null) {
+			if (!d) {
+				warnings.push("Inventory: You have negative cash value!");
+			}
+		}
+		
+		// skills
+		var e = (score=totalSkillPointsLeft) >= 0;
+		if (warnings != null) {
+			if (e && score>0) {
+				warnings.push("Skills: You still have skill points left to spend.");
+			}
+			if (!e) {
+				warnings.push("Skills: You are at a deficit of skill points!");
+			}
+		}
+		
+		var f = (score = profPointsLeft) >= 0 && (this.ProfPoints > 0 && char.school == null);
+		if (warnings != null) {
+			if (f  ) {
+				if (stillHaveProfSpend) warnings.push("School: You can still spend profeciency points on school/school-levels.");
+				if ( !(profCoreListMelee.length >= maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots) ) {
+					warnings.push("Profeciencies: You still have have melee profeciency slots to use.");
+				}
+				if ( !(profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots) ) {
+					warnings.push("Profeciencies: You still have have ranged profeciency slots to use.");
+				}
+				
+			}
+			if (!f) {
+				if (score < 0) warnings.push("School & Profeciencies: You are at a deficit of Prof points!");
+				if ( (this.ProfPoints > 0 && char.school == null) ) {
+					warnings.push("School: You must select at least a school (eg. Scrapper) if you have at least 1 Prof point!");
+				}
+			}
+		}
+		
+		return a && b && c && d && e && f && r2 && r2;
+	}
+	
+	@:computed function get_stillHaveProfSpend():Bool {
+		var a = profPointsLeft > 0;
+		var b = canStillSpendSchool(profPointsLeft);
+		return a && b;
+	}
+	
+	
+	public function saveFinaliseAll(finalising:Bool=false):Void { 
+		var warnings:Array<String> = finalising ? null : [];
+		if (isValidAll(warnings)) {
+			if (warnings != null && warnings.length > 0) {
+				// TODO popup box containing warnings
+				return;
+			}
+			else {
+				saveFinaliseCleanupChar();
+				var savedCharString = saveCharToBox();
+				char.ingame = true;
+				if (finaliseSaveCallback != null) {
+					finaliseSaveCallback(savedCharString);
+				}
+			}
+		}
+		else {
+			if (warnings != null && warnings.length > 0) {
+				// popup box containing warnings
+			}
+		}
+	}
+	
+	
+	function saveCharToBox():String
+	{
+		var s = new Serializer();
+		s.useCache = true;
+		s.serialize(this.char);
+		var str = s.toString();
+		this.savedCharContents = str;
+		return str;
+	}
+	
+	function executeCopyContents():Void {
+		var textarea:TextAreaElement = _vRefs.savedTextArea;
+		
+		textarea.select();
+		var result:Bool = Browser.document.execCommand("copy");
+		if (result != null) {
+			//Browser.alert("Copied to clipboard.");
+			var htmlElem:HtmlElement = _vRefs.copyNotify;
+			htmlElem.style.display = "inline-block";
+			Timer.delay( function() {
+				htmlElem.style.display = "none";
+			}, 3000);
+		}
+		else {
+			Browser.alert("Sorry, failed to copy to clipboard!");
+		}
+	}
+	
+	function confirmFinaliseAll():Void {
+		saveFinaliseAll(true);
+	}
+	
 		
 	var moneyLeft(get, never):Money;
 	function get_moneyLeft():Money {
@@ -332,3 +489,7 @@ class CharGen extends VComponent<CharGenData,NoneT>
 	}
 }
 
+typedef CharGenProps = {
+	@:prop({required:false}) @:optional var exitBtnCallback:Void->Void;
+	@:prop({required:false}) @:optional var finaliseSaveCallback:String->Void;
+}

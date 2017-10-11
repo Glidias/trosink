@@ -77,11 +77,19 @@ class Inventory
 		return signaler;
 	}
 	public function setSignaler(val:Signal1<InventorySignal>):Void {
+		if (signaler != null && val != signaler) signaler.removeAll();
 		signaler = val;
 	}
 	function dispatchSignal(signal:InventorySignal):Void {
 		getSignaler().dispatch(signal);
 	}
+	
+		
+	public function hxSerialize(s:Serializer):Void {
+		setSignaler(null);
+		s.serialize(this);
+	}
+	
 	
 	/*
 	public function getReach():Int {
@@ -602,7 +610,7 @@ class Inventory
 	{
 		
 	}
-	
+
 	public function getEquipedAssignList(type:String):Array<ReadyAssign> {
 		if (type == "weapon") {
 			return weapons;

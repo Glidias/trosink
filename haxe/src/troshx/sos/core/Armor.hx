@@ -2,6 +2,7 @@ package troshx.sos.core;
 //import troshx.ds.HashedArray;
 //import troshx.ds.IDMatchArray;
 import troshx.sos.core.ArmorSpecial.WornWith;
+import troshx.sos.core.BurdinadinArmory.BurdinadinArmor;
 import troshx.util.LibUtil;
 
 /**
@@ -19,6 +20,8 @@ class Armor extends Item
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
 	var _coverageValues:Array<Int>;
 	//var _hitLocationAVModifiers:Array<Int>; // yagni, any Armor with ArmorCustomise is considered always unique usually
+	
+	public var burdinadin:BurdinadinArmor = null;
 	
 	public function writeAVsAtLocation(body:BodyChar, hitLocationId:String, hitLocationMask:Int, result:AV3, layerMask:Int, nonFirearmMissile:Bool, targetZoneMask:Int, includeCrushedAVS:Bool):Bool {
 		var flags = LibUtil.field(coverage, hitLocationId);

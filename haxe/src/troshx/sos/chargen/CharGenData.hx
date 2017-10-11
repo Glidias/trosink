@@ -42,8 +42,6 @@ class CharGenData implements IBuildListed
 	// more for vue..actually
 	var insideInventory:Bool = false;
 	
-	
-	
 	static public inline var INT_MAX:Int = 2147483647;
 	
 	var showBnBs:Bool = true;
@@ -53,7 +51,7 @@ class CharGenData implements IBuildListed
 		return showBnBs ||  totalBnBScore<0;
 	}
 	
-	
+	public var savedCharContents:String = "";
 	
 	public function new(charSheet:CharSheet=null) 
 	{
@@ -356,7 +354,7 @@ class CharGenData implements IBuildListed
 	
 	public var isValidCategories(get, never):Bool;
 	function get_isValidCategories():Bool {
-		return categoriesRemainingAssignable >= 0;
+		return categoriesRemainingAssignable == 0;
 	}
 	
 	
@@ -850,16 +848,9 @@ class CharGenData implements IBuildListed
 
 	
 	
-	public function isValidAll(showWarnings:Bool=false):Bool { 
-		return true;
-	}
 	
-	public function saveFinaliseAll():Void { // TODO
-		if (isValidAll(true)) {
-			char.ingame = true;
-			// save data
-		}
-	}
+	
+	
 	
 	
 	// BOONS & BANES
@@ -1330,9 +1321,21 @@ class CharGenData implements IBuildListed
 	*/
 	
 	public function saveFinaliseSkillsFromPackets():Void {
-		// to do this when finailising char sheet
-		
+	
+		for ( i in 0...skillObjs.length) {
+			var s = skillObjs[i];
+			var total = clamp5( LibUtil.field(skillPacketValues, s.name)) + LibUtil.field(skillValues, s.name);
+			if (total > 0 ) {
+				//trace("Setting skill:" + s.name + " = " + total);
+				char.skills.setSkill(s.name, total);
+			}
+		}
 	}
+		
+	public static inline function clamp5(val:Int) {
+		return val >= 5 ? 5 : val;
+	}
+	 
 	public inline function clampSkillValue(value:Int):Int {
 		return value >= MAX_PACKET_SKILL_LEVEL ? MAX_PACKET_SKILL_LEVEL : value;
 	}
@@ -1686,6 +1689,12 @@ class CharGenData implements IBuildListed
 	}
 
 
+	public function saveFinaliseCleanupChar():Void {
+		// todo:
+		saveFinaliseSocial();
+		saveFinaliseSchoolProfs();
+		saveFinaliseSkillsFromPackets();
+	}
 
 	
 }

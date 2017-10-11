@@ -223,7 +223,7 @@ class CharSheet implements IBuildListed
 		return c;
 	}
 	
-	public var skills:Array<SkillAssign> = [];
+	public var skills:SkillTable = SkillTable.getNewEmptySkillTable(SkillTable.getDefaultSkillTable());
 	public var talents:Array<Talent> = [];
 	
 	

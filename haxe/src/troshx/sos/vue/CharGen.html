@@ -1,7 +1,7 @@
 <div class="chargen" :class="{'in-inventory':insideInventory}">
 	<h1>Song of Swords: Character Creation</h1>
 	
-	<div class="chargen__body" v-if="!insideInventory">
+	<div class="chargen__body" v-if="!insideInventory && !char.ingame">
 		
 		<section class="gen-general" id="gen-general">
 			<div><label>Name:<input type="text" v-model="char.name"></input></label></div>
@@ -175,7 +175,7 @@
 		
 	
 		<section class="gen-schoolprofs"  id="gen-schoolprofs">
-			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':profPointsLeft>0 && canStillSpendSchool(profPointsLeft) }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
+			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':stillHaveProfSpend }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
 			<div class="select-school">
 				<div>
 					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints, moneyLeft, char.school) || !li.school.customRequire(char)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :disabled="char.school==null" /></label>
@@ -228,11 +228,7 @@
 		<hr/>
 	</div>
 			
-	<div class="chargen__footer" v-if="!insideInventory">
-		<section class="wounds" v-show="false">
-			<h2>Wounds</h2>
-		</section>
-		
+	<div class="chargen__footer" v-if="!insideInventory && !char.ingame">
 		<section class="arcs">
 			<h2>Arcs</h2>
 			<div><label>Saga:</label><textarea v-model="char.arcSaga"></textarea></div>
@@ -242,7 +238,18 @@
 			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw"></textarea></div>
 		</section>
 		<hr/>
-		<button :disabled="true">Save Character!</button>
+		
+		<button :disabled="char.ingame" v-on:click="saveFinaliseAll()">Save Character!</button>
+	</div>
+				
+	<div class="chargen__done" v-if="char.ingame">
+		<p>Congratulations. Your character has been created. Copy the loadable stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
+		<div><textarea character-set="UTF-8"  readonly="readonly" ref="savedTextArea" v-model="savedCharContents">
+		</textarea><button v-on:click="executeCopyContents()" ref="copyButton">Copy</button><i class="copy-notify" ref="copyNotify" style="display:none">copied!</i></div>
+		<div v-if="exitBtnCallback!=null">
+			<i>You character's loadable contents is also listed on exit.</i>
+		</div>
+		<button v-if="exitBtnCallback!=null" v-on:click="exitBtnCallback()">Exit</button>
 	</div>
 	
 	<div ref="inventoryHolder">

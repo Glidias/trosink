@@ -12,6 +12,7 @@ import js.Lib;
 import js.html.Event;
 import js.html.HtmlElement;
 import js.html.InputElement;
+import js.html.TextAreaElement;
 import msignal.Signal.Signal1;
 import troshx.sos.core.ArmorSpecial;
 import troshx.sos.core.ArmorSpecial.WornWith;
@@ -179,6 +180,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		//this.char
 		var oldSignaler = this.inventory.getSignaler();
 		this.inventory.setSignaler(null);
+		
 		serializer.serialize(this.inventory);
 		
 		
@@ -1010,6 +1012,24 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return this.totalCostMoney.cp;
 	}
 	
+	function executeCopyContents():Void {
+		var textarea:TextAreaElement = _vRefs.savedTextArea;
+		
+		textarea.select();
+		var result:Bool = Browser.document.execCommand("copy");
+		if (result != null) {
+			//Browser.alert("Copied to clipboard.");
+			var htmlElem:HtmlElement = _vRefs.copyNotify;
+			htmlElem.style.display = "inline-block";
+			Timer.delay( function() {
+				htmlElem.style.display = "none";
+			}, 3000);
+		}
+		else {
+			Browser.alert("Sorry, failed to copy to clipboard!");
+		}
+	}
+	
 	@:computed function get_totalWeight():Float {
 		return inventory.calculateTotalWeight();
 	}
@@ -1042,9 +1062,6 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	@:computed function get_filteredAmmo():Array<WeaponAssign>   {
 		return this.inventory.ammoFiltered;
 	}
-	
-	
-	
 	
 	// watchers
 	
