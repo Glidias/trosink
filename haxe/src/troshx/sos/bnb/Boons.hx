@@ -61,7 +61,8 @@ class Beautiful extends Boon {
 class Berserker extends Boon {
 	public function new() {
 		super("Berserker", [8, 12]);
-		this.staticModifiers = [StaticModifier.create(Modifier.CP, 4 )];
+		var m = StaticModifier.create(Modifier.CP, 4 );
+		this.staticModifiers = [m,m];
 		// ..see manual
 	}
 }

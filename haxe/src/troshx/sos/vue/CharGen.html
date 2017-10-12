@@ -93,7 +93,7 @@
 				<div><label>Perception:</label><AttributeInput :obj="char" prop="perception" :remainingAttributePoints="remainingAttributePoints" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]">{{PER}}</span></div>
 			</div>
 			<div class="gen-col">
-				<div><b>ADR</b> (Adriotness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
+				<div><b>ADR</b> (Adroitness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
 				<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>
 				<div><b>GRIT</b> (Grit): <span class="modified-attribute" :class="[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']"><b>{{GRIT}}</b></span><i v-show="baseGrit!=GRIT" class="baseshow">({{baseGrit}})</i></div>
 			
