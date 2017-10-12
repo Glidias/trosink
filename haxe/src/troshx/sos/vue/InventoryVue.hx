@@ -449,7 +449,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		var arr:Array<String> = [];
 		var hitLocations = body.hitLocations;
 		var fields = Reflect.fields(coverage);
-		for (i in 0...body.rearStartIndex) {
+		for (i in 0...hitLocations.length) { //body.rearStartIndex
 			var ider = hitLocations[i].id;
 			var specs:Int = LibUtil.field(coverage, ider);
 			if (specs != null) {
@@ -544,7 +544,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	
 	
 	@:computed function get_coverageHitLocations():Array<HitLocation> {
-		return this.body.getNewHitLocationsFrontSlice();
+		return this.body.hitLocations; // getNewHitLocationsFrontSlice();
 	}
 	
 	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {

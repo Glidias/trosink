@@ -81,7 +81,7 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 			//var qty:Int = current.qty;
 			// house rule, both legs == 0.25  instead of .5 MOB penalty
 				
-			var equipedItems = char.inventory.equipedNonMeleeItems;
+			var equipedItems = char.inventory.wornArmor;
 			var crutchesHeld:Int = 0;
 			var affected:Int = 0;
 			var leftHanded:Bool = char.leftHanded;
@@ -89,10 +89,12 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 			affected |= (current.affectedLimbs & BrokenLimbAssign.RIGHT_LEG) != 0 ? (char.leftHanded ? Inventory.HELD_OFF : Inventory.HELD_MASTER) : 0;
 			for (i in 0...equipedItems.length) {
 				var entry = equipedItems[i];
-				if ( (entry.item.flags & Item.CRUTCH ) != 0 ) {
+				/*	// TODO when needed for ingame broken limbs
+				if ( (entry.armor.flags & Item.PROSTHETIC ) != 0 && (entry.armor.coverage )!=0  ) {
 					crutchesHeld |= entry.held;
 					break;
 				}
+				*/
 			}
 			
 			if ( crutchesHeld == 0) { // no crutches held...can only crawl like a snail?

@@ -95,9 +95,12 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 			node.children = cleanNodes(node.children);
 		}
 		for (i in 0... node.children.length) {
+			node.children[i].key = "_"+(valueKeyCounter++);
 			cleanNode(node.children[i]);
 		}
 	}
+	
+
 	
 	inline function cleanNodes(nodes:Array<GingkoNode>):Array<GingkoNode> {
 		return nodes.filter(nodeGotContent);
@@ -131,8 +134,8 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 	
 	
 	@:computed function get_curSerializable():Bool {
-		var val:String = this.curSelectedValue;
-		return val!=null && isSerializableValue(this.curSelectedValue);
+		var val:String = this.curSelectedNode != null ? this.curSelectedNode.content : null;
+		return val!=null && isSerializableValue(val);
 	}
 	
 	@:computed function get_curLandingSerializable():Bool {
@@ -142,7 +145,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 	
 	
 	@:computed function get_compiledMarkdown():String {
-		var val:String = this.curSelectedValue;
+		var val:String = this.curSelectedNode != null ? this.curSelectedNode.content : null;
 		return  val != null && !curSerializable ? MARKED(val, { sanitize:true }) : "";
 	}
 	
@@ -275,7 +278,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 					:model="model"
 					class="form-control"
 					labelname="content"
-					valuename="content"
+					valuename="key"
 					children = "children" 
 					:customLabelHandler = "customLabelHandler"
 					:filterNodeHandler = "filterNodeHandler"
@@ -303,6 +306,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 			loadedDomain:"",
 			isLoading:false,
 			curSelectedParentNode:null,
+			valueKeyCounter:0,
 			model: [
 				
 			]
@@ -313,6 +317,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 
 typedef GingkoNode = {
 	var content:String;
+	@:optional var key:String;
 	@:optional var children:Array<GingkoNode>;
 }
 
@@ -324,6 +329,7 @@ typedef GingkoTreeData = {
 	var requestEnteredDomain:String;	
 	var loadedDomain:String;
 	var isLoading:Bool;
+	var valueKeyCounter:Int;
 	
 }
 
@@ -334,7 +340,7 @@ typedef GingkoDataType = {
 }
 typedef GingkoTreeProps = {
 	@:prop({required:false, 'default':32})  @:optional var maxLabelLength:Int;
-	@:prop({required:false, 'default':"mwmzwn"})  @:optional var defaultDomain:String;
+	@:prop({required:false, 'default':"sos-weapons-and-armour"})  @:optional var defaultDomain:String;
 
 	@:prop({required:false}) @:optional var availableTypes:Dynamic<Bool>;
 	@:prop({required:false, 'default':false})  @:optional var locked:Bool;

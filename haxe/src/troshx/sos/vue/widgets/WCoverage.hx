@@ -53,7 +53,8 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 	}
 	
 	@:computed function get_hitLocations():Array<HitLocation> {
-		return !this.isCustomBody ? BodyChar.getInstance().getNewHitLocationsFrontSlice() : this.customBody.getNewHitLocationsFrontSlice();
+		// etNewHitLocationsFrontSlice()
+		return !this.isCustomBody ? BodyChar.getInstance().hitLocations  : this.customBody.hitLocations;
 	}
 	
 	@:computed inline function get_armor():Armor {

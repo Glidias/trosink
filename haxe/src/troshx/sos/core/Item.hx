@@ -34,7 +34,7 @@ class Item
 	@:flags("Two-Handed") public static inline var FLAG_TWO_HANDED:Int = (1<<0);
 	@:flags("Strapped") public static inline var FLAG_STRAPPED:Int = (1<<1);
 	@:flags("Eye-Corrective") public static inline var EYE_CORRECTIVE:Int = (1 << 2);
-	@:flags("Crutch") public static inline var CRUTCH:Int = (1 << 3);
+	@:flags("Prosthetic") public static inline var PROSTHETIC:Int = (1 << 3);
 	
 	public static inline var MASK_HANDED:Int = 1 | 2;
 	
@@ -94,8 +94,8 @@ class Item
 		if  ( (flags & EYE_CORRECTIVE) != 0 ) {
 			arr.push("Eye-Corrective");
 		}
-		if  ( (flags & CRUTCH) != 0 ) {
-			arr.push("Crutch");
+		if  ( (flags & PROSTHETIC) != 0 ) {
+			arr.push("Prosthetic");
 		}
 	}
 	
