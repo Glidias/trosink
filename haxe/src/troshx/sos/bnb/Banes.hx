@@ -80,8 +80,7 @@ class Blind extends Bane {
 	public function new() {
 		super("Blind", [20]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		channels = BoonBane.__BLIND__ONE_EYED_BANE | BoonBane.__GOOD_EYES__BAD_EYES;
-		
+		superChannels = BoonBane.__GOOD_EYES__BAD_EYES | BoonBane.__ONE_EYED;
 	}
 }
 
@@ -165,7 +164,7 @@ class OneEyed extends Bane {
 	public function new() {
 		super("One-Eyed", [10]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
-		channels = BoonBane.__BLIND__ONE_EYED_BANE;
+		channels = BoonBane.__ONE_EYED;
 		var m:StaticModifier = StaticModifier.create(Modifier.CP, "One-Eyed", -1);
 		m.next = StaticModifier.create(Modifier.MP, "One-Eyed", -2);
 		staticModifiers = [m];
@@ -179,7 +178,7 @@ class Sheltered extends Bane {
 	public function new() {
 		super("Sheltered", [2, 4, 6]);
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
-		channels = (BoonBane.__SHELTERED | BoonBane.__TRUE_GRIT); 
+		channels = (BoonBane.__TRUE_GRIT_SHELTERED); 
 		this.staticModifiers = [
 			StaticModifier.create(Modifier.STARTING_GRIT, "Sheltered (i)", -1),
 			StaticModifier.create(Modifier.STARTING_GRIT, "Sheltered (ii)", -2),

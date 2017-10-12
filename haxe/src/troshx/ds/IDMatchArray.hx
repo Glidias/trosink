@@ -17,6 +17,11 @@ class IDMatchArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		
 	}
 	
+	public function filter(handler:T->Bool):Void {
+		list = list.filter(handler);
+	}
+	
+	
 	public function add(item:T):Void {
 		var uid:String = item.uid;
 		

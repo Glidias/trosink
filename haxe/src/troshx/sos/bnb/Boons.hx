@@ -61,8 +61,8 @@ class Beautiful extends Boon {
 class Berserker extends Boon {
 	public function new() {
 		super("Berserker", [8, 12]);
-		this.staticModifiers = [StaticModifier.create(Modifier.CP, "Berserker", 4 )];
-		// ..see manual
+		var m = StaticModifier.create(Modifier.CP, "Berserker", 4 );
+		this.staticModifiers = [m, m];
 	}
 }
 
@@ -172,7 +172,7 @@ class TrueGrit extends Boon {
 	public function new() {
 		super("True Grit", [2, 4, 6]);
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
-		channels = (BoonBane.__SHELTERED | BoonBane.__TRUE_GRIT);
+		channels = (BoonBane.__TRUE_GRIT_SHELTERED);
 		this.staticModifiers = [
 			StaticModifier.create(Modifier.STARTING_GRIT, "True Grit (i)", 1),
 			StaticModifier.create(Modifier.STARTING_GRIT, "True Grit (ii)", 2),

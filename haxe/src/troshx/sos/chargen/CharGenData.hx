@@ -867,38 +867,68 @@ class CharGenData implements IBuildListed
 
 		*/
 
-		public function restoreAnyBnBWithMask(msk:Int):Void {
+		public function restoreAnyBnBWithMask(msk:Int, superMask:Int):Void {
 		var arr = baneAssignList;
 		var arr2 = boonAssignList;
 		var restored:Bool = false;
 		var restoredBane:troshx.sos.core.BoonBane.BaneAssign = null;
 		var restoredBoon:troshx.sos.core.BoonBane.BoonAssign = null;
+		/*
+		if (superMask != 0) {
+			for (i in 0...arr.length) {  
+				var a = arr[i];
+				if ( a._canceled && (a.bane.channels & superMask) != 0 ) {
+					superMask &= ~a.bane.channels;
+					a._canceled = false;
+				}
+			}
+			for (i in 0...arr2.length) { 
+				var a = arr2[i];
+				if ( a._canceled && (a.boon.channels & superMask) != 0 ) {
+					superMask &= ~a.boon.channels;
+					a._canceled = false;
+				}
+			}
+		}
+		*/
+		
+		msk |= superMask;
 		
 		for (i in 0...arr.length) {  // banes first
 			var a = arr[i];
 			if ( a._canceled && (a.bane.channels & msk)!=0 ) {
 				a._canceled = false;
-				
-				if (a.rank > 0)  {
+				//msk &= ~a.bane.channels;
+				///*
+				if (a.rank > 0 && restoredBane == null)  {
 					restoredBane = a;
-					break;
+					//break;
 				}
+				//*/
 			}
+		}
+		
+		if (restoredBane != null) {
+			msk &= ~(restoredBane.bane.channels | restoredBane.bane.superChannels);
 		}
 	
 		
-		if (restoredBane == null) {
+		//if (restoredBane == null) {
 			for (i in 0...arr2.length) {
 				var a = arr2[i];
 				if ( a._canceled &&  (a.boon.channels & msk)!=0 ) {
 					a._canceled = false;
-					if (a.rank > 0)  {
+					//msk &= ~a.boon.channels;
+					
+					///*
+					if (a.rank > 0 && restoredBoon == null)  {
 						restoredBoon = a;
-						break;
+						//break;
 					}
+					//*/
 				}
 			}
-		}
+		//}
 		
 		if (restoredBoon != null) {
 			checkBoonAgainstOthers(restoredBoon);
@@ -1000,9 +1030,11 @@ class CharGenData implements IBuildListed
 		var arr = baneAssignList;
 		var arr2 = boonAssignList;
 		baneAssign._canceled = false;
-		if (baneAssign.bane.channels == 0) return;
+
 		
-		var msk:Int = baneAssign.bane.channels;
+		var msk:Int = baneAssign.bane.channels | baneAssign.bane.superChannels;
+		if (msk == 0) return;
+		
 		for (i in 0...arr.length) {
 			var a = arr[i];
 			if ( a != baneAssign && (a.bane.channels & msk)!=0 ) {
@@ -1024,10 +1056,12 @@ class CharGenData implements IBuildListed
 		var arr = baneAssignList;
 		var arr2 = boonAssignList;
 		boonAssign._canceled = false;
-		if (boonAssign.boon.channels == 0) return;
+	
 		
-		var msk:Int = boonAssign.boon.channels;
-			for (i in 0...arr.length) {
+		var msk:Int = boonAssign.boon.channels | boonAssign.boon.superChannels;
+		if (msk  == 0) return;
+	
+		for (i in 0...arr.length) {
 			var a = arr[i];
 			if (   (a.bane.channels & msk)!=0 ) {
 				a._canceled = true;
@@ -1075,8 +1109,8 @@ class CharGenData implements IBuildListed
 		if (isBane) {
 			var b:BaneAssign = cast bba;
 			char.removeBane(b);
-			if (b.bane.channels != 0 ) {
-				restoreAnyBnBWithMask(b.bane.channels);
+			if ( (b.bane.channels|b.bane.superChannels) != 0 ) {
+				restoreAnyBnBWithMask(b.bane.channels, b.bane.superChannels);
 				
 			}
 			
@@ -1084,8 +1118,8 @@ class CharGenData implements IBuildListed
 		else {
 			var b:BoonAssign = cast bba;
 			char.removeBoon(b);
-			if (b.boon.channels != 0){
-				restoreAnyBnBWithMask(b.boon.channels);
+			if ( (b.boon.channels|b.boon.superChannels) != 0){
+				restoreAnyBnBWithMask(b.boon.channels,b.boon.superChannels);
 			}
 		}
 	}
@@ -1744,6 +1778,9 @@ class CharGenData implements IBuildListed
 		saveFinaliseSocial();
 		saveFinaliseSchoolProfs();
 		saveFinaliseSkillsFromPackets();
+		
+		char.boons.filter(function(bb) { return !bb._canceled;  } );
+		char.banes.filter(function(bb) { return !bb._canceled;  } );
 		
 		for (i in 0...char.boons.list.length) {
 			char.boons.list[i].cleanupUIArrays();

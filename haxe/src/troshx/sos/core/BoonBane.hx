@@ -24,7 +24,8 @@ class BoonBane
 	public var costs(default, null):Array<Int>;
 	public var multipleTimes(default, null):Int;
 	public var channels(default, null):Int;
-
+	public var superChannels(default, null):Int;
+	
 	// these modifiers are for returning a specific value for hardcoded cases
 	public var staticModifiers(default, null):Array<StaticModifier>;
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
@@ -40,13 +41,12 @@ class BoonBane
 	@:channel public static inline var __GOOD_EARS_BAD_EARS:Int = (1 << 1);
 	@:channel public static inline var __GOOD_EARS_BAD_NOSE:Int = (1 << 2);
 	@:channel public static inline var __RICH__POOR:Int = (1 << 3);
-	@:channel public static inline var __TRUE_GRIT:Int = (1 << 4);
+	@:channel public static inline var __TRUE_GRIT_SHELTERED:Int = (1 << 4);
 	@:channel public static inline var __ROBUST_FRAIL:Int = (1 << 5);
-	@:channel public static inline var __BLIND__ONE_EYED_BANE:Int = (1 << 6);
+	@:channel public static inline var __ONE_EYED:Int = (1 << 6);
 	@:channel public static inline var __CRAVEN__HONORABLE:Int = (1 << 7);
-	@:channel public static inline var __SHELTERED:Int = (1 << 8);
-	@:channel public static inline var __HONORABLE__COMPLETE_MONSTER:Int = (1 << 9);
-	@:channel public static inline var __TALL__SHORT:Int = (1 << 10);
+	@:channel public static inline var __HONORABLE__COMPLETE_MONSTER:Int = (1 << 8);
+	@:channel public static inline var __TALL__SHORT:Int = (1 << 9);
 	
 	@:flag public static inline var CHARACTER_CREATION_ONLY:Int = (1 << 0);
 	@:flag public static inline var CANNOT_BE_REMOVED:Int = (1 << 1);
@@ -72,6 +72,7 @@ class BoonBane
 		this.clampRank = false;
 		this.multipleTimes = 0;
 		this.channels = 0;
+		this.superChannels = 0;
 	}
 
 	

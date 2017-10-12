@@ -46,13 +46,13 @@ class BrainDamageAssign extends BaneAssign {
 		super();
 		this.char = char;
 		
-		oldWound = cast new OldWound().getAssign(1, char);
-		mute = cast new Mute().getAssign(1, char);
-		lastingPain = cast new LastingPain().getAssign(1, char);
-		badEyes = new BadEyes().getAssign(1, char);
-		badEars = new BadEars().getAssign(1, char);
-		blind = new Blind().getAssign(1, char);
-		oneEyed = new OneEyed().getAssign(1, char);
+		oldWound = cast new OldWound().getAssign(0, char);
+		mute = cast new Mute().getAssign(0, char);
+		lastingPain = cast new LastingPain().getAssign(0, char);
+		badEyes = new BadEyes().getAssign(0, char);
+		badEars = new BadEars().getAssign(0, char);
+		blind = new Blind().getAssign(0, char);
+		oneEyed = new OneEyed().getAssign(0, char);
 	}
 	
 	function callbackUITrigger(obj:Dynamic, prop:String):Dynamic {
@@ -108,7 +108,7 @@ class BrainDamageAssign extends BaneAssign {
 			case 2:
 			case 3:
 			case 4:
-				gainBane(badEyes, 1);
+				if (blind.rank == 0 ) gainBane(badEyes, 1);
 			case 5:
 				gainBane(badEars, 2);
 			case 6:
@@ -119,7 +119,7 @@ class BrainDamageAssign extends BaneAssign {
 				gainBane(badEars, 2);
 			case 8:
 				gainBane(oldWound.inflictRandom(), 1);
-				gainBane(oneEyed, 1);
+				if (blind.rank == 0 ) gainBane(oneEyed, 1);
 			case 9:
 				gainBane(oldWound.inflictRandom(), 1);
 				gainBane(mute, 1);

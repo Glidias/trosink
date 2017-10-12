@@ -27,12 +27,18 @@ class HashedArray<T:(IUid,IUpdateWith<T>)> implements IMatchArray<T>
 		
 	}
 	
+	public function filter(handler:T->Bool):Void {
+		list = list.filter(handler);
+		rehash();
+	}
+	
 	public function rehash():Void {
-		hash = {};
+		var theHash = {};
 		for (i in 0...list.length) {
 			var item = list[i];
-			LibUtil.setField(hash, item.uid, item);
+			LibUtil.setField(theHash, item.uid, item);
 		}
+		hash = theHash;
 	}
 	
 	public function add(item:T):Void {
