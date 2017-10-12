@@ -27,11 +27,14 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	
 	override function Template():String {
 		return  '<span class="gen-comp-bb" :class="{canceled:obj._canceled, \'required\':min>0, \'force-perm\':obj._forcePermanent, disabled:max<1, selected:obj[prop]>0}">
-		<label><input type="checkbox" :disabled="obj._canceled || obj._forcePermanent" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target, $$event)"></input><input type="number" :disabled="obj._canceled || obj._forcePermanent" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" v-on:blur="blurHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span class="close-btn" v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset" class="reset-btb">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
+		<label><input type="checkbox" :disabled="obj._canceled || cannotUncheck" v-if="coreMax<2" :checked="obj[prop]>=1" v-on:click.stop="checkboxHandler($$event.target, $$event)"></input><input type="number" :disabled="obj._canceled" v-if="coreMax>=2" number v-on:input="inputHandler($$event.target)" v-on:blur="blurHandler($$event.target)" :value="obj[prop]" :class="{invalid:!valid}" :min="min" :max="max"></input><span v-html="label" v-on:click="toggleIfPossible($$event)"></span><span class="close-btn" v-show="showClose">&nbsp;<a href="#" v-on:click.stop.prevent="closeBB()">[x]</a></span><span style="opacity:1;pointer-events:auto;" v-show="showReset && !(isBane && cannotUncheck)" class="reset-btb">[<a href="#" v-on:click.stop.prevent="resetBB()">c</a>]</span></label>
 		</span>';
 	}
 	
 
+	@:computed function get_cannotUncheck():Bool {
+		return (bba._minRequired >= 1 && LibUtil.field(obj,prop) >= 1);
+	}
 	
 	@:computed function get_canceled():Bool {
 		return bba._canceled;
@@ -56,7 +59,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	}
 	
 	@:computed function get_discount():Int {
-		return isBane ? 0 :  asBoonAssign.discount; 
+		return isBane ? 0 :  bba.discount; 
 	}
 	
 	@:computed function get_min():Int {
@@ -95,7 +98,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		
 		
 		var bba = this.bba;
-		if (gotDiscount || bba._forcePermanent) return;
+		if (gotDiscount ) return; //bba._forcePermanent
 		var cur:Int = LibUtil.field(obj, prop);
 		
 		
@@ -138,7 +141,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	function checkboxHandler(htmlInput:InputElement, event:Event) {
 		var bba = this.bba;
 
-		if (gotDiscount || bba._forcePermanent) {
+		if (gotDiscount ) {  //|| bba._forcePermanent
 			event.preventDefault();
 			return;
 		}
@@ -173,7 +176,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 	}
 	
 	@:computed inline function get_gotDiscount():Bool {
-		return this.asBoonAssign.discount > 0;
+		return bba.discount > 0;
 	}
 	
 	
@@ -217,7 +220,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		//if (Math.isNaN(cc)) trace();
 		cc = cc != 0 ? cc : costArr[0];// cc < costArr[0] ? costArr[0] : cc;
 		
-		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "") + (gotDiscount ?  "-"+this.asBoonAssign.discount : "");
+		return bb.name + " " +costDisp + (qty > 1 ? "~"+qty+"~" : '') + (cc!=rankCost ? "=<b>"+cc+"</b>" : "") + (gotDiscount ?  "-"+bba.discount : "");
 	}
 	
 	
@@ -226,10 +229,7 @@ class BoonBaneInput extends VComponent<NoneT, BoonBaneInputProps>
 		return obj;
 	}
 	
-	@:computed inline function get_asBoonAssign():BoonAssign {
-		
-		return obj;
-	}
+
 	
 	
 	@:computed function get_isBane():Bool {

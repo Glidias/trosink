@@ -25,7 +25,18 @@ class ButtonCounter extends VComponent<NoneT, ButtonCounterProps>
 		if (!preventDefault) {
 			LibUtil.setField(obj, prop, LibUtil.field(obj, prop) + 1);
 		}
-		callback(obj, prop);
+		var callbackValue:Dynamic = null;
+		if (callback != null) callbackValue = callback(obj, prop);
+		
+		
+		if (callbackValue != null) {
+			_vEmit("callback", callbackValue);
+		}
+		else {
+			_vEmit("callback");
+		}
+		
+		
 	}
 	
 	override function Template():String {
@@ -36,6 +47,6 @@ class ButtonCounter extends VComponent<NoneT, ButtonCounterProps>
 
 typedef ButtonCounterProps = {
 	>BaseUIProps,
-	@:prop({required:false}) @:optional var callback:Dynamic->Dynamic->Void;
+	@:prop({required:false}) @:optional var callback:Dynamic->Dynamic->Dynamic;
 	@:prop({required:false, 'default':false}) @:optional var preventDefault:Bool;
 }

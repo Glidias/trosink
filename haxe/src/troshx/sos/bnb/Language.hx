@@ -42,7 +42,7 @@ class LanguageAssign extends BoonAssign {
 	@:ui({  label:"Starting Polyglot Languages #3", maxLength:(rank >= 3 ? char.INT + 2 : 0)  })
 	public var polyglotLanguages:Array<String> = [];
 	
-	@:ui({maxLength:ingame ? null : 0 }) public var ingameLanguages:Array<String> = [];
+	@:ui({maxLength:char.ingame ? null : 0 }) public var ingameLanguages:Array<String> = [];
 	@:ui({type:"textarea"}) public var notes:String = "";
 	
 	

@@ -24,7 +24,7 @@ class Allies extends Boon {
 	}
 }
 
-class AlliesAssign extends BoonAssign {  // todo: combination of ranks
+class AlliesAssign extends BoonAssign {  
 	
 	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_1, clampLength(minorPowerList.length))}) public var minorPowerList:Array<String> = [""];
 	@:ui({minLength:0, maxLength:getMaxLength(Allies.COST_2, moderatePowerList.length)}) public var moderatePowerList:Array<String> = [];

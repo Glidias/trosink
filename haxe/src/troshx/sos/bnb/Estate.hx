@@ -33,6 +33,7 @@ class EstateAssign extends BoonAssign {
 	
 	static var COUNT:Int = 0;
 	var char:CharSheet;
+
 	
 	static function getEmptyWealthAssign():WealthAssetAssign {
 		return {

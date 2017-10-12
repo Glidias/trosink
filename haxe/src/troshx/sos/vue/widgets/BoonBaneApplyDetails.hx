@@ -45,7 +45,7 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 		//var qty = this.qty;
 		//var remainingCached:Dynamic=  Reflect.field(assign, "_remainingCached");
 		
-		return bb.name + ( !assign.ingame ? " ["+clampCost+(remainingPoints!=null ? "/"+(remainingPoints+clampCost) : "")+"]" : "");
+		return bb.name + ( !ingame ? " ["+clampCost+(remainingPoints!=null ? "/"+(remainingPoints+clampCost) : "")+"]" : "");
 	}
 	
 	@:computed function get_clampCost():Int {
@@ -77,7 +77,7 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 			<div class="bb-detail" v-show="assign.__hasUIFields__ && !isCanceled" :id="slug">
 				<h4>{{ titleheader }}</h4>
 				<div>	
-					<div v-for="(li, i) in uiFields" :is="typeMap[li.type]" :obj="assign" v-bind="li" :key="li.prop"></div>
+					<div v-for="(li, i) in uiFields" :is="typeMap[li.type]" :obj="assign" v-bind="li" :key="li.prop" v-on:callback="$$emit(\'callback\', assign, li.prop, arguments[1])"></div>
 				</div>
 			</div>
 		';
@@ -88,4 +88,5 @@ class BoonBaneApplyDetails extends VComponent<NoneT, BoonBaneApplyDetailsProps>
 typedef BoonBaneApplyDetailsProps = {
 	@:prop({required:true}) var assign:BoonBaneAssign;
 	@:prop({required:false}) var remainingPoints:Int;
+	@:prop({required:true}) var ingame:Bool;
 }

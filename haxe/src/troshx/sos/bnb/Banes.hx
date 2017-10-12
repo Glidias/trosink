@@ -126,7 +126,7 @@ class Frail extends Bane {
 		super("Frail", [8]);
 		channels = BoonBane.__ROBUST_FRAIL;
 		staticModifiers = [
-			StaticModifier.create(Modifier.CMP_TOU, -1)
+			StaticModifier.create(Modifier.CMP_TOU, "Frail",  -1)
 		];
 	}
 }
@@ -166,8 +166,8 @@ class OneEyed extends Bane {
 		super("One-Eyed", [10]);
 		flags = BoonBane.CANNOT_BE_REMOVED;
 		channels = BoonBane.__BLIND__ONE_EYED_BANE;
-		var m:StaticModifier = StaticModifier.create(Modifier.CP, -1);
-		m.next = StaticModifier.create(Modifier.MP, -2);
+		var m:StaticModifier = StaticModifier.create(Modifier.CP, "One-Eyed", -1);
+		m.next = StaticModifier.create(Modifier.MP, "One-Eyed", -2);
 		staticModifiers = [m];
 	}
 }
@@ -181,9 +181,9 @@ class Sheltered extends Bane {
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
 		channels = (BoonBane.__SHELTERED | BoonBane.__TRUE_GRIT); 
 		this.staticModifiers = [
-			StaticModifier.create(Modifier.STARTING_GRIT, -1),
-			StaticModifier.create(Modifier.STARTING_GRIT, -2),
-			StaticModifier.create(Modifier.STARTING_GRIT, -3)
+			StaticModifier.create(Modifier.STARTING_GRIT, "Sheltered (i)", -1),
+			StaticModifier.create(Modifier.STARTING_GRIT, "Sheltered (ii)", -2),
+			StaticModifier.create(Modifier.STARTING_GRIT, "Sheltered (iii)", -3)
 		];
 	}
 }
@@ -192,12 +192,12 @@ class Short extends Bane {
 	public function new() {
 		super("Short", [8, 15]);
 		channels = BoonBane.__TALL__SHORT;
-		var m:StaticModifier = StaticModifier.create(Modifier.REACH, -1);
-		m.next = StaticModifier.create(Modifier.CMP_MOB, -1);
+		var m:StaticModifier = StaticModifier.create(Modifier.REACH, "Short (i)", -1);
+		m.next = StaticModifier.create(Modifier.CMP_MOB, "Short (i)", -1);
 		// exhaustion speed by 1x? reduced 
 		
-		var m2:StaticModifier = StaticModifier.create(Modifier.REACH, -2);
-		m2.next = StaticModifier.create(Modifier.CMP_MOB, -2);
+		var m2:StaticModifier = StaticModifier.create(Modifier.REACH, "Short (ii)", -2);
+		m2.next = StaticModifier.create(Modifier.CMP_MOB, "Short (ii)", -2);
 		
 		this.staticModifiers = [
 			m,

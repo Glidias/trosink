@@ -14,15 +14,15 @@ class Poor extends Bane {
 		super("Poor", [4, 6, 8]);
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
 		channels = BoonBane.__RICH__POOR;
-		var h = StaticModifier.create(Modifier.STARTING_WEALTH, 0, .5);
-		h.next = StaticModifier.create(Modifier.STARTING_MONEY, 0, .5);
+		var h = StaticModifier.create(Modifier.STARTING_WEALTH, "Poor (i)",  0, .5);
+		h.next = StaticModifier.create(Modifier.STARTING_MONEY, "Poor (i)", 0, .5);
 		
-		var h2 =  StaticModifier.create(Modifier.STARTING_WEALTH, 0, .25);
-		h2.next = StaticModifier.create(Modifier.STARTING_MONEY, 0, .25);
+		var h2 =  StaticModifier.create(Modifier.STARTING_WEALTH, "Poor (ii)" , 0, .25);
+		h2.next = StaticModifier.create(Modifier.STARTING_MONEY, "Poor (ii)", 0, .25);
 		staticModifiers = [
 			h,
 			h2,
-			StaticModifier.create(Modifier.STARTING_MONEY, 0, 0)
+			StaticModifier.create(Modifier.STARTING_MONEY, "Poor (iii)", 0, 0)
 		];
 	}
 	

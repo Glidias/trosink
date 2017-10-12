@@ -29,6 +29,9 @@ class BuildUIFieldsMacro
 	
 		var collectedObjExpr:Array<Expr> = [];
 		
+		var collectedArrayMaxes:Array<Expr> = [];
+		var collectedArrayFieldNames:Array<String> = [];
+		
 		for (i in 0...fields.length) {
 			var f = fields[i];
 			
@@ -38,12 +41,16 @@ class BuildUIFieldsMacro
 			
 			var metaDataEntry = MacroUtil.getMetaTagEntry(f.meta, ":ui");
 			var defaultValueManuallyEntered:Bool = false;
+			var arrayMaxExpr:Expr = null;
+			var arrayFieldName:String = null;
+			
 			if ( metaDataEntry != null ) {
 				var fName:String = f.name;
 				var resolvedType:String = null;
 				var metaParam =  metaDataEntry.params[0];
 				
 				if (metaParam != null) {
+					
 					
 					switch(metaParam.expr ) {
 						case EConst(CString(s)):
@@ -53,6 +60,10 @@ class BuildUIFieldsMacro
 							for (e in fields) {
 								if (e.field == "type") {
 									resolvedType = MacroUtil.extractValue(e.expr);
+									
+								}
+								if (e.field == "maxLength") {
+									arrayMaxExpr = e.expr;
 								}
 								if (e.field == "defaultValue") {
 									defaultValueManuallyEntered = true;
@@ -124,7 +135,16 @@ class BuildUIFieldsMacro
 						metaParam = MacroUtil.combineObjDeclarations([metaParam, typeObjDecl],  f.pos);
 					}
 				}
-			
+				
+				if (resolvedType == "Array" || resolvedType == "ArrayOf") {
+					arrayFieldName = f.name;
+				}
+				
+				if (arrayFieldName != null && arrayMaxExpr != null) {
+					collectedArrayMaxes.push(arrayMaxExpr);
+					collectedArrayFieldNames.push(arrayFieldName);
+				}
+				
 				
 				metaParam = MacroUtil.combineObjDeclarations([
 					{ expr: EObjectDecl([{field:"prop", expr:macro $v{fName} }]), pos:metaDataEntry.pos},
@@ -175,6 +195,28 @@ class BuildUIFieldsMacro
 			accessing.push(Access.AOverride);
 		}
 		
+		if (collectedArrayMaxes.length > 0) {
+			
+			var exprList:Array<Expr> = [];
+			var exprBlock:Expr = {expr:ExprDef.EBlock(exprList), pos:cp };
+			
+			for (i in 0...collectedArrayMaxes.length) {
+				var varName:String = collectedArrayFieldNames[i];
+				var sliceToExpr:Expr = collectedArrayMaxes[i];
+				exprList.push( macro $i{varName} = $i{varName}.slice(0, ${sliceToExpr} ) );
+			}
+			
+			fields.push({
+				name:"cleanupUIArrays",
+				access: [Access.APublic, Access.AOverride],
+				kind: FieldType.FFun( {
+					args:[],
+					expr:exprBlock,
+					ret: null
+				}),
+				pos: cp	
+			});
+		}		
 
 		fields.push({
 			name:"getUIFields",

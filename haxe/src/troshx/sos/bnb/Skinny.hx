@@ -14,7 +14,7 @@ class Skinny extends Bane {
 		super("Skinny", [3]);
 		var m; 
 		MacroUtil.linkedListFromArray(m, [
-			StaticModifier.create(Modifier.CAR_END, -1)
+			StaticModifier.create(Modifier.CAR_END, "Skinny", -1)
 		]);
 		staticModifiers = [m];
 	}

@@ -50,12 +50,12 @@ class Goblin extends Race {
 	public function new() {
 		super("Goblin");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
-			StaticModifier.create(Modifier.ATTR_STR, -1),
-			StaticModifier.create(Modifier.ATTR_AGI, 1),
-			StaticModifier.create(Modifier.ATTR_PER, 1),
+			StaticModifier.create(Modifier.ATTR_STR, "Goblin", -1),
+			StaticModifier.create(Modifier.ATTR_AGI, "Goblin", 1),
+			StaticModifier.create(Modifier.ATTR_PER, "Goblin", 1),
 			// stuff for goblins
-			StaticModifier.create(Modifier.CMP_MOB, -2),	
-			StaticModifier.create(Modifier.REACH, -2)	
+			StaticModifier.create(Modifier.CMP_MOB, "Small", -2),	
+			StaticModifier.create(Modifier.REACH, "Small", -2)	
 		]);
 	}
 }
@@ -63,10 +63,12 @@ class Dwarf extends Race {
 	public function new() {
 		super("Dwarf");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
-			StaticModifier.create(Modifier.ATTR_END, 2),
-			StaticModifier.create(Modifier.ATTR_HLT, 1),
+			StaticModifier.create(Modifier.ATTR_END, "Dwarf",  2),
+			StaticModifier.create(Modifier.ATTR_HLT, "Dwarf", 1),
 			// stuff for dwarfs
-			StaticModifier.create(Modifier.CMP_TOU, 1)
+			StaticModifier.create(Modifier.REACH, "Short and Stout", -1),
+			StaticModifier.create(Modifier.CMP_MOB, "Short and Stout", -2),
+			StaticModifier.create(Modifier.CMP_TOU, "Sturdy Build", 1)
 		]);
 	}
 }
@@ -75,8 +77,8 @@ class Zell extends Race {
 	public function new() {
 		super("Zell");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
-			StaticModifier.create(Modifier.ATTR_AGI, 1),
-			StaticModifier.create(Modifier.ATTR_PER, 2)
+			StaticModifier.create(Modifier.ATTR_AGI, "Zell", 1),
+			StaticModifier.create(Modifier.ATTR_PER, "Zell", 2)
 		]);
 	}
 }
@@ -85,8 +87,8 @@ class Burdinadin extends Race {
 	public function new() {
 		super("Burdinadin");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
-			StaticModifier.create(Modifier.ATTR_INT, 1),
-			StaticModifier.create(Modifier.ATTR_AGI, 1)
+			StaticModifier.create(Modifier.ATTR_INT, "Burdinadin", 1),
+			StaticModifier.create(Modifier.ATTR_AGI, "Burdinadin", 1)
 		]);
 	}
 }
@@ -95,9 +97,9 @@ class Ohanedin extends Race {
 	public function new() {
 		super("Ohanedin");
 		MacroUtil.linkedListFromArray(staticModifiers,  [
-			StaticModifier.create(Modifier.ATTR_STR, 1),
-			StaticModifier.create(Modifier.ATTR_AGI, 1),
-			StaticModifier.create(Modifier.ATTR_PER, 1)
+			StaticModifier.create(Modifier.ATTR_STR, "Ohanedin", 1),
+			StaticModifier.create(Modifier.ATTR_AGI, "Ohanedin", 1),
+			StaticModifier.create(Modifier.ATTR_PER, "Ohanedin", 1)
 		]);
 	}
 }

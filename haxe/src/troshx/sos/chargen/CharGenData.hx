@@ -4,6 +4,7 @@ import haxe.ds.StringMap;
 import haxevx.vuex.core.IBuildListed;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
+import troshx.sos.bnb.BrainDamage.BrainDamageAssign;
 import troshx.sos.bnb.DirePast;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.SkillPacket;
@@ -52,6 +53,7 @@ class CharGenData implements IBuildListed
 	}
 	
 	public var savedCharContents:String = "";
+	public var warningMsgs:Array<String> = [];
 	
 	public function new(charSheet:CharSheet=null) 
 	{
@@ -919,6 +921,7 @@ class CharGenData implements IBuildListed
 			ba._costCached = bane.costs[0];
 			ba._forcePermanent = bba._forcePermanent;
 			
+			ba.discount = bba.discount;
 			ba._minRequired = bba._minRequired;
 			ba._canceled = bba._canceled;
 			CharGenData.dynSetArray(this.baneAssignList, i, ba );
@@ -947,6 +950,47 @@ class CharGenData implements IBuildListed
 				CharGenData.dynSetArray(char.boonsArray, i, ba );
 				char.boonAssignReplaced(ba, oldBA);
 			}
+		}
+	}
+	
+	function findBaneAssignIndexById(id:String):Int {
+		var i = baneAssignList.length;
+		while (--i > -1) {
+			if (baneAssignList[i].uid == id) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	function assignBrainDamage(bba:BrainDamageAssign):Void {
+		var arr = bba.baneQueue;
+		for (i in 0...arr.length) {
+			//dynSetArray(
+			var b = arr[i];
+			var ider = b.uid;
+			var index = findBaneAssignIndexById(ider);
+			if (index >= 0) {
+				CharGenData.dynSetArray(baneAssignList, index, b);
+				var ci:Int;
+				var existingBane:BaneAssign = char.banes.findById(ider);
+				if (existingBane == null) {
+					char.addBane(b);
+				}
+				else if (existingBane != b)  {
+					ci = char.banes.list.indexOf(existingBane);
+					CharGenData.dynSetArray(char.banes.list, ci, b);
+				}
+			}
+			else {
+				throw "Something went wrong, couldn't find brain damage assign bane: "+b.uid;
+			}
+		}
+	}
+	
+	public function onBaneCallbackReceived(bba:troshx.sos.core.BoonBane.BaneAssign):Void {  // yagni params //, prop:String, ?payload:Dynamic 
+	
+		if (Std.is(bba, BrainDamageAssign)) {
+			assignBrainDamage(cast bba);
 		}
 	}
 
@@ -1081,7 +1125,14 @@ class CharGenData implements IBuildListed
 		var i:Int = arr.length;
 		while (--i > -1) {
 			var b = arr[i];
-			total += !b.dontCountCost() ? b._costCached : 0;
+			var countCost = !b.dontCountCost();
+			var amt:Int = countCost ? b._costCached : 0;
+			
+			if (b.discount != 0) {
+				amt -= b.discount;
+				if (amt < 0) amt = 0;
+			}
+			total += amt;
 		}
 		return total;
 	}
@@ -1690,10 +1741,29 @@ class CharGenData implements IBuildListed
 
 
 	public function saveFinaliseCleanupChar():Void {
-		// todo:
 		saveFinaliseSocial();
 		saveFinaliseSchoolProfs();
 		saveFinaliseSkillsFromPackets();
+		
+		for (i in 0...char.boons.list.length) {
+			char.boons.list[i].cleanupUIArrays();
+		}
+		for (i in 0...char.banes.list.length) {
+			char.banes.list[i].cleanupUIArrays();
+		}
+		
+		for (i in 0...char.boons.list.length) {
+			char.boons.list[i].cleanup();
+		}
+		for (i in 0...char.banes.list.length) {
+			char.banes.list[i].cleanup();
+		}
+		
+		
+		if (!isHuman) {
+			char.arcFlaw = "";
+		}
+		
 	}
 
 	

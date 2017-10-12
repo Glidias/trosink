@@ -78,6 +78,7 @@ class Modifier
 
 class StaticModifier
 {
+	public var name(default, null):String;
 	
 	public var multiply(default,null):Float ;
 	public var add(default,null):Float;
@@ -90,8 +91,9 @@ class StaticModifier
 	{
 		
 	}
-	public static function create(index:Int, add:Float, multiply:Float=1):StaticModifier {
+	public static function create(index:Int, name:String, add:Float, multiply:Float=1):StaticModifier {
 		var me = new StaticModifier();
+		me.name = name;
 		me.index = index;
 		me.multiply = multiply;
 		me.add = add;
@@ -108,13 +110,20 @@ class StaticModifier
 
 class SituationalCharModifier 
 {
+	public var name(get, null):String;
+	function get_name():String {
+		return this.name;
+	}
+	
 	public var next:SituationalCharModifier;
 	public var index(default, null):Int;
 	
-	function new(index:Int) 
+	function new(index:Int, name:String) 
 	{
 		this.index = index;
+		this.name = name;
 	}
+	
 	
 	
 	public function getModifiedValueMultiply(char:CharSheet, base:Float, value:Float):Float {
@@ -132,6 +141,7 @@ class SituationalCharModifier
  */
 class EventModifierBinding { 
 	
+	public var name(default, null):String;
 	public var types:Array<String>;
 	public var handler:SOSEvent->Int;
 	
@@ -139,10 +149,11 @@ class EventModifierBinding {
 	
 	}
 	
-	public static function create(types:Array<String>, handler:SOSEvent->Int):EventModifierBinding {
+	public static function create(types:Array<String>, name:String, handler:SOSEvent->Int):EventModifierBinding {
 		
 		var me = new EventModifierBinding();
 		me.types = types;
+		me.name = name;
 		me.handler = handler;
 		return me;
 	}

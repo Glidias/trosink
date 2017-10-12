@@ -67,7 +67,7 @@ class CrippedLimbMOBModifier extends SituationalCharModifier {
 	var current:CrippledLimbAssign;
 	
 	public function new(current:CrippledLimbAssign) {
-		super(Modifier.CMP_MOB);
+		super(Modifier.CMP_MOB, "Crippled Limb/Appendage");
 		this.current = current;
 		
 	}

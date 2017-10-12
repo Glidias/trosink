@@ -34,6 +34,8 @@ class FavorAssign extends BoonAssign {
 	public function new() {
 		super();
 	}
+	
+	
 	override public function isValid():Bool {
 		return getQty() >= 1;
 	}

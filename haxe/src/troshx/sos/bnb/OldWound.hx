@@ -1,4 +1,5 @@
 package troshx.sos.bnb;
+import troshx.sos.bnb.OldWound.OldWoundAssign;
 import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.HitLocation;
@@ -26,7 +27,7 @@ class OldWound extends Bane
 
 class OldWoundAssign extends BaneAssign {
 	
-	@:ui({type:"HitLocationMultiSelector", body:char.body }) public var hitLocations:Int  = 0;
+	@:ui({type:"HitLocationMultiSelector", body:char.body, validateOptionFunc:isValidUILocation}) public var hitLocations:Int  = 0;
 	//public var hitLocations:Array<String> = [];
 	
 	
@@ -39,6 +40,28 @@ class OldWoundAssign extends BaneAssign {
 	
 	override public function getCost(rank:Int):Int {
 		return super.getCost(rank) * getQty();
+	}
+	
+	function isValidUILocation(i:Int):Bool {
+		return (i & permaMask)!=0;
+	}
+	
+	public var permaMask:Int = 0;
+	
+	public function inflictRandom():OldWoundAssign {  // done for char gen only
+		var i = char.body.hitLocations.length;
+		var selectArr:Array<Int> = [];
+		while (--i > -1) {
+			if ( ((1 << i) & hitLocations) == 0 ) {
+				selectArr.push( (1 << i) );
+			}
+		}
+		if (selectArr.length > 0) {
+			i = selectArr[ Std.int(Math.random() * selectArr.length) ];
+			hitLocations |= i;
+			permaMask |= i;
+		}
+		return this;
 	}
 	
 	override public function getQty():Int {

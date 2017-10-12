@@ -145,11 +145,11 @@
 				
 				<div class="bb-details">
 				<h3><span class="underline">Boon(s):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" :class="{canceled:li._canceled}" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
-				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft"></bb-apply>
+				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft" :ingame="char.ingame"></bb-apply>
 				</div>
 				<div class="bb-details">
 					<h3><span>Bane(s):</span><span class="header-liners"></span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined"  :class="{canceled:li._canceled}" v-for="li in banesArray">{{li.bane.name}}</a></span></h3>
-					<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li"></bb-apply>
+					<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li" :ingame="char.ingame" v-on:callback="onBaneCallbackReceived"></bb-apply>
 				</div>
 			</div>
 		</section>
@@ -248,16 +248,44 @@
 	</div>
 				
 	<div class="chargen__done" v-if="char.ingame">
-		<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
+		<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable serialized stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
 		<div><textarea character-set="UTF-8"  readonly="readonly" ref="savedTextArea" v-model="savedCharContents">
 		</textarea><button v-on:click="executeCopyContents()" ref="copyButton">Copy</button><i class="copy-notify" ref="copyNotify" style="display:none">copied!</i></div>
 		<div v-if="exitBtnCallback!=null">
 			<i>You character's loadable contents is also listed on exit.</i>
 		</div>
 		<button v-if="exitBtnCallback!=null" v-on:click="exitBtnCallback()">Exit</button>
+		
+		<hr/>
+		Consider pasting the copied serialized data content into a Gingko card,<br/>and storing all your data (for free) in a Gingko tree which {{ exitBtnCallback!=null ? "is" : "will be"}} loadable online by {{exitBtnCallback!=null ? "the" : "an upcoming" }} integrated suite's file browser!<br/>
+		(eg. <a href="https://gingkoapp.com/mwmzwn" target="_blank">https://gingkoapp.com/mwmzwn</a> ).<br/> Create a Gingko account now and {{ exitBtnCallback!=null? "start sharing your creations!" : "prepare your creations to be viewable through combined inventory/character sheets coming your way." }} 
 	</div>
 	
 	<div ref="inventoryHolder">
 		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" :maxWeight="CAR" />	
 	</div>
+		
+	<sweet-modal ref="finaliseWarning">
+		<div class="finalise-form finalise-warning">
+			<h3>Warning!</h3>
+			<p>You may have missed out some things.</p>
+			<ul>
+				<li v-for="li in warningMsgs" v-show="li.charAt(li.length-1)!='!'">{{li}}</li>
+			</ul>
+			<button v-on:click="$refs.finaliseWarning.close()">&lt; Back</button>
+			<br/><br/>
+			<i>You still sure you want to proceed with build?</i><br/>
+			<button v-on:click="$refs.finaliseWarning.close(); saveFinaliseAll(true)">Proceed with Build</button>
+		</div>
+	</sweet-modal>
+	<sweet-modal ref="finaliseError">
+		<div class="finalise-form finalise-errors">	
+			<h3>Invalid!</h3>
+			<p>You can't save this character yet and would need to rectify the following:</p>
+			<ul>
+				<li v-for="li in warningMsgs" v-show="li.charAt(li.length-1)=='!'">{{li}}</li>
+			</ul>
+			<button v-on:click="$refs.finaliseError.close()">&lt; Back</button>
+		</div>
+	</sweet-modal>
 </div>

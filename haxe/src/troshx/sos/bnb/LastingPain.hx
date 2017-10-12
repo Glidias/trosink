@@ -29,8 +29,8 @@ class LastingPain extends Bane
 class LastingPainAssign extends BaneAssign {
 	var char:CharSheet;
 	
-	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask  public var hitLocationsMinor:Int = 0;
-	@:ui({type:"HitLocationMultiSelector", body:char.body }) @:hitLocationMask  public var hitLocationsMajor:Int = 0;
+	@:ui({type:"HitLocationMultiSelector", body:char.body,  validateOptionFunc:isValidUILocation }) @:hitLocationMask  public var hitLocationsMinor:Int = 0;
+	@:ui({type:"HitLocationMultiSelector", body:char.body,  validateOptionFunc:isValidUILocation2}) @:hitLocationMask  public var hitLocationsMajor:Int = 0;
 	//public var hitLocationId:String = "";
 	
 	
@@ -39,8 +39,51 @@ class LastingPainAssign extends BaneAssign {
 		this.char = char;
 	}
 	
+	public var permaMask:Int = 0;
+	public var permaMask2:Int = 0;
+	
+	function isValidUILocation(i:Int):Bool {
+		return (i & permaMask)!=0;
+	}
+	
+	function isValidUILocation2(i:Int):Bool {
+		return (i & permaMask2)!=0;
+	}
+	
 	override public function getCost(rank:Int):Int {
 		return minorCount() * LastingPain.COST_MINOR +  majorCount() * LastingPain.COST_MAJOR;
+	}
+	
+	public function inflictRandomMinor():LastingPainAssign {
+		var i = char.body.hitLocations.length;
+		var selectArr:Array<Int> = [];
+		while (--i > -1) {
+			if ( ((1 << i) & hitLocationsMinor) == 0 ) {
+				selectArr.push( (1 << i) );
+			}
+		}
+		if (selectArr.length > 0) {
+			i = selectArr[ Std.int(Math.random() * selectArr.length) ];
+			hitLocationsMinor |= i;
+			permaMask |= i;
+		}
+		return this;
+	}
+	
+	public function inflictRandomMajor():LastingPainAssign {
+		var i = char.body.hitLocations.length;
+		var selectArr:Array<Int> = [];
+		while (--i > -1) {
+			if ( ((1 << i) & hitLocationsMajor) == 0 ) {
+				selectArr.push( (1 << i) );
+			}
+		}
+		if (selectArr.length > 0) {
+			i = selectArr[ Std.int(Math.random() * selectArr.length) ];
+			hitLocationsMajor |= i;
+			permaMask2 |= i;
+		}
+		return this;
 	}
 	
 	function minorCount():Int {

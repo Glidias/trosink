@@ -271,7 +271,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			}
 		}
 		
-		var f = (score = profPointsLeft) >= 0 && (this.ProfPoints > 0 && char.school == null);
+		var f = (score = profPointsLeft) >= 0 && (this.ProfPoints == 0 ? true :  char.school != null);
 		if (warnings != null) {
 			if (f  ) {
 				if (stillHaveProfSpend) warnings.push("School: You can still spend profeciency points on school/school-levels.");
@@ -291,7 +291,9 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			}
 		}
 		
-		return char.name != "" && a && b && c && d && e && f && r2 && r2;
+		this.warningMsgs = warnings;
+		
+		return char.name != "" && a && b && c && d && e && f && !r1 && !r2;
 	}
 	
 	@:computed function get_stillHaveProfSpend():Bool {
@@ -305,7 +307,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		var warnings:Array<String> = finalising ? null : [];
 		if (isValidAll(warnings)) {
 			if (warnings != null && warnings.length > 0) {
-				Browser.alert(warnings.join("\n"));
+				//Browser.alert(warnings.join("\n"));
+				_vRefs.finaliseWarning.open();
 				return;
 			}
 			else {
@@ -319,7 +322,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		}
 		else {
 			if (warnings != null && warnings.length > 0) {
-				Browser.alert(warnings.join("\n"));
+				//Browser.alert(warnings.join("\n"));
+				_vRefs.finaliseError.open();
 			}
 		}
 	}

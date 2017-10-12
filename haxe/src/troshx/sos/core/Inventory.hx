@@ -706,10 +706,7 @@ class Inventory
 		}
 	}
 	
-	static public inline function presumedActiveItem(entry:ReadyAssign):Bool
-	{
-		return entry.held != 0 || entry.unheld != Inventory.UNHELD_FORCE_DISABLED;
-	}
+	
 	
 }
 

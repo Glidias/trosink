@@ -24,7 +24,17 @@ class ButtonPermaPress extends VComponent<NoneT, ButtonPermaPressProps>
 		if (!preventDefault) {
 			LibUtil.setField(obj, prop, true);
 		}
-		callback(obj, prop);
+		
+		var callbackValue:Dynamic = null;
+		if (callback != null) callbackValue = callback(obj, prop);
+		
+		
+		if (callbackValue != null) {
+			_vEmit("callback", callbackValue);
+		}
+		else {
+			_vEmit("callback");
+		}
 	}
 	
 	override function Template():String {
@@ -42,6 +52,6 @@ typedef ButtonPermaPressProps = {
 	>BaseUIProps,
 	@:prop({required:false}) @:optional var description:String;
 	@:prop({required:false}) @:optional var descriptionDone:String;
-	@:prop({required:false}) @:optional var callback:Dynamic->Dynamic->Void;
+	@:prop({required:false}) @:optional var callback:Dynamic->Dynamic->Dynamic;
 	@:prop({required:false, 'default':false}) @:optional var preventDefault:Bool;
 }

@@ -498,6 +498,7 @@ section.gen-bnb .gen-comp-bb span.limit-join {
 }
 section.gen-bnb .gen-comp-bb.canceled {
 	text-decoration: line-through;
+	pointer-events:none;
 }
 
 .bb-details h3 .underline {
@@ -601,12 +602,11 @@ section.gen-bnb .gen-comp-bb.required .close-btn, section.gen-bnb .gen-comp-bb.r
 }
 
 section.gen-bnb .boon-tags .gen-comp-bb.force-perm {
-	pointer-events:none;
-	color:brown;
-	
+	//pointer-events:none;
+	color:green;
 }
 section.gen-bnb .bane-tags .gen-comp-bb.force-perm {
-	pointer-events:none;
+	//pointer-events:none;
 	color:brown;
 }
 
@@ -616,8 +616,7 @@ section.gen-bnb .boon-tags .gen-comp-bb.required {
 	
 }
 section.gen-bnb .bane-tags .gen-comp-bb.required {
-	
-	color:green;
+	color:brown;
 }
 
 section.gen-social-class .col-social-class {

@@ -13,8 +13,8 @@ class Fat extends Bane {
 		super("Fat", [5]);
 		var m; 
 		MacroUtil.linkedListFromArray(m, [
-			StaticModifier.create(Modifier.CMP_MOB, -2),
-			StaticModifier.create(Modifier.FATIQUE_END, -2)
+			StaticModifier.create(Modifier.CMP_MOB, "Fat", -2),
+			StaticModifier.create(Modifier.FATIQUE_END, "Fat", -2)
 		]);
 		staticModifiers = [m];
 		

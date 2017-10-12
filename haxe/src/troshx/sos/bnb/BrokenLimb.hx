@@ -70,7 +70,7 @@ class BrokenLimbMOBModifier extends SituationalCharModifier {
 	var current:BrokenLimbAssign;
 	
 	public function new(current:BrokenLimbAssign) {
-		super(Modifier.CMP_MOB);
+		super(Modifier.CMP_MOB, "Broken Limb");
 		this.current = current;
 		
 	}

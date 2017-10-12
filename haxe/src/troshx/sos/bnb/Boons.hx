@@ -61,7 +61,7 @@ class Beautiful extends Boon {
 class Berserker extends Boon {
 	public function new() {
 		super("Berserker", [8, 12]);
-		this.staticModifiers = [StaticModifier.create(Modifier.CP, 4 )];
+		this.staticModifiers = [StaticModifier.create(Modifier.CP, "Berserker", 4 )];
 		// ..see manual
 	}
 }
@@ -143,9 +143,9 @@ class NaturalBornKiller extends Boon {
 	public function new() {
 		super("Natural Born Killer", [6, 12, 18]);
 		this.staticModifiers = [
-			StaticModifier.create(Modifier.CP, 1 ),
-			StaticModifier.create(Modifier.CP, 2 ),
-			StaticModifier.create(Modifier.CP, 3 )
+			StaticModifier.create(Modifier.CP, "Natural Born Killer (i)", 1 ),
+			StaticModifier.create(Modifier.CP, "Natural Born Killer (ii)", 2 ),
+			StaticModifier.create(Modifier.CP, "Natural Born Killer (iii)", 3 )
 		];
 	}
 }
@@ -163,7 +163,7 @@ class Tall extends Boon {
 		channels = BoonBane.__TALL__SHORT;
 		this.staticModifiers = [
 			null,
-			StaticModifier.create(Modifier.REACH, 1) 
+			StaticModifier.create(Modifier.REACH, "Tall", 1) 
 		];
 	}
 }
@@ -174,9 +174,9 @@ class TrueGrit extends Boon {
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
 		channels = (BoonBane.__SHELTERED | BoonBane.__TRUE_GRIT);
 		this.staticModifiers = [
-			StaticModifier.create(Modifier.STARTING_GRIT, 1),
-			StaticModifier.create(Modifier.STARTING_GRIT, 2),
-			StaticModifier.create(Modifier.STARTING_GRIT, 3)
+			StaticModifier.create(Modifier.STARTING_GRIT, "True Grit (i)", 1),
+			StaticModifier.create(Modifier.STARTING_GRIT, "True Grit (ii)", 2),
+			StaticModifier.create(Modifier.STARTING_GRIT, "True Grit (iii)", 3)
 		];
 	}
 }
@@ -188,9 +188,9 @@ class Rich extends Boon {
 		channels = BoonBane.__RICH__POOR;
 		flags = BoonBane.CHARACTER_CREATION_ONLY;
 		staticModifiers = [
-			StaticModifier.create(Modifier.STARTING_MONEY, 0, 1.1),
-			StaticModifier.create(Modifier.STARTING_MONEY, 0, 1.5),
-			StaticModifier.create(Modifier.STARTING_MONEY, 0, 2)
+			StaticModifier.create(Modifier.STARTING_MONEY, "Rich (i)", 0, 1.1),
+			StaticModifier.create(Modifier.STARTING_MONEY, "Rich (ii)", 0, 1.5),
+			StaticModifier.create(Modifier.STARTING_MONEY, "Rich (iii)", 0, 2)
 		];
 	}
 }
@@ -200,7 +200,7 @@ class Robust extends Boon {
 		super("Robust", [8]);
 		channels = BoonBane.__ROBUST_FRAIL;
 		staticModifiers = [
-			StaticModifier.create(Modifier.CMP_TOU, 1)
+			StaticModifier.create(Modifier.CMP_TOU, "Robust", 1)
 		];
 	}
 }

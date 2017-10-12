@@ -125,9 +125,11 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	public var rank:Int;
 	//public var qty:Int;
 	
+	public var discount:Int = 0;
+	
 	public var _costCached:Int;  // used internally by engine to calculate cached costs of boons/banes. Do not touch!
 	
-	public var ingame:Bool = false;
+	//public var ingame:Bool = false;
 	public var _forcePermanent:Bool = false;
 	public var _canceled:Bool = false;
 	public var _minRequired:Int = 0;
@@ -139,6 +141,12 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 		return _canceled || _forcePermanent;
 	}
 	
+	public function cleanup():Void {
+		
+	}
+	public function cleanupUIArrays():Void { // override by macro if needed, boilerplate run to auto-cleanup array after char is confirmed
+		
+	}
 	
 	// ingame only
 	public function onFurtherAdded(char:CharSheet):Void {
@@ -197,9 +205,6 @@ class BoonAssign extends BoonBaneAssign implements IUpdateWith<BoonAssign>
 	public function new() {
 		
 	}
-	
-	// boon assignments may have a discount assosiated to them which is factored in when calculating Boon expediture elsewhere
-	public var discount:Int = 0;
 	
 	// utility
 
