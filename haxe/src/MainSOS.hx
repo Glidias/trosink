@@ -45,6 +45,10 @@ class MainSOS
 						<li><a href="${url}?chargen">Create a Character</a></li>
 						<li><a href="${url}?inventory">Inventory Manager</a></li>
 					</ul>
+					<h2>Misc TROSLike Utilities</h2>
+					<ul>
+						<li><a href="http://glidias.github.io/Asharena/demos/trosdev/probability.html" target="_blank">Dice Pool Probability Calculator</a></li>
+					</ul>
 					</div>';
 					
 			var mock:Dynamic =  { 
