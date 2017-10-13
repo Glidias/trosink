@@ -135,6 +135,13 @@ class BoonBaneAssign implements IBuildUIFields implements IUid
 	public var _canceled:Bool = false;
 	public var _minRequired:Int = 0;
 	
+	public function freeze():Void {
+		
+	}
+	public function unfreezeAll():Void {
+		
+	}
+	
 	public var situationalModifiers(default, null):Array<SituationalCharModifier>;
 	public var eventBasedModifiers:Array<EventModifierBinding>;
 	

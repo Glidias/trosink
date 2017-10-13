@@ -60,6 +60,16 @@ class LastingPainAssign extends BaneAssign {
 		discount = countMask(permaMask) *  LastingPain.COST_MINOR + countMask(permaMask2) *  LastingPain.COST_MAJOR;
 	}
 	
+	override public function freeze():Void {
+		permaMask |= hitLocationsMinor;
+		permaMask2 |= hitLocationsMajor;
+	}
+	
+	override public function unfreezeAll():Void {
+		permaMask = 0;
+		permaMask2 = 0;
+	}
+	
 	public function inflictRandomMinor():LastingPainAssign {
 		var i = char.body.hitLocations.length;
 		var selectArr:Array<Int> = [];

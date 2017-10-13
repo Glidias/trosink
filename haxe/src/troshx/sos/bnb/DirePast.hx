@@ -47,6 +47,7 @@ class DirePastAssign extends BaneAssign {
 			var b = baneAssigns[i];
 			b._minRequired = b.rank;
 			b.discount = b._costCached =  b.getCost(b.rank);
+			b.freeze();
 			//b._forcePermanent = true;
 			//b._forcePermanent = true; // or should just set min to existing rank only?
 		}

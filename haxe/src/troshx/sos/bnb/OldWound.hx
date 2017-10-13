@@ -48,6 +48,14 @@ class OldWoundAssign extends BaneAssign {
 	
 	public var permaMask:Int = 0;
 	
+	override public function freeze():Void {
+		permaMask |= hitLocations;
+	}
+	
+	override public function unfreezeAll():Void {
+		permaMask = 0;
+	}
+	
 	public function inflictRandom():OldWoundAssign {  // done for char gen only
 		var i = char.body.hitLocations.length;
 		var selectArr:Array<Int> = [];
