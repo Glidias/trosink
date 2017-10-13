@@ -43,7 +43,7 @@ class OldWoundAssign extends BaneAssign {
 	}
 	
 	function isValidUILocation(i:Int):Bool {
-		return (i & permaMask)==0;
+		return ( (1<< i) & permaMask)==0;
 	}
 	
 	public var permaMask:Int = 0;
@@ -64,11 +64,20 @@ class OldWoundAssign extends BaneAssign {
 		return this;
 	}
 	
+	public function mergeWith(other:OldWoundAssign):Void {
+		hitLocations |= other.hitLocations;
+		discount = super.getCost(rank) * countMask(permaMask);
+	}
+	
 	override public function getQty():Int {
+		return countMask(hitLocations);
+	}
+	
+	inline function countMask(msk:Int):Int {
 		var i = char.body.hitLocations.length;
 		var qty:Int = 0;
 		while (--i > -1) {
-			if ( ((1 << i) & hitLocations) != 0 ) {
+			if ( ((1 << i) & msk) != 0 ) {
 				qty++;
 			}
 		}

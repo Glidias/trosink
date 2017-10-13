@@ -43,15 +43,21 @@ class LastingPainAssign extends BaneAssign {
 	public var permaMask2:Int = 0;
 	
 	function isValidUILocation(i:Int):Bool {
-		return (i & permaMask)==0;
+		return ( (1<<i) & permaMask)==0;
 	}
 	
 	function isValidUILocation2(i:Int):Bool {
-		return (i & permaMask2)==0;
+		return ( (1<<i) & permaMask2)==0;
 	}
 	
 	override public function getCost(rank:Int):Int {
 		return minorCount() * LastingPain.COST_MINOR +  majorCount() * LastingPain.COST_MAJOR;
+	}
+	
+	public function mergeWith(other:LastingPainAssign):Void {
+		hitLocationsMajor |= other.hitLocationsMajor;
+		hitLocationsMinor |= other.hitLocationsMinor;
+		discount = countMask(permaMask) *  LastingPain.COST_MINOR + countMask(permaMask2) *  LastingPain.COST_MAJOR;
 	}
 	
 	public function inflictRandomMinor():LastingPainAssign {
@@ -87,29 +93,23 @@ class LastingPainAssign extends BaneAssign {
 	}
 	
 	function minorCount():Int {
-		var i = char.body.hitLocations.length;
-	
-		var qty:Int = 0;
-		while (--i > -1) {
-			if ( ((1 << i) & hitLocationsMinor) != 0 ) {
-				qty++;
-			}
-		}
-		return qty;
-		
+		return countMask(hitLocationsMinor);
 	}
 	
 	function majorCount():Int {
+		return countMask(hitLocationsMajor);
+	}
+	
+	inline function countMask(msk:Int):Int {
 		var i = char.body.hitLocations.length;
 		var qty:Int = 0;
 		while (--i > -1) {
-			if ( ((1 << i) & hitLocationsMajor) != 0 ) {
+			if ( ((1 << i) & msk) != 0 ) {
 				qty++;
 			}
 		}
 		return qty;
 	}
-	
 	override public function getQty():Int {
 	
 		return minorCount() + majorCount();

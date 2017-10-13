@@ -101,6 +101,11 @@ class BrainDamageAssign extends BaneAssign {
 			char.intelligence -= Std.int(Math.random() * (indexRank == 0 ? 2 : 5) ) + 1;
 		}
 		
+		var otherOldWounds:OldWoundAssign = cast char.banes.findById(oldWound.uid);
+		var otherLastingPain:LastingPainAssign = cast char.banes.findById(lastingPain.uid);
+		if (otherOldWounds == oldWound) otherOldWounds = null;
+		if (otherLastingPain == lastingPain) otherLastingPain = null;
+		
 		baneQueue = [];
 		var rIndex:Int = Std.int( Math.random() * 10 ) + add2 + 1;
 		switch (rIndex) {
@@ -113,26 +118,36 @@ class BrainDamageAssign extends BaneAssign {
 				gainBane(badEars, 2);
 			case 6:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(badEars, 1);
 			case 7:
-				gainBane(oldWound.inflictRandom(),1);
+				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(badEars, 2);
 			case 8:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				if (blind.rank == 0 ) gainBane(oneEyed, 1);
 			case 9:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(mute, 1);
 			case 10:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(lastingPain.inflictRandomMinor(), 1);
+				if (otherLastingPain != null) lastingPain.mergeWith(otherLastingPain);
 			case 11:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(lastingPain.inflictRandomMinor(), 1);
+				if (otherLastingPain != null) lastingPain.mergeWith(otherLastingPain);
 				if (char.ingame) char.intelligence-= 2;
 			case 12:
 				gainBane(oldWound.inflictRandom(), 1);
+				if (otherOldWounds != null) oldWound.mergeWith(otherOldWounds);
 				gainBane(lastingPain.inflictRandomMajor(), 2);
+				if (otherLastingPain != null) lastingPain.mergeWith(otherLastingPain);
 				gainBane(blind, 1);
 			default:
 				trace("Warning, unforeseen roll index number detected: " + rIndex);
