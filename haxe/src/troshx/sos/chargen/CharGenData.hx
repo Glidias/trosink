@@ -1796,6 +1796,8 @@ class CharGenData implements IBuildListed
 			char.banes.list[i].cleanup();
 		}
 		
+		char.inventory.cleanupBeforeSerialize();
+		
 		
 		if (!isHuman) {
 			char.arcFlaw = "";

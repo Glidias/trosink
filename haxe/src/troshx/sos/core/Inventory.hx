@@ -17,7 +17,7 @@ import troshx.util.LibUtil;
  * ...
  * @author Glidias
  */
-class Inventory 
+class Inventory
 {
 	public var dropped(default, null):IDMatchArray<ItemQty> = new IDMatchArray<ItemQty>(); // any items directly below one's feet
 	public function setNewDroppedList(list:IDMatchArray<ItemQty>):Void {
@@ -68,7 +68,7 @@ class Inventory
 	public var miscItemHand:Item = null;
 	*/
 	
-	var signaler:Signal1<InventorySignal>;
+	@:skipSerialize var signaler:Signal1<InventorySignal>;
 	public inline function getSignaler():Signal1<InventorySignal> {
 		return (signaler != null ? signaler : signaler=createSignaler());
 	}
@@ -85,10 +85,7 @@ class Inventory
 	}
 	
 		
-	public function hxSerialize(s:Serializer):Void {
-		setSignaler(null);
-		s.serialize(this);
-	}
+	
 	
 	
 	/*
@@ -704,6 +701,11 @@ class Inventory
 				key:UID_COUNT++
 			};
 		}
+	}
+	
+	public function cleanupBeforeSerialize():Void
+	{	
+		setSignaler(null); 
 	}
 	
 	
