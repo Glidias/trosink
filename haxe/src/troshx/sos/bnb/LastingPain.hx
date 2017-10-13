@@ -43,11 +43,11 @@ class LastingPainAssign extends BaneAssign {
 	public var permaMask2:Int = 0;
 	
 	function isValidUILocation(i:Int):Bool {
-		return (i & permaMask)!=0;
+		return (i & permaMask)==0;
 	}
 	
 	function isValidUILocation2(i:Int):Bool {
-		return (i & permaMask2)!=0;
+		return (i & permaMask2)==0;
 	}
 	
 	override public function getCost(rank:Int):Int {

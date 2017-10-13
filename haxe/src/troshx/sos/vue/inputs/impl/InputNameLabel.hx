@@ -21,8 +21,10 @@ class InputNameLabel extends VComponent<NoneT, BaseInputProps>
 	function onBlur(input:InputElement):Void {
 		var val:String = input.value;
 		val = StringTools.trim(val);
+		if (val != input.value) {
+			input.value = val;
+		}
 		LibUtil.setField(obj, prop, val);
-		input.value = val;
 	}
 	
 	override function Template():String {

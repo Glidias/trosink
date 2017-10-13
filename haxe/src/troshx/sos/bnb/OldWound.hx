@@ -43,7 +43,7 @@ class OldWoundAssign extends BaneAssign {
 	}
 	
 	function isValidUILocation(i:Int):Bool {
-		return (i & permaMask)!=0;
+		return (i & permaMask)==0;
 	}
 	
 	public var permaMask:Int = 0;
