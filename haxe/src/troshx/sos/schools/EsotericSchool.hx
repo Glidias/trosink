@@ -17,8 +17,7 @@ class EsotericSchool extends School
 
 	public function new() 
 	{
-		super("Esoteric School", 3, 5);
-		costMoney = Money.create(15, 0, 0);
+		super("Esoteric School",4, 8);
 	}
 	
 	static var TEST:CompleteMonster;  
