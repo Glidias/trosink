@@ -83,6 +83,9 @@ class CharSheet implements IBuildListed
 	public var intelligence:Int = 1;
 	public var perception:Int = 1;
 	
+	// new in v2
+	public var healthLoss:Int = 0;
+	public var prone:Bool = false;
 	
 	public var STR(get, never):Int;	// strength
 	function get_STR():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_STR, strength));  } 
@@ -91,7 +94,7 @@ class CharSheet implements IBuildListed
 	public var END(get, never):Int;	// endurance
 	function get_END():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_END, endurance));  } 
 	public var HLT(get, never):Int;	// health
-	function get_HLT():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_HLT, health));  } 
+	function get_HLT():Int { return Math.floor(getModifiedValue(Modifier.ATTR_HLT, health)) - healthLoss;  } 
 	public var WIP(get, never):Int;	// willpower
 	function get_WIP():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_WIL, willpower));  } 
 	public var WIT(get, never):Int;	// wit
@@ -583,7 +586,7 @@ class CharSheet implements IBuildListed
 	
 	inline function get_CP():Int {
 		var row = encumbranceLvlRow;
-		return row.cpMult * clampIntZero( (getModifiedValue(Modifier.CP, baseCP)) + row.cp + fatiqueCPPenalty );
+		return row.cpMult * clampIntZero( (getModifiedValue(Modifier.CP, baseCP)) * (prone ? 0.5 : 1) + row.cp + fatiqueCPPenalty );
 	}
 	
 	inline function get_meleeCP():Int 

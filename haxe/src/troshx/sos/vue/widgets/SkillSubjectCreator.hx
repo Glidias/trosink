@@ -177,7 +177,6 @@ class SkillSubjectCreator extends VComponent<SkillSubjectCreatorData, SkillSubje
 typedef SkillSubjectCreatorProps = {
 	@:prop({required:true}) var skillSubjects:Array<String>;
 	@:prop({required:true}) var skillValues:Dynamic<Int>;  // for internal validation of existing skill values
-	@:prop({required:true}) var skillPacketValues:Dynamic<Int>;  // for internal validation of existing skill values
 	@:prop({required:true}) var permaHash:Dynamic<Bool>;
 	@:prop({required:true}) var skillList:Array<String>;
 	@:prop({required:true}) var skillSubjectHash:Dynamic<Array<String>>;

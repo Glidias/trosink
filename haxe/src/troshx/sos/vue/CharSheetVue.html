@@ -1,0 +1,200 @@
+<div class="chargen">
+	<br/>
+	<h1>Song of Swords: Character Sheet</h1>
+	
+	<div class="chargen__body" v-if="!insideInventory && !char.ingame">
+		
+		<section class="gen-general" id="gen-general">
+			<div class="gen-col">
+				<div><label>Name:<InputNameLabel :obj="char" prop="name"></InputNameLabel></label></div>
+				<div><label>Title <i>(optional)</i>:<InputNameLabel :obj="char" prop="title"></InputNameLabel></label></div>
+				<div><label>Nickname <i>(optional)</i>:<InputNameLabel :obj="char" prop="nickname"></InputNameLabel></label></div>
+				<div><label>Faction/Assosiation <i>(optional)</i>:<InputNameLabel :obj="char" prop="faction"></InputNameLabel></label></div>
+				<div><label>Gender:</label><select number v-model.number="char.gender"><option :value="0">Male</option><option :value="1">Female</option></select></div>
+				<div><label>Left-handed?:<input type="checkbox" v-model="char.leftHanded"></input></label></div>
+				<br/>
+				Known as: <b>{{addressedAs}}</b>
+				<div>Race: <b>{{char.race.name}}</b></div>
+				<div>Social Class/Wealth: <b>{{char.socialClass.name}} / {{char.socialClass.wealth}}</b></div>
+				<div class="wealth-assets">
+					<label>Your Wealth Assets:</label>
+					<ArrayOf of="WealthAssetAssign" :defaultValue="getEmptyWealthAssign" :obj="char" prop="wealthAssets" :minLength="0" />
+				</div>
+			</div>
+			<div class="gen-col">
+				<label style="vertical-align:top">Notes:</label><textarea v-model="char.notes"></textarea>
+			</div>
+		</section>
+	
+		<hr/>
+			
+		<section class="gen-attributes" id="gen-attributes">
+			<h2>Attributes &amp; Stats <span class="valuer"><label>&#128274;</label><input type="checkbox"></input></span></h2>
+			<div class="gen-col">
+				<div><label>Strength:</label><InputInt :obj="char" prop="strength" :min="1" /><span class="modified-attribute" v-show="strength != STR" :class="[STR<strength ? 'lower' : 'higher', {'zero-neg':STR<=0} ]">{{STR}}</span></div>
+				<div><label>Agility:</label><InputInt :obj="char" prop="agility" :min="1" /><span class="modified-attribute" v-show="agility != AGI" :class="[AGI<agility ? 'lower' : 'higher', {'zero-neg':AGI<=0}]">{{AGI}}</span></div>
+				<div><label>Endurance:</label><InputInt :obj="char" prop="endurance" :min="1" /><span class="modified-attribute" v-show="endurance != END" :class="[END<endurance ? 'lower' : 'higher', {'zero-neg':END<=0}]">{{END}}</span></div>
+				<div><label>Health:</label><InputInt :obj="char" prop="health" :min="1" /><span class="modified-attribute" v-show="health != HLT" :class="[HLT<health ? 'lower' : 'higher', {'zero-neg':HLT<=0}]">{{HLT}}</span></div>
+				<div><label>Willpower:</label><InputInt :obj="char" prop="willpower" :min="1" /><span class="modified-attribute" v-show="willpower != WIP" :class="[WIP<willpower ? 'lower' : 'higher', {'zero-neg':WIP<=0}]">{{WIP}}</span></div>
+				<div><label>Wit:</label><InputInt :obj="char" prop="wit" :min="1" /><span class="modified-attribute" v-show="wit != WIT" :class="[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]">{{WIT}}</span></div>
+				<div><label>Intelligence:</label><InputInt :obj="char" prop="intelligence" :min="1" /><span class="modified-attribute" v-show="intelligence != INT" :class="[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]">{{INT}}</span></div>
+				<div><label>Perception:</label><InputInt :obj="char" prop="perception" :min="1" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]">{{PER}}</span></div>
+			</div>
+			<div class="gen-col">
+				<div><b>ADR</b> (Adroitness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
+				<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>
+				<div><b>GRIT</b> (Grit): <span class="modified-attribute" :class="[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']"><b>{{GRIT}}</b></span><i v-show="baseGrit!=GRIT" class="baseshow">({{baseGrit}})</i></div>
+			
+				<div><b>MOB</b> (Mobility): <span class="modified-attribute" :class="[MOB==mob ?'base' : MOB<mob ? 'lower' : 'higher']"><b>{{MOB}}</b></span><i v-show="mob!=MOB" class="baseshow">({{mob}})</i></div>
+				<div><b>CAR</b> (Carry): <span class="modified-attribute" :class="[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']"><b>{{CAR}}</b></span><i v-show="car!=CAR" class="baseshow">({{car}})</i></div>
+				
+				<div><b>CHA</b> (Charisma): <span class="modified-attribute" :class="[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']"><b>{{CHA}}</b></span><i v-show="cha!=CHA" class="baseshow">({{cha}})</i></div>
+				
+				<div><i>TOU</i> (Toughness): <span class="modified-attribute" :class="[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']"><b>{{TOU}}</b></span><i v-show="tou!=TOU" class="baseshow">({{tou}})</i></div>
+				<hr/>
+				<div>Weight/Carry:</div>
+				<div>Master-hand:</div>
+				<div>Off-hand: <select><option>Low</option></select></div>
+				<div>Reach: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
+				<div>Perception Penalty: <b>0</b></div>
+			</div>
+			<div class="gen-col">
+				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i></div>
+				<div>Current Profeciency: <b>-</b></div>
+				<div>&#9876; <i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b></div>
+				<br/>
+				<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
+				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
+				<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>
+				<div>Recovery Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmount!=recoveryRateAmountBase" class="baseshow">({{recoveryRateAmountBase}})</i></div>
+				<div><b>Fatique Points:</b><InputInt :min="0" :obj="char" prop="fatique" /></div>
+				<div><label><input type="checkbox" v-model="char.prone"></input>Prone?</label></div>
+				<hr/>
+				<div><b>Health Lost:</b><InputInt :min="0" :obj="char" prop="healthLoss" /></div>
+			</div>
+		</section>
+
+		<hr/>
+				
+		<section class="gen-wounds" id="gen-wounds">
+			<h2>Wounds <span class="valuer"><button>Add New Wound</button></span></h2>
+			<div>
+				<div>Total Pain: <b>0</b></div>
+				<div>Total Blood Lost: <b>0</b></div>
+			</div>
+		</section>
+				
+		<hr/>
+			
+		<section class="gen-bnb"  id="gen-bnb">
+			<h2>Boons &amp; Banes</h2>
+			<h3><span class="underline">Boons (if any):</span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined" :class="{canceled:li._canceled}" v-for="li in boonsArray">{{li.boon.name}}</a></span></h3>
+			<h3><span>Banes (if any):</span><span class="header-liners"></span><span class="header-liners"><a :href="li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined"  :class="{canceled:li._canceled}" v-for="li in banesArray">{{li.bane.name}}</a></span></h3>
+			<div class="opencloselink"><a href="#" v-show="showBnBs" v-on:click.prevent="showBnBs=false">^ Hide</a><a href="#" v-show="!showBnBs" v-on:click.prevent="showBnBs=true">Show More &gt;</a> &nbsp;&nbsp;</div>
+			<div v-show="shouldShowBnBs">
+				<div class="new-bnbs">
+					<h3>Choose Boons <span class="valuer"><input type="checkbox"></input></span></h3>
+					<div class="boon-tags">
+						<BoonBaneInput v-for="(li, i) in boonAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:uncancel="uncancel" v-on:addBB="addBB" v-on:removeBB="removeBB"  v-on:updateRankBB="updateRankBB" v-on:updateCanceledBB="updateCanceledBB" />
+					</div>	
+					<h3>Choose Banes <span class="valuer"><input type="checkbox"></input></span></h3>
+					<div class="bane-tags">
+						<BoonBaneInput v-for="(li, i) in baneAssignList" :key="i" :obj="li" prop="rank" v-on:resetBB="resetBB" v-on:uncancel="uncancel"  v-on:addBB="addBB" v-on:removeBB="removeBB"  v-on:updateRankBB="updateRankBB" v-on:updateCanceledBB="updateCanceledBB" />	
+					</div>
+				</div>
+				
+				<br/>
+				
+				<div class="bb-details">
+				<h3>Boon Details (if any):</h3>
+				<bb-apply v-for="(li,i) in boonsArray" :key="li.get_uid()" :assign="li" :remainingPoints="maxBoonsSpendableLeft" :ingame="char.ingame"></bb-apply>
+				</div>
+				<div class="bb-details">
+					<h3>Bane Details (if any):</h3>
+					<bb-apply v-for="(li,i) in banesArray" :key="li.get_uid()" :assign="li" :ingame="char.ingame" v-on:callback="onBaneCallbackReceived"></bb-apply>
+				</div>
+			</div>
+		</section>
+			
+		<hr/>
+			
+		<section class="gen-skills"  id="gen-skills">
+			<h2>Skills</h2>
+		<h3>Skill(s): <span class="valuer"></span></h3>
+		<div class="opencloselink"><a href="#" v-show="true" v-on:click.prevent="">^ Hide</a><a href="#" v-show="!true" v-on:click.prevent="">Show More &gt;</a> &nbsp;&nbsp;</div>
+			<div class="new-skills">
+				<div class="skill-lib">
+					<SkillLibInput v-for="(skillObj, i) in skillObjs" v-if="!skillsTable.requiresSpecialisation[skillObj.name]" :index="i" :key="skillObj.name" :obj="skillValues" :prop="skillObj.name" :skillsTable="skillsTable" :canDelete="i>=startingSkillObjsCount"  v-on:delete="deleteSkillInput" />
+				</div>
+
+				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" :skillSubjectHash="skillSubjectHash" v-on:addSkill="addSkill" v-if="false" />		
+			</div>
+		</section>
+			
+		<hr/>
+
+		<section class="gen-schoolprofs"  id="gen-schoolprofs">
+			<h2>School &amp; Profeciencies</h2>
+			<div class="select-school">
+				<div>
+					<label class="lbl-school">School:</label> <span v-if="char.school!=null">{{char.school.name}}</span><b v-show="char.school==null">-</b> , <label class="lbl-level">Level:<InputInt :obj="char" prop="schoolLevel" :disabled="char.school==null" :readonly="true" /></label>
+				</div>
+	
+			</div>
+			<div class="school-info" v-if="char.school != null">
+				<div>Max Profeciencies: {{ char.school.profLimit }}</div>
+				<div class="cost-info">Learning Profeciency/Arc Point Cost: ( <span :class="{selected:isHuman}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman}"><b>3 points</b> - Non-human)</span></div>
+			</div>
+			<div class="prof-list">
+				<div class="gen-col">
+					<h5>Melee Profeciencies:</h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots"  />
+				</div>
+				<div class="gen-col">
+					<h5>Ranged Profeciencies:</h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots"  />
+				</div>
+			</div>
+			<div class="manuever-list gen-col">
+				<h5>Superior Manuevers:</h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes"  :maxLength="maxSuperiorSlots"/>
+				<h5>Mastery Manuever:</h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes" :maxLength="maxMasterySlots"  />
+			</div>
+			<div class="talent-list gen-col">
+				<h5>Talents:</h5>
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="talentNotes" :maxLength="maxTalentSlots" />
+			</div>		
+			<div class="school-benefits gen-col" v-if="char.schoolBonuses != null">
+				<h5>Benefits: <span class="tag" v-for="li in schoolTags" :key="li">{{li}}</span></h5>
+			</div>
+			
+		</section>
+		
+		<hr/>
+	
+		<div ref="inventoryHolder">
+			<inventory :inventory="char.inventory" :maxWeight="CAR" />	
+		</div>
+	
+		<hr/>
+	</div>
+			
+	<div class="chargen__footer" v-if="!insideInventory && !char.ingame">
+			
+		<div class="sect-arc">
+			<h2>Arcs</h2>
+			<div><label>Arc awarded: <b>{{char.arcPointsAccum}}</b></label> <button>Award Arc</button> <span class="awarding"> Revoke Arc Awarded (0) <a href="javascript:;">[x]</a></span></div>
+			<div><label>Arc spent: <b>{{char.arcSpent}}</b></label> <button>Spend Arc</button> <span class="spending"> Revoke Arc Spent: (0) <a href="javascript:;">[x]</a></span></div>
+			
+			<br/>
+			<div><label>Saga:</label><textarea v-model="char.arcSaga"></textarea></div>
+			<div><label>Epic:</label><textarea v-model="char.arcEpic"></textarea></div>
+			<div><label>Belief:</label><textarea v-model="char.arcBelief"></textarea></div>
+			<div><label>Glory:</label><textarea v-model="char.arcGlory"></textarea></div>
+			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw"></textarea></div>
+		</div>
+		<button :disabled="char.ingame" v-on:click="saveFinaliseAll()">Save Character!</button>
+	</div>
+
+</div>

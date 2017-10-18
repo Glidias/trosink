@@ -467,6 +467,18 @@ td.w-tags .pop-widget label {
 	margin-right:15px;
 	
 }
+
+.chargen .gen-attributes input[type="number"], .chargen .sect-arc input[type="number"] {
+	display:inline-block;
+	max-width:55px;
+}
+
+.chargen .sect-arc button {
+	font-family:inherit;
+	font-size:inherit;
+}
+
+
 .chargen .gen-col:last-child {
 	margin-right:0;
 }
@@ -510,24 +522,24 @@ section.gen-bnb .gen-comp-bb.canceled {
 .bb-details h4 {
 	text-decoration:underline;
 }
-.bb-details .header-liners {
+.gen-bnb .header-liners {
 	font-size:12px;
 	text-decoration:none;
 	font-weight:normal;
 }
-.bb-details .header-liners a {
+.gen-bnb .header-liners a {
 	display:inline-block;
 	margin-left:5px;
 	
 }
-.bb-details .header-liners a.canceled {
+.gen-bnb  .header-liners a.canceled {
 	text-decoration: line-through;
 	pointer-events:none;
 }
-.bb-details .header-liners a:after {
+.gen-bnb  .header-liners a:after {
 	content:', ';
 }
-.bb-details .header-liners a:last-child:after {
+.gen-bnb  .header-liners a:last-child:after {
 	content:'';
 }
 

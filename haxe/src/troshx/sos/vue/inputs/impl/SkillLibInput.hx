@@ -32,7 +32,7 @@ class SkillLibInput extends VComponent<SkillLibInputData, SkillLibInputProps>
 	}
 	
 	@:computed function get_min():Int {  // cannot be reduced to  < points of current skill level from packets
-		return clamp5( LibUtil.field(this.skillLevelsPacket, this.prop) );
+		return skillLevelsPacket != null ? clamp5( LibUtil.field(this.skillLevelsPacket, this.prop) ) : 0;
 	}
 	
 	function checkConstraints():Void
@@ -98,7 +98,7 @@ class SkillLibInput extends VComponent<SkillLibInputData, SkillLibInputProps>
 
 	@:computed inline function get_current():Int {
 		// the current display value to show
-		return clamp5(LibUtil.field(skillLevelsPacket, prop)) + LibUtil.field(obj, prop); 
+		return (skillLevelsPacket!=null?  clamp5(LibUtil.field(skillLevelsPacket, prop)) : 0) + LibUtil.field(obj, prop); 
 	}
 	
 	@:computed function get_deleteBtnStyle():Dynamic {
@@ -120,10 +120,10 @@ class SkillLibInput extends VComponent<SkillLibInputData, SkillLibInputProps>
 typedef SkillLibInputProps = {
 	>NumericInputProps,  // obj assumed to be skillLevelsIndividual:Dynamic<Int>
 	
-	@:prop({required:true}) var remaining:Int; // individualSkillsRemaining
+	@:prop({required:false, 'default':10})  @:optional var remaining:Int; // individualSkillsRemaining
 	@:prop({required:true}) var skillsTable:SkillTable;
 	@:prop({required:true}) var index:Int;
-	@:prop({required:true}) var skillLevelsPacket:Dynamic<Int>;
+	@:prop({required:false}) @:optional var skillLevelsPacket:Dynamic<Int>;
 	@:prop({required:false, 'default':false}) var canDelete:Bool;
 
 }

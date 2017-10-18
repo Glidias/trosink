@@ -90,6 +90,28 @@ class CharGenData implements IBuildListed
 		
 	}
 	
+	public static function getTalentsAvailable():Array<Int> {
+		var talentsAvailable:Array<Int> =  School.getTalentAdds();
+		
+		var accum =  talentsAvailable[0];
+		for (i in 1...talentsAvailable.length) {
+			accum +=  talentsAvailable[i];
+			talentsAvailable[i] = accum;
+		}
+		return talentsAvailable;
+	}
+	
+	public static function getSuperiorsAvailable():Array<Int> {
+		var superiorsAvailable = School.getSuperiorAdds();
+		
+		var accum =  superiorsAvailable[0];
+		for (i in 1...superiorsAvailable.length) {
+			accum +=  superiorsAvailable[i];
+			superiorsAvailable[i] = accum;
+		}
+		return superiorsAvailable;
+	}
+	
 	function initSchools():Void {
 		
 		schoolLevelCosts = School.getLevels();
@@ -101,21 +123,9 @@ class CharGenData implements IBuildListed
 			schoolLevelCosts[i] = accum;
 		}
 		
-		talentsAvailable = School.getTalentAdds();
-		
-		accum =  talentsAvailable[0];
-		for (i in 1...talentsAvailable.length) {
-			accum +=  talentsAvailable[i];
-			talentsAvailable[i] = accum;
-		}
-		
-		superiorsAvailable = School.getSuperiorAdds();
-		
-		accum =  superiorsAvailable[0];
-		for (i in 1...superiorsAvailable.length) {
-			accum +=  superiorsAvailable[i];
-			superiorsAvailable[i] = accum;
-		}
+		talentsAvailable = getTalentsAvailable();
+	
+		superiorsAvailable = getSuperiorsAvailable();
 		
 		schoolAssignList = [];
 		var schoolList = Schools.getList();
@@ -518,10 +528,7 @@ class CharGenData implements IBuildListed
 	
 	var emptySocialBenefit:SocialBoonAssign = {name:"", rank:0, cost:0};
 	
-	public function getEmptyWealthAssign():WealthAssetAssign {
-		return this.char.getEmptyWealthAssetAssign(1);
-	}
-	
+
 	public function updateSocialBenefitsToBoon(newValue:SocialBoonAssign, oldValue:SocialBoonAssign):Void {
 		
 		var b;
@@ -867,122 +874,6 @@ class CharGenData implements IBuildListed
 
 		*/
 
-		public function restoreAnyBnBWithMask(msk:Int, superMask:Int):Void {
-		var arr = baneAssignList;
-		var arr2 = boonAssignList;
-		var restored:Bool = false;
-		var restoredBane:troshx.sos.core.BoonBane.BaneAssign = null;
-		var restoredBoon:troshx.sos.core.BoonBane.BoonAssign = null;
-		/*
-		if (superMask != 0) {
-			for (i in 0...arr.length) {  
-				var a = arr[i];
-				if ( a._canceled && (a.bane.channels & superMask) != 0 ) {
-					superMask &= ~a.bane.channels;
-					a._canceled = false;
-				}
-			}
-			for (i in 0...arr2.length) { 
-				var a = arr2[i];
-				if ( a._canceled && (a.boon.channels & superMask) != 0 ) {
-					superMask &= ~a.boon.channels;
-					a._canceled = false;
-				}
-			}
-		}
-		*/
-		
-		msk |= superMask;
-		
-		for (i in 0...arr.length) {  // banes first
-			var a = arr[i];
-			if ( a._canceled && (a.bane.channels & msk)!=0 ) {
-				a._canceled = false;
-				//msk &= ~a.bane.channels;
-				///*
-				if (a.rank > 0 && restoredBane == null)  {
-					restoredBane = a;
-					//break;
-				}
-				//*/
-			}
-		}
-		
-		if (restoredBane != null) {
-			msk &= ~(restoredBane.bane.channels | restoredBane.bane.superChannels);
-		}
-	
-		
-		//if (restoredBane == null) {
-			for (i in 0...arr2.length) {
-				var a = arr2[i];
-				if ( a._canceled &&  (a.boon.channels & msk)!=0 ) {
-					a._canceled = false;
-					//msk &= ~a.boon.channels;
-					
-					///*
-					if (a.rank > 0 && restoredBoon == null)  {
-						restoredBoon = a;
-						//break;
-					}
-					//*/
-				}
-			}
-		//}
-		
-		if (restoredBoon != null) {
-			checkBoonAgainstOthers(restoredBoon);
-		}
-		else if (restoredBane != null) {
-			checkBaneAgainstOthers(restoredBane);
-		}
-		
-	}
-	
-	public function resetBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
-		//trace("REMOVING:" + bba + " , " + isBane);
-		if (isBane) {
-			//char.mayRemoveBane(cast bba);  // this is done elsewhere
-			
-			var bane:Bane = cast bba.getBoonOrBane();
-			var ba;
-			var i = baneAssignList.indexOf(cast bba);
-			ba = bane.getAssign(0, char);
-			ba._costCached = bane.costs[0];
-			ba._forcePermanent = bba._forcePermanent;
-			
-			ba.discount = bba.discount;
-			ba._minRequired = bba._minRequired;
-			ba._canceled = bba._canceled;
-			CharGenData.dynSetArray(this.baneAssignList, i, ba );
-			
-		}
-		else {
-			var boonAssign:BoonAssign = cast bba;
-			var boon:Boon = boonAssign.boon;
-			var ba;
-			var i = boonAssignList.indexOf(cast bba);
-			ba = boon.getAssign(0, char);
-			ba.discount = boonAssign.discount;
-			ba.rank = bba._minRequired;
-			ba._remainingCached = maxBoonsSpendableLeft;
-			
-			
-			
-			ba._costCached = boon.costs[0];
-			ba._forcePermanent = bba._forcePermanent;
-			ba._minRequired = bba._minRequired;
-			ba._canceled = bba._canceled;
-			CharGenData.dynSetArray(this.boonAssignList, i, ba );
-			if (ba.rank > 0) {
-				i = char.boonsArray.indexOf(boonAssign);
-				var oldBA = char.boonsArray[i];
-				CharGenData.dynSetArray(char.boonsArray, i, ba );
-				char.boonAssignReplaced(ba, oldBA);
-			}
-		}
-	}
-	
 	function findBaneAssignIndexById(id:String):Int {
 		var i = baneAssignList.length;
 		while (--i > -1) {
@@ -1079,72 +970,6 @@ class CharGenData implements IBuildListed
 	public static inline function getBnBFromPCP(pcp:Int):Int {
 		return -BaneAssign.MAX_BANE_EARNABLE + (pcp*5-5);
 	}
-	
-	public function uncancel(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
-		bba._canceled = false;
-		if (isBane) {
-		
-			checkBaneAgainstOthers(cast bba);
-		}
-		else {
-			
-			checkBoonAgainstOthers(cast bba);
-		}
-	}
-		
-	public function addBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
-		//trace("ADDING:" + bba + " , " + isBane);
-		if (isBane) {
-			char.addBane(cast bba);
-			checkBaneAgainstOthers(cast bba);
-		}
-		else {
-			char.addBoon(cast bba);
-			checkBoonAgainstOthers(cast bba);
-		}
-		
-	}
-	public function removeBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool):Void {
-		//trace("REMOVING:" + bba + " , " + isBane);
-		if (isBane) {
-			var b:BaneAssign = cast bba;
-			char.removeBane(b);
-			if ( (b.bane.channels|b.bane.superChannels) != 0 ) {
-				restoreAnyBnBWithMask(b.bane.channels, b.bane.superChannels);
-				
-			}
-			
-		}
-		else {
-			var b:BoonAssign = cast bba;
-			char.removeBoon(b);
-			if ( (b.boon.channels|b.boon.superChannels) != 0){
-				restoreAnyBnBWithMask(b.boon.channels,b.boon.superChannels);
-			}
-		}
-	}
-	
-	public function updateRankBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool, newValue:Int, oldValue:Int):Void {
-		//trace("AA");
-		if (isBane) {
-			char.baneRankUpdated(cast bba, newValue, oldValue);
-		}
-		else {
-			char.boonRankUpdated(cast bba, newValue, oldValue);
-		}
-	}
-	
-	public function updateCanceledBB(bba:troshx.sos.core.BoonBane.BoonBaneAssign, isBane:Bool, newValue:Bool, oldValue:Bool):Void {
-		//trace("AA");
-		if (isBane) {
-			char.baneRankCanceledChange(cast bba, newValue, oldValue);
-		}
-		else {
-			char.boonRankCanceledChange(cast bba, newValue, oldValue);
-		}
-	}
-	
-	
 	
 	var categoryBnB(get, never):CategoryPCP;
 		function get_categoryBnB():CategoryPCP 
@@ -1593,6 +1418,8 @@ class CharGenData implements IBuildListed
 	}
 	
 	
+	
+	
 	public var hasSchool(get, never):Bool;
 	inline function get_hasSchool():Bool {
 		return char.school != null;	
@@ -1602,13 +1429,6 @@ class CharGenData implements IBuildListed
 	inline function get_schoolProfLevel():Int {
 		return hasSchool ? char.schoolLevel : 0;	
 	}
-	
-	public var schoolTags(get, never):Array<String>;
-	inline function get_schoolTags():Array<String> {
-		return hasSchool  && char.schoolBonuses != null ? char.schoolBonuses.getTags() : [];	
-	}
-	
-
 	
 	public var ProfPoints(get, never):Int;
 	inline function get_ProfPoints():Int {
@@ -1646,9 +1466,7 @@ class CharGenData implements IBuildListed
 	inline function get_maxAvailableProfSlots():Int {
 		return hasSchool ? char.school.profLimit : 0;
 	}
-	
-	
-	
+
 	
 	public var maxMeleeProfSlots(get, never):Int;
 	function get_maxMeleeProfSlots():Int {
@@ -1735,15 +1553,7 @@ class CharGenData implements IBuildListed
 	}
 	
 	
-	public var profCoreMeleeListNames(get, never):Array<String>;
-	function get_profCoreMeleeListNames():Array<String> {
-		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreMelee(), Profeciency.MASK_ALL);
-	}
-	
-	public var profCoreRangedListNames(get, never):Array<String>;
-	function get_profCoreRangedListNames():Array<String> {
-		return Profeciency.getLabelsOfArrayProfs(Profeciency.getCoreRanged(), Profeciency.MASK_ALL);
-	}
+
 	
 	public var traceProfCoreRangedCurrent(get, never):Array<String>;
 	function get_traceProfCoreRangedCurrent():Array<String> {

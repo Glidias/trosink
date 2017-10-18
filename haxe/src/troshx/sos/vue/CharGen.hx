@@ -65,10 +65,6 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	}
 	
 	
-	@:computed function get_addressedAs():String {
-		return char.uid;
-	}
-	
 	@:watch function watch_maxBoonsSpendableLeft(newValue:Int):Void {
 		var arr = this.boonsArray;
 		var i = arr.length;
@@ -466,10 +462,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	}
 	
 	
-	function getBnBSlug(name:String):String {
-		return BoonBaneApplyDetails.getSlug(name);
-	}
-
+	
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
 		return [

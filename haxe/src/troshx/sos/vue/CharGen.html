@@ -169,7 +169,7 @@
 			</div>
 			<div class="packet-list">
 				<SkillPacketInput v-for="(packet,i) in skillPackets" v-on:change="onSkillPacketChange" :obj="packet" prop="qty" :labelMap="skillLabelMappings" :labelSchema="skillLabelMappingBases" :key="packet.name" :index="i" :skillPacketsRemaining="skillPacketsRemaining" :skillValues="skillPacketValues"  :packetChoosy="packetChoosy" :skillSubjectHash="skillSubjectHash"  />
-				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :skillPacketValues="skillPacketValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" :skillSubjectHash="skillSubjectHash" v-on:addSkill="addSkill" />
+				<SkillSubjectCreator :skillSubjects="skillSubjects" :skillValues="skillValues" :permaHash="skillSubjectsInitial" :skillList="specialisedSkills" :skillSubjectHash="skillSubjectHash" v-on:addSkill="addSkill" />
 			</div>
 			
 			

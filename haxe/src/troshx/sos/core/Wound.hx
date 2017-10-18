@@ -19,7 +19,12 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	public var stun:Int = 0;
 	public var pain:Int = 0;
 	public var BL:Int = 0;
-	public var treated:Bool = false;
+	public var flags:Int;
+
+	@:flag public static inline var STAUNCHED:Int = (1 << 0);
+	@:flag public static inline var TREATED:Int = (1 << 1);
+
+	public static inline var MASK_OPENWOUND:Int = STAUNCHED | TREATED;
 
 	public var uid(get, never):String;
 	
@@ -37,19 +42,19 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	}
 	
 	
-	
 	public function updateAgainst(ref:Wound):Void {
 		if (ref.stun > stun) stun = ref.stun;
 		if (ref.pain > pain) pain = ref.pain;
 		if (ref.BL > BL) BL = ref.BL;
-		ref.treated = false;
+		ref.flags &= ~MASK_OPENWOUND;
+		
 	}
 	
 	public function spliceAgainst(ref:Wound):Int {
 		if (ref.stun < stun) stun = ref.stun;
 		if (ref.pain < pain) pain = ref.pain;
 		if (ref.BL < BL) BL = ref.BL;
-		ref.treated = true;
+		ref.flags &= ~MASK_OPENWOUND;
 		return -1;
 	}
 	
