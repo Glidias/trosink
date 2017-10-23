@@ -2,7 +2,6 @@ package;
 
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
-import troshx.sos.BoutController;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.CharGen;
 import troshx.sos.vue.InventoryManager;
