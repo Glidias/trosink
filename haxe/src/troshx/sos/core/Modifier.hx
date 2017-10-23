@@ -80,8 +80,8 @@ class StaticModifier
 {
 	public var name(default, null):String;
 	
-	public var multiply(default,null):Float ;
-	public var add(default,null):Float;
+	public var multiply:Float;
+	public var add:Float;
 	public var index(default,null):Int;
 	//public var applyMax:Float = 0;
 	//public var applyMin:Float = 0;

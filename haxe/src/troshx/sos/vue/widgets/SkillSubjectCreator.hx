@@ -28,7 +28,7 @@ class SkillSubjectCreator extends VComponent<SkillSubjectCreatorData, SkillSubje
 	
 	@:computed function get_withinEditableScope():Bool {
 		var a = selectedSubject != "";
-		var b:Bool = !LibUtil.field(permaHash, selectedSubject);
+		var b:Bool = permaHash != null ? !LibUtil.field(permaHash, selectedSubject) : true;
 		return a && b;
 	}
 
@@ -177,7 +177,7 @@ class SkillSubjectCreator extends VComponent<SkillSubjectCreatorData, SkillSubje
 typedef SkillSubjectCreatorProps = {
 	@:prop({required:true}) var skillSubjects:Array<String>;
 	@:prop({required:true}) var skillValues:Dynamic<Int>;  // for internal validation of existing skill values
-	@:prop({required:true}) var permaHash:Dynamic<Bool>;
+	@:prop({required:false}) @:optional var permaHash:Dynamic<Bool>;
 	@:prop({required:true}) var skillList:Array<String>;
 	@:prop({required:true}) var skillSubjectHash:Dynamic<Array<String>>;
 	

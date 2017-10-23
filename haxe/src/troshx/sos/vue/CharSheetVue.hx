@@ -1,15 +1,17 @@
 package troshx.sos.vue;
 import haxe.Unserializer;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.core.VxMacros;
+import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CharGenData;
-import troshx.sos.chargen.CharGenSkillPackets;
 import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.Profeciency;
 import troshx.sos.core.Skill;
 import troshx.sos.core.Skill.SkillObj;
 import troshx.sos.core.Skill.SkillTable;
@@ -79,16 +81,26 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		});
 		*/
 	}
-	public function saveFinaliseSkills():Void {
-	
+
+	function saveFinaliseSkills():Void {
+		
+
+		char.skills.clearAllSkills(true);
 		for ( i in 0...skillObjs.length) {
-			var s = skillObjs[i];
-			var total = LibUtil.field(skillValues, s.name);
+			var ss = skillObjs[i];
+			
+			var total = LibUtil.field(skillValues, ss.name);
 			if (total > 0 ) {
 				//trace("Setting skill:" + s.name + " = " + total);
-				char.skills.setSkill(s.name, total);
+				char.skills.setSkill(ss.name, total);
 			}
+			
 		}
+	
+	}
+	
+	function saveCharacter():Void {
+		saveFinaliseSkills();
 	}
 	
 	var maxAvailableProfSlots(get, never):Int;
@@ -128,6 +140,30 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	function get_maxSuperiorSlots():Int {
 		var r = char.schoolLevel > 0 ? superiorsAvailable[char.schoolLevel-1] : 0;
 		return char.school !=null ? r : 0;
+	}
+	
+		
+	function addSkill(skill:String, special:String):Void {
+		
+		var skillToSpecial:Array<String>;
+		var specialToSkill:Array<String>;
+		if ( (skillToSpecial=LibUtil.field(skillSubjectHash, skill)) == null ) {
+			Vue.set(skillSubjectHash, skill, skillToSpecial=[]);
+		}
+		if ( (specialToSkill=LibUtil.field(skillSubjectHash, special)) == null ) {
+			Vue.set(skillSubjectHash, special, specialToSkill=[]);
+		}
+		
+		skillToSpecial.push(special);
+		specialToSkill.push(skill);
+		
+		var name = Skill.specialisationName(skill, special);
+		Vue.set(skillValues, name, 0);
+		
+		skillObjs.push({
+			name: name,
+			attribs:0	// for this case (or for now), this isn't needed
+		});
 	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
@@ -194,9 +230,8 @@ class CharSheetVueData {
 	var specialisedSkills:Array<String>;
 	var skillSubjectHash:Dynamic<Array<String>>;
 	
-	// todo
-	//var skillSubjects:Array<String>;
-	//var skillSubjectsInitial:Dynamic<Bool>;
+	var skillSubjects:Array<String>;
+	var skillSubjectsInitial:Dynamic<Bool>;
 	
 	var profCoreListMelee:Array<Int> = [];
 	var profCoreListRanged:Array<Int> = [];
@@ -214,16 +249,28 @@ class CharSheetVueData {
 	
 	function getSampleChar():CharSheet {
 		var s:Unserializer = new Unserializer( VHTMacros.getHTMLStringFromFile("src/troshx/sos/vue/samplechar", "txt") );
-		return s.unserialize();
+		
+		var c:CharSheet =  s.unserialize();
+		c.postSerialize_2();
+		return c;
 	}
 	
 	function initProfs():Void {
-		// todo: link with char's existing melee/ranged profs
+		for (i in 0...31) {
+			if ( (char.profsMelee & (1<<i)) != 0) {
+				profCoreListMelee.push( (1 << i));
+			}
+		}
+		for ( i in 0...31) {
+			if ( (char.profsRanged & (1<<i)) != 0) {
+				profCoreListRanged.push( (1 << i));
+			}
+		}
 		
 	}
 	
 	function initBoons():Void {
-		// todo: link with char
+	
 		
 		var boonList:Array<Boon> = Boons.getList();
 		this.boonAssignList = [];
@@ -234,8 +281,9 @@ class CharSheetVueData {
 			bb =  boonList[i];
 			
 			if (bb.costs != null) {
-				var ba;
-				this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
+				var ba =  char.boons.findById( bb.uid);
+			
+				this.boonAssignList.push(ba != null ? ba :  ba = boonList[i].getAssign(0, this.char) );
 				//ba._costCached = bb.costs[0];
 				ba._remainingCached = 999;
 			}
@@ -244,18 +292,21 @@ class CharSheetVueData {
 		for (i in 0...baneList.length) {
 			bb = baneList[i];
 			if (bb.costs != null) {
-				var ba;
-				this.baneAssignList.push(ba = baneList[i].getAssign(0, this.char) );
+				var ba = char.banes.findById(bb.uid);
+				
+				this.baneAssignList.push( ba != null ? ba : ba = baneList[i].getAssign(0, this.char) );
 				//ba._costCached = bb.costs[0];
 			}
 		}
+		
 	}
 	
 	
 	function initSkills():Void {  // somewhat similar to CharGenData, but without packets
-		// todo: link with char
+
 		
 		skillsTable = SkillTable.getNewDefaultSkillTable();
+		skillsTable.matchValuesWith(char.skills);
 		skillObjs = skillsTable.getSkillObjectsAsArray(true);
 		specialisedSkills = skillsTable.getSpecialisationList();
 		setupEmptyMappings();
@@ -278,6 +329,7 @@ class CharSheetVueData {
 				skillToSpecial.push(special);
 				specialToSkill.push(skill);
 			}
+			
 		}
 		
 		startingSkillObjsCount = skillObjs.length;
@@ -294,20 +346,22 @@ class CharSheetVueData {
 		
 		for (f in Reflect.fields(skillsTable.skillHash)) {
 			if ( !skillsTable.requiresSpecification(f) ) {
-				LibUtil.setField(this.skillValues, f, 0);
+				var existingVal = char.skills.getSkillValue(f);
+				LibUtil.setField(this.skillValues, f,  existingVal != null ? existingVal : 0);
 			}
 		}
+		
 		arrAdded.sort(SkillTable.sortArrayMethod);
 		skillObjs = skillObjs.concat(arrAdded);
 		
-		/*
-		skillSubjects = CharGenSkillPackets.getExistingSubjects();
+	
+		skillSubjects = char.skills.getSubjects();
 		var reflectedExisting:Dynamic<Bool> = {};
 		for ( i in 0...skillSubjects.length) {
 			LibUtil.setField(reflectedExisting, skillSubjects[i], true);
 		}
 		skillSubjectsInitial = reflectedExisting;
-		*/
+	
 		
 	}
 

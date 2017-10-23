@@ -83,9 +83,20 @@ class CharSheet implements IBuildListed
 	public var intelligence:Int = 1;
 	public var perception:Int = 1;
 	
+	
 	// new in v2
+	public static inline var VERSION:Int = 2;
+	public var version:Int = VERSION;
 	public var healthLoss:Int = 0;
 	public var prone:Bool = false;
+	@:postSerialize public function postSerialize_2():Void {	// warning: ingame ONLY!
+		if (version == null || version < 2) version = 2;
+		if (!ingame) ingame = true;  // a bug in prev chargen that needs to be monkey patched
+			
+		if (healthLoss == null) healthLoss = 0;
+		if (prone == null) prone = false;
+	
+	}
 	
 	public var STR(get, never):Int;	// strength
 	function get_STR():Int { return clampIntZero(getModifiedValue(Modifier.ATTR_STR, strength));  } 
@@ -556,6 +567,15 @@ class CharSheet implements IBuildListed
 	public function clampIntZero(val:Float):Int {
 		var r = Std.int(val);
 		return r < 0 ? 0 : r;
+	}
+	
+	public function hasStaticModifier(mod:StaticModifier):Bool
+	{
+		return staticModifierTable[mod.index].indexOf(mod) >= 0;
+	}
+	public function hasSituationalCharModifier(mod:SituationalCharModifier):Bool
+	{
+		return situationalModifierTable[mod.index].indexOf(mod) >= 0;
 	}
 	
 	inline function get_TOU():Int 

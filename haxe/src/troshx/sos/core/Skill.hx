@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.core.Skill.SkillTable;
 import troshx.util.LibUtil;
 
 /**
@@ -216,6 +217,7 @@ class SkillTable
 		requiresSpecialisation = other.requiresSpecialisation;
 	}
 	
+
 	inline public function requiresSpecification(name:String):Bool {
 		return LibUtil.field(requiresSpecialisation, name);
 	}
@@ -245,6 +247,13 @@ class SkillTable
 	public inline function setSkill(name:String, attribs:Int):Void {
 		LibUtil.setField(skillHash, name, attribs); 
 	}
+	public function matchValuesWith(other:SkillTable):Void {
+		for (f in Reflect.fields(other.skillHash)) {
+			var result = LibUtil.field(other.skillHash, f);
+			setSkill(f, result);
+		}
+	}
+	
 	public function addSpecialisationTo(skillName:String, special:String, specialAttribs:Int=0):String {
 		if (hasSkill(skillName)) {
 			throw "No skill found for:" + skillName;
@@ -257,6 +266,20 @@ class SkillTable
 	public inline function removeSkill(name:String):Bool {
 		return Reflect.deleteField(skillHash, name);
 	}
+	
+	public function getSubjects():Array<String>
+	{
+		var arr:Array<String> = [];
+		for (f in Reflect.fields(skillHash)) {
+			var sub = Skill.getSplitFromSpecialisation(f);
+			if (sub != null) {
+				arr.push(sub[1]);
+			}
+		}
+		return arr;
+	}
+	
+	
 	
 }
 

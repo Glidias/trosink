@@ -309,8 +309,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			}
 			else {
 				saveFinaliseCleanupChar();
-				var savedCharString = saveCharToBox();
 				char.ingame = true;
+				var savedCharString = saveCharToBox();
 				if (finaliseSaveCallback != null) {
 					finaliseSaveCallback(savedCharString);
 				}

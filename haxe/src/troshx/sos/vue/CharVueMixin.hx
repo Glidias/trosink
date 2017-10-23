@@ -1,6 +1,8 @@
 package troshx.sos.vue;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
+import troshx.sos.bnb.BrainDamage.BrainDamageAssign;
 import troshx.sos.chargen.CharGenData;
 import troshx.sos.core.BoonBane.Bane;
 import troshx.sos.core.BoonBane.BaneAssign;
@@ -383,7 +385,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 			ba.discount = bba.discount;
 			ba._minRequired = bba._minRequired;
 			ba._canceled = bba._canceled;
-			CharGenData.dynSetArray(this.baneAssignList, i, ba );
+			Vue.set(this.baneAssignList, i, ba );
 			
 		}
 		else {
@@ -400,16 +402,58 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 			ba._forcePermanent = bba._forcePermanent;
 			ba._minRequired = bba._minRequired;
 			ba._canceled = bba._canceled;
-			CharGenData.dynSetArray(this.boonAssignList, i, ba );
+			Vue.set(this.boonAssignList, i, ba );
 			if (ba.rank > 0) {
 				i = char.boonsArray.indexOf(boonAssign);
 				var oldBA = char.boonsArray[i];
-				CharGenData.dynSetArray(char.boonsArray, i, ba );
+				Vue.set(char.boonsArray, i, ba );
 				char.boonAssignReplaced(ba, oldBA);
 			}
 		}
 	}
 		
+		function findBaneAssignIndexById(id:String):Int {
+		var i = baneAssignList.length;
+		while (--i > -1) {
+			if (baneAssignList[i].uid == id) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	function assignBrainDamage(bba:BrainDamageAssign):Void {
+		var arr = bba.baneQueue;
+		for (i in 0...arr.length) {
+			//dynSetArray(
+			var b = arr[i];
+			var ider = b.uid;
+			var index = findBaneAssignIndexById(ider);
+			if (index >= 0) {
+				CharGenData.dynSetArray(baneAssignList, index, b);
+				var ci:Int;
+				var existingBane:BaneAssign = char.banes.findById(ider);
+				if (existingBane == null) {
+					char.addBane(b);
+				}
+				else if (existingBane != b)  {
+					ci = char.banes.list.indexOf(existingBane);
+					CharGenData.dynSetArray(char.banes.list, ci, b);
+				}
+			}
+			else {
+				throw "Something went wrong, couldn't find brain damage assign bane: "+b.uid;
+			}
+		}
+	}
+	
+	public function onBaneCallbackReceived(bba:troshx.sos.core.BoonBane.BaneAssign):Void {  // yagni params //, prop:String, ?payload:Dynamic 
+	
+		if (Std.is(bba, BrainDamageAssign)) {
+			assignBrainDamage(cast bba);
+		}
+	}
+	
+	
 	public function checkBaneAgainstOthers(baneAssign:troshx.sos.core.BoonBane.BaneAssign):Void {
 		var arr = baneAssignList;
 		var arr2 = boonAssignList;

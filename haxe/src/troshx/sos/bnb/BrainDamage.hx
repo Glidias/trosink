@@ -7,6 +7,8 @@ import troshx.sos.bnb.LastingPain.LastingPainAssign;
 import troshx.sos.bnb.OldWound.OldWoundAssign;
 import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.Bane;
+import troshx.sos.core.Modifier;
+import troshx.sos.core.Modifier.StaticModifier;
 import troshx.sos.sheets.CharSheet;
 
 /**
@@ -84,6 +86,9 @@ class BrainDamageAssign extends BaneAssign {
 	
 	public var baneQueue(default, null):Array<BaneAssign>;
 	
+	var intModifier:StaticModifier = StaticModifier.create(Modifier.ATTR_INT, "Brain Damage", 0);
+
+	
 	public function execute(indexRank:Int):Void {
 		_minRequired = 1;
 		
@@ -98,7 +103,10 @@ class BrainDamageAssign extends BaneAssign {
 		}
 		
 		if (char.ingame) {
-			char.intelligence -= Std.int(Math.random() * (indexRank == 0 ? 2 : 5) ) + 1;
+			intModifier.add -= Std.int(Math.random() * (indexRank == 0 ? 2 : 5) ) + 1;
+			if (intModifier.add !=0 && !char.hasStaticModifier(intModifier) ) {
+				char.addStaticModifier(intModifier);
+			}
 		}
 		
 		var otherOldWounds:OldWoundAssign = cast char.banes.findById(oldWound.uid);
