@@ -149,7 +149,7 @@ class CharGenData implements IBuildListed
 		for (i in 0...boonList.length) {
 			bb =  boonList[i];
 			
-			if (bb.costs != null) {
+			if (bb.isAvailableCharacterCreation()) {
 				var ba;
 				this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
 				ba._costCached = bb.costs[0];
@@ -159,7 +159,7 @@ class CharGenData implements IBuildListed
 		var baneList:Array<Bane> = Banes.getList();
 		for (i in 0...baneList.length) {
 			bb = baneList[i];
-			if (bb.costs != null) {
+			if (bb.isAvailableCharacterCreation()) {
 				var ba;
 				this.baneAssignList.push(ba = baneList[i].getAssign(0, this.char) );
 				ba._costCached = bb.costs[0];
@@ -847,16 +847,47 @@ class CharGenData implements IBuildListed
 		var a = this.wealthAssets.slice(0, len);
 		a =  a.filter(filterAwayLiquidatedAssets);
 		this.char.wealthAssets = a;
+		if (tempMoneyLeft != null) this.char.money.matchWith(tempMoneyLeft);
+		else {
+			this.char.money.matchWith(getMoneyLeft());
+		}
 	}
 	
 	
-	
-	
-	
+
 	var tempMoneyLeft:Money;
 
+	function getMoneyLeft():Money {
+		if (tempMoneyLeft == null) tempMoneyLeft = new Money();
+		var startingMoneyBonusCP = getStartingMoneyBonusCP();
+		return tempMoneyLeft.matchWith(socialClassList[wealthIndex].socialClass.money).addValues(getLiquidity(), 0, 0).subtractAgainst(char.school != null && char.school.costMoney != null ? char.school.costMoney : Money.ZERO ).subtractAgainst(char.inventory.calculateTotalCost()).addValues(0, 0, startingMoneyBonusCP).subtractValues(0, 0, startingMoneyBonusCP);
+		return tempMoneyLeft;
+	}
+		
+	function getStartingMoneyBonusCP():Int {
+		var v = getStartingMoneyModifiedCP();
+		return v  > 0 ? v : 0;
+	}
+	
+		
+	inline function getMoneyAvailable():Money {
+		return socialClassList[wealthIndex].socialClass.money;
+	}
+
+
+	static var STARTING_MONEY_MOD:Money;
+	public function getStartingMoneyModifiedCP():Int {
+		var sample = STARTING_MONEY_MOD != null ? STARTING_MONEY_MOD : (STARTING_MONEY_MOD = new Money());
+		sample._resetToZero();
+		var baseCP = getMoneyAvailable().getCPValue();
+		return Std.int( this.char.getModifiedValue(Modifier.STARTING_MONEY, getMoneyAvailable().getCPValue() ) ) - baseCP;
+	}
 	
 	
+	 function getLiquidity():Int {
+		var len:Int = wealthAssetsWorthLen();
+		return CharSheet.getTotalLiquidity(wealthAssets, len); 
+	}
 	
 	
 	

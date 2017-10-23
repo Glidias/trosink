@@ -271,17 +271,38 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		return char.banesArray;
 	}
 	
-	var shouldShowBnBs(get, never):Bool;
-	function get_shouldShowBnBs():Bool 
-	{
-		return showBnBs;
-	}
-	
 	@:computed function get_maxBoonsSpendableLeft():Int {
 		return 999;
 	}
 	
+	function consoleLog(dyn:Dynamic):Void {
+		trace(dyn);
+	}
 	
+	function getBracketLabelBnB(bba:BoonBaneAssign):String {
+		var bb = bba.getBoonOrBane();
+		var qty = bba.getQty();
+		var noCostLadder:Bool = !bb.isAvailableCharacterCreation();
+		
+		return (noCostLadder? "x": "(") + ( noCostLadder ?  (qty > 1 ? qty+"" : "") :  bb.clampRank ? (bba._costCached!=null ? bba._costCached+"" : ""+bba.getCost(bba.rank) )  : getRomanDigit(bba.rank) ) + (noCostLadder ? "": ")");
+	}
+	
+	function getRomanDigit(num:Int):String {
+		switch (num) {
+			case 0: return "0";
+			case 1: return "i";
+			case 2: return "ii";
+			case 3: return "iii";
+			case 4: return "iv";
+			case 5: return "v";
+			case 6: return "vi";
+			case 7: return "vii";
+			case 8: return "viii";
+			case 9: return "ix";
+			case 10: return "x";
+			default: return ">x";
+		}
+	}
 	
 	function getBnBSlug(name:String):String {
 		return BoonBaneApplyDetails.getSlug(name);

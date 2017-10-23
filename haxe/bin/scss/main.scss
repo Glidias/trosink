@@ -522,25 +522,28 @@ section.gen-bnb .gen-comp-bb.canceled {
 .bb-details h4 {
 	text-decoration:underline;
 }
-.gen-bnb .header-liners {
+.chargen .header-liners {
 	font-size:12px;
 	text-decoration:none;
 	font-weight:normal;
 }
-.gen-bnb .header-liners a {
+.chargen .header-liners > * {
 	display:inline-block;
-	margin-left:5px;
+	margin-left:10px;
 	
 }
-.gen-bnb  .header-liners a.canceled {
+
+.chargen  .header-liners > .canceled {
 	text-decoration: line-through;
 	pointer-events:none;
 }
-.gen-bnb  .header-liners a:after {
+.chargen  .header-liners *:after {
 	content:', ';
 }
-.gen-bnb  .header-liners a:last-child:after {
+
+.chargen  .header-liners *:last-child:after {
 	content:'';
+	
 }
 
 .bb-details > div {

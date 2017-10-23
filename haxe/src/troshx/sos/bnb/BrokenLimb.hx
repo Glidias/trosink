@@ -16,7 +16,7 @@ class BrokenLimb extends Bane
 
 	public function new() 
 	{
-		super("Broken Limb", null);
+		super("Broken Limb", BoonBane.COSTLESS_ARRAY);
 		flags = BoonBane.CANNOT_BE_REMOVED;
 		multipleTimes = BoonBane.TIMES_VARYING; 
 	}

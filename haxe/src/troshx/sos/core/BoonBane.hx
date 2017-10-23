@@ -51,14 +51,15 @@ class BoonBane
 	@:flag public static inline var CHARACTER_CREATION_ONLY:Int = (1 << 0);
 	@:flag public static inline var CANNOT_BE_REMOVED:Int = (1 << 1);
 	
-	public inline function isAvailableCharaterCreation():Bool {
-		return this.costs != null;
+	public inline function isAvailableCharacterCreation():Bool {
+		return this.costs != COSTLESS_ARRAY;
 	}
 	
 	public static inline var TIMES_INFINITE:Int = -1;
 	public static inline var TIMES_VARYING:Int = -2;
 	
 	public var uid(get, never):String;
+	static public var COSTLESS_ARRAY(default,null):Array<Int> = [0];
 	inline function get_uid():String 
 	{
 		return name;

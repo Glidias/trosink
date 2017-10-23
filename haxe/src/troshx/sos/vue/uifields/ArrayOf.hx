@@ -35,7 +35,7 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	
 	override public function Template():String {
 		return '<div>
-		<label v-if="label!=null">{{label}}:&nbsp;| {{maxLength}}</label><label v-if="label==null && maxLength!=null">| {{maxLength}} </label><button :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button>
+		<label v-if="label!=null">{{label}}:&nbsp;| {{maxLength}}</label><label v-if="label==null && maxLength!=null">| {{maxLength}} </label><button v-show="!readonly" :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button  v-show="!readonly" :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button>
 		<ul class="array-of">
 			<li v-for="(li, i) in current" :class="{disabled:!(maxLength == null || i < maxLength)}">
 				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
@@ -103,5 +103,6 @@ typedef ArrayOfProps = {
 	@:prop({required:false}) @:optional var maxLength:Int;
 	
 	@:prop({required:false, 'default':false}) @:optional var autoExpand:Bool;
+	@:prop({required:false, 'default':false}) @:optional var readonly:Bool;
 	
 }

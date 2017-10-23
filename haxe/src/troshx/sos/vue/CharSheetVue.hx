@@ -22,6 +22,7 @@ import troshx.sos.vue.inputs.impl.InputNameLabel;
 import troshx.sos.vue.inputs.impl.SkillLibInput;
 import troshx.sos.vue.uifields.ArrayOf;
 import troshx.sos.vue.uifields.ArrayOfBits;
+import troshx.sos.vue.uifields.MoneyField;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 import troshx.sos.vue.widgets.SchoolSheetDetails;
 import troshx.sos.vue.widgets.SkillSubjectCreator;
@@ -180,6 +181,8 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 			ArrayOf.NAME => new ArrayOf(),
 			ArrayOfBits.NAME => new ArrayOfBits(),
 			
+			MoneyField.NAME => new MoneyField(),
+			
 			"inventory" => new InventoryVue()
 		];
 	}
@@ -217,7 +220,19 @@ typedef CharSheetVueProps = {
 
 
 class CharSheetVueData {
-	var showBnBs:Bool = true;
+	//safety locks
+	var lockAttributes:Bool = true;
+	var lockBoons:Bool = true;
+	var lockBanes:Bool = true;
+	var lockProfs:Bool = true;
+	var lockWealth:Bool = true;
+	
+	//  view hide/show
+	var showBnBs:Bool = false;
+	var showEditSkills:Bool = false;
+	
+	
+	// blah
 	var insideInventory:Bool = false;
 	var char:CharSheet;
 	var boonAssignList:Array<BoonAssign>;
@@ -280,23 +295,41 @@ class CharSheetVueData {
 		for (i in 0...boonList.length) {
 			bb =  boonList[i];
 			
-			if (bb.costs != null) {
+			//if (bb.costs != null) {
 				var ba =  char.boons.findById( bb.uid);
-			
-				this.boonAssignList.push(ba != null ? ba :  ba = boonList[i].getAssign(0, this.char) );
+				if (ba != null) {
+					this.boonAssignList.push(ba);
+				}
+				else if ( (bb.flags & BoonBane.CHARACTER_CREATION_ONLY)!=0 ) {
+					continue;
+					
+				}
+				else {
+					this.boonAssignList.push(  ba = boonList[i].getAssign(0, this.char) );
+				}
+				
 				//ba._costCached = bb.costs[0];
 				ba._remainingCached = 999;
-			}
+			//}
 		}
 		var baneList:Array<Bane> = Banes.getList();
 		for (i in 0...baneList.length) {
 			bb = baneList[i];
-			if (bb.costs != null) {
+			//if (bb.costs != null) {
 				var ba = char.banes.findById(bb.uid);
 				
-				this.baneAssignList.push( ba != null ? ba : ba = baneList[i].getAssign(0, this.char) );
+				if (ba != null) {
+					this.baneAssignList.push(ba);
+				}
+				else if ( (bb.flags & BoonBane.CHARACTER_CREATION_ONLY)!=0 ) {
+					continue;
+					
+				}
+				else {
+					this.baneAssignList.push(  ba = baneList[i].getAssign(0, this.char) );
+				}
 				//ba._costCached = bb.costs[0];
-			}
+			//}
 		}
 		
 	}
