@@ -9,6 +9,8 @@ import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import js.html.HtmlElement;
 import js.html.TextAreaElement;
+import troshx.sos.core.DamageType;
+import troshx.sos.core.Wound;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CharGenData;
@@ -28,6 +30,7 @@ import troshx.sos.vue.inputs.impl.InputNameLabel;
 import troshx.sos.vue.inputs.impl.SkillLibInput;
 import troshx.sos.vue.uifields.ArrayOf;
 import troshx.sos.vue.uifields.ArrayOfBits;
+import troshx.sos.vue.uifields.Bitmask;
 import troshx.sos.vue.uifields.MoneyField;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 import troshx.sos.vue.widgets.GingkoTreeBrowser;
@@ -58,14 +61,52 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		this.char.inventory = chk;
 	}
 	
+	@:computed function get_domainId():String {
+		return Globals.DOMAIN_CHARACTER;
+	}
 
+	function recoverFatique(amt:Int):Void {
+		this.char.fatique -= amt;
+		if (this.char.fatique < 0) this.char.fatique = 0;
+	}
 	override function Data():CharSheetVueData {
 		return new CharSheetVueData(this.injectChar);
 	}
 	
+	/*  // yagni atm
+	function openAwardArc():Void {
+		
+	}
+	function openSpendArc():Void {
+		
+	}
+	
+	@:computed function get_maxArcSpendable():Int {
+		return this.char.arcPointsAvailable;
+		
+	}
+	@:computed function get_minArcSpendable():Int {
+		return this.maxArcSpendable > 0 ? 1 : 0;
+	}
+	
+	function awardArc(amt:Int):Void {
+		this.char.arcPointsAccum += amt;
+		this.sessionArcAwarded += amt;
+	}
+	
+	function revokeArcAwarded():Void {
+		this.char.arcPointsAccum  -= this.sessionArcAwarded;
+		this.sessionArcAwarded = 0;
+	}
+	function revokeArcSpent():Void {
+		this.char.arcSpent -= this.sessionArcSpent;
+		this.sessionArcSpent = 0;
+	}
+	*/
+	
 	override function Created():Void {
 		//_vData.privateInit();
-		//untyped CharGenData.dynSetField = Vue.set;
+		untyped CharSheet.dynSetField = Vue.set;
 		//untyped CharGenData.dynDeleteField = Vue.delete;
 		//untyped CharGenData.dynSetArray = Vue.set;
 	}
@@ -83,6 +124,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 			
 			ArrayOf.NAME => new ArrayOf(),
 			ArrayOfBits.NAME => new ArrayOfBits(),
+			Bitmask.NAME => new Bitmask(),
 			
 			MoneyField.NAME => new MoneyField(),
 			
@@ -93,7 +135,17 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	}
 	
 	function openTreeBrowser():Void {
-		_vRefs.treeBrowser.open();
+		if (!treeBrowserInited) {
+			treeBrowserInited = true;
+		}
+		Vue.nextTick( function() {
+			_vRefs.treeBrowser.open();
+		});
+	}
+	
+	function openClipboardWindow():Void {
+		clipboardLoadContents = "";
+		_vRefs.clipboardWindow.open();
 	}
 	
 	function openFromTreeBrowser(contents:String, filename:String, disableCallback:Void->Void):Void {
@@ -111,8 +163,44 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 			"troshx.sos.sheets.CharSheet": true
 		};
 	}
+	
+	@:computed function get_hasSampleWound():Bool {
+		return this.char.hasWound(this.sampleWound);
+	}
 
+	function confirmAddWound():Void {
+		var lastWound:Wound = sampleWound;
+		//sampleWound = Wound.getNewEmptyAssign();
+		if (forceNewSampleWound) {
+			lastWound.makeUnique();
+		}
+		sampleWound = null;
+		this.char.applyWound(lastWound);
+		_vRefs.addWoundWindow.close();
+	}
+	
+	@:computed function get_woundFlagLabels():Array<String> {
+		return Wound.getFlagLabels();
+	}
+	@:computed function get_damageTypeLabels():Array<String> {
+		return DamageType.getFlagLabels();
+	}
 
+	function matchExistingSampleWound():Void {
+		var sample:Wound = sampleWound;
+		var wound:Wound = this.char.getWound(sample);
+		sample.pain = wound.pain;
+		sample.BL = wound.BL;
+		sample.stun = wound.stun;
+		
+	}
+	
+	function openAddNewWound():Void {
+		//if (sampleWound == null)
+		sampleWound = Wound.getNewEmptyAssign();
+		forceNewSampleWound = false;
+		_vRefs.addWoundWindow.open();
+	}
 	
 	function exitInventory():Void {
 		
@@ -160,6 +248,11 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		
 	}
 	
+	function loadCharacterClipboardWindow():Void {
+		if (loadCharContents(this.clipboardLoadContents)) {
+			_vRefs.clipboardWindow.close();
+		}
+	}
 	function loadCharContents(contents:String):Bool 
 	{
 		var newItem:Dynamic;
@@ -321,6 +414,10 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	@:watch function watch_injectChar(newVal:CharSheet, oldVal:CharSheet):Void {
 		this.char = newVal;
 	}
+	
+	@:watch function watch_char(newVal:CharSheet):Void {
+		_vData.initNewChar();
+	}
 }
 
 typedef CharSheetVueProps = {
@@ -337,16 +434,23 @@ class CharSheetVueData {
 	var lockBanes:Bool = true;
 	var lockProfs:Bool = true;
 	var lockWealth:Bool = true;
+	var lockArc:Bool = true;
+	var lockWounds:Bool = true;
+	
+	var treeBrowserInited:Bool = false;
 	
 	//  view hide/show
 	var showBnBs:Bool = false;
 	var showEditSkills:Bool = false;
 	
+	// load
+	var clipboardLoadContents:String = "";
+	
 	// save
 	var savedCharContents:String = "";
 	
 	// blah
-	var insideInventory:Bool = false;
+	var insideInventory:Bool;
 	var char:CharSheet;
 	var boonAssignList:Array<BoonAssign>;
 	var baneAssignList:Array<BaneAssign>;
@@ -361,19 +465,46 @@ class CharSheetVueData {
 	var skillSubjects:Array<String>;
 	var skillSubjectsInitial:Dynamic<Bool>;
 	
-	var profCoreListMelee:Array<Int> = [];
-	var profCoreListRanged:Array<Int> = [];
+	var profCoreListMelee:Array<Int>;
+	var profCoreListRanged:Array<Int>;
 	
+	// sampleWound
+	var sampleWound:Wound;
+	var forceNewSampleWound:Bool = false;
+	
+	// arc session
+	var sessionArcSpent:Int;
+	var sessionArcAwarded:Int;
+	var loadedArcAccum:Int;
+	var loadedArcSpent:Int;
+	var arcAwardQty:Int = 0;
+	var arcSpendQty:Int = 0;
 	
 	public function new(char:CharSheet = null) {
-		this.char = char == null ? getSampleChar() : char;
+		this.char = char == null ? new CharSheet() : char;
+		// getSampleChar()
+		
+		initNewChar();
+	}
+	
+	public function initNewChar():Void {
+		sampleWound = null;// Wound.getNewEmptyAssign();
+		profCoreListMelee = [];
+		profCoreListRanged = [];
+		sessionArcSpent = 0;
+		sessionArcAwarded = 0;
+		insideInventory = false;
+		loadedArcAccum = char.arcPointsAccum;
+		loadedArcSpent = char.arcSpent;
 		
 		initBoons();
 		initSkills();
 		initProfs();
 	}
+	
 
 	
+	/*
 	function getSampleChar():CharSheet {
 		var s:Unserializer = new Unserializer( VHTMacros.getHTMLStringFromFile("src/troshx/sos/vue/samplechar", "txt") );
 		
@@ -382,6 +513,7 @@ class CharSheetVueData {
 		//c.addBoon( new Ambidextrous().getAssign(1, c) );  // for testing
 		return c;
 	}
+	*/
 	
 	function initProfs():Void {
 		for (i in 0...31) {

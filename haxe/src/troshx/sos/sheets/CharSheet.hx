@@ -8,6 +8,8 @@ import troshx.sos.core.Race;
 import troshx.sos.core.SocialClass;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
+import troshx.sos.sheets.FatiqueTable;
+import troshx.util.LibUtil;
 
 
 import troshx.sos.core.BodyChar;
@@ -418,7 +420,7 @@ class CharSheet implements IBuildListed
 	}
 	
 	public var arcPointsAccum:Int = 0;
-	var arcSpent:Int = 0;
+	public var arcSpent:Int = 0;
 	public var arcPointsAvailable(get, never):Int;
 	
 	//
@@ -435,17 +437,34 @@ class CharSheet implements IBuildListed
 	public var body:BodyChar = BodyChar.getInstance();
 	var wounds:Array<Wound> = [];
 	var woundHash:Dynamic<Wound> = {}; 
+	
+	public static function dynSetField(obj:Dynamic, prop:String, val:Dynamic):Void {
+		LibUtil.setField(obj, prop, val);
+	}
+	
 	public function applyWound(w:Wound):Void {
 		var uid:String = w.uid;
 		if (!Reflect.hasField(woundHash, uid)) {
-			Reflect.setField(woundHash, uid, w);
-			wounds.push(w);
+			dynSetField(woundHash, uid, w);
+			wounds.push(w); 
+			
+			
 		}
 		else { 
-			var fw:Wound = Reflect.field(woundHash, uid);
+			var fw:Wound = LibUtil.field(woundHash, uid);
 			fw.updateAgainst(w);
+		
 		}
 		
+	}
+	
+	public function hasWound(w:Wound):Bool {
+		var uid:String = w.uid;
+		return Reflect.hasField(woundHash, uid);
+	}
+	
+	public inline function getWound(w:Wound):Wound {
+		return LibUtil.field(woundHash, w.uid);
 	}
 	
 	public function removeWound(w:Wound):Void {
@@ -494,16 +513,23 @@ class CharSheet implements IBuildListed
 	
 	function get_totalPain():Int {
 		var c:Int = 0;
+		var gotInfinite:Bool = false;
 		for (i in 0...wounds.length) {
-			c += wounds[i].pain;
+			var w = wounds[i];
+			c += w.isTreated() ? Math.floor(w.pain*.5) : w.pain;
+			
+			if ( w.pain < 0) {
+				gotInfinite = true;
+			}
 		}
-		return c;
+		return gotInfinite ? 999999999 : c;
 	}
 	
 	function get_totalBloodLost():Int {
 		var c:Int = 0;
 		for (i in 0...wounds.length) {
-			c += wounds[i].BL;
+			var w = wounds[i];
+			c += w.gotBloodLost() ? w.BL : 0;
 		}
 		return c;
 	}
@@ -633,7 +659,8 @@ class CharSheet implements IBuildListed
 	
 	function get_arcPointsAvailable():Int 
 	{
-		return arcPointsAccum - arcSpent;
+		var r =  arcPointsAccum - arcSpent;
+		return r >= 0 ? r : 0;
 	}
 	
 	
@@ -673,24 +700,30 @@ class CharSheet implements IBuildListed
 		return encumbranceLvlRow.exhaustion;
 	}
 	
+	public var fatiqueLevel(get, never):Int;
+	function get_fatiqueLevel():Int 
+	{
+		var hlt:Int = HLT;
+		hlt = hlt < 0 ? 0 : hlt;
+		return FatiqueTable.getFatiqueLevel(fatique, hlt);
+	}
 	
-	// todo: for game charsheet only
 	public var fatiqueSkillPenalty(get, never):Int;
 	inline function get_fatiqueSkillPenalty():Int 
 	{
-		return 0;
+		return FatiqueTable.getTable()[fatiqueLevel].skill;
 	}
 	
 	public var fatiqueMobPenalty(get, never):Int;
 	inline function get_fatiqueMobPenalty():Int 
 	{
-		return 0;
+		return FatiqueTable.getTable()[fatiqueLevel].mob;
 	}
 	
 	public var fatiqueCPPenalty(get, never):Int;
 	inline function get_fatiqueCPPenalty():Int 
 	{
-		return 0;
+		return FatiqueTable.getTable()[fatiqueLevel].cp;
 	}
 	
 

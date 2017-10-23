@@ -212,6 +212,15 @@ class BodyChar
 			arr.push( h.name +  ((f & Armor.WEAK_SPOT) != 0 ? Armor.WEAK_SPOT_SYMBOL : "") + ((f & Armor.HALF) != 0 ? "*" : "") ); 
 		}
 	}
+	
+	public function getHitLocationLabelFromId(id:String):String
+	{
+		var i:Int = LibUtil.field(hitLocationHash, id);
+		if (i != null) {
+			return hitLocations[i].name;
+		}
+		return null;
+	}
 
 	
 }

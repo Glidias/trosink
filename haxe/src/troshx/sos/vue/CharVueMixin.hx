@@ -19,6 +19,8 @@ import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
+import troshx.sos.sheets.FatiqueTable;
+import troshx.sos.sheets.FatiqueTable.FatiqueRow;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 import troshx.util.LibUtil;
 
@@ -72,6 +74,8 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed  function get_cha():Int  { return this.char.cha;  }
 	@:computed  function get_tou():Int   { return this.char.tou;  }
 	
+	@:computed function get_totalPain():Int { return this.char.totalPain;  }
+	@:computed  function get_totalBloodLost():Int   { return this.char.totalBloodLost;  }
 
 	// derived with mods
 	@:computed  function get_ADR():Int {
@@ -267,15 +271,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	{
 		return this.char.meleeCP;
 	}
-		
-	@:computed inline function get_totalPain():Int 
-	{
-		return this.char.totalPain;
-	}
-	@:computed inline function get_totalBloodlost():Int 
-	{
-		return this.char.totalBloodLost;
-	}
+	
 	
 	@:computed inline function get_schoolCP():Int 
 	{
@@ -324,6 +320,30 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 
 	
 	// ALl duplicates from charGenData (factored out), so long as  relavant to regular charsheet.
+	
+	@:computed function get_fatiqueLevel():Int 
+	{
+		return char.fatiqueLevel;
+	}
+	
+	@:computed function get_curFatiqueRow():FatiqueRow { 
+		return FatiqueTable.getTable()[fatiqueLevel];
+	}
+	
+	@:computed inline function get_fatiqueSkillPenalty():Int 
+	{
+		return curFatiqueRow.skill;
+	}
+	
+	@:computed inline function get_fatiqueMobPenalty():Int 
+	{
+		return curFatiqueRow.mob;
+	}
+	
+	@:computed inline function get_fatiqueCPPenalty():Int 
+	{
+		return curFatiqueRow.cp;
+	}
 	
 	@:computed function get_addressedAs():String {
 		

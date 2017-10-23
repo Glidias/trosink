@@ -1,12 +1,76 @@
 <div class="chargen">
 	<br/>
-	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button></h1>
+	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button> <button  v-show="!insideInventory" v-on:click="$refs.clipboardWindow.open()">&#128203;</button></h1>
 	
-	<sweet-modal ref="treeBrowser" :class="{reset:true}" >		
-		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser"  />
+	<sweet-modal ref="treeBrowser" :class="{reset:true}" v-if="treeBrowserInited" >		
+		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" :initialDomain="domainId" />
+	</sweet-modal>
+	
+	<sweet-modal ref="addWoundWindow" >
+		<div v-if="sampleWound!=null">
+			<h3>Add/Apply Wound</h3>
+			<div>Location: 
+			<select v-model="sampleWound.locationId">
+				<option value="" :key=""></option>
+				<option v-for="(li, i) in char.body.hitLocations" :value="li.get_uid()" :key="li.get_uid()">{{li.name}}</option>
+			</select></div>
+			<div>Level: <InputInt :obj="sampleWound" prop="level" :min="0" /></div>
+			<div>Damage Type: 
+			<select v-model.number="sampleWound.damageType" number>
+				<option :value="-1" :key="-1"></option>
+				<option v-for="(label, index) in damageTypeLabels" :key="index" :value="index">{{ label }}</option>
+			</select></div>
+			<div :style="{opacity: (!hasSampleWound ? .5 : 1), 'pointer-events': (!hasSampleWound ? 'none':'auto') }"><label>Force New? <input type="checkbox" v-model="forceNewSampleWound"></input></label></div>
+			<div><button v-on:click="confirmAddWound">Confirm {{ !hasSampleWound || forceNewSampleWound ? 'Add' : 'Re-inflict' }}</button></div>
+			<hr/>
+			<div>-<i>Inflict stats</i>-<button v-show="hasSampleWound" v-on:click="matchExistingSampleWound()">Set Existing</button></div>
+			<div>Stun: <InputInt :obj="sampleWound" prop="stun" :min="-1" /> <i v-show="sampleWound.stun<0">Infinite!</i></div>
+			<div>Pain: <InputInt :obj="sampleWound" prop="pain" :min="-1" /> <i v-show="sampleWound.pain<0">Infinite!</i></div>
+			<div>BloodLost (BL): <InputInt :obj="sampleWound" prop="BL" :min="0" /></div>
+		</div>
+	</sweet-modal>
+	
+	<sweet-modal ref="clipboardWindow" :class="{reset:true}" >		
+		<div>
+			You can manually paste saved text stream into text-area and click on Load Character to open a new character!
+			<div>
+				<textarea ref="savedCharTextArea" character-set="UTF-8" v-model="clipboardLoadContents" style="min-height:60px;"></textarea>	
+			</div>
+			<div><button v-on:click="loadCharacterClipboardWindow()">Load Character</button></div>
+		</div>
 	</sweet-modal>
 	
 	<div class="chargen__body" v-if="char!=null && !insideInventory">
+		
+		<sweet-modal ref="awardArcWindow" v-if="false">
+			<div>
+				<div>
+					How much arc to AWARD?
+				</div>
+				<br/>
+				<div>
+					<InputInt :obj="$data" prop="arcAwardQty" :min="1" />
+				</div>
+				<br/>
+				<button slot="button" v-on:click="awardArc(arcAwardQty)">Award</button>
+			</div>
+		</sweet-modal>
+		
+		<sweet-modal ref="spendArcWindow" v-if="false">
+			<div>
+				<div>
+					How much arc to spend?
+				</div>
+				<br/>
+				<div>
+					<InputInt :obj="$data" prop="arcSpendQty" :min="minArcSpendable" :max="maxArcSpendable" />
+				</div>
+				<br/>
+				<button slot="button" v-on:click="spendArc(arcSpendQty)">Award</button>
+			</div>
+		</sweet-modal>
+			
+			
 		
 		<section class="gen-general" id="gen-general">
 			<div class="gen-col">
@@ -71,11 +135,12 @@
 				
 				<div><i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>
 				<br/>
-				<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
+				<div>Encumbrance Level: <span><b :style="{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
 				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
 				<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>
-				<div>Recovery Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmount!=recoveryRateAmountBase" class="baseshow">({{recoveryRateAmountBase}})</i></div>
-				<div><b>Fatique Points:</b><InputInt :min="0" :obj="char" prop="fatique" /></div>
+				<div>Recovery Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmount!=recoveryRateAmountBase" class="baseshow">({{recoveryRateAmountBase}})</i><a v-show="char.fatique > 0" href="javascript:;" v-on:click="recoverFatique(recoveryRateAmount)">[+]</a></div>
+				<hr/>
+				<div><b>Fatique Points:</b><InputInt :min="0" :obj="char" prop="fatique" /> {{fatiqueLevel}}:<b :style="{fontWeight:fatiqueLevel>=1 ?'bold':'normal'}">{{curFatiqueRow.name}}</b></div>
 				<div><label><input type="checkbox" v-model="char.prone"></input>Prone?</label></div>
 				<hr/>
 				<div><b>Health Lost:</b><InputInt :min="0" :obj="char" prop="healthLoss" /></div>
@@ -85,10 +150,13 @@
 		<hr/>
 				
 		<section class="gen-wounds" id="gen-wounds">
-			<h2>Wounds <span class="valuer"><button>Add New Wound</button></span></h2>
+			<h2>Wounds <span class="valuer"><label>&#128274;</label><input type="checkbox" v-model="lockWounds"></input></span> <span class="valuer"><button v-on:click="openAddNewWound()">Add/Apply Wound</button></span></h2>
+			<ul v-if="char.wounds.length > 0" class="wounds">
+				<li v-for="(li, i) in char.wounds" :key="li.get_uid()">{{li.getDescLabel(char.body, damageTypeLabels)}} <span class="stats"><span><label>Stun:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="stun" /></label><i v-show="li.stun<0">infinite!</i></span> <span><label>Pain:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="pain" /></label><i v-show="li.pain<0">infinite!</i></span> <span><label>BL:<InputInt :readonly="lockWounds" :min="0" prop="BL" :obj="li"  /></label></span> <Bitmask :obj="li" prop="flags" :labels="woundFlagLabels" /> <span><label>Notes:<InputString :min="0" prop="notes" :obj="li" class="notes"  /></label></span> <span><label>Age:<InputNumber :min="0" prop="age" :obj="li"  /></label></span></span></li>
+			</ul>
 			<div>
-				<div>Total Pain: <b>0</b></div>
-				<div>Total Blood Lost: <b>0</b></div>
+				<div>Total Pain: <b>{{totalPain}}</b></div>
+				<div>Total Blood Lost (BL): <b>{{totalBloodLost}}</b></div>
 			</div>
 		</section>
 				
@@ -155,22 +223,22 @@
 			<div class="prof-list">
 				<div class="gen-col">
 					<h5>Melee Profeciencies:</h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots" :readonly="lockProfs" />
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="char.school!=null ? maxMeleeProfSlots : undefined" :readonly="lockProfs" />
 				</div>
 				<div class="gen-col">
 					<h5>Ranged Profeciencies:</h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots" :readonly="lockProfs"  />
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="char.school!=null ? maxRangedProfSlots : undefined" :readonly="lockProfs"  />
 				</div>
 			</div>
 			<div class="manuever-list gen-col">
 				<h5>Superior Manuevers:</h5>
-				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes"  :maxLength="maxSuperiorSlots" :readonly="lockProfs" />
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="superiorManueverNotes"  :maxLength="char.school!=null ? maxSuperiorSlots : undefined" :readonly="lockProfs" />
 				<h5>Mastery Manuever:</h5>
-				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes" :maxLength="maxMasterySlots" :readonly="lockProfs" />
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="masteryManueverNotes" :maxLength="char.school!=null ? maxMasterySlots : undefined" :readonly="lockProfs" />
 			</div>
 			<div class="talent-list gen-col">
 				<h5>Talents:</h5>
-				<ArrayOf of="String" defaultValue="" :obj="char" prop="talentNotes" :maxLength="maxTalentSlots" :readonly="lockProfs" />
+				<ArrayOf of="String" defaultValue="" :obj="char" prop="talentNotes" :maxLength="char.school!=null ? maxTalentSlots : undefined" :readonly="lockProfs" />
 			</div>		
 			<div class="school-benefits gen-col" v-if="char.schoolBonuses != null">
 				<h5>Benefits: <span class="tag" v-for="li in schoolTags" :key="li">{{li}}</span></h5>
@@ -184,6 +252,7 @@
 			
 			<inventory :inventory="char.inventory" :maxWeight="CAR" :injectWeight="inventoryWeight" v-on:loadSheet="loadSheet">	
 				<span slot="titleAfter">&nbsp;&nbsp;<button v-on:click="proceedToInventory">&#10064;</button></span>
+				<span slot="weightAfter"><span><b :style="{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></span>
 			</inventory>
 		</div>
 	
@@ -193,10 +262,10 @@
 	<div class="chargen__footer" v-if="char!=null && !insideInventory">
 			
 		<div class="sect-arc">
-			<h2>Arcs</h2>
-			<div><label>Arc awarded: <b>{{char.arcPointsAccum}}</b></label> <button>Award Arc</button> <span class="awarding"> Revoke Arc Awarded (0) <a href="javascript:;">[x]</a></span></div>
-			<div><label>Arc spent: <b>{{char.arcSpent}}</b></label> <button>Spend Arc</button> <span class="spending"> Revoke Arc Spent: (0) <a href="javascript:;">[x]</a></span></div>
-			
+			<h2>Arcs <span class="valuer"><label>&#128274;</label><input type="checkbox" v-model="lockArc"></input></span></h2>
+			<div><label>Arc awarded: <InputInt :obj="char" :min="0" prop="arcPointsAccum" :readonly="lockArc" /></label></div>
+			<div><label>Arc spent: <InputInt :obj="char" :min="0" prop="arcSpent" :readonly="lockArc" :max="char.arcPointsAccum" /></label></div>
+			<div>Loaded (spent/awarded): <i>{{loadedArcSpent}}</i>/<i>{{loadedArcAccum}}</i></div>
 			<br/>
 			<div><label>Saga:</label><textarea v-model="char.arcSaga" class="notes"></textarea></div>
 			<div><label>Epic:</label><textarea v-model="char.arcEpic" class="notes"></textarea></div>
@@ -215,6 +284,8 @@
 	</div>
 
 	<div ref="inventoryHolder" v-if="char!=null">
-		<inventory-manager v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxWeight="CAR" />	
+		<inventory-manager v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxWeight="CAR">
+			<span slot="weightAfter"><span><b :style="{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></span>
+		</inventory-manager>
 	</div>
 </div>

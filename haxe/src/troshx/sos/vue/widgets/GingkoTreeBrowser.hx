@@ -295,6 +295,9 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 		';
 	}
 	
+	@:computed function get_defaultDomain():String {
+		return initialDomain != null ? initialDomain : troshx.sos.vue.Globals.DOMAIN_INVENTORY;
+	}
 	
 	
 	override function Data():GingkoTreeData 
@@ -340,7 +343,7 @@ typedef GingkoDataType = {
 }
 typedef GingkoTreeProps = {
 	@:prop({required:false, 'default':32})  @:optional var maxLabelLength:Int;
-	@:prop({required:false, 'default':"sos-weapons-and-armour"})  @:optional var defaultDomain:String;
+	@:prop({required:false})  @:optional var initialDomain:String;
 
 	@:prop({required:false}) @:optional var availableTypes:Dynamic<Bool>;
 	@:prop({required:false, 'default':false})  @:optional var locked:Bool;

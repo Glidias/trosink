@@ -18,7 +18,7 @@ public static inline var NAME:String = "InputInt";
 	}
 	
 	override function Template():String {
-		return '<input type="number" :disabled="disabled" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="1"></input>';
+		return '<input type="number" :disabled="disabled" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="1" :readonly="readonly"></input>';
 	}
 }
 

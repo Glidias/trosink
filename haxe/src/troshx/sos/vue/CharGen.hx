@@ -59,6 +59,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	
 	override function Created():Void {
 		_vData.privateInit();
+		untyped CharSheet.dynSetField = Vue.set;
 		untyped CharGenData.dynSetField = Vue.set;
 		untyped CharGenData.dynDeleteField = Vue.delete;
 		untyped CharGenData.dynSetArray = Vue.set;

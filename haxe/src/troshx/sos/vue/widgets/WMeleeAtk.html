@@ -13,10 +13,10 @@
 	<div>
 		<label>Damage Type:</label>
 		<select v-if="!thrusting" number v-model.number="item.damageTypeS">
-			<option v-for="(label, index) in damageTypeLabels" :value="index">{{ label }}</option>
+			<option v-for="(label, index) in damageTypeLabels" :value="index" :key="index">{{ label }}</option>
 		</select>
 		<select v-if="thrusting" number v-model.number="item.damageTypeT">
-			<option v-for="(label, index) in damageTypeLabels" :value="index">{{ label }}</option>
+			<option v-for="(label, index) in damageTypeLabels" :value="index" :key="index">{{ label }}</option>
 		</select>
 	</div>
 	

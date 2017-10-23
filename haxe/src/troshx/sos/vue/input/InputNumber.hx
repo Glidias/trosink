@@ -20,7 +20,7 @@ class InputNumber extends VComponent<NoneT,InputNumberProps>
 	}
 	
 	override function Template():String {
-		return '<input type="number" :disabled="disabled" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="step"></input>';
+		return '<input type="number" :disabled="disabled" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="step" :readonly="readonly"></input>';
 	}
 	
 }

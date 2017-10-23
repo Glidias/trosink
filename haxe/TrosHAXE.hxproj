@@ -12,7 +12,7 @@
     <movie minorVersion="0" />
     <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="Haxe 3.3.0;3.3.0;" />
+    <movie preferredSDK="Haxe 3.4.2;3.4.2;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -23,17 +23,18 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="Main" />
+    <option mainClass="MainSOS" />
     <option enabledebug="False" />
-    <option additional="" />
+    <option additional="-D vue_global&#xA;-D production" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <!-- example: <library name="..." /> -->
+    <library name="haxevx" />
+    <library name="msignal" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Main.hx" />
+    <compile path="src\MainSOS.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
@@ -45,7 +46,7 @@
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
-    <option showHiddenPaths="False" />
+    <option showHiddenPaths="True" />
     <option testMovie="OpenDocument" />
     <option testMovieCommand="bin/index.html" />
   </options>

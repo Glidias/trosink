@@ -10,11 +10,30 @@ body {
 	background-color:#f3f5f6;
 }
 
-textarea.notes {
+textarea.notes, input.notes {
 	font-family:inherit;
 	font-size:inherit;
 }
 
+.chargen ul.wounds > li input {
+	width:40px;
+}
+.chargen ul.wounds > li input[type='checkbox'] {
+	width:auto;
+}
+.chargen ul.wounds > li input.notes {
+	width:130px;
+}
+.chargen ul.wounds > li .stats {
+	margin-left:5px;
+}
+.chargen ul.wounds > li .stats:before {
+	content: ' ... ';
+}
+.chargen ul.wounds > li .stats > * {
+	margin-left:5px;
+	display:inline-block;
+}
 
 td.actions {
 	min-width:105px;
@@ -275,10 +294,11 @@ td.gotbtn.focus > button {
 	cursor:pointer;
 }
 .inventory .tab-list label.selected {
-	background-color:#e3f5f6;
+	background-color:#69f9f9;
 }
 .inventory .tab-list label:hover {
-	background-color:#f9f9f9;
+	background-color:#69f9f9;
+	text-decoration:underline;
 }
 .inventory .tab-list label:last-child {
 	margin-right:0;
@@ -551,11 +571,13 @@ section.gen-bnb .gen-comp-bb.canceled {
 .bb-details h4 {
 	text-decoration:underline;
 }
+
 .chargen .header-liners {
 	font-size:12px;
 	text-decoration:none;
 	font-weight:normal;
 }
+
 .chargen .header-liners > * {
 	display:inline-block;
 	margin-left:10px;

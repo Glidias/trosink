@@ -24,6 +24,10 @@ EReg.prototype = {
 		this.r.s = s;
 		return this.r.m != null;
 	}
+	,split: function(s) {
+		var d = "#__delim__#";
+		return s.replace(this.r,d).split(d);
+	}
 	,__class__: EReg
 };
 var HxOverrides = function() { };
@@ -156,18 +160,41 @@ _$List_ListIterator.prototype = {
 	}
 	,__class__: _$List_ListIterator
 };
-var MainSOSCharGenTest = function() {
+var MainSOS = function() {
 	this.boot = new haxevx_vuex_core_VxBoot();
-	this.boot.startVueWithRootComponent("#app",new troshx_sos_vue_CharGen());
-	haxevx_vuex_core_VxBoot.notifyStarted();
+	var urlSplit = window.location.href.split("#")[0].split("?");
+	var params = haxe_web_Request.getParams();
+	if((__map_reserved["inventories"] != null ? params.getReserved("inventories") : params.h["inventories"]) != null) {
+		troshx_sos_vue_Globals.DOMAIN_INVENTORY = __map_reserved["inventories"] != null ? params.getReserved("inventories") : params.h["inventories"];
+	}
+	if((__map_reserved["characters"] != null ? params.getReserved("characters") : params.h["characters"]) != null) {
+		troshx_sos_vue_Globals.DOMAIN_CHARACTER = __map_reserved["characters"] != null ? params.getReserved("characters") : params.h["characters"];
+	}
+	var url = urlSplit[0];
+	var hash = urlSplit.pop();
+	hash = hash.split("&")[0];
+	if(hash == "chargen") {
+		this.boot.startVueWithRootComponent("#app",new troshx_sos_vue_CharGen());
+		haxevx_vuex_core_VxBoot.notifyStarted();
+	} else if(hash == "charsheet") {
+		this.boot.startVueWithRootComponent("#app",new troshx_sos_vue_CharSheetVue());
+		haxevx_vuex_core_VxBoot.notifyStarted();
+	} else if(hash == "inventory") {
+		this.boot.startVueWithRootComponent("#app",new troshx_sos_vue_InventoryStandalone(new troshx_sos_vue_InventoryManager()));
+		haxevx_vuex_core_VxBoot.notifyStarted();
+	} else {
+		var templateStr = "<div>\r\n\t\t\t\t\t<h1>Song of Swords Utilities</h1>\r\n\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t<li><a href=\"" + url + "?chargen\">Create a Character</a></li>\r\n\t\t\t\t\t\t<li><a href=\"" + url + "?charsheet\">Load a Character</a></li>\r\n\t\t\t\t\t\t<li><a href=\"" + url + "?inventory\">Inventory Manager</a></li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t<h2>General TROSLike Utilities</h2>\r\n\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t<li><a href=\"http://glidias.github.io/Asharena/demos/trosdev/probability.html\" target=\"_blank\">Dice Pool Probability Calculator</a></li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>";
+		var mock = { template : templateStr};
+		this.boot.startVueWithRootComponent("#app",mock);
+	}
 };
-$hxClasses["MainSOSCharGenTest"] = MainSOSCharGenTest;
-MainSOSCharGenTest.__name__ = ["MainSOSCharGenTest"];
-MainSOSCharGenTest.main = function() {
-	new MainSOSCharGenTest();
+$hxClasses["MainSOS"] = MainSOS;
+MainSOS.__name__ = ["MainSOS"];
+MainSOS.main = function() {
+	new MainSOS();
 };
-MainSOSCharGenTest.prototype = {
-	__class__: MainSOSCharGenTest
+MainSOS.prototype = {
+	__class__: MainSOS
 };
 Math.__name__ = ["Math"];
 var Reflect = function() { };
@@ -1508,6 +1535,33 @@ haxe_io_Bytes.fastGet = function(b,pos) {
 haxe_io_Bytes.prototype = {
 	__class__: haxe_io_Bytes
 };
+var haxe_web_Request = function() { };
+$hxClasses["haxe.web.Request"] = haxe_web_Request;
+haxe_web_Request.__name__ = ["haxe","web","Request"];
+haxe_web_Request.getParams = function() {
+	var get = HxOverrides.substr(window.location.search,1,null);
+	var params = new haxe_ds_StringMap();
+	var _g = 0;
+	var _g1 = new EReg("[&;]","g").split(get);
+	while(_g < _g1.length) {
+		var p = _g1[_g];
+		++_g;
+		var pl = p.split("=");
+		if(pl.length < 2) {
+			continue;
+		}
+		var name = pl.shift();
+		var key = decodeURIComponent(name.split("+").join(" "));
+		var s = pl.join("=");
+		var value = decodeURIComponent(s.split("+").join(" "));
+		if(__map_reserved[key] != null) {
+			params.setReserved(key,value);
+		} else {
+			params.h[key] = value;
+		}
+	}
+	return params;
+};
 var haxevx_vuex_core_IBuildListed = function() { };
 $hxClasses["haxevx.vuex.core.IBuildListed"] = haxevx_vuex_core_IBuildListed;
 haxevx_vuex_core_IBuildListed.__name__ = ["haxevx","vuex","core","IBuildListed"];
@@ -2658,8 +2712,8 @@ var troshx_sos_core_BoonBane = function(name,costs) {
 $hxClasses["troshx.sos.core.BoonBane"] = troshx_sos_core_BoonBane;
 troshx_sos_core_BoonBane.__name__ = ["troshx","sos","core","BoonBane"];
 troshx_sos_core_BoonBane.prototype = {
-	isAvailableCharaterCreation: function() {
-		return this.costs != null;
+	isAvailableCharacterCreation: function() {
+		return this.costs != troshx_sos_core_BoonBane.COSTLESS_ARRAY;
 	}
 	,get_uid: function() {
 		return this.name;
@@ -2711,7 +2765,11 @@ $hxClasses["troshx.sos.core.BoonBaneAssign"] = troshx_sos_core_BoonBaneAssign;
 troshx_sos_core_BoonBaneAssign.__name__ = ["troshx","sos","core","BoonBaneAssign"];
 troshx_sos_core_BoonBaneAssign.__interfaces__ = [troshx_core_IUid];
 troshx_sos_core_BoonBaneAssign.prototype = {
-	dontCountCost: function() {
+	freeze: function() {
+	}
+	,unfreezeAll: function() {
+	}
+	,dontCountCost: function() {
 		if(!this._canceled) {
 			return this._forcePermanent;
 		} else {
@@ -3414,6 +3472,7 @@ troshx_sos_bnb_BrainDamage.prototype = $extend(troshx_sos_core_Bane.prototype,{
 });
 var troshx_sos_bnb_BrainDamageAssign = function($char) {
 	this.__hasUIFields__ = true;
+	this.intModifier = troshx_sos_core_StaticModifier.create(6,"Brain Damage",0);
 	this.count2 = 0;
 	this.count1 = 0;
 	troshx_sos_core_BaneAssign.call(this);
@@ -3455,7 +3514,33 @@ troshx_sos_bnb_BrainDamageAssign.prototype = $extend(troshx_sos_core_BaneAssign.
 			add2 = 2;
 		}
 		if(this["char"].ingame) {
-			this["char"].intelligence -= (Math.random() * (indexRank == 0 ? 2 : 5) | 0) + 1;
+			this.intModifier.add -= (Math.random() * (indexRank == 0 ? 2 : 5) | 0) + 1;
+			if(this.intModifier.add != 0 && !this["char"].hasStaticModifier(this.intModifier)) {
+				var _this = this["char"];
+				var modifier = this.intModifier;
+				if(modifier != null) {
+					var t = _this.staticModifierTable[modifier.index];
+					t.push(modifier);
+					var m = modifier.next;
+					while(m != null) {
+						t = _this.staticModifierTable[m.index];
+						t.push(m);
+						m = m.next;
+					}
+				}
+			}
+		}
+		var _this1 = this["char"].banes;
+		var id = this.oldWound.get_uid();
+		var otherOldWounds = Reflect.field(_this1.hash,id);
+		var _this2 = this["char"].banes;
+		var id1 = this.lastingPain.get_uid();
+		var otherLastingPain = Reflect.field(_this2.hash,id1);
+		if(otherOldWounds == this.oldWound) {
+			otherOldWounds = null;
+		}
+		if(otherLastingPain == this.lastingPain) {
+			otherLastingPain = null;
 		}
 		this.baneQueue = [];
 		var rIndex = (Math.random() * 10 | 0) + add2 + 1;
@@ -3476,36 +3561,66 @@ troshx_sos_bnb_BrainDamageAssign.prototype = $extend(troshx_sos_core_BaneAssign.
 			break;
 		case 6:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.badEars,1);
 			break;
 		case 7:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.badEars,2);
 			break;
 		case 8:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			if(this.blind.rank == 0) {
 				this.gainBane(this.oneEyed,1);
 			}
 			break;
 		case 9:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.mute,1);
 			break;
 		case 10:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.lastingPain.inflictRandomMinor(),1);
+			if(otherLastingPain != null) {
+				this.lastingPain.mergeWith(otherLastingPain);
+			}
 			break;
 		case 11:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.lastingPain.inflictRandomMinor(),1);
+			if(otherLastingPain != null) {
+				this.lastingPain.mergeWith(otherLastingPain);
+			}
 			if(this["char"].ingame) {
 				this["char"].intelligence -= 2;
 			}
 			break;
 		case 12:
 			this.gainBane(this.oldWound.inflictRandom(),1);
+			if(otherOldWounds != null) {
+				this.oldWound.mergeWith(otherOldWounds);
+			}
 			this.gainBane(this.lastingPain.inflictRandomMajor(),2);
+			if(otherLastingPain != null) {
+				this.lastingPain.mergeWith(otherLastingPain);
+			}
 			this.gainBane(this.blind,1);
 			break;
 		default:
@@ -3521,7 +3636,7 @@ troshx_sos_bnb_BrainDamageAssign.prototype = $extend(troshx_sos_core_BaneAssign.
 	,__class__: troshx_sos_bnb_BrainDamageAssign
 });
 var troshx_sos_bnb_BrokenLimb = function() {
-	troshx_sos_core_Bane.call(this,"Broken Limb",null);
+	troshx_sos_core_Bane.call(this,"Broken Limb",troshx_sos_core_BoonBane.COSTLESS_ARRAY);
 	this.flags = 2;
 	this.multipleTimes = -2;
 };
@@ -3593,7 +3708,7 @@ troshx_sos_bnb_BrokenLimbMOBModifier.__super__ = troshx_sos_core_SituationalChar
 troshx_sos_bnb_BrokenLimbMOBModifier.prototype = $extend(troshx_sos_core_SituationalCharModifier.prototype,{
 	getModifiedValueMultiply: function($char,base,value) {
 		if((this.current.affectedLimbs & 12) != 0) {
-			var equipedItems = $char.inventory.equipedNonMeleeItems;
+			var equipedItems = $char.inventory.wornArmor;
 			var crutchesHeld = 0;
 			var affected = 0;
 			var leftHanded = $char.leftHanded;
@@ -3604,10 +3719,6 @@ troshx_sos_bnb_BrokenLimbMOBModifier.prototype = $extend(troshx_sos_core_Situati
 			while(_g1 < _g) {
 				var i = _g1++;
 				var entry = equipedItems[i];
-				if((entry.item.flags & 8) != 0) {
-					crutchesHeld |= entry.held;
-					break;
-				}
 			}
 			if(crutchesHeld == 0) {
 				if(value < 1) {
@@ -3760,6 +3871,7 @@ troshx_sos_bnb_DirePastAssign.prototype = $extend(troshx_sos_core_BaneAssign.pro
 			var b = baneAssigns[i];
 			b._minRequired = b.rank;
 			b.discount = b._costCached = b.getCost(b.rank);
+			b.freeze();
 		}
 	}
 	,getUIFields: function() {
@@ -4014,13 +4126,39 @@ troshx_sos_bnb_LastingPainAssign.__name__ = ["troshx","sos","bnb","LastingPainAs
 troshx_sos_bnb_LastingPainAssign.__super__ = troshx_sos_core_BaneAssign;
 troshx_sos_bnb_LastingPainAssign.prototype = $extend(troshx_sos_core_BaneAssign.prototype,{
 	isValidUILocation: function(i) {
-		return (i & this.permaMask) != 0;
+		return (1 << i & this.permaMask) == 0;
 	}
 	,isValidUILocation2: function(i) {
-		return (i & this.permaMask2) != 0;
+		return (1 << i & this.permaMask2) == 0;
 	}
 	,getCost: function(rank) {
 		return this.minorCount() * 4 + this.majorCount() * 8;
+	}
+	,mergeWith: function(other) {
+		this.hitLocationsMajor |= other.hitLocationsMajor;
+		this.hitLocationsMinor |= other.hitLocationsMinor;
+		var msk = this.permaMask;
+		var i = this["char"].body.hitLocations.length;
+		var qty = 0;
+		while(--i > -1) if((1 << i & msk) != 0) {
+			++qty;
+		}
+		var tmp = qty * 4;
+		var msk1 = this.permaMask2;
+		var i1 = this["char"].body.hitLocations.length;
+		var qty1 = 0;
+		while(--i1 > -1) if((1 << i1 & msk1) != 0) {
+			++qty1;
+		}
+		this.discount = tmp + qty1 * 8;
+	}
+	,freeze: function() {
+		this.permaMask |= this.hitLocationsMinor;
+		this.permaMask2 |= this.hitLocationsMajor;
+	}
+	,unfreezeAll: function() {
+		this.permaMask = 0;
+		this.permaMask2 = 0;
 	}
 	,inflictRandomMinor: function() {
 		var i = this["char"].body.hitLocations.length;
@@ -4049,17 +4187,27 @@ troshx_sos_bnb_LastingPainAssign.prototype = $extend(troshx_sos_core_BaneAssign.
 		return this;
 	}
 	,minorCount: function() {
+		var msk = this.hitLocationsMinor;
 		var i = this["char"].body.hitLocations.length;
 		var qty = 0;
-		while(--i > -1) if((1 << i & this.hitLocationsMinor) != 0) {
+		while(--i > -1) if((1 << i & msk) != 0) {
 			++qty;
 		}
 		return qty;
 	}
 	,majorCount: function() {
+		var msk = this.hitLocationsMajor;
 		var i = this["char"].body.hitLocations.length;
 		var qty = 0;
-		while(--i > -1) if((1 << i & this.hitLocationsMajor) != 0) {
+		while(--i > -1) if((1 << i & msk) != 0) {
+			++qty;
+		}
+		return qty;
+	}
+	,countMask: function(msk) {
+		var i = this["char"].body.hitLocations.length;
+		var qty = 0;
+		while(--i > -1) if((1 << i & msk) != 0) {
 			++qty;
 		}
 		return qty;
@@ -4177,7 +4325,13 @@ troshx_sos_bnb_OldWoundAssign.prototype = $extend(troshx_sos_core_BaneAssign.pro
 		return troshx_sos_core_BaneAssign.prototype.getCost.call(this,rank) * this.getQty();
 	}
 	,isValidUILocation: function(i) {
-		return (i & this.permaMask) != 0;
+		return (1 << i & this.permaMask) == 0;
+	}
+	,freeze: function() {
+		this.permaMask |= this.hitLocations;
+	}
+	,unfreezeAll: function() {
+		this.permaMask = 0;
 	}
 	,inflictRandom: function() {
 		var i = this["char"].body.hitLocations.length;
@@ -4192,10 +4346,30 @@ troshx_sos_bnb_OldWoundAssign.prototype = $extend(troshx_sos_core_BaneAssign.pro
 		}
 		return this;
 	}
-	,getQty: function() {
+	,mergeWith: function(other) {
+		this.hitLocations |= other.hitLocations;
+		var tmp = troshx_sos_core_BaneAssign.prototype.getCost.call(this,this.rank);
+		var msk = this.permaMask;
 		var i = this["char"].body.hitLocations.length;
 		var qty = 0;
-		while(--i > -1) if((1 << i & this.hitLocations) != 0) {
+		while(--i > -1) if((1 << i & msk) != 0) {
+			++qty;
+		}
+		this.discount = tmp * qty;
+	}
+	,getQty: function() {
+		var msk = this.hitLocations;
+		var i = this["char"].body.hitLocations.length;
+		var qty = 0;
+		while(--i > -1) if((1 << i & msk) != 0) {
+			++qty;
+		}
+		return qty;
+	}
+	,countMask: function(msk) {
+		var i = this["char"].body.hitLocations.length;
+		var qty = 0;
+		while(--i > -1) if((1 << i & msk) != 0) {
 			++qty;
 		}
 		return qty;
@@ -4377,6 +4551,30 @@ var troshx_sos_chargen_CharGenData = function(charSheet) {
 };
 $hxClasses["troshx.sos.chargen.CharGenData"] = troshx_sos_chargen_CharGenData;
 troshx_sos_chargen_CharGenData.__name__ = ["troshx","sos","chargen","CharGenData"];
+troshx_sos_chargen_CharGenData.getTalentsAvailable = function() {
+	var talentsAvailable = troshx_sos_core_School.getTalentAdds();
+	var accum = talentsAvailable[0];
+	var _g1 = 1;
+	var _g = talentsAvailable.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		accum += talentsAvailable[i];
+		talentsAvailable[i] = accum;
+	}
+	return talentsAvailable;
+};
+troshx_sos_chargen_CharGenData.getSuperiorsAvailable = function() {
+	var superiorsAvailable = troshx_sos_core_School.getSuperiorAdds();
+	var accum = superiorsAvailable[0];
+	var _g1 = 1;
+	var _g = superiorsAvailable.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		accum += superiorsAvailable[i];
+		superiorsAvailable[i] = accum;
+	}
+	return superiorsAvailable;
+};
 troshx_sos_chargen_CharGenData.getNewCharGenCategories = function() {
 	var arr = [];
 	var a = new troshx_sos_chargen_CategoryPCP("Race");
@@ -4446,31 +4644,15 @@ troshx_sos_chargen_CharGenData.prototype = {
 			accum += this.schoolLevelCosts[i];
 			this.schoolLevelCosts[i] = accum;
 		}
-		this.talentsAvailable = troshx_sos_core_School.getTalentAdds();
-		accum = this.talentsAvailable[0];
-		var _g11 = 1;
-		var _g2 = this.talentsAvailable.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			accum += this.talentsAvailable[i1];
-			this.talentsAvailable[i1] = accum;
-		}
-		this.superiorsAvailable = troshx_sos_core_School.getSuperiorAdds();
-		accum = this.superiorsAvailable[0];
-		var _g12 = 1;
-		var _g3 = this.superiorsAvailable.length;
-		while(_g12 < _g3) {
-			var i2 = _g12++;
-			accum += this.superiorsAvailable[i2];
-			this.superiorsAvailable[i2] = accum;
-		}
+		this.talentsAvailable = troshx_sos_chargen_CharGenData.getTalentsAvailable();
+		this.superiorsAvailable = troshx_sos_chargen_CharGenData.getSuperiorsAvailable();
 		this.schoolAssignList = [];
 		var schoolList = troshx_sos_schools_Schools.getList();
-		var _g13 = 0;
-		var _g4 = schoolList.length;
-		while(_g13 < _g4) {
-			var i3 = _g13++;
-			var s = schoolList[i3];
+		var _g11 = 0;
+		var _g2 = schoolList.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var s = schoolList[i1];
 			this.schoolAssignList.push({ school : s, bonuses : s.getSchoolBonuses(this["char"])});
 		}
 	}
@@ -4484,7 +4666,7 @@ troshx_sos_chargen_CharGenData.prototype = {
 		while(_g1 < _g) {
 			var i = _g1++;
 			bb = boonList[i];
-			if(bb.costs != null) {
+			if(bb.costs != troshx_sos_core_BoonBane.COSTLESS_ARRAY) {
 				var ba;
 				var tmp = this.boonAssignList;
 				ba = boonList[i].getAssign(0,this["char"]);
@@ -4499,7 +4681,7 @@ troshx_sos_chargen_CharGenData.prototype = {
 		while(_g11 < _g2) {
 			var i1 = _g11++;
 			bb = baneList[i1];
-			if(bb.costs != null) {
+			if(bb.costs != troshx_sos_core_BoonBane.COSTLESS_ARRAY) {
 				var ba1;
 				var tmp1 = this.baneAssignList;
 				ba1 = baneList[i1].getAssign(0,this["char"]);
@@ -4771,9 +4953,6 @@ troshx_sos_chargen_CharGenData.prototype = {
 		} else {
 			return false;
 		}
-	}
-	,getEmptyWealthAssign: function() {
-		return this["char"].getEmptyWealthAssetAssign(1);
 	}
 	,updateSocialBenefitsToBoon: function(newValue,oldValue) {
 		var b;
@@ -5050,7 +5229,7 @@ troshx_sos_chargen_CharGenData.prototype = {
 	,filterAwayLiquidatedAssets: function(w) {
 		return !w.liquidate;
 	}
-	,saveFinaliseSocial: function() {
+	,saveFinaliseSocial: function(moneyLeft) {
 		if(this.socialClassIndex == this.wealthIndex || this["char"].socialClass.name == "") {
 			this["char"].socialClass.name = this.get_socialClassPlaceHolderName();
 		}
@@ -5060,216 +5239,7 @@ troshx_sos_chargen_CharGenData.prototype = {
 		var a = this.wealthAssets.slice(0,len1);
 		a = a.filter($bind(this,this.filterAwayLiquidatedAssets));
 		this["char"].wealthAssets = a;
-	}
-	,restoreAnyBnBWithMask: function(msk,superMask) {
-		var arr = this.baneAssignList;
-		var arr2 = this.boonAssignList;
-		var restored = false;
-		var restoredBane = null;
-		var restoredBoon = null;
-		msk |= superMask;
-		var _g1 = 0;
-		var _g = arr.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var a = arr[i];
-			if(a._canceled && (a.bane.channels & msk) != 0) {
-				a._canceled = false;
-				if(a.rank > 0 && restoredBane == null) {
-					restoredBane = a;
-				}
-			}
-		}
-		if(restoredBane != null) {
-			msk &= ~(restoredBane.bane.channels | restoredBane.bane.superChannels);
-		}
-		var _g11 = 0;
-		var _g2 = arr2.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var a1 = arr2[i1];
-			if(a1._canceled && (a1.boon.channels & msk) != 0) {
-				a1._canceled = false;
-				if(a1.rank > 0 && restoredBoon == null) {
-					restoredBoon = a1;
-				}
-			}
-		}
-		if(restoredBoon != null) {
-			this.checkBoonAgainstOthers(restoredBoon);
-		} else if(restoredBane != null) {
-			this.checkBaneAgainstOthers(restoredBane);
-		}
-	}
-	,resetBB: function(bba,isBane) {
-		if(isBane) {
-			var bane = bba.getBoonOrBane();
-			var ba;
-			var i = this.baneAssignList.indexOf(bba);
-			ba = bane.getAssign(0,this["char"]);
-			ba._costCached = bane.costs[0];
-			ba._forcePermanent = bba._forcePermanent;
-			ba.discount = bba.discount;
-			ba._minRequired = bba._minRequired;
-			ba._canceled = bba._canceled;
-			troshx_sos_chargen_CharGenData.dynSetArray(this.baneAssignList,i,ba);
-		} else {
-			var boonAssign = bba;
-			var boon = boonAssign.boon;
-			var ba1;
-			var i1 = this.boonAssignList.indexOf(bba);
-			ba1 = boon.getAssign(0,this["char"]);
-			ba1.discount = boonAssign.discount;
-			ba1.rank = bba._minRequired;
-			ba1._remainingCached = this.get_maxBoonsSpendableLeft();
-			ba1._costCached = boon.costs[0];
-			ba1._forcePermanent = bba._forcePermanent;
-			ba1._minRequired = bba._minRequired;
-			ba1._canceled = bba._canceled;
-			troshx_sos_chargen_CharGenData.dynSetArray(this.boonAssignList,i1,ba1);
-			if(ba1.rank > 0) {
-				i1 = this["char"].boons.list.indexOf(boonAssign);
-				var oldBA = this["char"].boons.list[i1];
-				troshx_sos_chargen_CharGenData.dynSetArray(this["char"].boons.list,i1,ba1);
-				this["char"].boonAssignReplaced(ba1,oldBA);
-			}
-		}
-	}
-	,findBaneAssignIndexById: function(id) {
-		var i = this.baneAssignList.length;
-		while(--i > -1) if(this.baneAssignList[i].get_uid() == id) {
-			return i;
-		}
-		return -1;
-	}
-	,assignBrainDamage: function(bba) {
-		var arr = bba.baneQueue;
-		var _g1 = 0;
-		var _g = arr.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var b = arr[i];
-			var ider = b.get_uid();
-			var index = this.findBaneAssignIndexById(ider);
-			if(index >= 0) {
-				troshx_sos_chargen_CharGenData.dynSetArray(this.baneAssignList,index,b);
-				var ci;
-				var existingBane = Reflect.field(this["char"].banes.hash,ider);
-				if(existingBane == null) {
-					this["char"].banes.add(b);
-				} else if(existingBane != b) {
-					ci = this["char"].banes.list.indexOf(existingBane);
-					troshx_sos_chargen_CharGenData.dynSetArray(this["char"].banes.list,ci,b);
-				}
-			} else {
-				throw new js__$Boot_HaxeError("Something went wrong, couldn't find brain damage assign bane: " + b.get_uid());
-			}
-		}
-	}
-	,onBaneCallbackReceived: function(bba) {
-		if(js_Boot.__instanceof(bba,troshx_sos_bnb_BrainDamageAssign)) {
-			this.assignBrainDamage(bba);
-		}
-	}
-	,checkBaneAgainstOthers: function(baneAssign) {
-		var arr = this.baneAssignList;
-		var arr2 = this.boonAssignList;
-		baneAssign._canceled = false;
-		var msk = baneAssign.bane.channels | baneAssign.bane.superChannels;
-		if(msk == 0) {
-			return;
-		}
-		var _g1 = 0;
-		var _g = arr.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var a = arr[i];
-			if(a != baneAssign && (a.bane.channels & msk) != 0) {
-				a._canceled = true;
-			}
-		}
-		var _g11 = 0;
-		var _g2 = arr2.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var a1 = arr2[i1];
-			if((a1.boon.channels & msk) != 0) {
-				a1._canceled = true;
-			}
-		}
-	}
-	,checkBoonAgainstOthers: function(boonAssign) {
-		var arr = this.baneAssignList;
-		var arr2 = this.boonAssignList;
-		boonAssign._canceled = false;
-		var msk = boonAssign.boon.channels | boonAssign.boon.superChannels;
-		if(msk == 0) {
-			return;
-		}
-		var _g1 = 0;
-		var _g = arr.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var a = arr[i];
-			if((a.bane.channels & msk) != 0) {
-				a._canceled = true;
-			}
-		}
-		var _g11 = 0;
-		var _g2 = arr2.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var a1 = arr2[i1];
-			if(a1 != boonAssign && (a1.boon.channels & msk) != 0) {
-				a1._canceled = true;
-			}
-		}
-	}
-	,uncancel: function(bba,isBane) {
-		bba._canceled = false;
-		if(isBane) {
-			this.checkBaneAgainstOthers(bba);
-		} else {
-			this.checkBoonAgainstOthers(bba);
-		}
-	}
-	,addBB: function(bba,isBane) {
-		if(isBane) {
-			this["char"].banes.add(bba);
-			this.checkBaneAgainstOthers(bba);
-		} else {
-			this["char"].boons.add(bba);
-			this.checkBoonAgainstOthers(bba);
-		}
-	}
-	,removeBB: function(bba,isBane) {
-		if(isBane) {
-			var b = bba;
-			this["char"].banes["delete"](b);
-			if((b.bane.channels | b.bane.superChannels) != 0) {
-				this.restoreAnyBnBWithMask(b.bane.channels,b.bane.superChannels);
-			}
-		} else {
-			var b1 = bba;
-			this["char"].boons["delete"](b1);
-			if((b1.boon.channels | b1.boon.superChannels) != 0) {
-				this.restoreAnyBnBWithMask(b1.boon.channels,b1.boon.superChannels);
-			}
-		}
-	}
-	,updateRankBB: function(bba,isBane,newValue,oldValue) {
-		if(isBane) {
-			this["char"].baneRankUpdated(bba,newValue,oldValue);
-		} else {
-			this["char"].boonRankUpdated(bba,newValue,oldValue);
-		}
-	}
-	,updateCanceledBB: function(bba,isBane,newValue,oldValue) {
-		if(isBane) {
-			this["char"].baneRankCanceledChange(bba,newValue,oldValue);
-		} else {
-			this["char"].boonRankCanceledChange(bba,newValue,oldValue);
-		}
+		this["char"].money.matchWith(moneyLeft);
 	}
 	,get_categoryBnB: function() {
 		return this.categories[2];
@@ -5600,13 +5570,6 @@ troshx_sos_chargen_CharGenData.prototype = {
 			return 0;
 		}
 	}
-	,get_schoolTags: function() {
-		if(this["char"].school != null && this["char"].schoolBonuses != null) {
-			return this["char"].schoolBonuses.getTags();
-		} else {
-			return [];
-		}
-	}
 	,get_ProfPoints: function() {
 		return (this.categories[5].pcp - 1) * 3;
 	}
@@ -5753,12 +5716,6 @@ troshx_sos_chargen_CharGenData.prototype = {
 	,get_profPointsLeft: function() {
 		return (this.categories[5].pcp - 1) * 3 - this.get_totalProfecienciesBought() * ((this["char"].race != null ? this["char"].race.name : "") == "Human" ? 0 : 3) - (this["char"].school != null ? this["char"].school.costArc : 0) - (this["char"].school != null && this["char"].schoolLevel > 0 ? this.schoolLevelCosts[this["char"].schoolLevel - 1] : 0);
 	}
-	,get_profCoreMeleeListNames: function() {
-		return troshx_sos_core_Profeciency.getLabelsOfArrayProfs(troshx_sos_core_Profeciency.getCoreMelee(),2147483647);
-	}
-	,get_profCoreRangedListNames: function() {
-		return troshx_sos_core_Profeciency.getLabelsOfArrayProfs(troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged(),2147483647);
-	}
 	,get_traceProfCoreRangedCurrent: function() {
 		return troshx_sos_core_Profeciency.getLabelsOfArrayProfs(troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged(),this["char"].profsRanged);
 	}
@@ -5783,8 +5740,8 @@ troshx_sos_chargen_CharGenData.prototype = {
 		var tmp5 = this.get_maxTalentSlots();
 		this["char"].talentNotes = tmp4.slice(0,tmp5);
 	}
-	,saveFinaliseCleanupChar: function() {
-		this.saveFinaliseSocial();
+	,saveFinaliseCleanupChar: function(moneyLeft) {
+		this.saveFinaliseSocial(moneyLeft);
 		this.saveFinaliseSchoolProfs();
 		this.saveFinaliseSkillsFromPackets();
 		this["char"].boons.filter(function(bb) {
@@ -5817,6 +5774,7 @@ troshx_sos_chargen_CharGenData.prototype = {
 			var i3 = _g13++;
 			this["char"].banes.list[i3].cleanup();
 		}
+		this["char"].inventory.cleanupBeforeSerialize();
 		if((this["char"].race != null ? this["char"].race.name : "") != "Human") {
 			this["char"].arcFlaw = "";
 		}
@@ -6156,7 +6114,7 @@ troshx_sos_core_Item.prototype = {
 			arr.push("Eye-Corrective");
 		}
 		if((this.flags & 8) != 0) {
-			arr.push("Crutch");
+			arr.push("Prosthetic");
 		}
 	}
 	,getTypeLabel: function() {
@@ -7034,6 +6992,13 @@ troshx_sos_core_BodyChar.prototype = {
 			arr.push(h.name + ((f1 & 1) != 0 ? "ϕ" : "") + ((f1 & 2) != 0 ? "*" : ""));
 		}
 	}
+	,getHitLocationLabelFromId: function(id) {
+		var i = this.hitLocationHash[id];
+		if(i != null) {
+			return this.hitLocations[i].name;
+		}
+		return null;
+	}
 	,__class__: troshx_sos_core_BodyChar
 };
 var troshx_sos_core_IBodyHitZones = function() { };
@@ -7563,6 +7528,7 @@ troshx_sos_core_Money.prototype = {
 	,__class__: troshx_sos_core_Money
 };
 var troshx_sos_core_Inventory = function() {
+	this.version = 2;
 	this.shieldPosition = 0;
 	this.weapons = [];
 	this.shields = [];
@@ -7650,9 +7616,59 @@ troshx_sos_core_Inventory.prototype = {
 	,dispatchSignal: function(signal) {
 		(this.signaler != null ? this.signaler : this.signaler = this.createSignaler()).dispatch(signal);
 	}
-	,hxSerialize: function(s) {
-		this.setSignaler(null);
-		s.serialize(this);
+	,findOffHandItem: function() {
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.weapons[i].held == 2) {
+				return this.weapons[i].weapon;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.shields.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			if(this.shields[i1].held == 2) {
+				return this.shields[i1].shield;
+			}
+		}
+		var _g12 = 0;
+		var _g3 = this.equipedNonMeleeItems.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			if(this.equipedNonMeleeItems[i2].held == 2) {
+				return this.equipedNonMeleeItems[i2].item;
+			}
+		}
+		return null;
+	}
+	,findMasterHandItem: function() {
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if((this.weapons[i].held & 1) != 0) {
+				return this.weapons[i].weapon;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.shields.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			if((this.shields[i1].held & 1) != 0) {
+				return this.shields[i1].shield;
+			}
+		}
+		var _g12 = 0;
+		var _g3 = this.equipedNonMeleeItems.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			if((this.equipedNonMeleeItems[i2].held & 1) != 0) {
+				return this.equipedNonMeleeItems[i2].item;
+			}
+		}
+		return null;
 	}
 	,getOffhandWeapon: function() {
 		var _g1 = 0;
@@ -7860,6 +7876,16 @@ troshx_sos_core_Inventory.prototype = {
 		this._unholdAllItems(held,Object.prototype.hasOwnProperty.call(alreadyEquiped,"shield"));
 		alreadyEquiped.held = held;
 		this.dispatchSignal(troshx_sos_core_InventorySignal.HoldItem);
+	}
+	,getPerceptionPenalty: function() {
+		var val = 0;
+		var _g1 = 0;
+		var _g = this.wornArmor.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			val += this.wornArmor[i].armor.pp;
+		}
+		return val;
 	}
 	,calculateTotalWeight: function(forceIncludePacked,forceIncludeDropped) {
 		if(forceIncludeDropped == null) {
@@ -8244,6 +8270,74 @@ troshx_sos_core_Inventory.prototype = {
 		} else {
 			return this.equipedNonMeleeItems;
 		}
+	}
+	,cleanupBeforeSerialize: function() {
+		this.setSignaler(null);
+	}
+	,postSerialization: function() {
+		this.postSerialize_2();
+	}
+	,postSerialize_2: function() {
+		if(this.version == null || this.version < 2) {
+			this.version = 2;
+		} else {
+			return false;
+		}
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.weapons[i].weapon.burdinadin == null) {
+				this.weapons[i].weapon.burdinadin = null;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.wornArmor.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			if(this.wornArmor[i1].armor.burdinadin == null) {
+				this.wornArmor[i1].armor.burdinadin = null;
+			}
+		}
+		var armor;
+		var weap;
+		var _g12 = 0;
+		var _g3 = this.dropped.list.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			var item = this.dropped.list[i2].item;
+			armor = js_Boot.__instanceof(item,troshx_sos_core_Armor) ? item : null;
+			weap = js_Boot.__instanceof(item,troshx_sos_core_Weapon) ? item : null;
+			if(armor != null) {
+				if(armor.burdinadin == null) {
+					armor.burdinadin = null;
+				}
+			}
+			if(weap != null) {
+				if(weap.burdinadin == null) {
+					weap.burdinadin = null;
+				}
+			}
+		}
+		var _g13 = 0;
+		var _g4 = this.packed.list.length;
+		while(_g13 < _g4) {
+			var i3 = _g13++;
+			var item1 = this.packed.list[i3].item;
+			armor = js_Boot.__instanceof(item1,troshx_sos_core_Armor) ? item1 : null;
+			weap = js_Boot.__instanceof(item1,troshx_sos_core_Weapon) ? item1 : null;
+			if(armor != null) {
+				if(armor.burdinadin == null) {
+					armor.burdinadin = null;
+				}
+			}
+			if(weap != null) {
+				if(weap.burdinadin == null) {
+					weap.burdinadin = null;
+				}
+			}
+		}
+		return true;
 	}
 	,__class__: troshx_sos_core_Inventory
 };
@@ -8955,6 +9049,16 @@ troshx_sos_core_SkillTable.prototype = {
 	,setSkill: function(name,attribs) {
 		this.skillHash[name] = attribs;
 	}
+	,matchValuesWith: function(other) {
+		var _g = 0;
+		var _g1 = Reflect.fields(other.skillHash);
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			var result = other.skillHash[f];
+			this.skillHash[f] = result;
+		}
+	}
 	,addSpecialisationTo: function(skillName,special,specialAttribs) {
 		if(specialAttribs == null) {
 			specialAttribs = 0;
@@ -8969,6 +9073,20 @@ troshx_sos_core_SkillTable.prototype = {
 	}
 	,removeSkill: function(name) {
 		return Reflect.deleteField(this.skillHash,name);
+	}
+	,getSubjects: function() {
+		var arr = [];
+		var _g = 0;
+		var _g1 = Reflect.fields(this.skillHash);
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			var sub = troshx_sos_core_Skill.getSplitFromSpecialisation(f);
+			if(sub != null) {
+				arr.push(sub[1]);
+			}
+		}
+		return arr;
 	}
 	,__class__: troshx_sos_core_SkillTable
 };
@@ -9127,7 +9245,9 @@ troshx_sos_core_CustomMelee.prototype = {
 	,__class__: troshx_sos_core_CustomMelee
 };
 var troshx_sos_core_Wound = function(locationId,level,damageType) {
-	this.treated = false;
+	this.age = 0;
+	this.uidSuffix = "";
+	this.flags = 0;
 	this.BL = 0;
 	this.pain = 0;
 	this.stun = 0;
@@ -9140,6 +9260,24 @@ var troshx_sos_core_Wound = function(locationId,level,damageType) {
 $hxClasses["troshx.sos.core.Wound"] = troshx_sos_core_Wound;
 troshx_sos_core_Wound.__name__ = ["troshx","sos","core","Wound"];
 troshx_sos_core_Wound.__interfaces__ = [troshx_ds_IUpdateWith,troshx_core_IUid];
+troshx_sos_core_Wound.getNewFlagLabels = function() {
+	var arr = [];
+	arr.push("Staunched");
+	arr.push("Treated");
+	return arr;
+};
+troshx_sos_core_Wound.getFlagLabels = function() {
+	if(troshx_sos_core_Wound.FLAG_LABELS != null) {
+		return troshx_sos_core_Wound.FLAG_LABELS;
+	} else {
+		return troshx_sos_core_Wound.FLAG_LABELS = troshx_sos_core_Wound.getNewFlagLabels();
+	}
+};
+troshx_sos_core_Wound.getNewEmptyAssign = function() {
+	var w = new troshx_sos_core_Wound("",0,0);
+	w.notes = "";
+	return w;
+};
 troshx_sos_core_Wound.prototype = {
 	isNullified: function() {
 		if(this.stun == 0 && this.pain == 0) {
@@ -9147,6 +9285,10 @@ troshx_sos_core_Wound.prototype = {
 		} else {
 			return false;
 		}
+	}
+	,getDescLabel: function(body,damageTypeLabels) {
+		var dmgLabel = this.damageType >= 0 && this.damageType < damageTypeLabels.length ? " " + damageTypeLabels[this.damageType] : "";
+		return "Level " + this.level + dmgLabel + " wound" + (this.locationId != "" ? " on the " + body.getHitLocationLabelFromId(this.locationId) : "");
 	}
 	,updateAgainst: function(ref) {
 		if(ref.stun > this.stun) {
@@ -9158,23 +9300,24 @@ troshx_sos_core_Wound.prototype = {
 		if(ref.BL > this.BL) {
 			this.BL = ref.BL;
 		}
-		ref.treated = false;
+		this.flags &= -4;
+		this.age = 0;
 	}
 	,spliceAgainst: function(ref) {
-		if(ref.stun < this.stun) {
-			this.stun = ref.stun;
-		}
-		if(ref.pain < this.pain) {
-			this.pain = ref.pain;
-		}
-		if(ref.BL < this.BL) {
-			this.BL = ref.BL;
-		}
-		ref.treated = true;
+		this.updateAgainst(ref);
 		return -1;
 	}
+	,makeUnique: function() {
+		this.uidSuffix = "^" + troshx_sos_core_Wound.UNIQUE_COUNT;
+	}
+	,isTreated: function() {
+		return (this.flags & 2) != 0;
+	}
+	,gotBloodLost: function() {
+		return (this.flags & 3) == 0;
+	}
 	,get_uid: function() {
-		return this.locationId + "_" + this.level + "_" + (this.damageType >= 0 ? this.damageType : troshx_sos_core_Wound.UNIQUE_COUNT++);
+		return this.locationId + "_" + this.level + "_" + this.damageType + this.uidSuffix;
 	}
 	,__class__: troshx_sos_core_Wound
 };
@@ -9206,27 +9349,6 @@ troshx_sos_events_SOSEvent.MELEE_BOUT_RESOLVE.toString = $estr;
 troshx_sos_events_SOSEvent.MELEE_BOUT_RESOLVE.__enum__ = troshx_sos_events_SOSEvent;
 troshx_sos_events_SOSEvent.CHALLENGE_INIT = function(attributes,skills,challenge) { var $x = ["CHALLENGE_INIT",9,attributes,skills,challenge]; $x.__enum__ = troshx_sos_events_SOSEvent; $x.toString = $estr; return $x; };
 troshx_sos_events_SOSEvent.CHALLENGE_EXECUTE = function($char,attributes,skills,challenge) { var $x = ["CHALLENGE_EXECUTE",10,$char,attributes,skills,challenge]; $x.__enum__ = troshx_sos_events_SOSEvent; $x.toString = $estr; return $x; };
-var troshx_sos_events_SOSNotification = $hxClasses["troshx.sos.events.SOSNotification"] = { __ename__ : ["troshx","sos","events","SOSNotification"], __constructs__ : ["BOON_TRIGGERED","BANE_TRIGGERED","BANE_REMOVED","BANE_ADDED","BOON_REMOVED","BOON_ADDED","HIT_TARGET_RESOLVED","MELEE_EXCHANGE_RESOLVED","MELEE_ROUND_RESOLVED","CHALLENGE_RESOLVED","SKIRMISH_PHASE_RESOLVED","SKIRMISH_ROUND_RESOLVED"] };
-troshx_sos_events_SOSNotification.BOON_TRIGGERED = function(boon) { var $x = ["BOON_TRIGGERED",0,boon]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.BANE_TRIGGERED = function(bane) { var $x = ["BANE_TRIGGERED",1,bane]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.BANE_REMOVED = function(bane) { var $x = ["BANE_REMOVED",2,bane]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.BANE_ADDED = function(bane) { var $x = ["BANE_ADDED",3,bane]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.BOON_REMOVED = function(boon) { var $x = ["BOON_REMOVED",4,boon]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.BOON_ADDED = function(boon) { var $x = ["BOON_ADDED",5,boon]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.HIT_TARGET_RESOLVED = function(from,target) { var $x = ["HIT_TARGET_RESOLVED",6,from,target]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.MELEE_EXCHANGE_RESOLVED = ["MELEE_EXCHANGE_RESOLVED",7];
-troshx_sos_events_SOSNotification.MELEE_EXCHANGE_RESOLVED.toString = $estr;
-troshx_sos_events_SOSNotification.MELEE_EXCHANGE_RESOLVED.__enum__ = troshx_sos_events_SOSNotification;
-troshx_sos_events_SOSNotification.MELEE_ROUND_RESOLVED = ["MELEE_ROUND_RESOLVED",8];
-troshx_sos_events_SOSNotification.MELEE_ROUND_RESOLVED.toString = $estr;
-troshx_sos_events_SOSNotification.MELEE_ROUND_RESOLVED.__enum__ = troshx_sos_events_SOSNotification;
-troshx_sos_events_SOSNotification.CHALLENGE_RESOLVED = function(attributes,skills,challenge) { var $x = ["CHALLENGE_RESOLVED",9,attributes,skills,challenge]; $x.__enum__ = troshx_sos_events_SOSNotification; $x.toString = $estr; return $x; };
-troshx_sos_events_SOSNotification.SKIRMISH_PHASE_RESOLVED = ["SKIRMISH_PHASE_RESOLVED",10];
-troshx_sos_events_SOSNotification.SKIRMISH_PHASE_RESOLVED.toString = $estr;
-troshx_sos_events_SOSNotification.SKIRMISH_PHASE_RESOLVED.__enum__ = troshx_sos_events_SOSNotification;
-troshx_sos_events_SOSNotification.SKIRMISH_ROUND_RESOLVED = ["SKIRMISH_ROUND_RESOLVED",11];
-troshx_sos_events_SOSNotification.SKIRMISH_ROUND_RESOLVED.toString = $estr;
-troshx_sos_events_SOSNotification.SKIRMISH_ROUND_RESOLVED.__enum__ = troshx_sos_events_SOSNotification;
 var troshx_sos_macro_MacroUtil = function() { };
 $hxClasses["troshx.sos.macro.MacroUtil"] = troshx_sos_macro_MacroUtil;
 troshx_sos_macro_MacroUtil.__name__ = ["troshx","sos","macro","MacroUtil"];
@@ -9367,8 +9489,7 @@ troshx_sos_races_DessianSilverGuard.prototype = $extend(troshx_sos_core_Race.pro
 	__class__: troshx_sos_races_DessianSilverGuard
 });
 var troshx_sos_schools_EsotericSchool = function() {
-	troshx_sos_core_School.call(this,"Esoteric School",3,5);
-	this.costMoney = troshx_sos_core_Money.create(15,0,0);
+	troshx_sos_core_School.call(this,"Esoteric School",4,8);
 };
 $hxClasses["troshx.sos.schools.EsotericSchool"] = troshx_sos_schools_EsotericSchool;
 troshx_sos_schools_EsotericSchool.__name__ = ["troshx","sos","schools","EsotericSchool"];
@@ -9639,6 +9760,9 @@ var troshx_sos_sheets_CharSheet = function() {
 	this.schoolBonuses = null;
 	this.school = null;
 	this.gritAccum = 0;
+	this.prone = false;
+	this.healthLoss = 0;
+	this.version = 2;
 	this.perception = 1;
 	this.intelligence = 1;
 	this.wit = 1;
@@ -9670,6 +9794,9 @@ troshx_sos_sheets_CharSheet.getTotalLiquidity = function(wealthAssets,customLen)
 		c += w.liquidate ? w.worth * 6 : 0;
 	}
 	return c;
+};
+troshx_sos_sheets_CharSheet.dynSetField = function(obj,prop,val) {
+	obj[prop] = val;
 };
 troshx_sos_sheets_CharSheet.prototype = {
 	get_uid: function() {
@@ -9737,6 +9864,27 @@ troshx_sos_sheets_CharSheet.prototype = {
 			return "Female";
 		}
 	}
+	,postSerialization: function() {
+		this.postSerialize_2();
+	}
+	,postSerialize_2: function() {
+		if(this.version == null || this.version < 2) {
+			this.version = 2;
+		} else {
+			return false;
+		}
+		if(!this.ingame) {
+			this.ingame = true;
+		}
+		if(this.healthLoss == null) {
+			this.healthLoss = 0;
+		}
+		if(this.prone == null) {
+			this.prone = false;
+		}
+		this.inventory.postSerialization();
+		return true;
+	}
 	,get_STR: function() {
 		return this.clampIntZero(this.getModifiedValue(0,this.strength));
 	}
@@ -9747,7 +9895,7 @@ troshx_sos_sheets_CharSheet.prototype = {
 		return this.clampIntZero(this.getModifiedValue(2,this.endurance));
 	}
 	,get_HLT: function() {
-		return this.clampIntZero(this.getModifiedValue(3,this.health));
+		return Math.floor(this.getModifiedValue(3,this.health)) - this.healthLoss;
 	}
 	,get_WIP: function() {
 		return this.clampIntZero(this.getModifiedValue(4,this.willpower));
@@ -10239,21 +10387,28 @@ troshx_sos_sheets_CharSheet.prototype = {
 		return this.inventory.calculateTotalWeight();
 	}
 	,applyWound: function(w) {
-		var uid = w.locationId + "_" + w.level + "_" + (w.damageType >= 0 ? w.damageType : troshx_sos_core_Wound.UNIQUE_COUNT++);
+		var uid = w.locationId + "_" + w.level + "_" + w.damageType + w.uidSuffix;
 		if(!Object.prototype.hasOwnProperty.call(this.woundHash,uid)) {
-			this.woundHash[uid] = w;
+			troshx_sos_sheets_CharSheet.dynSetField(this.woundHash,uid,w);
 			this.wounds.push(w);
 		} else {
-			var fw = Reflect.field(this.woundHash,uid);
+			var fw = this.woundHash[uid];
 			fw.updateAgainst(w);
 		}
 	}
+	,hasWound: function(w) {
+		var uid = w.locationId + "_" + w.level + "_" + w.damageType + w.uidSuffix;
+		return Object.prototype.hasOwnProperty.call(this.woundHash,uid);
+	}
+	,getWound: function(w) {
+		return this.woundHash[w.locationId + "_" + w.level + "_" + w.damageType + w.uidSuffix];
+	}
 	,removeWound: function(w) {
-		var uid = w.locationId + "_" + w.level + "_" + (w.damageType >= 0 ? w.damageType : troshx_sos_core_Wound.UNIQUE_COUNT++);
+		var uid = w.locationId + "_" + w.level + "_" + w.damageType + w.uidSuffix;
 		if(Object.prototype.hasOwnProperty.call(this.woundHash,uid)) {
 			Reflect.deleteField(this.woundHash,uid);
 		} else {
-			console.log("Warning: No wound found to be removed for uid:" + (w.locationId + "_" + w.level + "_" + (w.damageType >= 0 ? w.damageType : troshx_sos_core_Wound.UNIQUE_COUNT++)));
+			console.log("Warning: No wound found to be removed for uid:" + (w.locationId + "_" + w.level + "_" + w.damageType + w.uidSuffix));
 		}
 		var index = this.wounds.indexOf(w);
 		if(index >= 0) {
@@ -10270,13 +10425,22 @@ troshx_sos_sheets_CharSheet.prototype = {
 	}
 	,get_totalPain: function() {
 		var c = 0;
+		var gotInfinite = false;
 		var _g1 = 0;
 		var _g = this.wounds.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			c += this.wounds[i].pain;
+			var w = this.wounds[i];
+			c += (w.flags & 2) != 0 ? Math.floor(w.pain * .5) : w.pain;
+			if(w.pain < 0) {
+				gotInfinite = true;
+			}
 		}
-		return c;
+		if(gotInfinite) {
+			return 999999999;
+		} else {
+			return c;
+		}
 	}
 	,get_totalBloodLost: function() {
 		var c = 0;
@@ -10284,7 +10448,8 @@ troshx_sos_sheets_CharSheet.prototype = {
 		var _g = this.wounds.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			c += this.wounds[i].BL;
+			var w = this.wounds[i];
+			c += (w.flags & 3) == 0 ? w.BL : 0;
 		}
 		return c;
 	}
@@ -10308,7 +10473,7 @@ troshx_sos_sheets_CharSheet.prototype = {
 	}
 	,get_MOB: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.mobMult * this.clampIntZero(this.getModifiedValue(9,(this.strength + this.agility + this.endurance) / 2 | 0) + row.mob);
+		return row.mobMult * this.clampIntZero(this.getModifiedValue(9,(this.strength + this.agility + this.endurance) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].mob);
 	}
 	,get_CAR: function() {
 		return this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance))));
@@ -10333,6 +10498,12 @@ troshx_sos_sheets_CharSheet.prototype = {
 			return r;
 		}
 	}
+	,hasStaticModifier: function(mod) {
+		return this.staticModifierTable[mod.index].indexOf(mod) >= 0;
+	}
+	,hasSituationalCharModifier: function(mod) {
+		return this.situationalModifierTable[mod.index].indexOf(mod) >= 0;
+	}
 	,get_TOU: function() {
 		return this.clampIntZero(this.getModifiedValue(12,4));
 	}
@@ -10353,16 +10524,23 @@ troshx_sos_sheets_CharSheet.prototype = {
 			return "";
 		}
 	}
+	,get_labelSocialClass: function() {
+		if(this.socialClass != null) {
+			return this.socialClass.name;
+		} else {
+			return "";
+		}
+	}
 	,get_baseCP: function() {
 		return (this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0));
 	}
 	,get_CP: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) + row.cp);
+		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp);
 	}
 	,get_meleeCP: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) + row.cp) - this.get_totalPain();
+		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp) - this.get_totalPain();
 	}
 	,get_schoolCP: function() {
 		if(this.schoolLevel >= 1) {
@@ -10372,10 +10550,15 @@ troshx_sos_sheets_CharSheet.prototype = {
 		}
 	}
 	,get_arcPointsAvailable: function() {
-		return this.arcPointsAccum - this.arcSpent;
+		var r = this.arcPointsAccum - this.arcSpent;
+		if(r >= 0) {
+			return r;
+		} else {
+			return 0;
+		}
 	}
 	,get_skillPenalty: function() {
-		return this.get_encumbranceLvlRow().skill;
+		return this.get_encumbranceLvlRow().skill + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].skill;
 	}
 	,get_recoveryRate: function() {
 		return this.clampIntZero(this.get_encumbranceLvlRow().recovery);
@@ -10393,14 +10576,23 @@ troshx_sos_sheets_CharSheet.prototype = {
 	,get_exhaustionRate: function() {
 		return this.get_encumbranceLvlRow().exhaustion;
 	}
+	,get_fatiqueLevel: function() {
+		var hlt = this.get_HLT();
+		if(hlt < 0) {
+			hlt = 0;
+		} else {
+			hlt = hlt;
+		}
+		return troshx_sos_sheets_FatiqueTable.getFatiqueLevel(this.fatique,hlt);
+	}
 	,get_fatiqueSkillPenalty: function() {
-		return 0;
+		return troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].skill;
 	}
 	,get_fatiqueMobPenalty: function() {
-		return 0;
+		return troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].mob;
 	}
 	,get_fatiqueCPPenalty: function() {
-		return 0;
+		return troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp;
 	}
 	,__class__: troshx_sos_sheets_CharSheet
 };
@@ -10417,6 +10609,31 @@ troshx_sos_sheets_EncumbranceTable.getTable = function() {
 troshx_sos_sheets_EncumbranceTable.getNewTable = function() {
 	return [{ name : "Unencumbered", cp : 0, mob : 0, skill : 0, exhaustion : 1, recovery : 1, cpMult : 1, mobMult : 1},{ name : "Light", cp : -1, mob : -2, skill : 1, exhaustion : 1.5, recovery : 1, cpMult : 1, mobMult : 1},{ name : "Medium", cp : -2, mob : -4, skill : 2, exhaustion : 2, recovery : 0.5, cpMult : 1, mobMult : 1},{ name : "Heavy", cp : -3, mob : -6, skill : 3, exhaustion : 3, recovery : 0.25, cpMult : 1, mobMult : 1},{ name : "Overloaded", cp : -4, mob : -8, skill : 4, exhaustion : 3.5, recovery : 0, cpMult : 1, mobMult : 1},{ name : "Beyond Overloaded!", cp : -4, mob : -8, skill : 4, exhaustion : 3.5, recovery : 0, cpMult : 0, mobMult : 0}];
 };
+var troshx_sos_sheets_FatiqueTable = function() { };
+$hxClasses["troshx.sos.sheets.FatiqueTable"] = troshx_sos_sheets_FatiqueTable;
+troshx_sos_sheets_FatiqueTable.__name__ = ["troshx","sos","sheets","FatiqueTable"];
+troshx_sos_sheets_FatiqueTable.getTable = function() {
+	if(troshx_sos_sheets_FatiqueTable.TABLE != null) {
+		return troshx_sos_sheets_FatiqueTable.TABLE;
+	} else {
+		return troshx_sos_sheets_FatiqueTable.TABLE = troshx_sos_sheets_FatiqueTable.getNewTable();
+	}
+};
+troshx_sos_sheets_FatiqueTable.getFatiqueLevel = function(fatique,hlt) {
+	var f = Math.ceil((fatique - 5 - hlt) / 5);
+	if(f >= 0) {
+		if(f < 5) {
+			return f;
+		} else {
+			return 4;
+		}
+	} else {
+		return 0;
+	}
+};
+troshx_sos_sheets_FatiqueTable.getNewTable = function() {
+	return [{ name : "Fresh", cp : 0, mob : 0, skill : 0},{ name : "Winded", cp : -1, mob : -1, skill : -1},{ name : "Tired", cp : -2, mob : -2, skill : -2},{ name : "Very Tired", cp : -4, mob : -4, skill : -4},{ name : "Exhausted", cp : -6, mob : -6, skill : -6}];
+};
 var troshx_sos_vue_CharGen = function() {
 	haxevx_vuex_core_VComponent.call(this);
 	this.mixins = [troshx_sos_vue_CharVueMixin.getSampleInstance()];
@@ -10430,12 +10647,10 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 	}
 	,Created: function() {
 		this.$data.privateInit();
+		troshx_sos_sheets_CharSheet.dynSetField = Vue.set;
 		troshx_sos_chargen_CharGenData.dynSetField = Vue.set;
 		troshx_sos_chargen_CharGenData.dynDeleteField = Vue["delete"];
 		troshx_sos_chargen_CharGenData.dynSetArray = Vue.set;
-	}
-	,get_addressedAs: function() {
-		return this["char"].get_uid();
 	}
 	,watch_maxBoonsSpendableLeft: function(newValue) {
 		var arr = this.boonsArray;
@@ -10691,9 +10906,9 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 				this.$refs.finaliseWarning.open();
 				return;
 			} else {
-				this.$data.saveFinaliseCleanupChar();
-				var savedCharString = this.saveCharToBox();
+				this.$data.saveFinaliseCleanupChar(this.moneyLeft);
 				this["char"].ingame = true;
+				var savedCharString = this.saveCharToBox();
 				if(this.finaliseSaveCallback != null) {
 					this.finaliseSaveCallback(savedCharString);
 				}
@@ -10820,9 +11035,6 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 			window.scroll({ top : htmlElement.offsetTop});
 		});
 	}
-	,getBnBSlug: function(name) {
-		return "bb-detail-" + name.split(" ").join("-").toLowerCase();
-	}
 	,Components: function() {
 		var _m_ = { };
 		_m_["CategoryPCPInput"] = new troshx_sos_vue_inputs_impl_CategoryPCPInput();
@@ -10841,7 +11053,7 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 		return _m_;
 	}
 	,Template: function() {
-		return "<div class=\"chargen\" :class=\"{'in-inventory':insideInventory}\">\r\n\t<h1>Song of Swords: Character Creation</h1>\r\n\t\r\n\t<div class=\"chargen__body\" v-if=\"!insideInventory && !char.ingame\">\r\n\t\t\r\n\t\t<section class=\"gen-general\" id=\"gen-general\">\r\n\t\t\t<div><label>Name:<InputNameLabel :obj=\"char\" prop=\"name\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Title <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"title\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Nickname <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"nickname\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Faction/Assosiation <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"faction\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Gender:</label><select number v-model.number=\"char.gender\"><option :value=\"0\">Male</option><option :value=\"1\">Female</option></select></div>\r\n\t\t\t<div><label>Left-handed?:<input type=\"checkbox\" v-model=\"char.leftHanded\"></input></label></div>\r\n\t\t\t<br/>\r\n\t\t\t<b>{{addressedAs}}</b>\r\n\t\t</section>\r\n\t\t\r\n\t\t<section class=\"gen-campaign-type\">\r\n\t\t\t<h2>Campaign Power</h2>\r\n\t\t\t<div v-for=\"(li, i) in campaignPowerLevels\">\r\n\t\t\t\t<label><input type=\"radio\" name=\"campaign-power\" v-on:click=\"campaignPowLevelIndex=i\" :checked=\"campaignPowLevelIndex == i\">{{li.name}} (<span class=\"num\">{{li.pcp}}</span> PCP Total) (Max <span class=\"num\">{{li.maxCategoryPCP}}</span> PCP per category) </input></label>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\t\r\n\t\t<section class=\"gen-categories\">\r\n\t\t\t<h2>Categories <span class=\"valuer\" :class=\"{'still-have':categoriesRemainingAssignable>0}\">({{ categoriesRemainingAssignable }} remaining PCP)</span> <span class=\"valid\" v-show=\"categoriesRemainingAssignable==0\" style=\"color:green\">Ok!</span></h2>\r\n\t\t\t<div v-for=\"(li, i) in categories\"><label>{{li.name}}: </label><CategoryPCPInput :obj=\"li\" prop=\"pcp\" :magic=\"li.magic\" :remainingAssignable=\"categoriesRemainingAssignable\" :maxPCPPerCategory=\"campaignPowLevel.maxCategoryPCP\" />PCP &nbsp;&nbsp;|{{campaignPowLevel.maxCategoryPCP}}</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t\t\r\n\t\t<!-- for each category -->\r\n\t\t<section class=\"gen-race\" id=\"gen-race\">\r\n\t\t\t<h2>Race <span class=\"valuer\">(Tier {{raceTier}}) </span> <span class=\"valid\" v-show=\"!promptSettleRaceTier\" style=\"color:green\">Ready.</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div v-for=\"(tier, ti) in raceTierTable\" :key=\"ti\">\r\n\t\t\t\t\t<span class=\"index-num\">{{ ti + 1 }}:</span> ({{pcpForTiers[ti]}} PCP)\r\n\t\t\t\t\t<label :class=\"{disabled:ti>=raceTier}\" v-for=\"(race, ri) in tier\"><input type=\"radio\" :disabled=\"ti>=raceTier\" name=\"race\" :checked=\"race.name == selectedRaceName\" v-on:click=\"selectRaceAt(ti, ri)\" :key=\"ri\"></input>{{ race.name }}</label>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div v-show=\"promptSettleRaceTier\"><button style=\"margin-top:10px\"  v-on:click=\"settleRaceTier()\">Finalise Race/Tier!</button> <span class=\"invalid\" style=\"color:red\">&lt;&lt; Click this to confirm.</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\t\r\n\t\t\t\r\n\t\t<section class=\"gen-social-class\"  id=\"gen-social-class\">\r\n\t\t\t<h2>Social Class/Wealth <span class=\"valuer\">({{categorySocialClassWealth.pcp}} PCP assigned)</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div class=\"socialclass-li\">\r\n\t\t\t\t\t<span class=\"index-num\"></span><span class=\"col-social-class\" style=\"text-align:right;\">Sync Wealth?</span><span class=\"col-wealth\"><input type=\"checkbox\" v-model=\"syncSocialWealth\"></input><label v-show=\"!syncSocialWealth\">&#128275;</label><label v-show=\"syncSocialWealth\">&#128274;</label> <label>{{ socialClassIndex == wealthIndex ? \"==\" :  \"!=\"}}</label></span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div v-for=\"(li, i) in socialClassList\" class=\"socialclass-li\">\r\n\t\t\t\t\t<span class=\"index-num\">{{i+1}}:</span> <label class=\"col-social-class\" :class=\"{disabled:socialEitherMaxIndex<i}\"><input type=\"radio\" v-on:click=\"setSocialClassIndex(i)\" name=\"social-class\" :checked=\"socialClassIndex==i\"></input>{{ li.socialClass.name }}</label> <label class=\"col-wealth\" :class=\"{disabled:wealthEitherMaxIndex<i}\"><input type=\"radio\" v-on:click=\"setWealthIndex(i)\" name=\"wealth\" :disabled=\"syncSocialWealth\" :checked=\"wealthIndex==i\"></input>{{ li.socialClass.money.getLabel() }}{{ li.socialClass.wealth!= 0 ? \", [\"+li.socialClass.wealth+\"W]\" : \"\" }}</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div v-show=\"wealthIndex != socialClassIndex\" class=\"custom-label\"><label>Custom Label: <input type=\"text\" :placeholder=\"socialClassPlaceHolderName\" v-model=\"char.socialClass.name\"></input></label></div>\r\n\t\t\t\t<div class=\"social-benefits\">\r\n\t\t\t\t\t<div class=\"social-benefit\"><label>Social Benefit #1: </label><select  v-on:change=\"socialBenefitSelectChangeHandler(1, $event.target.selectedIndex)\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit2.name===li.name || (curSelectedSocialClass.maxBoons >= 3 && socialBenefit3.name===li.name)\" :selected=\"li===socialBenefit1\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t\t<div class=\"social-benefit\"  v-show=\"curSelectedSocialClass.maxBoons>= 2\"><label>Social Benefit #2: </label><select v-on:change=\"socialBenefitSelectChangeHandler(2, $event.target.selectedIndex)\" :disabled=\"curSelectedSocialClass.maxBoons<2\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons>=3 && socialBenefit3.name===li.name)\" :selected=\"li===socialBenefit2\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t\t<div class=\"social-benefit\"  v-show=\"curSelectedSocialClass.maxBoons>=3\"><label>Social Benefit #3: </label><select v-on:change=\"socialBenefitSelectChangeHandler(3, $event.target.selectedIndex)\" :disabled=\"curSelectedSocialClass.maxBoons<3\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons >=2 && socialBenefit2.name===li.name)\" :selected=\"li===socialBenefit3\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modified-wealth-assets\" v-show=\"availableWealthPointsBase!=availableWealthPoints\" :class=\"[availableWealthPoints<availableWealthPointsBase ? 'lower' : 'higher']\">\r\n\t\t\t\t\t<label>Modified Wealth: <b>{{ availableWealthPoints }}W</b></label>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"wealth-assets\" v-show=\"availableWealthPoints > 0\">\r\n\t\t\t\t\t<label>Your Wealth Assets: <span class=\"valuer\" v-show=\"remainingWealthPoints>0\" :class=\"{'still-have':remainingWealthPoints>0}\">({{remainingWealthPoints}}  Wealth Point(s) remaining.)</span></label>\r\n\t\t\t\t\t<ArrayOf of=\"WealthAssetAssign\" :defaultValue=\"getEmptyWealthAssign\" :obj=\"$data\" prop=\"wealthAssets\" :minLength=\"0\" :maxLength=\"maxWealthAssets\" :remainingWealth=\"remainingWealthPoints\" />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\t\t\r\n\t\t\t<div v-show=\"promptSettleSocialTier\"><button style=\"margin-top:10px\"  v-on:click=\"settleSocialTier()\">Finalise Social Class/Wealth!</button> <span class=\"invalid\" style=\"color:red\">&lt;&lt; Click this to confirm. </span><span v-show=\"!syncSocialWealth\">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t\r\n\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-attributes\" id=\"gen-attributes\">\r\n\t\t\t<h2>Attributes <span class=\"valuer\" :class=\"{'still-have':remainingAttributePoints>0 || negativeOrZeroStat}\">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class=\"valuer\">(Available: {{availableAttributePoints}}) </span><span class=\"valid\" v-show=\"remainingAttributePoints==0 && !negativeOrZeroStat\" style=\"color:green\">Ok!</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><label>Strength:</label><AttributeInput :obj=\"char\" prop=\"strength\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"strength != STR\" :class=\"[STR<strength ? 'lower' : 'higher', {'zero-neg':STR<=0} ]\">{{STR}}</span></div>\r\n\t\t\t\t<div><label>Agility:</label><AttributeInput :obj=\"char\" prop=\"agility\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"agility != AGI\" :class=\"[AGI<agility ? 'lower' : 'higher', {'zero-neg':AGI<=0}]\">{{AGI}}</span></div>\r\n\t\t\t\t<div><label>Endurance:</label><AttributeInput :obj=\"char\" prop=\"endurance\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"endurance != END\" :class=\"[END<endurance ? 'lower' : 'higher', {'zero-neg':END<=0}]\">{{END}}</span></div>\r\n\t\t\t\t<div><label>Health:</label><AttributeInput :obj=\"char\" prop=\"health\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"health != HLT\" :class=\"[HLT<health ? 'lower' : 'higher', {'zero-neg':HLT<=0}]\">{{HLT}}</span></div>\r\n\t\t\t\t<div><label>Willpower:</label><AttributeInput :obj=\"char\" prop=\"willpower\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"willpower != WIP\" :class=\"[WIP<willpower ? 'lower' : 'higher', {'zero-neg':WIP<=0}]\">{{WIP}}</span></div>\r\n\t\t\t\t<div><label>Wit:</label><AttributeInput :obj=\"char\" prop=\"wit\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"wit != WIT\" :class=\"[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]\">{{WIT}}</span></div>\r\n\t\t\t\t<div><label>Intelligence:</label><AttributeInput :obj=\"char\" prop=\"intelligence\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"intelligence != INT\" :class=\"[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]\">{{INT}}</span></div>\r\n\t\t\t\t<div><label>Perception:</label><AttributeInput :obj=\"char\" prop=\"perception\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"perception != PER\" :class=\"[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]\">{{PER}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><b>ADR</b> (Adroitness): <span class=\"modified-attribute\" :class=\"[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']\"><b>{{ADR}}</b></span><i v-show=\"adr!=ADR\" class=\"baseshow\">({{adr}})</i></div>\r\n\t\t\t\t<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>\r\n\t\t\t\t<div><b>GRIT</b> (Grit): <span class=\"modified-attribute\" :class=\"[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']\"><b>{{GRIT}}</b></span><i v-show=\"baseGrit!=GRIT\" class=\"baseshow\">({{baseGrit}})</i></div>\r\n\t\t\t\r\n\t\t\t\t<div><b>MOB</b> (Mobility): <span class=\"modified-attribute\" :class=\"[MOB==mob ?'base' : MOB<mob ? 'lower' : 'higher']\"><b>{{MOB}}</b></span><i v-show=\"mob!=MOB\" class=\"baseshow\">({{mob}})</i></div>\r\n\t\t\t\t<div><b>CAR</b> (Carry): <span class=\"modified-attribute\" :class=\"[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']\"><b>{{CAR}}</b></span><i v-show=\"car!=CAR\" class=\"baseshow\">({{car}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><b>CHA</b> (Charisma): <span class=\"modified-attribute\" :class=\"[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']\"><b>{{CHA}}</b></span><i v-show=\"cha!=CHA\" class=\"baseshow\">({{cha}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><i>TOU</i> (Toughness): <span class=\"modified-attribute\" :class=\"[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']\"><b>{{TOU}}</b></span><i v-show=\"tou!=TOU\" class=\"baseshow\">({{tou}})</i></div>\r\n\t\t\t\t\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div class=\"cp\"><b>CP</b> (Melee Combat Pool): <span :class=\"[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]\"><b>{{CP}}</b></span><i v-show=\"CP!=baseCP\" class=\"baseshow\">({{baseCP}})</i></div>\r\n\t\t\t\t<div> <i>CP - Pain(<span v-show=\"totalPain>0\" class=\"got-pain\">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>\r\n\t\t\t\t<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>\r\n\t\t\t\t<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>\r\n\t\t\t\t<div>Recovery Amount: <span class=\"modified-attribute\" :class=\"[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']\"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show=\"recoveryRateAmount!=recoveryRateAmountBase\" class=\"baseshow\">({{recoveryRateAmountBase}})</i></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div><b>Reach</b>: <span class=\"modified-attribute\" :class=\"[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']\"><b>{{reach}}</b></span><i v-show=\"reachBase!=reach\" class=\"baseshow\">({{reachBase}})</i></div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\r\n\t\t<hr/>\r\n\t\t\r\n\t\t\t\r\n\t\t<section class=\"gen-bnb\"  id=\"gen-bnb\">\r\n\t\t\t<h2>Boons &amp; Banes <span class=\"valuer\">(<span class=\"num\">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>\r\n\t\t\t\r\n\t\t\t<span v-show=\"totalBnBScore<0\" class=\"invalid\"><span style=\"color:red\">invalid!</span><i style=\"font-size:13px\">(Need &gt;=0 B&amp;B points!<br/>Assign more PCP to 'Boons &amp; Banes' or buy more Banes to pay off debt!)</i></span>\r\n\t\t\t<span v-show=\"totalBnBScore>=0\" class=\"valid\">\r\n\t\t\t\t<span style=\"color:green\">Ok!</span><br/><span v-show=\"totalBnBScore>0\" style=\"color:#ff4444;font-size:13px\">(but you have additional {{ totalBnBScore }} B&amp;B Points!)</span>\r\n\t\t\t\t<div class=\"opencloselink\"><a href=\"#\" v-show=\"showBnBs\" v-on:click.prevent=\"showBnBs=false\">^ Hide</a><a href=\"#\" v-show=\"!showBnBs\" v-on:click.prevent=\"showBnBs=true\">Open &gt;</a> &nbsp;&nbsp;<a style=\"font-size:12px;float:right\" href=\"#gen-skills\" class=\"jumplink\">Skip to Skills..</a></div>\r\n\t\t\t</span>\r\n\t\t\t\r\n\t\t\t</h2>\r\n\t\t\t<div v-show=\"shouldShowBnBs\">\r\n\t\t\t\t<h3>Choose Boons: -{{ totalBoonExpenditure }}   <span v-show=\"true\" style=\"color:#aaaaaa\">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>\r\n\t\t\t\t<div class=\"boon-tags\">\r\n\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in boonAssignList\" :key=\"i\" :obj=\"li\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\" v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  :remaining=\"maxBoonsSpendableLeft\" v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\r\n\t\t\t\t</div>\t\r\n\t\t\t\t<h3>Choose Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>\r\n\t\t\t\t<div class=\"bane-tags\">\r\n\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in baneAssignList\" :key=\"i\" :obj=\"li\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\"  v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\t\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<br/>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"bb-details\">\r\n\t\t\t\t<h3><span class=\"underline\">Boon(s):</span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined\" :class=\"{canceled:li._canceled}\" v-for=\"li in boonsArray\">{{li.boon.name}}</a></span></h3>\r\n\t\t\t\t<bb-apply v-for=\"(li,i) in boonsArray\" :key=\"li.get_uid()\" :assign=\"li\" :remainingPoints=\"maxBoonsSpendableLeft\" :ingame=\"char.ingame\"></bb-apply>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"bb-details\">\r\n\t\t\t\t\t<h3><span>Bane(s):</span><span class=\"header-liners\"></span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined\"  :class=\"{canceled:li._canceled}\" v-for=\"li in banesArray\">{{li.bane.name}}</a></span></h3>\r\n\t\t\t\t\t<bb-apply v-for=\"(li,i) in banesArray\" :key=\"li.get_uid()\" :assign=\"li\" :ingame=\"char.ingame\" v-on:callback=\"onBaneCallbackReceived\"></bb-apply>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-skills\"  id=\"gen-skills\">\r\n\t\t\t<h2>Skills <span class=\"valuer\" :class=\"{'still-have':totalSkillPointsLeft!=0}\">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class=\"valuer\">(Available: {{totalSkillPointsProvided}})</span><span class=\"formula\">(PCP-1)*3+INT*2</span></h2>\r\n\t\t<h3>Skill(s):</h3>\r\n\t\t\t<div class=\"skill-lib\">\r\n\t\t\t\t<SkillLibInput v-for=\"(skillObj, i) in skillObjs\" v-if=\"!skillsTable.requiresSpecialisation[skillObj.name]\" :index=\"i\" :key=\"skillObj.name\" :obj=\"skillValues\" :prop=\"skillObj.name\" :skillsTable=\"skillsTable\" :skillLevelsPacket=\"skillPacketValues\" :remaining=\"individualSkillsRemaining\" :canDelete=\"i>=startingSkillObjsCount\" v-on:change=\"onSkillIndividualChange\" v-on:delete=\"deleteSkillInput\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"packet-selection-mode\">\r\n\t\t\t\t<b>Buy Packets:</b> (cost 3 skill points each)\r\n\t\t\t\t<label><input type=\"radio\" name=\"packetSelectionMode\" :checked=\"!packetChoosy\" v-on:click=\"packetChoosy = false\"></input>Pennywise</label>\r\n\t\t\t\t<label><input type=\"radio\" name=\"packetSelectionMode\" :checked=\"packetChoosy\" v-on:click=\"packetChoosy = true\"></input>Pennywise and Choosy</label>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"packet-list\">\r\n\t\t\t\t<SkillPacketInput v-for=\"(packet,i) in skillPackets\" v-on:change=\"onSkillPacketChange\" :obj=\"packet\" prop=\"qty\" :labelMap=\"skillLabelMappings\" :labelSchema=\"skillLabelMappingBases\" :key=\"packet.name\" :index=\"i\" :skillPacketsRemaining=\"skillPacketsRemaining\" :skillValues=\"skillPacketValues\"  :packetChoosy=\"packetChoosy\" :skillSubjectHash=\"skillSubjectHash\"  />\r\n\t\t\t\t<SkillSubjectCreator :skillSubjects=\"skillSubjects\" :skillValues=\"skillValues\" :skillPacketValues=\"skillPacketValues\" :permaHash=\"skillSubjectsInitial\" :skillList=\"specialisedSkills\" :skillSubjectHash=\"skillSubjectHash\" v-on:addSkill=\"addSkill\" />\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\r\n\t\t\r\n\t\r\n\t\t<section class=\"gen-schoolprofs\"  id=\"gen-schoolprofs\">\r\n\t\t\t<h2>School &amp; Profeciencies <span class=\"valuer\" :class=\"{'still-have':stillHaveProfSpend }\">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class=\"valuer\">(Available: {{ProfPoints}}) </span></h2>\r\n\t\t\t<div class=\"select-school\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<label class=\"lbl-school\">School: <select number v-on:change=\"schoolSelectChangeHandler($event.target)\"><option :value=\"-1\" :selected=\"char.school==null\"></option><option :value=\"i\" v-for=\"(li, i) in schoolAssignList\" :disabled=\"!li.school.canAffordWith(ProfPoints, moneyLeft, char.school) || !li.school.customRequire(char)\" :selected=\"char.school==li.school\">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? \" - \"+li.school.costMoney.getLabel() : \"\" }}</option></select></label> <label class=\"lbl-level\">Level:<SchoolLevelInput :obj=\"char\" prop=\"schoolLevel\" :levelCosts=\"schoolLevelCosts\" :remainingArc=\"profPointsLeft\" :disabled=\"char.school==null\" /></label>\r\n\t\t\t\t</div>\r\n\t\r\n\t\t\t</div>\r\n\t\t\t<div class=\"school-info\" v-if=\"hasSchool\">\r\n\t\t\t\t<div>Max Profeciencies: {{ char.school.profLimit }}</div>\r\n\t\t\t\t<div class=\"cost-info\">Learning Profeciency/Arc Point Cost: ( <span :class=\"{selected:isHuman}\"><b class=\"color-free\">Free</b> - Human</span>, &nbsp; <span :class=\"{selected:!isHuman}\"><b>3 points</b> - Non-human)</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"prof-list\">\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Melee Profeciencies: <span class=\"valid ready\" style=\"color:green\" v-if=\"$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots\">{{ maxMeleeProfSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-else>Not Full!</span></h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListMelee\" :labels=\"profCoreMeleeListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsMelee\" :maxLength=\"maxMeleeProfSlots\"  />\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Ranged Profeciencies: <span class=\"valid ready\" style=\"color:green\" v-if=\"$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots\">{{ maxRangedProfSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-else>Not Full!</span></h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListRanged\" :labels=\"profCoreRangedListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsRanged\" :maxLength=\"maxRangedProfSlots\"  />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"manuever-list gen-col\">\r\n\t\t\t\t<h5>Superior Manuevers: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.superiorManueverNotes.length>=maxSuperiorSlots\">{{ maxSuperiorSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.superiorManueverNotes.length<maxSuperiorSlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"superiorManueverNotes\"  :maxLength=\"maxSuperiorSlots\"/>\r\n\t\t\t\t<h5>Mastery Manuever: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.masteryManueverNotes.length>=maxMasterySlots\">{{ maxMasterySlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.masteryManueverNotes.length<maxMasterySlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"masteryManueverNotes\" :maxLength=\"maxMasterySlots\"  />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"talent-list gen-col\">\r\n\t\t\t\t<h5>Talents: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.talentNotes.length>=maxTalentSlots\">{{maxTalentSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.talentNotes.length<maxTalentSlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"talentNotes\" :maxLength=\"maxTalentSlots\" />\r\n\t\t\t</div>\t\t\r\n\t\t\t<div class=\"school-benefits gen-col\" v-if=\"char.schoolBonuses != null\">\r\n\t\t\t\t<h5>Benefits: <span class=\"tag\" v-for=\"li in schoolTags\" :key=\"li\">{{li}}</span></h5>\r\n\t\t\t\t<SchoolSheetDetails :bonuses=\"char.schoolBonuses\" />\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-checkout\" ref=\"checkoutHeader\">\r\n\t\t\t<h2>Checkout <span class=\"legend valuer\">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class=\"valid\" v-show=\"notBankrupt\" style=\"color:green\"> &nbsp;Ready.</span><span class=\"invalid\" v-show=\"!notBankrupt\" style=\"color:red\"> &nbsp;Bankrupt!</span></h2>\r\n\t\t\t<div class=\"checkout\">\r\n\t\t\t\t<div class=\"cash\">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>\r\n\t\t\t\t<div class=\"carry\">Carry: <b :class=\"{encumbered:encumbered}\">{{totalWeight}}</b> / <span class=\"modified-attribute\" :class=\"[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']\"><b>{{CAR}}</b></span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"inventory-section\">\r\n\t\t\t\t<button v-on:click=\"proceedToInventory()\" v-show=\"!insideInventory\">&#10064; Proceed to Inventory &gt;&gt;</button>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t<hr/>\r\n\t</div>\r\n\t\t\t\r\n\t<div class=\"chargen__footer\" v-if=\"!insideInventory && !char.ingame\">\r\n\t\t<section class=\"arcs\">\r\n\t\t\t<h2>Arcs</h2>\r\n\t\t\t<div><label>Saga:</label><textarea v-model=\"char.arcSaga\"></textarea></div>\r\n\t\t\t<div><label>Epic:</label><textarea v-model=\"char.arcEpic\"></textarea></div>\r\n\t\t\t<div><label>Belief:</label><textarea v-model=\"char.arcBelief\"></textarea></div>\r\n\t\t\t<div><label>Glory:</label><textarea v-model=\"char.arcGlory\"></textarea></div>\r\n\t\t\t<div><label>Flaw:</label><textarea :disabled=\"!isHuman\" v-model=\"char.arcFlaw\"></textarea></div>\r\n\t\t</section>\r\n\t\t<hr/>\r\n\t\t\r\n\t\t<button :disabled=\"char.ingame\" v-on:click=\"saveFinaliseAll()\">Save Character!</button>\r\n\t</div>\r\n\t\t\t\t\r\n\t<div class=\"chargen__done\" v-if=\"char.ingame\">\r\n\t\t<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable serialized stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>\r\n\t\t<div><textarea character-set=\"UTF-8\"  readonly=\"readonly\" ref=\"savedTextArea\" v-model=\"savedCharContents\">\r\n\t\t</textarea><button v-on:click=\"executeCopyContents()\" ref=\"copyButton\">Copy</button><i class=\"copy-notify\" ref=\"copyNotify\" style=\"display:none\">copied!</i></div>\r\n\t\t<div v-if=\"exitBtnCallback!=null\">\r\n\t\t\t<i>You character's loadable contents is also listed on exit.</i>\r\n\t\t</div>\r\n\t\t<button v-if=\"exitBtnCallback!=null\" v-on:click=\"exitBtnCallback()\">Exit</button>\r\n\t\t\r\n\t\t<hr/>\r\n\t\tConsider pasting the copied serialized data content into a Gingko card,<br/>and storing all your data (for free) in a Gingko tree which {{ exitBtnCallback!=null ? \"is\" : \"will be\"}} loadable online by {{exitBtnCallback!=null ? \"the\" : \"an upcoming\" }} integrated suite's file browser!<br/>\r\n\t\t(eg. <a href=\"https://gingkoapp.com/mwmzwn\" target=\"_blank\">https://gingkoapp.com/mwmzwn</a> ).<br/> Create a Gingko account now and {{ exitBtnCallback!=null? \"start sharing your creations!\" : \"prepare your creations to be viewable through combined inventory/character sheets coming your way.\" }} \r\n\t</div>\r\n\t\r\n\t<div ref=\"inventoryHolder\">\r\n\t\t<inventory v-if=\"insideInventory\" :backBtnCallback=\"exitInventory\" :inventory=\"char.inventory\" :maxCostCopper=\"moneyLeft.getCPValue()\" :maxWeight=\"CAR\" />\t\r\n\t</div>\r\n\t\t\r\n\t<sweet-modal ref=\"finaliseWarning\">\r\n\t\t<div class=\"finalise-form finalise-warning\">\r\n\t\t\t<h3>Warning!</h3>\r\n\t\t\t<p>You may have missed out some things.</p>\r\n\t\t\t<ul>\r\n\t\t\t\t<li v-for=\"li in warningMsgs\" v-show=\"li.charAt(li.length-1)!='!'\">{{li}}</li>\r\n\t\t\t</ul>\r\n\t\t\t<button v-on:click=\"$refs.finaliseWarning.close()\">&lt; Back</button>\r\n\t\t\t<br/><br/>\r\n\t\t\t<i>You still sure you want to proceed with build?</i><br/>\r\n\t\t\t<button v-on:click=\"$refs.finaliseWarning.close(); saveFinaliseAll(true)\">Proceed with Build</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t<sweet-modal ref=\"finaliseError\">\r\n\t\t<div class=\"finalise-form finalise-errors\">\t\r\n\t\t\t<h3>Invalid!</h3>\r\n\t\t\t<p>You can't save this character yet and would need to rectify the following:</p>\r\n\t\t\t<ul>\r\n\t\t\t\t<li v-for=\"li in warningMsgs\" v-show=\"li.charAt(li.length-1)=='!'\">{{li}}</li>\r\n\t\t\t</ul>\r\n\t\t\t<button v-on:click=\"$refs.finaliseError.close()\">&lt; Back</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n</div>\r\n";
+		return "<div class=\"chargen\" :class=\"{'in-inventory':insideInventory}\">\r\n\t<h1>Song of Swords: Character Creation</h1>\r\n\t\r\n\t<div class=\"chargen__body\" v-if=\"!insideInventory && !char.ingame\">\r\n\t\t\r\n\t\t<section class=\"gen-general\" id=\"gen-general\">\r\n\t\t\t<div><label>Name:<InputNameLabel :obj=\"char\" prop=\"name\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Title <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"title\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Nickname <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"nickname\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Faction/Assosiation <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"faction\"></InputNameLabel></label></div>\r\n\t\t\t<div><label>Gender:</label><select number v-model.number=\"char.gender\"><option :value=\"0\">Male</option><option :value=\"1\">Female</option></select></div>\r\n\t\t\t<div><label>Left-handed?:<input type=\"checkbox\" v-model=\"char.leftHanded\"></input></label></div>\r\n\t\t\t<br/>\r\n\t\t\t<b>{{addressedAs}}</b>\r\n\t\t</section>\r\n\t\t\r\n\t\t<section class=\"gen-campaign-type\">\r\n\t\t\t<h2>Campaign Power</h2>\r\n\t\t\t<div v-for=\"(li, i) in campaignPowerLevels\">\r\n\t\t\t\t<label><input type=\"radio\" name=\"campaign-power\" v-on:click=\"campaignPowLevelIndex=i\" :checked=\"campaignPowLevelIndex == i\">{{li.name}} (<span class=\"num\">{{li.pcp}}</span> PCP Total) (Max <span class=\"num\">{{li.maxCategoryPCP}}</span> PCP per category) </input></label>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\t\r\n\t\t<section class=\"gen-categories\">\r\n\t\t\t<h2>Categories <span class=\"valuer\" :class=\"{'still-have':categoriesRemainingAssignable>0}\">({{ categoriesRemainingAssignable }} remaining PCP)</span> <span class=\"valid\" v-show=\"categoriesRemainingAssignable==0\" style=\"color:green\">Ok!</span></h2>\r\n\t\t\t<div v-for=\"(li, i) in categories\"><label>{{li.name}}: </label><CategoryPCPInput :obj=\"li\" prop=\"pcp\" :magic=\"li.magic\" :remainingAssignable=\"categoriesRemainingAssignable\" :maxPCPPerCategory=\"campaignPowLevel.maxCategoryPCP\" />PCP &nbsp;&nbsp;|{{campaignPowLevel.maxCategoryPCP}}</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t\t\r\n\t\t<!-- for each category -->\r\n\t\t<section class=\"gen-race\" id=\"gen-race\">\r\n\t\t\t<h2>Race <span class=\"valuer\">(Tier {{raceTier}}) </span> <span class=\"valid\" v-show=\"!promptSettleRaceTier\" style=\"color:green\">Ready.</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div v-for=\"(tier, ti) in raceTierTable\" :key=\"ti\">\r\n\t\t\t\t\t<span class=\"index-num\">{{ ti + 1 }}:</span> ({{pcpForTiers[ti]}} PCP)\r\n\t\t\t\t\t<label :class=\"{disabled:ti>=raceTier}\" v-for=\"(race, ri) in tier\"><input type=\"radio\" :disabled=\"ti>=raceTier\" name=\"race\" :checked=\"race.name == selectedRaceName\" v-on:click=\"selectRaceAt(ti, ri)\" :key=\"ri\"></input>{{ race.name }}</label>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div v-show=\"promptSettleRaceTier\"><button style=\"margin-top:10px\"  v-on:click=\"settleRaceTier()\">Finalise Race/Tier!</button> <span class=\"invalid\" style=\"color:red\">&lt;&lt; Click this to confirm.</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\t\r\n\t\t\t\r\n\t\t<section class=\"gen-social-class\"  id=\"gen-social-class\">\r\n\t\t\t<h2>Social Class/Wealth <span class=\"valuer\">({{categorySocialClassWealth.pcp}} PCP assigned)</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div class=\"socialclass-li\">\r\n\t\t\t\t\t<span class=\"index-num\"></span><span class=\"col-social-class\" style=\"text-align:right;\">Sync Wealth?</span><span class=\"col-wealth\"><input type=\"checkbox\" v-model=\"syncSocialWealth\"></input><label v-show=\"!syncSocialWealth\">&#128275;</label><label v-show=\"syncSocialWealth\">&#128274;</label> <label>{{ socialClassIndex == wealthIndex ? \"==\" :  \"!=\"}}</label></span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div v-for=\"(li, i) in socialClassList\" class=\"socialclass-li\">\r\n\t\t\t\t\t<span class=\"index-num\">{{i+1}}:</span> <label class=\"col-social-class\" :class=\"{disabled:socialEitherMaxIndex<i}\"><input type=\"radio\" v-on:click=\"setSocialClassIndex(i)\" name=\"social-class\" :checked=\"socialClassIndex==i\"></input>{{ li.socialClass.name }}</label> <label class=\"col-wealth\" :class=\"{disabled:wealthEitherMaxIndex<i}\"><input type=\"radio\" v-on:click=\"setWealthIndex(i)\" name=\"wealth\" :disabled=\"syncSocialWealth\" :checked=\"wealthIndex==i\"></input>{{ li.socialClass.money.getLabel() }}{{ li.socialClass.wealth!= 0 ? \", [\"+li.socialClass.wealth+\"W]\" : \"\" }}</label>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div v-show=\"wealthIndex != socialClassIndex\" class=\"custom-label\"><label>Custom Label: <input type=\"text\" :placeholder=\"socialClassPlaceHolderName\" v-model=\"char.socialClass.name\"></input></label></div>\r\n\t\t\t\t<div class=\"social-benefits\">\r\n\t\t\t\t\t<div class=\"social-benefit\"><label>Social Benefit #1: </label><select  v-on:change=\"socialBenefitSelectChangeHandler(1, $event.target.selectedIndex)\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit2.name===li.name || (curSelectedSocialClass.maxBoons >= 3 && socialBenefit3.name===li.name)\" :selected=\"li===socialBenefit1\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t\t<div class=\"social-benefit\"  v-show=\"curSelectedSocialClass.maxBoons>= 2\"><label>Social Benefit #2: </label><select v-on:change=\"socialBenefitSelectChangeHandler(2, $event.target.selectedIndex)\" :disabled=\"curSelectedSocialClass.maxBoons<2\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons>=3 && socialBenefit3.name===li.name)\" :selected=\"li===socialBenefit2\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t\t<div class=\"social-benefit\"  v-show=\"curSelectedSocialClass.maxBoons>=3\"><label>Social Benefit #3: </label><select v-on:change=\"socialBenefitSelectChangeHandler(3, $event.target.selectedIndex)\" :disabled=\"curSelectedSocialClass.maxBoons<3\"><option v-for=\"(li,i) in socialBenefitChoices\" :disabled=\"socialBenefit1.name===li.name || (curSelectedSocialClass.maxBoons >=2 && socialBenefit2.name===li.name)\" :selected=\"li===socialBenefit3\" :key=\"li.label\">{{ li.label }}</option></select></div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modified-wealth-assets\" v-show=\"availableWealthPointsBase!=availableWealthPoints\" :class=\"[availableWealthPoints<availableWealthPointsBase ? 'lower' : 'higher']\">\r\n\t\t\t\t\t<label>Modified Wealth: <b>{{ availableWealthPoints }}W</b></label>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"wealth-assets\" v-show=\"availableWealthPoints > 0\">\r\n\t\t\t\t\t<label>Your Wealth Assets: <span class=\"valuer\" v-show=\"remainingWealthPoints>0\" :class=\"{'still-have':remainingWealthPoints>0}\">({{remainingWealthPoints}}  Wealth Point(s) remaining.)</span></label>\r\n\t\t\t\t\t<ArrayOf of=\"WealthAssetAssign\" :defaultValue=\"getEmptyWealthAssign\" :obj=\"$data\" prop=\"wealthAssets\" :minLength=\"0\" :maxLength=\"maxWealthAssets\" :remainingWealth=\"remainingWealthPoints\" />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\t\t\r\n\t\t\t<div v-show=\"promptSettleSocialTier\"><button style=\"margin-top:10px\"  v-on:click=\"settleSocialTier()\">Finalise Social Class/Wealth!</button> <span class=\"invalid\" style=\"color:red\">&lt;&lt; Click this to confirm. </span><span v-show=\"!syncSocialWealth\">( <b>{{socialPCPRequired }}</b> PCP instead. )</span>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t\r\n\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-attributes\" id=\"gen-attributes\">\r\n\t\t\t<h2>Attributes <span class=\"valuer\" :class=\"{'still-have':remainingAttributePoints>0 || negativeOrZeroStat}\">({{remainingAttributePoints}}  Attribute Points remaining.)</span> <span class=\"valuer\">(Available: {{availableAttributePoints}}) </span><span class=\"valid\" v-show=\"remainingAttributePoints==0 && !negativeOrZeroStat\" style=\"color:green\">Ok!</span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><label>Strength:</label><AttributeInput :obj=\"char\" prop=\"strength\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"strength != STR\" :class=\"[STR<strength ? 'lower' : 'higher', {'zero-neg':STR<=0} ]\">{{STR}}</span></div>\r\n\t\t\t\t<div><label>Agility:</label><AttributeInput :obj=\"char\" prop=\"agility\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"agility != AGI\" :class=\"[AGI<agility ? 'lower' : 'higher', {'zero-neg':AGI<=0}]\">{{AGI}}</span></div>\r\n\t\t\t\t<div><label>Endurance:</label><AttributeInput :obj=\"char\" prop=\"endurance\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"endurance != END\" :class=\"[END<endurance ? 'lower' : 'higher', {'zero-neg':END<=0}]\">{{END}}</span></div>\r\n\t\t\t\t<div><label>Health:</label><AttributeInput :obj=\"char\" prop=\"health\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"health != HLT\" :class=\"[HLT<health ? 'lower' : 'higher', {'zero-neg':HLT<=0}]\">{{HLT}}</span></div>\r\n\t\t\t\t<div><label>Willpower:</label><AttributeInput :obj=\"char\" prop=\"willpower\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"willpower != WIP\" :class=\"[WIP<willpower ? 'lower' : 'higher', {'zero-neg':WIP<=0}]\">{{WIP}}</span></div>\r\n\t\t\t\t<div><label>Wit:</label><AttributeInput :obj=\"char\" prop=\"wit\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"wit != WIT\" :class=\"[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]\">{{WIT}}</span></div>\r\n\t\t\t\t<div><label>Intelligence:</label><AttributeInput :obj=\"char\" prop=\"intelligence\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"intelligence != INT\" :class=\"[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]\">{{INT}}</span></div>\r\n\t\t\t\t<div><label>Perception:</label><AttributeInput :obj=\"char\" prop=\"perception\" :remainingAttributePoints=\"remainingAttributePoints\" /><span class=\"modified-attribute\" v-show=\"perception != PER\" :class=\"[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]\">{{PER}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><b>ADR</b> (Adroitness): <span class=\"modified-attribute\" :class=\"[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']\"><b>{{ADR}}</b></span><i v-show=\"adr!=ADR\" class=\"baseshow\">({{adr}})</i></div>\r\n\t\t\t\t<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>\r\n\t\t\t\t<div><b>GRIT</b> (Grit): <span class=\"modified-attribute\" :class=\"[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']\"><b>{{GRIT}}</b></span><i v-show=\"baseGrit!=GRIT\" class=\"baseshow\">({{baseGrit}})</i></div>\r\n\t\t\t\r\n\t\t\t\t<div><b>MOB</b> (Mobility): <span class=\"modified-attribute\" :class=\"[MOB==mob ?'base' : MOB<mob ? 'lower' : 'higher']\"><b>{{MOB}}</b></span><i v-show=\"mob!=MOB\" class=\"baseshow\">({{mob}})</i></div>\r\n\t\t\t\t<div><b>CAR</b> (Carry): <span class=\"modified-attribute\" :class=\"[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']\"><b>{{CAR}}</b></span><i v-show=\"car!=CAR\" class=\"baseshow\">({{car}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><b>CHA</b> (Charisma): <span class=\"modified-attribute\" :class=\"[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']\"><b>{{CHA}}</b></span><i v-show=\"cha!=CHA\" class=\"baseshow\">({{cha}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><i>TOU</i> (Toughness): <span class=\"modified-attribute\" :class=\"[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']\"><b>{{TOU}}</b></span><i v-show=\"tou!=TOU\" class=\"baseshow\">({{tou}})</i></div>\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<div>Weight/Carry: <b>{{inventoryWeightLbl}}</b> / <b :style=\"{fontWeight:encumbranceLvl>=1 ?'normal':'bold'}\">{{CAR}}</b></div>\r\n\t\t\t\t<div>Master-hand: <span v-if=\"masterHandItem!=null\"><b>{{masterHandItem.name}}</b> <span v-show=\"masterWeapon!=null\">&#9876;</span><span v-if=\"carriedShield!=null && carriedShield==masterHandItem\"><span class=\"shield-icon-inv\">☗</span><select v-model.number=\"char.inventory.shieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select></span></span></div>\r\n\t\t\t\t<div>Off-hand: <span v-if=\"offHandItem!=null\"><b>{{offHandItem.name}}</b> <span v-show=\"offhandWeapon!=null\">&#9876;</span><span v-if=\"carriedShield!=null && carriedShield==offHandItem\"><span class=\"shield-icon-inv\">☗</span><select v-model.number=\"char.inventory.shieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select></span></span></div>\r\n\t\t\t\t<div>Reach: <span class=\"modified-attribute\" :class=\"[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']\"><b>{{reach}}</b></span><i v-show=\"reachBase!=reach\" class=\"baseshow\">({{reachBase}})</i></div>\r\n\t\t\t\t<div>Perception Penalty: <b>{{ perceptionPenalty }}</b></div>\r\n\t\t\t\t<div v-if=\"heldProfeciencies!=null\">&#9876;: <b style=\"max-width:120px\">{{heldProfeciencies}}</b></div>\r\n\t\t\t\t<div v-else>Defaulting&#9876;from:<br/><b style=\"max-width:120px\">{{defaultProfs}}</b></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div>School Level: <b>{{char.schoolLevel}}</b></div>\r\n\t\t\t\t<div class=\"cp\"><b>CP</b> (Melee Combat Pool): <span :class=\"[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]\"><b>{{CP}}</b></span><i v-show=\"CP!=baseCP\" class=\"baseshow\">({{baseCP}})</i>  (<i>{{CP-char.schoolLevel}}</i> CP without &#9876;)</div>\r\n\t\t\t\t\r\n\t\t\t\t<div><i>CP - Pain(<span v-show=\"totalPain>0\" class=\"got-pain\">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>\r\n\t\t\t\t<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>\r\n\t\t\t\t<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>\r\n\t\t\t\t<div>Recovery Amount: <span class=\"modified-attribute\" :class=\"[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']\"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show=\"recoveryRateAmount!=recoveryRateAmountBase\" class=\"baseshow\">({{recoveryRateAmountBase}})</i></div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\r\n\t\t<hr/>\r\n\t\t\r\n\t\t\t\r\n\t\t<section class=\"gen-bnb\"  id=\"gen-bnb\">\r\n\t\t\t<h2>Boons &amp; Banes <span class=\"valuer\">(<span class=\"num\">{{totalBnBScore }}</span> B&amp;B Points currently. (Pool: {{BnBpoints}} Points) ) </span>\r\n\t\t\t\r\n\t\t\t<span v-show=\"totalBnBScore<0\" class=\"invalid\"><span style=\"color:red\">invalid!</span><i style=\"font-size:13px\">(Need &gt;=0 B&amp;B points!<br/>Assign more PCP to 'Boons &amp; Banes' or buy more Banes to pay off debt!)</i></span>\r\n\t\t\t<span v-show=\"totalBnBScore>=0\" class=\"valid\">\r\n\t\t\t\t<span style=\"color:green\">Ok!</span><br/><span v-show=\"totalBnBScore>0\" style=\"color:#ff4444;font-size:13px\">(but you have additional {{ totalBnBScore }} B&amp;B Points!)</span>\r\n\t\t\t\t<div class=\"opencloselink\"><a href=\"#\" v-show=\"showBnBs\" v-on:click.prevent=\"showBnBs=false\">^ Hide</a><a href=\"#\" v-show=\"!showBnBs\" v-on:click.prevent=\"showBnBs=true\">Open &gt;</a> &nbsp;&nbsp;<a style=\"font-size:12px;float:right\" href=\"#gen-skills\" class=\"jumplink\">Skip to Skills..</a></div>\r\n\t\t\t</span>\r\n\t\t\t\r\n\t\t\t</h2>\r\n\t\t\t<div v-show=\"shouldShowBnBs\">\r\n\t\t\t\t<h3>Choose Boons: -{{ totalBoonExpenditure }}   <span v-show=\"true\" style=\"color:#aaaaaa\">&nbsp;&nbsp;({{maxBoonsSpendableLeft }})</span></h3>\r\n\t\t\t\t<div class=\"boon-tags\">\r\n\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in boonAssignList\" :key=\"i\" :obj=\"li\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\" v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  :remaining=\"maxBoonsSpendableLeft\" v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\r\n\t\t\t\t</div>\t\r\n\t\t\t\t<h3>Choose Banes: +{{ totalBanePointsEarned }}, ~{{ totalBanePointsSpent }}</h3>\r\n\t\t\t\t<div class=\"bane-tags\">\r\n\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in baneAssignList\" :key=\"i\" :obj=\"li\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\"  v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\t\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<br/>\r\n\t\t\t\t\r\n\t\t\t\t<div class=\"bb-details\">\r\n\t\t\t\t<h3><span class=\"underline\">Boon(s):</span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? '#'+getBnBSlug(li.boon.name) : undefined\" :class=\"{canceled:li._canceled}\" v-for=\"li in boonsArray\">{{li.boon.name}}</a></span></h3>\r\n\t\t\t\t<bb-apply v-for=\"(li,i) in boonsArray\" :key=\"li.get_uid()\" :assign=\"li\" :remainingPoints=\"maxBoonsSpendableLeft\" :ingame=\"char.ingame\"></bb-apply>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"bb-details\">\r\n\t\t\t\t\t<h3><span>Bane(s):</span><span class=\"header-liners\"></span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? '#'+getBnBSlug(li.bane.name) : undefined\"  :class=\"{canceled:li._canceled}\" v-for=\"li in banesArray\">{{li.bane.name}}</a></span></h3>\r\n\t\t\t\t\t<bb-apply v-for=\"(li,i) in banesArray\" :key=\"li.get_uid()\" :assign=\"li\" :ingame=\"char.ingame\" v-on:callback=\"onBaneCallbackReceived\"></bb-apply>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-skills\"  id=\"gen-skills\">\r\n\t\t\t<h2>Skills <span class=\"valuer\" :class=\"{'still-have':totalSkillPointsLeft!=0}\">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class=\"valuer\">(Available: {{totalSkillPointsProvided}})</span><span class=\"formula\">(PCP-1)*3+INT*2</span></h2>\r\n\t\t<h3>Skill(s):</h3>\r\n\t\t\t<div class=\"skill-lib\">\r\n\t\t\t\t<SkillLibInput v-for=\"(skillObj, i) in skillObjs\" v-if=\"!skillsTable.requiresSpecialisation[skillObj.name]\" :index=\"i\" :key=\"skillObj.name\" :obj=\"skillValues\" :prop=\"skillObj.name\" :skillsTable=\"skillsTable\" :skillLevelsPacket=\"skillPacketValues\" :remaining=\"individualSkillsRemaining\" :canDelete=\"i>=startingSkillObjsCount\" v-on:change=\"onSkillIndividualChange\" v-on:delete=\"deleteSkillInput\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"packet-selection-mode\">\r\n\t\t\t\t<b>Buy Packets:</b> (cost 3 skill points each)\r\n\t\t\t\t<label><input type=\"radio\" name=\"packetSelectionMode\" :checked=\"!packetChoosy\" v-on:click=\"packetChoosy = false\"></input>Pennywise</label>\r\n\t\t\t\t<label><input type=\"radio\" name=\"packetSelectionMode\" :checked=\"packetChoosy\" v-on:click=\"packetChoosy = true\"></input>Pennywise and Choosy</label>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"packet-list\">\r\n\t\t\t\t<SkillPacketInput v-for=\"(packet,i) in skillPackets\" v-on:change=\"onSkillPacketChange\" :obj=\"packet\" prop=\"qty\" :labelMap=\"skillLabelMappings\" :labelSchema=\"skillLabelMappingBases\" :key=\"packet.name\" :index=\"i\" :skillPacketsRemaining=\"skillPacketsRemaining\" :skillValues=\"skillPacketValues\"  :packetChoosy=\"packetChoosy\" :skillSubjectHash=\"skillSubjectHash\"  />\r\n\t\t\t\t<SkillSubjectCreator :skillSubjects=\"skillSubjects\" :skillValues=\"skillValues\" :permaHash=\"skillSubjectsInitial\" :skillList=\"specialisedSkills\" :skillSubjectHash=\"skillSubjectHash\" v-on:addSkill=\"addSkill\" />\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\r\n\t\t\r\n\t\r\n\t\t<section class=\"gen-schoolprofs\"  id=\"gen-schoolprofs\">\r\n\t\t\t<h2>School &amp; Profeciencies <span class=\"valuer\" :class=\"{'still-have':stillHaveProfSpend }\">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class=\"valuer\">(Available: {{ProfPoints}}) </span></h2>\r\n\t\t\t<div class=\"select-school\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<label class=\"lbl-school\">School: <select number v-on:change=\"schoolSelectChangeHandler($event.target)\"><option :value=\"-1\" :selected=\"char.school==null\"></option><option :value=\"i\" v-for=\"(li, i) in schoolAssignList\" :disabled=\"!li.school.canAffordWith(ProfPoints, moneyLeft, char.school) || !li.school.customRequire(char)\" :selected=\"char.school==li.school\">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? \" - \"+li.school.costMoney.getLabel() : \"\" }}</option></select></label> <label class=\"lbl-level\">Level:<SchoolLevelInput :obj=\"char\" prop=\"schoolLevel\" :levelCosts=\"schoolLevelCosts\" :remainingArc=\"profPointsLeft\" :disabled=\"char.school==null\" /></label>\r\n\t\t\t\t</div>\r\n\t\r\n\t\t\t</div>\r\n\t\t\t<div class=\"school-info\" v-if=\"hasSchool\">\r\n\t\t\t\t<div>Max Profeciencies: {{ char.school.profLimit }}</div>\r\n\t\t\t\t<div class=\"cost-info\">Learning Profeciency/Arc Point Cost: ( <span :class=\"{selected:isHuman}\"><b class=\"color-free\">Free</b> - Human</span>, &nbsp; <span :class=\"{selected:!isHuman}\"><b>3 points</b> - Non-human)</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"prof-list\">\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Melee Profeciencies: <span class=\"valid ready\" style=\"color:green\" v-if=\"$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots\">{{ maxMeleeProfSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-else>Not Full!</span></h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListMelee\" :labels=\"profCoreMeleeListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsMelee\" :maxLength=\"maxMeleeProfSlots\"  />\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Ranged Profeciencies: <span class=\"valid ready\" style=\"color:green\" v-if=\"$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots\">{{ maxRangedProfSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-else>Not Full!</span></h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListRanged\" :labels=\"profCoreRangedListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsRanged\" :maxLength=\"maxRangedProfSlots\"  />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"manuever-list gen-col\">\r\n\t\t\t\t<h5>Superior Manuevers: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.superiorManueverNotes.length>=maxSuperiorSlots\">{{ maxSuperiorSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.superiorManueverNotes.length<maxSuperiorSlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"superiorManueverNotes\"  :maxLength=\"maxSuperiorSlots\"/>\r\n\t\t\t\t<h5>Mastery Manuever: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.masteryManueverNotes.length>=maxMasterySlots\">{{ maxMasterySlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.masteryManueverNotes.length<maxMasterySlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"masteryManueverNotes\" :maxLength=\"maxMasterySlots\"  />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"talent-list gen-col\">\r\n\t\t\t\t<h5>Talents: <span class=\"valid ready\" style=\"color:green\" v-show=\"char.talentNotes.length>=maxTalentSlots\">{{maxTalentSlots > 0 ? \"Full!\" : \"Not available.\" }}</span><span class=\"invalid\" style=\"color:brown\" v-show=\"char.talentNotes.length<maxTalentSlots\">Not Full!</span></h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"talentNotes\" :maxLength=\"maxTalentSlots\" />\r\n\t\t\t</div>\t\t\r\n\t\t\t<div class=\"school-benefits gen-col\" v-if=\"char.schoolBonuses != null\">\r\n\t\t\t\t<h5>Benefits: <span class=\"tag\" v-for=\"li in schoolTags\" :key=\"li\">{{li}}</span></h5>\r\n\t\t\t\t<SchoolSheetDetails :bonuses=\"char.schoolBonuses\" />\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-checkout\" ref=\"checkoutHeader\">\r\n\t\t\t<h2>Checkout <span class=\"legend valuer\">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class=\"valid\" v-show=\"notBankrupt\" style=\"color:green\"> &nbsp;Ready.</span><span class=\"invalid\" v-show=\"!notBankrupt\" style=\"color:red\"> &nbsp;Bankrupt!</span></h2>\r\n\t\t\t<div class=\"checkout\">\r\n\t\t\t\t<div class=\"cash\">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>\r\n\t\t\t\t<div class=\"carry\">Carry: <b :class=\"{encumbered:encumbered}\">{{inventoryWeightLbl}}</b> / <span class=\"modified-attribute\" :class=\"[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']\"><b>{{CAR}}</b></span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"inventory-section\">\r\n\t\t\t\t<button v-on:click=\"proceedToInventory()\" v-show=\"!insideInventory\">&#10064; Proceed to Inventory &gt;&gt;</button>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t<hr/>\r\n\t</div>\r\n\t\t\t\r\n\t<div class=\"chargen__footer\" v-if=\"!insideInventory && !char.ingame\">\r\n\t\t<section class=\"arcs\">\r\n\t\t\t<h2>Arcs</h2>\r\n\t\t\t<div><label>Saga:</label><textarea v-model=\"char.arcSaga\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Epic:</label><textarea v-model=\"char.arcEpic\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Belief:</label><textarea v-model=\"char.arcBelief\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Glory:</label><textarea v-model=\"char.arcGlory\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Flaw:</label><textarea :disabled=\"!isHuman\" v-model=\"char.arcFlaw\" class=\"notes\"></textarea></div>\r\n\t\t</section>\r\n\t\t<hr/>\r\n\t\t\r\n\t\t<button :disabled=\"char.ingame\" v-on:click=\"saveFinaliseAll()\">Save Character!</button>\r\n\t</div>\r\n\t\t\t\t\r\n\t<div class=\"chargen__done\" v-if=\"char.ingame\">\r\n\t\t<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable serialized stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>\r\n\t\t<div><textarea character-set=\"UTF-8\"  readonly=\"readonly\" ref=\"savedTextArea\" v-model=\"savedCharContents\">\r\n\t\t</textarea><button v-on:click=\"executeCopyContents()\" ref=\"copyButton\">Copy</button><i class=\"copy-notify\" ref=\"copyNotify\" style=\"display:none\">copied!</i></div>\r\n\t\t<div v-if=\"exitBtnCallback!=null\">\r\n\t\t\t<i>You character's loadable contents is also listed on exit.</i>\r\n\t\t</div>\r\n\t\t<button v-if=\"exitBtnCallback!=null\" v-on:click=\"exitBtnCallback()\">Exit</button>\r\n\t\t\r\n\t\t<hr/>\r\n\t\tConsider pasting the copied serialized data content into a Gingko card,<br/>and storing all your data (for free) in a Gingko tree which {{ exitBtnCallback!=null ? \"is\" : \"will be\"}} loadable online by {{exitBtnCallback!=null ? \"the\" : \"an upcoming\" }} integrated suite's file browser!<br/>\r\n\t\t(eg. <a href=\"https://gingkoapp.com/sos-weapons-and-armour\" target=\"_blank\">https://gingkoapp.com/sos-weapons-and-armour</a> ).<br/> Create a Gingko account now and {{ exitBtnCallback!=null? \"start sharing your creations!\" : \"prepare your creations to be viewable through combined inventory/character sheets coming your way.\" }} \r\n\t</div>\r\n\t\r\n\t<div ref=\"inventoryHolder\">\r\n\t\t<inventory v-if=\"insideInventory\" :backBtnCallback=\"exitInventory\" :inventory=\"char.inventory\" :maxCostCopper=\"moneyLeft.getCPValue()\" :maxWeight=\"CAR\" />\t\r\n\t</div>\r\n\t\t\r\n\t<sweet-modal ref=\"finaliseWarning\">\r\n\t\t<div class=\"finalise-form finalise-warning\">\r\n\t\t\t<h3>Warning!</h3>\r\n\t\t\t<p>You may have missed out some things.</p>\r\n\t\t\t<ul>\r\n\t\t\t\t<li v-for=\"li in warningMsgs\" v-show=\"li.charAt(li.length-1)!='!'\">{{li}}</li>\r\n\t\t\t</ul>\r\n\t\t\t<button v-on:click=\"$refs.finaliseWarning.close()\">&lt; Back</button>\r\n\t\t\t<br/><br/>\r\n\t\t\t<i>You still sure you want to proceed with build?</i><br/>\r\n\t\t\t<button v-on:click=\"$refs.finaliseWarning.close(); saveFinaliseAll(true)\">Proceed with Build</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t<sweet-modal ref=\"finaliseError\">\r\n\t\t<div class=\"finalise-form finalise-errors\">\t\r\n\t\t\t<h3>Invalid!</h3>\r\n\t\t\t<p>You can't save this character yet and would need to rectify the following:</p>\r\n\t\t\t<ul>\r\n\t\t\t\t<li v-for=\"li in warningMsgs\" v-show=\"li.charAt(li.length-1)=='!'\">{{li}}</li>\r\n\t\t\t</ul>\r\n\t\t\t<button v-on:click=\"$refs.finaliseError.close()\">&lt; Back</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n</div>\r\n";
 	}
 	,get_placeholder: function() {
 		return "[placeholder]";
@@ -10927,9 +11139,6 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 	}
 	,checkWarningAttributes: function() {
 		return this.$data.checkWarningAttributes();
-	}
-	,getEmptyWealthAssign: function() {
-		return this.$data.getEmptyWealthAssign();
 	}
 	,updateSocialBenefitsToBoon: function(newValue,oldValue) {
 		this.$data.updateSocialBenefitsToBoon(newValue,oldValue);
@@ -11052,48 +11261,8 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 		this.$data.updateMoneyToCharsheet();
 		return;
 	}
-	,saveFinaliseSocial: function() {
-		this.$data.saveFinaliseSocial();
-		return;
-	}
-	,restoreAnyBnBWithMask: function(msk,superMask) {
-		this.$data.restoreAnyBnBWithMask(msk,superMask);
-		return;
-	}
-	,resetBB: function(bba,isBane) {
-		this.$data.resetBB(bba,isBane);
-		return;
-	}
-	,onBaneCallbackReceived: function(bba) {
-		this.$data.onBaneCallbackReceived(bba);
-		return;
-	}
-	,checkBaneAgainstOthers: function(baneAssign) {
-		this.$data.checkBaneAgainstOthers(baneAssign);
-		return;
-	}
-	,checkBoonAgainstOthers: function(boonAssign) {
-		this.$data.checkBoonAgainstOthers(boonAssign);
-		return;
-	}
-	,uncancel: function(bba,isBane) {
-		this.$data.uncancel(bba,isBane);
-		return;
-	}
-	,addBB: function(bba,isBane) {
-		this.$data.addBB(bba,isBane);
-		return;
-	}
-	,removeBB: function(bba,isBane) {
-		this.$data.removeBB(bba,isBane);
-		return;
-	}
-	,updateRankBB: function(bba,isBane,newValue,oldValue) {
-		this.$data.updateRankBB(bba,isBane,newValue,oldValue);
-		return;
-	}
-	,updateCanceledBB: function(bba,isBane,newValue,oldValue) {
-		this.$data.updateCanceledBB(bba,isBane,newValue,oldValue);
+	,saveFinaliseSocial: function(moneyLeft) {
+		this.$data.saveFinaliseSocial(moneyLeft);
 		return;
 	}
 	,get_totalBaneExpenditure: function() {
@@ -11217,14 +11386,6 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 			return 0;
 		}
 	}
-	,get_schoolTags: function() {
-		var _this = this.$data;
-		if(_this["char"].school != null && _this["char"].schoolBonuses != null) {
-			return _this["char"].schoolBonuses.getTags();
-		} else {
-			return [];
-		}
-	}
 	,get_ProfPoints: function() {
 		return (this.$data.categories[5].pcp - 1) * 3;
 	}
@@ -11322,12 +11483,6 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 		var _this = this.$data;
 		return (_this.categories[5].pcp - 1) * 3 - _this.get_totalProfecienciesBought() * ((_this["char"].race != null ? _this["char"].race.name : "") == "Human" ? 0 : 3) - (_this["char"].school != null ? _this["char"].school.costArc : 0) - (_this["char"].school != null && _this["char"].schoolLevel > 0 ? _this.schoolLevelCosts[_this["char"].schoolLevel - 1] : 0);
 	}
-	,get_profCoreMeleeListNames: function() {
-		return this.$data.get_profCoreMeleeListNames();
-	}
-	,get_profCoreRangedListNames: function() {
-		return this.$data.get_profCoreRangedListNames();
-	}
 	,get_traceProfCoreRangedCurrent: function() {
 		return this.$data.get_traceProfCoreRangedCurrent();
 	}
@@ -11340,8 +11495,8 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 	,get_traceProfCoreMeleeCount: function() {
 		return this.$data.get_traceProfCoreMeleeCount();
 	}
-	,saveFinaliseCleanupChar: function() {
-		this.$data.saveFinaliseCleanupChar();
+	,saveFinaliseCleanupChar: function(moneyLeft) {
+		this.$data.saveFinaliseCleanupChar(moneyLeft);
 		return;
 	}
 	,_Init: function() {
@@ -11351,13 +11506,461 @@ troshx_sos_vue_CharGen.prototype = $extend(haxevx_vuex_core_VComponent.prototype
 		this.created = clsP.Created;
 		this.components = this.Components();
 		this.template = this.Template();
-		this.computed = { validAffordCurrentSchool : clsP.get_validAffordCurrentSchool, moneyLeft : clsP.get_moneyLeft, moneyLeftStr : clsP.get_moneyLeftStr, liquidity : clsP.get_liquidity, liquidityStr : clsP.get_liquidityStr, startingMoneyModifiedCP : clsP.get_startingMoneyModifiedCP, startingMoneyBonusCP : clsP.get_startingMoneyBonusCP, startingMoneyPenaltyCP : clsP.get_startingMoneyPenaltyCP, inventoryCost : clsP.get_inventoryCost, moneyAvailable : clsP.get_moneyAvailable, moneyAvailableStr : clsP.get_moneyAvailableStr, checkoutBonuses : clsP.get_checkoutBonuses, checkoutPenalties : clsP.get_checkoutPenalties, checkoutSchool : clsP.get_checkoutSchool, checkoutInventory : clsP.get_checkoutInventory, shouldShowBnBs : clsP.get_shouldShowBnBs, campaignPowLevel : clsP.get_campaignPowLevel, categoryRace : clsP.get_categoryRace, categoryAttributes : clsP.get_categoryAttributes, categorySocialClassWealth : clsP.get_categorySocialClassWealth, categoriesRemainingAssignable : clsP.get_categoriesRemainingAssignable, isValidCategories : clsP.get_isValidCategories, isHuman : clsP.get_isHuman, selectedRaceName : clsP.get_selectedRaceName, promptSettleRaceTier : clsP.get_promptSettleRaceTier, raceTier : clsP.get_raceTier, totalAttributePointsSpent : clsP.get_totalAttributePointsSpent, remainingAttributePoints : clsP.get_remainingAttributePoints, availableAttributePoints : clsP.get_availableAttributePoints, availableWealthPointsBase : clsP.get_availableWealthPointsBase, availableWealthPoints : clsP.get_availableWealthPoints, remainingWealthPointsFull : clsP.get_remainingWealthPointsFull, remainingWealthPoints : clsP.get_remainingWealthPoints, socialBenefitChoices : clsP.get_socialBenefitChoices, curSelectedSocialClass : clsP.get_curSelectedSocialClass, maxSocialClassIndex : clsP.get_maxSocialClassIndex, socialEitherMaxIndex : clsP.get_socialEitherMaxIndex, wealthEitherMaxIndex : clsP.get_wealthEitherMaxIndex, socialClassPlaceHolderName : clsP.get_socialClassPlaceHolderName, promptSettleSocialTier : clsP.get_promptSettleSocialTier, socialPCPRequired : clsP.get_socialPCPRequired, unevenSocialPCPRequired : clsP.get_unevenSocialPCPRequired, unevenMaxSocialClassIndex : clsP.get_unevenMaxSocialClassIndex, unevenMaxWealthIndex : clsP.get_unevenMaxWealthIndex, maxWealthAssets : clsP.get_maxWealthAssets, totalBaneExpenditure : clsP.get_totalBaneExpenditure, maxBanePointsEarnable : clsP.get_maxBanePointsEarnable, totalBanePointsEarned : clsP.get_totalBanePointsEarned, totalBanePointsSpent : clsP.get_totalBanePointsSpent, totalBoonExpenditure : clsP.get_totalBoonExpenditure, boonsArray : clsP.get_boonsArray, banesArray : clsP.get_banesArray, BnBpoints : clsP.get_BnBpoints, totalBnBScore : clsP.get_totalBnBScore, maxBoonsSpendable : clsP.get_maxBoonsSpendable, maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft, maxBanesSpendable : clsP.get_maxBanesSpendable, maxBanesSpendableLeft : clsP.get_maxBanesSpendableLeft, SkillPoints : clsP.get_SkillPoints, individualSkillsSpent : clsP.get_individualSkillsSpent, maxSkillPacketsAllowed : clsP.get_maxSkillPacketsAllowed, maxIndividualSkillsSpendable : clsP.get_maxIndividualSkillsSpendable, individualSkillsRemaining : clsP.get_individualSkillsRemaining, totalSkillPointsProvided : clsP.get_totalSkillPointsProvided, skillPacketsRemaining : clsP.get_skillPacketsRemaining, skillPacketsBought : clsP.get_skillPacketsBought, totalSkillPointsLeft : clsP.get_totalSkillPointsLeft, hasSchool : clsP.get_hasSchool, schoolProfLevel : clsP.get_schoolProfLevel, schoolTags : clsP.get_schoolTags, ProfPoints : clsP.get_ProfPoints, totalAvailProfSlots : clsP.get_totalAvailProfSlots, profArcCost : clsP.get_profArcCost, schoolArcCost : clsP.get_schoolArcCost, profExpenditure : clsP.get_profExpenditure, totalProfSlotExpenditure : clsP.get_totalProfSlotExpenditure, maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, maxRangedProfSlots : clsP.get_maxRangedProfSlots, maxTalentSlots : clsP.get_maxTalentSlots, maxSuperiorSlots : clsP.get_maxSuperiorSlots, maxMasterySlots : clsP.get_maxMasterySlots, totalProfecienciesBought : clsP.get_totalProfecienciesBought, maxClampedMeleeProfs : clsP.get_maxClampedMeleeProfs, maxClampedRangedProfs : clsP.get_maxClampedRangedProfs, levelsExpenditure : clsP.get_levelsExpenditure, totalProfArcExpenditure : clsP.get_totalProfArcExpenditure, profPointsLeft : clsP.get_profPointsLeft, profCoreMeleeListNames : clsP.get_profCoreMeleeListNames, profCoreRangedListNames : clsP.get_profCoreRangedListNames, traceProfCoreRangedCurrent : clsP.get_traceProfCoreRangedCurrent, traceProfCoreMeleeCurrent : clsP.get_traceProfCoreMeleeCurrent, traceProfCoreRangedCount : clsP.get_traceProfCoreRangedCount, traceProfCoreMeleeCount : clsP.get_traceProfCoreMeleeCount, addressedAs : clsP.get_addressedAs, totalDraftedProfSlots : clsP.get_totalDraftedProfSlots, maxBuyableProfSlots : clsP.get_maxBuyableProfSlots, excessDraftedSlots : clsP.get_excessDraftedSlots, notBankrupt : clsP.get_notBankrupt, stillHaveProfSpend : clsP.get_stillHaveProfSpend, placeholder : clsP.get_placeholder};
-		this.methods = { get_addressedAs : clsP.get_addressedAs, watch_maxBoonsSpendableLeft : clsP.watch_maxBoonsSpendableLeft, watch_raceTier : clsP.watch_raceTier, watch_socialEitherMaxIndex : clsP.watch_socialEitherMaxIndex, watch_wealthEitherMaxIndex : clsP.watch_wealthEitherMaxIndex, watch_syncSocialWealth : clsP.watch_syncSocialWealth, watch_socialClassIndex : clsP.watch_socialClassIndex, watch_wealthIndex : clsP.watch_wealthIndex, watch_socialBenefit1 : clsP.watch_socialBenefit1, watch_socialBenefit2 : clsP.watch_socialBenefit2, watch_socialBenefit3 : clsP.watch_socialBenefit3, schoolSelectChangeHandler : clsP.schoolSelectChangeHandler, watch_validAffordCurrentSchool : clsP.watch_validAffordCurrentSchool, get_totalDraftedProfSlots : clsP.get_totalDraftedProfSlots, get_maxBuyableProfSlots : clsP.get_maxBuyableProfSlots, get_excessDraftedSlots : clsP.get_excessDraftedSlots, watch_excessDraftedSlots : clsP.watch_excessDraftedSlots, get_validAffordCurrentSchool : clsP.get_validAffordCurrentSchool, get_notBankrupt : clsP.get_notBankrupt, isValidAll : clsP.isValidAll, get_stillHaveProfSpend : clsP.get_stillHaveProfSpend, saveFinaliseAll : clsP.saveFinaliseAll, saveCharToBox : clsP.saveCharToBox, executeCopyContents : clsP.executeCopyContents, confirmFinaliseAll : clsP.confirmFinaliseAll, get_moneyLeft : clsP.get_moneyLeft, get_moneyLeftStr : clsP.get_moneyLeftStr, get_liquidity : clsP.get_liquidity, get_liquidityStr : clsP.get_liquidityStr, get_startingMoneyModifiedCP : clsP.get_startingMoneyModifiedCP, get_startingMoneyBonusCP : clsP.get_startingMoneyBonusCP, get_startingMoneyPenaltyCP : clsP.get_startingMoneyPenaltyCP, get_inventoryCost : clsP.get_inventoryCost, get_moneyAvailable : clsP.get_moneyAvailable, get_moneyAvailableStr : clsP.get_moneyAvailableStr, get_checkoutBonuses : clsP.get_checkoutBonuses, get_checkoutPenalties : clsP.get_checkoutPenalties, get_checkoutSchool : clsP.get_checkoutSchool, get_checkoutInventory : clsP.get_checkoutInventory, exitInventory : clsP.exitInventory, proceedToInventory : clsP.proceedToInventory, getBnBSlug : clsP.getBnBSlug, get_placeholder : clsP.get_placeholder, get_shouldShowBnBs : clsP.get_shouldShowBnBs, privateInit : clsP.privateInit, get_campaignPowLevel : clsP.get_campaignPowLevel, get_categoryRace : clsP.get_categoryRace, get_categoryAttributes : clsP.get_categoryAttributes, get_categorySocialClassWealth : clsP.get_categorySocialClassWealth, get_categoriesRemainingAssignable : clsP.get_categoriesRemainingAssignable, get_isValidCategories : clsP.get_isValidCategories, checkWarningCategories : clsP.checkWarningCategories, get_isHuman : clsP.get_isHuman, get_selectedRaceName : clsP.get_selectedRaceName, resetToHuman : clsP.resetToHuman, selectRaceAt : clsP.selectRaceAt, settleRaceTier : clsP.settleRaceTier, get_promptSettleRaceTier : clsP.get_promptSettleRaceTier, get_raceTier : clsP.get_raceTier, getRaceTierFromPCP : clsP.getRaceTierFromPCP, get_totalAttributePointsSpent : clsP.get_totalAttributePointsSpent, get_remainingAttributePoints : clsP.get_remainingAttributePoints, get_availableAttributePoints : clsP.get_availableAttributePoints, canBuyMoreAttributeLevels : clsP.canBuyMoreAttributeLevels, checkWarningAttributes : clsP.checkWarningAttributes, getEmptyWealthAssign : clsP.getEmptyWealthAssign, updateSocialBenefitsToBoon : clsP.updateSocialBenefitsToBoon, validateSocialBenefitsWithClass : clsP.validateSocialBenefitsWithClass, socialBenefitSelectChangeHandler : clsP.socialBenefitSelectChangeHandler, get_availableWealthPointsBase : clsP.get_availableWealthPointsBase, get_availableWealthPoints : clsP.get_availableWealthPoints, get_remainingWealthPointsFull : clsP.get_remainingWealthPointsFull, get_remainingWealthPoints : clsP.get_remainingWealthPoints, wealthAssetsWorthLen : clsP.wealthAssetsWorthLen, wealthAssetsWorth : clsP.wealthAssetsWorth, get_socialBenefitChoices : clsP.get_socialBenefitChoices, get_curSelectedSocialClass : clsP.get_curSelectedSocialClass, get_maxSocialClassIndex : clsP.get_maxSocialClassIndex, constraintSocialWealth : clsP.constraintSocialWealth, get_socialEitherMaxIndex : clsP.get_socialEitherMaxIndex, get_wealthEitherMaxIndex : clsP.get_wealthEitherMaxIndex, get_socialClassPlaceHolderName : clsP.get_socialClassPlaceHolderName, get_promptSettleSocialTier : clsP.get_promptSettleSocialTier, get_socialPCPRequired : clsP.get_socialPCPRequired, settleSocialTier : clsP.settleSocialTier, get_unevenSocialPCPRequired : clsP.get_unevenSocialPCPRequired, get_unevenMaxSocialClassIndex : clsP.get_unevenMaxSocialClassIndex, get_unevenMaxWealthIndex : clsP.get_unevenMaxWealthIndex, setSocialClassIndex : clsP.setSocialClassIndex, setWealthIndex : clsP.setWealthIndex, updateSocialToCharsheet : clsP.updateSocialToCharsheet, get_maxWealthAssets : clsP.get_maxWealthAssets, updateMoneyToCharsheet : clsP.updateMoneyToCharsheet, saveFinaliseSocial : clsP.saveFinaliseSocial, restoreAnyBnBWithMask : clsP.restoreAnyBnBWithMask, resetBB : clsP.resetBB, onBaneCallbackReceived : clsP.onBaneCallbackReceived, checkBaneAgainstOthers : clsP.checkBaneAgainstOthers, checkBoonAgainstOthers : clsP.checkBoonAgainstOthers, uncancel : clsP.uncancel, addBB : clsP.addBB, removeBB : clsP.removeBB, updateRankBB : clsP.updateRankBB, updateCanceledBB : clsP.updateCanceledBB, get_totalBaneExpenditure : clsP.get_totalBaneExpenditure, get_maxBanePointsEarnable : clsP.get_maxBanePointsEarnable, get_totalBanePointsEarned : clsP.get_totalBanePointsEarned, get_totalBanePointsSpent : clsP.get_totalBanePointsSpent, get_totalBoonExpenditure : clsP.get_totalBoonExpenditure, get_boonsArray : clsP.get_boonsArray, get_banesArray : clsP.get_banesArray, get_BnBpoints : clsP.get_BnBpoints, get_totalBnBScore : clsP.get_totalBnBScore, get_maxBoonsSpendable : clsP.get_maxBoonsSpendable, get_maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft, get_maxBanesSpendable : clsP.get_maxBanesSpendable, get_maxBanesSpendableLeft : clsP.get_maxBanesSpendableLeft, addSkill : clsP.addSkill, deleteSkillInput : clsP.deleteSkillInput, onSkillPacketChange : clsP.onSkillPacketChange, onSkillIndividualChange : clsP.onSkillIndividualChange, saveFinaliseSkillsFromPackets : clsP.saveFinaliseSkillsFromPackets, clampSkillValue : clsP.clampSkillValue, isSkillLabelBinded : clsP.isSkillLabelBinded, get_SkillPoints : clsP.get_SkillPoints, get_individualSkillsSpent : clsP.get_individualSkillsSpent, get_maxSkillPacketsAllowed : clsP.get_maxSkillPacketsAllowed, get_maxIndividualSkillsSpendable : clsP.get_maxIndividualSkillsSpendable, get_individualSkillsRemaining : clsP.get_individualSkillsRemaining, get_totalSkillPointsProvided : clsP.get_totalSkillPointsProvided, get_skillPacketsRemaining : clsP.get_skillPacketsRemaining, get_skillPacketsBought : clsP.get_skillPacketsBought, get_totalSkillPointsLeft : clsP.get_totalSkillPointsLeft, selectSchoolAssign : clsP.selectSchoolAssign, canStillSpendSchool : clsP.canStillSpendSchool, get_hasSchool : clsP.get_hasSchool, get_schoolProfLevel : clsP.get_schoolProfLevel, get_schoolTags : clsP.get_schoolTags, get_ProfPoints : clsP.get_ProfPoints, get_totalAvailProfSlots : clsP.get_totalAvailProfSlots, get_profArcCost : clsP.get_profArcCost, get_schoolArcCost : clsP.get_schoolArcCost, get_profExpenditure : clsP.get_profExpenditure, get_totalProfSlotExpenditure : clsP.get_totalProfSlotExpenditure, get_maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, get_maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, get_maxRangedProfSlots : clsP.get_maxRangedProfSlots, get_maxTalentSlots : clsP.get_maxTalentSlots, get_maxSuperiorSlots : clsP.get_maxSuperiorSlots, get_maxMasterySlots : clsP.get_maxMasterySlots, get_totalProfecienciesBought : clsP.get_totalProfecienciesBought, get_maxClampedMeleeProfs : clsP.get_maxClampedMeleeProfs, get_maxClampedRangedProfs : clsP.get_maxClampedRangedProfs, get_levelsExpenditure : clsP.get_levelsExpenditure, get_totalProfArcExpenditure : clsP.get_totalProfArcExpenditure, get_profPointsLeft : clsP.get_profPointsLeft, get_profCoreMeleeListNames : clsP.get_profCoreMeleeListNames, get_profCoreRangedListNames : clsP.get_profCoreRangedListNames, get_traceProfCoreRangedCurrent : clsP.get_traceProfCoreRangedCurrent, get_traceProfCoreMeleeCurrent : clsP.get_traceProfCoreMeleeCurrent, get_traceProfCoreRangedCount : clsP.get_traceProfCoreRangedCount, get_traceProfCoreMeleeCount : clsP.get_traceProfCoreMeleeCount, saveFinaliseCleanupChar : clsP.saveFinaliseCleanupChar};
+		this.computed = { validAffordCurrentSchool : clsP.get_validAffordCurrentSchool, moneyLeft : clsP.get_moneyLeft, moneyLeftStr : clsP.get_moneyLeftStr, liquidity : clsP.get_liquidity, liquidityStr : clsP.get_liquidityStr, startingMoneyModifiedCP : clsP.get_startingMoneyModifiedCP, startingMoneyBonusCP : clsP.get_startingMoneyBonusCP, startingMoneyPenaltyCP : clsP.get_startingMoneyPenaltyCP, inventoryCost : clsP.get_inventoryCost, moneyAvailable : clsP.get_moneyAvailable, moneyAvailableStr : clsP.get_moneyAvailableStr, checkoutBonuses : clsP.get_checkoutBonuses, checkoutPenalties : clsP.get_checkoutPenalties, checkoutSchool : clsP.get_checkoutSchool, checkoutInventory : clsP.get_checkoutInventory, shouldShowBnBs : clsP.get_shouldShowBnBs, campaignPowLevel : clsP.get_campaignPowLevel, categoryRace : clsP.get_categoryRace, categoryAttributes : clsP.get_categoryAttributes, categorySocialClassWealth : clsP.get_categorySocialClassWealth, categoriesRemainingAssignable : clsP.get_categoriesRemainingAssignable, isValidCategories : clsP.get_isValidCategories, isHuman : clsP.get_isHuman, selectedRaceName : clsP.get_selectedRaceName, promptSettleRaceTier : clsP.get_promptSettleRaceTier, raceTier : clsP.get_raceTier, totalAttributePointsSpent : clsP.get_totalAttributePointsSpent, remainingAttributePoints : clsP.get_remainingAttributePoints, availableAttributePoints : clsP.get_availableAttributePoints, availableWealthPointsBase : clsP.get_availableWealthPointsBase, availableWealthPoints : clsP.get_availableWealthPoints, remainingWealthPointsFull : clsP.get_remainingWealthPointsFull, remainingWealthPoints : clsP.get_remainingWealthPoints, socialBenefitChoices : clsP.get_socialBenefitChoices, curSelectedSocialClass : clsP.get_curSelectedSocialClass, maxSocialClassIndex : clsP.get_maxSocialClassIndex, socialEitherMaxIndex : clsP.get_socialEitherMaxIndex, wealthEitherMaxIndex : clsP.get_wealthEitherMaxIndex, socialClassPlaceHolderName : clsP.get_socialClassPlaceHolderName, promptSettleSocialTier : clsP.get_promptSettleSocialTier, socialPCPRequired : clsP.get_socialPCPRequired, unevenSocialPCPRequired : clsP.get_unevenSocialPCPRequired, unevenMaxSocialClassIndex : clsP.get_unevenMaxSocialClassIndex, unevenMaxWealthIndex : clsP.get_unevenMaxWealthIndex, maxWealthAssets : clsP.get_maxWealthAssets, totalBaneExpenditure : clsP.get_totalBaneExpenditure, maxBanePointsEarnable : clsP.get_maxBanePointsEarnable, totalBanePointsEarned : clsP.get_totalBanePointsEarned, totalBanePointsSpent : clsP.get_totalBanePointsSpent, totalBoonExpenditure : clsP.get_totalBoonExpenditure, boonsArray : clsP.get_boonsArray, banesArray : clsP.get_banesArray, BnBpoints : clsP.get_BnBpoints, totalBnBScore : clsP.get_totalBnBScore, maxBoonsSpendable : clsP.get_maxBoonsSpendable, maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft, maxBanesSpendable : clsP.get_maxBanesSpendable, maxBanesSpendableLeft : clsP.get_maxBanesSpendableLeft, SkillPoints : clsP.get_SkillPoints, individualSkillsSpent : clsP.get_individualSkillsSpent, maxSkillPacketsAllowed : clsP.get_maxSkillPacketsAllowed, maxIndividualSkillsSpendable : clsP.get_maxIndividualSkillsSpendable, individualSkillsRemaining : clsP.get_individualSkillsRemaining, totalSkillPointsProvided : clsP.get_totalSkillPointsProvided, skillPacketsRemaining : clsP.get_skillPacketsRemaining, skillPacketsBought : clsP.get_skillPacketsBought, totalSkillPointsLeft : clsP.get_totalSkillPointsLeft, hasSchool : clsP.get_hasSchool, schoolProfLevel : clsP.get_schoolProfLevel, ProfPoints : clsP.get_ProfPoints, totalAvailProfSlots : clsP.get_totalAvailProfSlots, profArcCost : clsP.get_profArcCost, schoolArcCost : clsP.get_schoolArcCost, profExpenditure : clsP.get_profExpenditure, totalProfSlotExpenditure : clsP.get_totalProfSlotExpenditure, maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, maxRangedProfSlots : clsP.get_maxRangedProfSlots, maxTalentSlots : clsP.get_maxTalentSlots, maxSuperiorSlots : clsP.get_maxSuperiorSlots, maxMasterySlots : clsP.get_maxMasterySlots, totalProfecienciesBought : clsP.get_totalProfecienciesBought, maxClampedMeleeProfs : clsP.get_maxClampedMeleeProfs, maxClampedRangedProfs : clsP.get_maxClampedRangedProfs, levelsExpenditure : clsP.get_levelsExpenditure, totalProfArcExpenditure : clsP.get_totalProfArcExpenditure, profPointsLeft : clsP.get_profPointsLeft, traceProfCoreRangedCurrent : clsP.get_traceProfCoreRangedCurrent, traceProfCoreMeleeCurrent : clsP.get_traceProfCoreMeleeCurrent, traceProfCoreRangedCount : clsP.get_traceProfCoreRangedCount, traceProfCoreMeleeCount : clsP.get_traceProfCoreMeleeCount, totalDraftedProfSlots : clsP.get_totalDraftedProfSlots, maxBuyableProfSlots : clsP.get_maxBuyableProfSlots, excessDraftedSlots : clsP.get_excessDraftedSlots, notBankrupt : clsP.get_notBankrupt, stillHaveProfSpend : clsP.get_stillHaveProfSpend, placeholder : clsP.get_placeholder};
+		this.methods = { watch_maxBoonsSpendableLeft : clsP.watch_maxBoonsSpendableLeft, watch_raceTier : clsP.watch_raceTier, watch_socialEitherMaxIndex : clsP.watch_socialEitherMaxIndex, watch_wealthEitherMaxIndex : clsP.watch_wealthEitherMaxIndex, watch_syncSocialWealth : clsP.watch_syncSocialWealth, watch_socialClassIndex : clsP.watch_socialClassIndex, watch_wealthIndex : clsP.watch_wealthIndex, watch_socialBenefit1 : clsP.watch_socialBenefit1, watch_socialBenefit2 : clsP.watch_socialBenefit2, watch_socialBenefit3 : clsP.watch_socialBenefit3, schoolSelectChangeHandler : clsP.schoolSelectChangeHandler, watch_validAffordCurrentSchool : clsP.watch_validAffordCurrentSchool, get_totalDraftedProfSlots : clsP.get_totalDraftedProfSlots, get_maxBuyableProfSlots : clsP.get_maxBuyableProfSlots, get_excessDraftedSlots : clsP.get_excessDraftedSlots, watch_excessDraftedSlots : clsP.watch_excessDraftedSlots, get_validAffordCurrentSchool : clsP.get_validAffordCurrentSchool, get_notBankrupt : clsP.get_notBankrupt, isValidAll : clsP.isValidAll, get_stillHaveProfSpend : clsP.get_stillHaveProfSpend, saveFinaliseAll : clsP.saveFinaliseAll, saveCharToBox : clsP.saveCharToBox, executeCopyContents : clsP.executeCopyContents, confirmFinaliseAll : clsP.confirmFinaliseAll, get_moneyLeft : clsP.get_moneyLeft, get_moneyLeftStr : clsP.get_moneyLeftStr, get_liquidity : clsP.get_liquidity, get_liquidityStr : clsP.get_liquidityStr, get_startingMoneyModifiedCP : clsP.get_startingMoneyModifiedCP, get_startingMoneyBonusCP : clsP.get_startingMoneyBonusCP, get_startingMoneyPenaltyCP : clsP.get_startingMoneyPenaltyCP, get_inventoryCost : clsP.get_inventoryCost, get_moneyAvailable : clsP.get_moneyAvailable, get_moneyAvailableStr : clsP.get_moneyAvailableStr, get_checkoutBonuses : clsP.get_checkoutBonuses, get_checkoutPenalties : clsP.get_checkoutPenalties, get_checkoutSchool : clsP.get_checkoutSchool, get_checkoutInventory : clsP.get_checkoutInventory, exitInventory : clsP.exitInventory, proceedToInventory : clsP.proceedToInventory, get_placeholder : clsP.get_placeholder, get_shouldShowBnBs : clsP.get_shouldShowBnBs, privateInit : clsP.privateInit, get_campaignPowLevel : clsP.get_campaignPowLevel, get_categoryRace : clsP.get_categoryRace, get_categoryAttributes : clsP.get_categoryAttributes, get_categorySocialClassWealth : clsP.get_categorySocialClassWealth, get_categoriesRemainingAssignable : clsP.get_categoriesRemainingAssignable, get_isValidCategories : clsP.get_isValidCategories, checkWarningCategories : clsP.checkWarningCategories, get_isHuman : clsP.get_isHuman, get_selectedRaceName : clsP.get_selectedRaceName, resetToHuman : clsP.resetToHuman, selectRaceAt : clsP.selectRaceAt, settleRaceTier : clsP.settleRaceTier, get_promptSettleRaceTier : clsP.get_promptSettleRaceTier, get_raceTier : clsP.get_raceTier, getRaceTierFromPCP : clsP.getRaceTierFromPCP, get_totalAttributePointsSpent : clsP.get_totalAttributePointsSpent, get_remainingAttributePoints : clsP.get_remainingAttributePoints, get_availableAttributePoints : clsP.get_availableAttributePoints, canBuyMoreAttributeLevels : clsP.canBuyMoreAttributeLevels, checkWarningAttributes : clsP.checkWarningAttributes, updateSocialBenefitsToBoon : clsP.updateSocialBenefitsToBoon, validateSocialBenefitsWithClass : clsP.validateSocialBenefitsWithClass, socialBenefitSelectChangeHandler : clsP.socialBenefitSelectChangeHandler, get_availableWealthPointsBase : clsP.get_availableWealthPointsBase, get_availableWealthPoints : clsP.get_availableWealthPoints, get_remainingWealthPointsFull : clsP.get_remainingWealthPointsFull, get_remainingWealthPoints : clsP.get_remainingWealthPoints, wealthAssetsWorthLen : clsP.wealthAssetsWorthLen, wealthAssetsWorth : clsP.wealthAssetsWorth, get_socialBenefitChoices : clsP.get_socialBenefitChoices, get_curSelectedSocialClass : clsP.get_curSelectedSocialClass, get_maxSocialClassIndex : clsP.get_maxSocialClassIndex, constraintSocialWealth : clsP.constraintSocialWealth, get_socialEitherMaxIndex : clsP.get_socialEitherMaxIndex, get_wealthEitherMaxIndex : clsP.get_wealthEitherMaxIndex, get_socialClassPlaceHolderName : clsP.get_socialClassPlaceHolderName, get_promptSettleSocialTier : clsP.get_promptSettleSocialTier, get_socialPCPRequired : clsP.get_socialPCPRequired, settleSocialTier : clsP.settleSocialTier, get_unevenSocialPCPRequired : clsP.get_unevenSocialPCPRequired, get_unevenMaxSocialClassIndex : clsP.get_unevenMaxSocialClassIndex, get_unevenMaxWealthIndex : clsP.get_unevenMaxWealthIndex, setSocialClassIndex : clsP.setSocialClassIndex, setWealthIndex : clsP.setWealthIndex, updateSocialToCharsheet : clsP.updateSocialToCharsheet, get_maxWealthAssets : clsP.get_maxWealthAssets, updateMoneyToCharsheet : clsP.updateMoneyToCharsheet, saveFinaliseSocial : clsP.saveFinaliseSocial, get_totalBaneExpenditure : clsP.get_totalBaneExpenditure, get_maxBanePointsEarnable : clsP.get_maxBanePointsEarnable, get_totalBanePointsEarned : clsP.get_totalBanePointsEarned, get_totalBanePointsSpent : clsP.get_totalBanePointsSpent, get_totalBoonExpenditure : clsP.get_totalBoonExpenditure, get_boonsArray : clsP.get_boonsArray, get_banesArray : clsP.get_banesArray, get_BnBpoints : clsP.get_BnBpoints, get_totalBnBScore : clsP.get_totalBnBScore, get_maxBoonsSpendable : clsP.get_maxBoonsSpendable, get_maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft, get_maxBanesSpendable : clsP.get_maxBanesSpendable, get_maxBanesSpendableLeft : clsP.get_maxBanesSpendableLeft, addSkill : clsP.addSkill, deleteSkillInput : clsP.deleteSkillInput, onSkillPacketChange : clsP.onSkillPacketChange, onSkillIndividualChange : clsP.onSkillIndividualChange, saveFinaliseSkillsFromPackets : clsP.saveFinaliseSkillsFromPackets, clampSkillValue : clsP.clampSkillValue, isSkillLabelBinded : clsP.isSkillLabelBinded, get_SkillPoints : clsP.get_SkillPoints, get_individualSkillsSpent : clsP.get_individualSkillsSpent, get_maxSkillPacketsAllowed : clsP.get_maxSkillPacketsAllowed, get_maxIndividualSkillsSpendable : clsP.get_maxIndividualSkillsSpendable, get_individualSkillsRemaining : clsP.get_individualSkillsRemaining, get_totalSkillPointsProvided : clsP.get_totalSkillPointsProvided, get_skillPacketsRemaining : clsP.get_skillPacketsRemaining, get_skillPacketsBought : clsP.get_skillPacketsBought, get_totalSkillPointsLeft : clsP.get_totalSkillPointsLeft, selectSchoolAssign : clsP.selectSchoolAssign, canStillSpendSchool : clsP.canStillSpendSchool, get_hasSchool : clsP.get_hasSchool, get_schoolProfLevel : clsP.get_schoolProfLevel, get_ProfPoints : clsP.get_ProfPoints, get_totalAvailProfSlots : clsP.get_totalAvailProfSlots, get_profArcCost : clsP.get_profArcCost, get_schoolArcCost : clsP.get_schoolArcCost, get_profExpenditure : clsP.get_profExpenditure, get_totalProfSlotExpenditure : clsP.get_totalProfSlotExpenditure, get_maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, get_maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, get_maxRangedProfSlots : clsP.get_maxRangedProfSlots, get_maxTalentSlots : clsP.get_maxTalentSlots, get_maxSuperiorSlots : clsP.get_maxSuperiorSlots, get_maxMasterySlots : clsP.get_maxMasterySlots, get_totalProfecienciesBought : clsP.get_totalProfecienciesBought, get_maxClampedMeleeProfs : clsP.get_maxClampedMeleeProfs, get_maxClampedRangedProfs : clsP.get_maxClampedRangedProfs, get_levelsExpenditure : clsP.get_levelsExpenditure, get_totalProfArcExpenditure : clsP.get_totalProfArcExpenditure, get_profPointsLeft : clsP.get_profPointsLeft, get_traceProfCoreRangedCurrent : clsP.get_traceProfCoreRangedCurrent, get_traceProfCoreMeleeCurrent : clsP.get_traceProfCoreMeleeCurrent, get_traceProfCoreRangedCount : clsP.get_traceProfCoreRangedCount, get_traceProfCoreMeleeCount : clsP.get_traceProfCoreMeleeCount, saveFinaliseCleanupChar : clsP.saveFinaliseCleanupChar};
 		this.props = { exitBtnCallback : { required : false, type : Function}, finaliseSaveCallback : { required : false, type : Function}};
 		this.watch = { maxBoonsSpendableLeft : clsP.watch_maxBoonsSpendableLeft, raceTier : clsP.watch_raceTier, socialEitherMaxIndex : clsP.watch_socialEitherMaxIndex, wealthEitherMaxIndex : clsP.watch_wealthEitherMaxIndex, syncSocialWealth : clsP.watch_syncSocialWealth, socialClassIndex : clsP.watch_socialClassIndex, wealthIndex : clsP.watch_wealthIndex, socialBenefit1 : clsP.watch_socialBenefit1, socialBenefit2 : clsP.watch_socialBenefit2, socialBenefit3 : clsP.watch_socialBenefit3, validAffordCurrentSchool : clsP.watch_validAffordCurrentSchool, excessDraftedSlots : clsP.watch_excessDraftedSlots};
 	}
 	,__class__: troshx_sos_vue_CharGen
 });
+var troshx_sos_vue_CharSheetVue = function() {
+	haxevx_vuex_core_VComponent.call(this);
+	this.mixins = [troshx_sos_vue_CharVueMixin.getSampleInstance(),troshx_sos_vue_input_MixinInput.getInstance(),new troshx_sos_vue_InventoryStandalone(null)];
+};
+$hxClasses["troshx.sos.vue.CharSheetVue"] = troshx_sos_vue_CharSheetVue;
+troshx_sos_vue_CharSheetVue.__name__ = ["troshx","sos","vue","CharSheetVue"];
+troshx_sos_vue_CharSheetVue.__super__ = haxevx_vuex_core_VComponent;
+troshx_sos_vue_CharSheetVue.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
+	setInventory: function(chk) {
+		this["char"].inventory = chk;
+	}
+	,get_domainId: function() {
+		return troshx_sos_vue_Globals.DOMAIN_CHARACTER;
+	}
+	,recoverFatique: function(amt) {
+		this["char"].fatique -= amt;
+		if(this["char"].fatique < 0) {
+			this["char"].fatique = 0;
+		}
+	}
+	,Data: function() {
+		return new troshx_sos_vue_CharSheetVueData(this.injectChar);
+	}
+	,Created: function() {
+		troshx_sos_sheets_CharSheet.dynSetField = Vue.set;
+	}
+	,Components: function() {
+		var _m_ = { };
+		_m_["BoonBaneInput"] = new troshx_sos_vue_inputs_impl_BoonBaneInput();
+		_m_["bb-apply"] = new troshx_sos_vue_widgets_BoonBaneApplyDetails();
+		_m_["SkillLibInput"] = new troshx_sos_vue_inputs_impl_SkillLibInput();
+		_m_["SkillSubjectCreator"] = new troshx_sos_vue_widgets_SkillSubjectCreator();
+		_m_["InputNameLabel"] = new troshx_sos_vue_inputs_impl_InputNameLabel();
+		_m_["ArrayOf"] = new troshx_sos_vue_uifields_ArrayOf();
+		_m_["ArrayOfBits"] = new troshx_sos_vue_uifields_ArrayOfBits();
+		_m_["Bitmask"] = new troshx_sos_vue_uifields_Bitmask();
+		_m_["Money"] = new troshx_sos_vue_uifields_MoneyField();
+		_m_["inventory"] = new troshx_sos_vue_InventoryVue();
+		_m_["inventory-manager"] = new troshx_sos_vue_InventoryManager();
+		_m_["tree-browser"] = new troshx_sos_vue_widgets_GingkoTreeBrowser();
+		return _m_;
+	}
+	,openTreeBrowser: function() {
+		var _gthis = this;
+		if(!this.treeBrowserInited) {
+			this.treeBrowserInited = true;
+		}
+		Vue.nextTick(function() {
+			_gthis.$refs.treeBrowser.open();
+		});
+	}
+	,openClipboardWindow: function() {
+		this.clipboardLoadContents = "";
+		this.$refs.clipboardWindow.open();
+	}
+	,openFromTreeBrowser: function(contents,filename,disableCallback) {
+		if(this.loadCharContents(contents)) {
+			this.$refs.treeBrowser.close();
+		}
+	}
+	,get_availableTypes: function() {
+		return { "troshx.sos.sheets.CharSheet" : true};
+	}
+	,get_hasSampleWound: function() {
+		return this["char"].hasWound(this.sampleWound);
+	}
+	,confirmAddWound: function() {
+		var lastWound = this.sampleWound;
+		if(this.forceNewSampleWound) {
+			lastWound.makeUnique();
+		}
+		this.sampleWound = null;
+		this["char"].applyWound(lastWound);
+		this.$refs.addWoundWindow.close();
+	}
+	,get_woundFlagLabels: function() {
+		return troshx_sos_core_Wound.getFlagLabels();
+	}
+	,get_damageTypeLabels: function() {
+		return troshx_sos_core_DamageType.getFlagLabels();
+	}
+	,matchExistingSampleWound: function() {
+		var sample = this.sampleWound;
+		var wound = this["char"].woundHash[sample.locationId + "_" + sample.level + "_" + sample.damageType + sample.uidSuffix];
+		sample.pain = wound.pain;
+		sample.BL = wound.BL;
+		sample.stun = wound.stun;
+	}
+	,openAddNewWound: function() {
+		this.sampleWound = troshx_sos_core_Wound.getNewEmptyAssign();
+		this.forceNewSampleWound = false;
+		this.$refs.addWoundWindow.open();
+	}
+	,exitInventory: function() {
+		var _gthis = this;
+		this.insideInventory = false;
+		Vue.nextTick(function() {
+			var htmlElement = _gthis.$refs.inventoryHolder;
+			window.scroll({ top : htmlElement.offsetTop});
+		});
+	}
+	,proceedToInventory: function() {
+		var _gthis = this;
+		this.insideInventory = true;
+		Vue.nextTick(function() {
+			var htmlElement = _gthis.$refs.inventoryHolder;
+			window.scroll({ top : htmlElement.offsetTop});
+		});
+	}
+	,saveFinaliseSkills: function() {
+		this["char"].skills.clearAllSkills(true);
+		var _g1 = 0;
+		var _g = this.skillObjs.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var ss = this.skillObjs[i];
+			var total = this.skillValues[ss.name];
+			if(total > 0) {
+				this["char"].skills.skillHash[ss.name] = total;
+			}
+		}
+	}
+	,loadCharacter: function() {
+		this.loadCharContents(this.savedCharContents);
+	}
+	,loadCharacterClipboardWindow: function() {
+		if(this.loadCharContents(this.clipboardLoadContents)) {
+			this.$refs.clipboardWindow.close();
+		}
+	}
+	,loadCharContents: function(contents) {
+		var newItem;
+		try {
+			newItem = new haxe_Unserializer(contents).unserialize();
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			console.log(e);
+			js_Browser.alert("Sorry, failed to unserialize save-content string!");
+			return false;
+		}
+		if(!js_Boot.__instanceof(newItem,troshx_sos_sheets_CharSheet)) {
+			console.log(newItem);
+			js_Browser.alert("Sorry, unserialized type isn't CharSeet!");
+			return false;
+		}
+		var me = js_Boot.__instanceof(newItem,troshx_sos_sheets_CharSheet) ? newItem : null;
+		me.postSerialization();
+		this["char"] = me;
+		return true;
+	}
+	,saveCharacter: function() {
+		this.saveFinaliseSkills();
+		this.saveFinaliseCleanupChar();
+		this.saveCharToBox();
+	}
+	,saveFinaliseCleanupChar: function() {
+		this["char"].boons.filter(function(bb) {
+			return !bb._canceled;
+		});
+		this["char"].banes.filter(function(bb1) {
+			return !bb1._canceled;
+		});
+		this["char"].inventory.cleanupBeforeSerialize();
+	}
+	,executeCopyContents: function() {
+		var textarea = this.$refs.savedCharTextArea;
+		textarea.select();
+		var result = window.document.execCommand("copy");
+		if(result != null) {
+			var htmlElem = this.$refs.copyNotify;
+			htmlElem.style.display = "inline-block";
+			haxe_Timer.delay(function() {
+				htmlElem.style.display = "none";
+			},3000);
+		} else {
+			js_Browser.alert("Sorry, failed to copy to clipboard!");
+		}
+	}
+	,saveCharToBox: function() {
+		var s = new haxe_Serializer();
+		s.useCache = true;
+		s.serialize(this["char"]);
+		var str = s.toString();
+		this.savedCharContents = str;
+		return str;
+	}
+	,get_maxAvailableProfSlots: function() {
+		if(this["char"].school != null) {
+			return this["char"].school.profLimit;
+		} else {
+			return 0;
+		}
+	}
+	,get_maxMeleeProfSlots: function() {
+		var r = this.maxAvailableProfSlots - this.profCoreListRanged.length;
+		if(this["char"].school != null) {
+			if(r < 0) {
+				return 0;
+			} else {
+				return r;
+			}
+		} else {
+			return 0;
+		}
+	}
+	,get_maxRangedProfSlots: function() {
+		var r = this.maxAvailableProfSlots - this.profCoreListMelee.length;
+		if(this["char"].school != null) {
+			if(r < 0) {
+				return 0;
+			} else {
+				return r;
+			}
+		} else {
+			return 0;
+		}
+	}
+	,get_talentsAvailable: function() {
+		return troshx_sos_chargen_CharGenData.getTalentsAvailable();
+	}
+	,get_superiorsAvailable: function() {
+		return troshx_sos_chargen_CharGenData.getSuperiorsAvailable();
+	}
+	,get_maxTalentSlots: function() {
+		var r = this["char"].schoolLevel > 0 ? this.talentsAvailable[this["char"].schoolLevel - 1] : 0;
+		if(this["char"].school != null) {
+			return r;
+		} else {
+			return 0;
+		}
+	}
+	,get_maxSuperiorSlots: function() {
+		var r = this["char"].schoolLevel > 0 ? this.superiorsAvailable[this["char"].schoolLevel - 1] : 0;
+		if(this["char"].school != null) {
+			return r;
+		} else {
+			return 0;
+		}
+	}
+	,addSkill: function(skill,special) {
+		var skillToSpecial;
+		var specialToSkill;
+		skillToSpecial = this.skillSubjectHash[skill];
+		if(skillToSpecial == null) {
+			skillToSpecial = [];
+			Vue.set(this.skillSubjectHash,skill,skillToSpecial);
+		}
+		specialToSkill = this.skillSubjectHash[special];
+		if(specialToSkill == null) {
+			specialToSkill = [];
+			Vue.set(this.skillSubjectHash,special,specialToSkill);
+		}
+		skillToSpecial.push(special);
+		specialToSkill.push(skill);
+		var name = skill + " (" + special + ")";
+		Vue.set(this.skillValues,name,0);
+		this.skillObjs.push({ name : name, attribs : 0});
+	}
+	,deleteSkillInput: function(index) {
+		var obj = this.skillObjs[index];
+		var spl = troshx_sos_core_Skill.getSplitFromSpecialisation(obj.name);
+		var skill = spl[0];
+		var special = spl[1];
+		var skillToSpecial = this.skillSubjectHash[skill];
+		var specialToSkill = this.skillSubjectHash[special];
+		skillToSpecial.splice(skillToSpecial.indexOf(special),1);
+		specialToSkill.splice(skillToSpecial.indexOf(skill),1);
+		troshx_sos_chargen_CharGenData.dynDeleteField(this.skillValues,obj.name);
+		this.skillObjs.splice(index,1);
+	}
+	,Template: function() {
+		return "<div class=\"chargen\">\r\n\t<br/>\r\n\t<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click=\"openTreeBrowser\" v-show=\"!insideInventory\">&#127759;</button> <button  v-show=\"!insideInventory\" v-on:click=\"$refs.clipboardWindow.open()\">&#128203;</button></h1>\r\n\t\r\n\t<sweet-modal ref=\"treeBrowser\" :class=\"{reset:true}\" v-if=\"treeBrowserInited\" >\t\t\r\n\t\t<tree-browser :availableTypes=\"availableTypes\" v-on:open=\"openFromTreeBrowser\" :initialDomain=\"domainId\" />\r\n\t</sweet-modal>\r\n\t\r\n\t<sweet-modal ref=\"addWoundWindow\" >\r\n\t\t<div v-if=\"sampleWound!=null\">\r\n\t\t\t<h3>Add/Apply Wound</h3>\r\n\t\t\t<div>Location: \r\n\t\t\t<select v-model=\"sampleWound.locationId\">\r\n\t\t\t\t<option value=\"\" :key=\"\"></option>\r\n\t\t\t\t<option v-for=\"(li, i) in char.body.hitLocations\" :value=\"li.get_uid()\" :key=\"li.get_uid()\">{{li.name}}</option>\r\n\t\t\t</select></div>\r\n\t\t\t<div>Level: <InputInt :obj=\"sampleWound\" prop=\"level\" :min=\"0\" /></div>\r\n\t\t\t<div>Damage Type: \r\n\t\t\t<select v-model.number=\"sampleWound.damageType\" number>\r\n\t\t\t\t<option :value=\"-1\" :key=\"-1\"></option>\r\n\t\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :key=\"index\" :value=\"index\">{{ label }}</option>\r\n\t\t\t</select></div>\r\n\t\t\t<div :style=\"{opacity: (!hasSampleWound ? .5 : 1), 'pointer-events': (!hasSampleWound ? 'none':'auto') }\"><label>Force New? <input type=\"checkbox\" v-model=\"forceNewSampleWound\"></input></label></div>\r\n\t\t\t<div><button v-on:click=\"confirmAddWound\">Confirm {{ !hasSampleWound || forceNewSampleWound ? 'Add' : 'Re-inflict' }}</button></div>\r\n\t\t\t<hr/>\r\n\t\t\t<div>-<i>Inflict stats</i>-<button v-show=\"hasSampleWound\" v-on:click=\"matchExistingSampleWound()\">Set Existing</button></div>\r\n\t\t\t<div>Stun: <InputInt :obj=\"sampleWound\" prop=\"stun\" :min=\"-1\" /> <i v-show=\"sampleWound.stun<0\">Infinite!</i></div>\r\n\t\t\t<div>Pain: <InputInt :obj=\"sampleWound\" prop=\"pain\" :min=\"-1\" /> <i v-show=\"sampleWound.pain<0\">Infinite!</i></div>\r\n\t\t\t<div>BloodLost (BL): <InputInt :obj=\"sampleWound\" prop=\"BL\" :min=\"0\" /></div>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\r\n\t<sweet-modal ref=\"clipboardWindow\" :class=\"{reset:true}\" >\t\t\r\n\t\t<div>\r\n\t\t\tYou can manually paste saved text stream into text-area and click on Load Character to open a new character!\r\n\t\t\t<div>\r\n\t\t\t\t<textarea ref=\"savedCharTextArea\" character-set=\"UTF-8\" v-model=\"clipboardLoadContents\" style=\"min-height:60px;\"></textarea>\t\r\n\t\t\t</div>\r\n\t\t\t<div><button v-on:click=\"loadCharacterClipboardWindow()\">Load Character</button></div>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\r\n\t<div class=\"chargen__body\" v-if=\"char!=null && !insideInventory\">\r\n\t\t\r\n\t\t<sweet-modal ref=\"awardArcWindow\" v-if=\"false\">\r\n\t\t\t<div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\tHow much arc to AWARD?\r\n\t\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<InputInt :obj=\"$data\" prop=\"arcAwardQty\" :min=\"1\" />\r\n\t\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" v-on:click=\"awardArc(arcAwardQty)\">Award</button>\r\n\t\t\t</div>\r\n\t\t</sweet-modal>\r\n\t\t\r\n\t\t<sweet-modal ref=\"spendArcWindow\" v-if=\"false\">\r\n\t\t\t<div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\tHow much arc to spend?\r\n\t\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<InputInt :obj=\"$data\" prop=\"arcSpendQty\" :min=\"minArcSpendable\" :max=\"maxArcSpendable\" />\r\n\t\t\t\t</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" v-on:click=\"spendArc(arcSpendQty)\">Award</button>\r\n\t\t\t</div>\r\n\t\t</sweet-modal>\r\n\t\t\t\r\n\t\t\t\r\n\t\t\r\n\t\t<section class=\"gen-general\" id=\"gen-general\">\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><label>Name:<InputNameLabel :obj=\"char\" prop=\"name\"></InputNameLabel></label></div>\r\n\t\t\t\t<div><label>Title <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"title\"></InputNameLabel></label></div>\r\n\t\t\t\t<div><label>Nickname <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"nickname\"></InputNameLabel></label></div>\r\n\t\t\t\t<div><label>Faction/Assosiation <i>(optional)</i>:<InputNameLabel :obj=\"char\" prop=\"faction\"></InputNameLabel></label></div>\r\n\t\t\t\t<div><label>Gender:</label><select number v-model.number=\"char.gender\"><option :value=\"0\">Male</option><option :value=\"1\">Female</option></select></div>\r\n\t\t\t\t<div><label>Left-handed?:<input type=\"checkbox\" v-model=\"char.leftHanded\"></input></label></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\tKnown as: <b>{{addressedAs}}</b>\r\n\t\t\t\t<div>Race: <b>{{raceName}}</b></div>\r\n\t\t\t\t<div>Social Class/Wealth: <b>{{char.socialClass.name}} / {{char.socialClass.wealth}}</b> <label>&#128274;</label><input type=\"checkbox\" v-model=\"lockWealth\"></input></div>\r\n\t\t\t\t<div><Money :obj=\"char\" prop=\"money\" :readonly=\"lockWealth\"></Money></div>\r\n\t\t\t\t<div class=\"wealth-assets\">\r\n\t\t\t\t\t<label>Your Wealth Assets:</label>\r\n\t\t\t\t\t<ArrayOf of=\"WealthAssetAssign\" :defaultValue=\"getEmptyWealthAssign\" :obj=\"char\" prop=\"wealthAssets\" :minLength=\"0\" :readonly=\"lockWealth\" />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<label style=\"vertical-align:top\">Notes:</label><textarea v-model=\"char.notes\"  class=\"notes\"></textarea>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-attributes\" id=\"gen-attributes\">\r\n\t\t\t<h2>Attributes &amp; Stats <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockAttributes\"></input></span></h2>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><label>Strength:</label><InputInt :obj=\"char\" prop=\"strength\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"strength != STR\" :class=\"[STR<strength ? 'lower' : 'higher', {'zero-neg':STR<=0} ]\">{{STR}}</span></div>\r\n\t\t\t\t<div><label>Agility:</label><InputInt :obj=\"char\" prop=\"agility\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"agility != AGI\" :class=\"[AGI<agility ? 'lower' : 'higher', {'zero-neg':AGI<=0}]\">{{AGI}}</span></div>\r\n\t\t\t\t<div><label>Endurance:</label><InputInt :obj=\"char\" prop=\"endurance\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"endurance != END\" :class=\"[END<endurance ? 'lower' : 'higher', {'zero-neg':END<=0}]\">{{END}}</span></div>\r\n\t\t\t\t<div><label>Health:</label><InputInt :obj=\"char\" prop=\"health\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"health != HLT\" :class=\"[HLT<health ? 'lower' : 'higher', {'zero-neg':HLT<=0}]\">{{HLT}}</span></div>\r\n\t\t\t\t<div><label>Willpower:</label><InputInt :obj=\"char\" prop=\"willpower\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"willpower != WIP\" :class=\"[WIP<willpower ? 'lower' : 'higher', {'zero-neg':WIP<=0}]\">{{WIP}}</span></div>\r\n\t\t\t\t<div><label>Wit:</label><InputInt :obj=\"char\" prop=\"wit\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"wit != WIT\" :class=\"[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]\">{{WIT}}</span></div>\r\n\t\t\t\t<div><label>Intelligence:</label><InputInt :obj=\"char\" prop=\"intelligence\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"intelligence != INT\" :class=\"[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]\">{{INT}}</span></div>\r\n\t\t\t\t<div><label>Perception:</label><InputInt :obj=\"char\" prop=\"perception\" :min=\"1\" :readonly=\"lockAttributes\" /><span class=\"modified-attribute\" v-show=\"perception != PER\" :class=\"[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]\">{{PER}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div><b>ADR</b> (Adroitness): <span class=\"modified-attribute\" :class=\"[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']\"><b>{{ADR}}</b></span><i v-show=\"adr!=ADR\" class=\"baseshow\">({{adr}})</i></div>\r\n\t\t\t\t<div><b>SDB</b> (Strength Damage Bonus): <span><b>{{SDB}}</b></span></div>\r\n\t\t\t\t<div><b>GRIT</b> (Grit): <span class=\"modified-attribute\" :class=\"[baseGrit==GRIT ?'base' : GRIT<baseGrit ? 'lower' : 'higher']\"><b>{{GRIT}}</b></span><i v-show=\"baseGrit!=GRIT\" class=\"baseshow\">({{baseGrit}})</i></div>\r\n\t\t\t\r\n\t\t\t\t<div><b>MOB</b> (Mobility): <span class=\"modified-attribute\" :class=\"[MOB==mob ?'base' : MOB<mob ? 'lower' : 'higher']\"><b>{{MOB}}</b></span><i v-show=\"mob!=MOB\" class=\"baseshow\">({{mob}})</i></div>\r\n\t\t\t\t<div><b>CAR</b> (Carry): <span class=\"modified-attribute\" :class=\"[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']\"><b>{{CAR}}</b></span><i v-show=\"car!=CAR\" class=\"baseshow\">({{car}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><b>CHA</b> (Charisma): <span class=\"modified-attribute\" :class=\"[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']\"><b>{{CHA}}</b></span><i v-show=\"cha!=CHA\" class=\"baseshow\">({{cha}})</i></div>\r\n\t\t\t\t\r\n\t\t\t\t<div><i>TOU</i> (Toughness): <span class=\"modified-attribute\" :class=\"[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']\"><b>{{TOU}}</b></span><i v-show=\"tou!=TOU\" class=\"baseshow\">({{tou}})</i></div>\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<div>Weight/Carry: <b>{{inventoryWeightLbl}}</b> / <b :style=\"{fontWeight:encumbranceLvl>=1 ?'normal':'bold'}\">{{CAR}}</b></div>\r\n\t\t\t\t<div>Master-hand: <span v-if=\"masterHandItem!=null\"><b>{{masterHandItem.name}}</b> <span v-show=\"masterWeapon!=null\">&#9876;</span><span v-if=\"carriedShield!=null && carriedShield==masterHandItem\"><span class=\"shield-icon-inv\">☗</span><select v-model.number=\"char.inventory.shieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select></span></span></div>\r\n\t\t\t\t<div>Off-hand: <span v-if=\"offHandItem!=null\"><b>{{offHandItem.name}}</b> <span v-show=\"offhandWeapon!=null\">&#9876;</span><span v-if=\"carriedShield!=null && carriedShield==offHandItem\"><span class=\"shield-icon-inv\">☗</span><select v-model.number=\"char.inventory.shieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select></span></span></div>\r\n\t\t\t\t<div>Reach: <span class=\"modified-attribute\" :class=\"[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']\"><b>{{reach}}</b></span><i v-show=\"reachBase!=reach\" class=\"baseshow\">({{reachBase}})</i></div>\r\n\t\t\t\t<div>Perception Penalty: <b>{{ perceptionPenalty }}</b></div>\r\n\t\t\t\t<div v-if=\"heldProfeciencies!=null\">&#9876;: <b style=\"max-width:120px\">{{heldProfeciencies}}</b></div>\r\n\t\t\t\t<div v-else>Defaulting&#9876;from:<br/><b style=\"max-width:120px\">{{defaultProfs}}</b></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t<div>School Level: <b>{{char.schoolLevel}}</b></div>\r\n\t\t\t\t<div class=\"cp\"><b>CP</b> (Melee Combat Pool): <span :class=\"[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]\"><b>{{CP}}</b></span><i v-show=\"CP!=baseCP\" class=\"baseshow\">({{baseCP}})</i>  (<i>{{CP-char.schoolLevel}}</i> CP without &#9876;)</div>\r\n\t\t\t\t\r\n\t\t\t\t<div><i>CP - Pain(<span v-show=\"totalPain>0\" class=\"got-pain\">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div>Encumbrance Level: <span><b :style=\"{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}\">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>\r\n\t\t\t\t<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>\r\n\t\t\t\t<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>\r\n\t\t\t\t<div>Recovery Amount: <span class=\"modified-attribute\" :class=\"[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']\"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show=\"recoveryRateAmount!=recoveryRateAmountBase\" class=\"baseshow\">({{recoveryRateAmountBase}})</i><a v-show=\"char.fatique > 0\" href=\"javascript:;\" v-on:click=\"recoverFatique(recoveryRateAmount)\">[+]</a></div>\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<div><b>Fatique Points:</b><InputInt :min=\"0\" :obj=\"char\" prop=\"fatique\" /> {{fatiqueLevel}}:<b :style=\"{fontWeight:fatiqueLevel>=1 ?'bold':'normal'}\">{{curFatiqueRow.name}}</b></div>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"char.prone\"></input>Prone?</label></div>\r\n\t\t\t\t<hr/>\r\n\t\t\t\t<div><b>Health Lost:</b><InputInt :min=\"0\" :obj=\"char\" prop=\"healthLoss\" /></div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\r\n\t\t<hr/>\r\n\t\t\t\t\r\n\t\t<section class=\"gen-wounds\" id=\"gen-wounds\">\r\n\t\t\t<h2>Wounds <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockWounds\"></input></span> <span class=\"valuer\"><button v-on:click=\"openAddNewWound()\">Add/Apply Wound</button></span></h2>\r\n\t\t\t<ul v-if=\"char.wounds.length > 0\" class=\"wounds\">\r\n\t\t\t\t<li v-for=\"(li, i) in char.wounds\" :key=\"li.get_uid()\">{{li.getDescLabel(char.body, damageTypeLabels)}} <span class=\"stats\"><span><label>Stun:<InputInt :readonly=\"lockWounds\" :min=\"-1\" :obj=\"li\" prop=\"stun\" /></label><i v-show=\"li.stun<0\">infinite!</i></span> <span><label>Pain:<InputInt :readonly=\"lockWounds\" :min=\"-1\" :obj=\"li\" prop=\"pain\" /></label><i v-show=\"li.pain<0\">infinite!</i></span> <span><label>BL:<InputInt :readonly=\"lockWounds\" :min=\"0\" prop=\"BL\" :obj=\"li\"  /></label></span> <Bitmask :obj=\"li\" prop=\"flags\" :labels=\"woundFlagLabels\" /> <span><label>Notes:<InputString :min=\"0\" prop=\"notes\" :obj=\"li\" class=\"notes\"  /></label></span> <span><label>Age:<InputNumber :min=\"0\" prop=\"age\" :obj=\"li\"  /></label></span></span></li>\r\n\t\t\t</ul>\r\n\t\t\t<div>\r\n\t\t\t\t<div>Total Pain: <b>{{totalPain}}</b></div>\r\n\t\t\t\t<div>Total Blood Lost (BL): <b>{{totalBloodLost}}</b></div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-bnb\"  id=\"gen-bnb\">\r\n\t\t\t<h2>Boons &amp; Banes</h2>\r\n\t\t\t<h3><span class=\"underline\">Boons (if any):</span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? 'javascript:;' : undefined\" :class=\"{canceled:li._canceled}\" v-for=\"li in boonsArray\"><span v-if=\"li.__hasUIFields__\" v-on:click=\"$refs['bb_'+li.get_uid()][0].open()\">{{li.boon.name}} {{getBracketLabelBnB(li)}}</span><span v-else>{{li.boon.name}} {{getBracketLabelBnB(li)}}</span></a></span></h3>\r\n\t\t\t<h3><span>Banes (if any):</span><span class=\"header-liners\"></span><span class=\"header-liners\"><a :href=\"li.__hasUIFields__ ? 'javascript:;' : undefined\"  :class=\"{canceled:li._canceled}\" v-for=\"li in banesArray\"><span v-if=\"li.__hasUIFields__\" v-on:click=\"$refs['bb_'+li.get_uid()][0].open()\">{{li.bane.name}} {{getBracketLabelBnB(li)}}</span><span v-else>{{li.bane.name}} {{getBracketLabelBnB(li)}}</span></a></span></h3>\r\n\t\t\t<div class=\"opencloselink\"><a href=\"#\" v-show=\"showBnBs\" v-on:click.prevent=\"showBnBs=false\">^ Hide</a><a href=\"#\" v-show=\"!showBnBs\" v-on:click.prevent=\"showBnBs=true\">Show More &gt;</a> &nbsp;&nbsp;</div>\r\n\t\t\t<div v-show=\"showBnBs\">\r\n\t\t\t\t<div class=\"new-bnbs\">\r\n\t\t\t\t\t<h3>Choose Boons <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockBoons\"></input></span></h3>\r\n\t\t\t\t\t<div class=\"boon-tags\">\r\n\t\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in boonAssignList\" :key=\"i\" :obj=\"li\" :readonly=\"lockBoons\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\" v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\r\n\t\t\t\t\t</div>\t\r\n\t\t\t\t\t<h3>Choose Banes <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockBanes\"></input></span></h3>\r\n\t\t\t\t\t<div class=\"bane-tags\">\r\n\t\t\t\t\t\t<BoonBaneInput v-for=\"(li, i) in baneAssignList\" :key=\"i\" :obj=\"li\" :readonly=\"lockBanes\" prop=\"rank\" v-on:resetBB=\"resetBB\" v-on:uncancel=\"uncancel\"  v-on:addBB=\"addBB\" v-on:removeBB=\"removeBB\"  v-on:updateRankBB=\"updateRankBB\" v-on:updateCanceledBB=\"updateCanceledBB\" />\t\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\r\n\t\t\t<sweet-modal v-for=\"(li,i) in boonsArray\" :key=\"'bb_'+li.get_uid()\" :ref=\"'bb_'+li.get_uid()\"  >\t\t\r\n\t\t\t\t<bb-apply :assign=\"li\" :remainingPoints=\"maxBoonsSpendableLeft\" :ingame=\"char.ingame\"></bb-apply>\r\n\t\t\t</sweet-modal>\r\n\r\n\t\t\t\r\n\t\t\t<sweet-modal v-for=\"(li,i) in banesArray\" :key=\"'bb_'+li.get_uid()\" :ref=\"'bb_'+li.get_uid()\"  >\r\n\t\t\t\t<bb-apply :assign=\"li\" :ingame=\"char.ingame\" v-on:callback=\"onBaneCallbackReceived\"></bb-apply>\r\n\t\t\t</sweet-modal>\r\n\t\t\r\n\t\t</section>\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<section class=\"gen-skills\"  id=\"gen-skills\">\r\n\t\t\t<h2>Skills</h2>\r\n\t\t\t<h3>Skill(s): <span class=\"header-liners\"><span v-for=\"(skillObj, i) in skillObjs\" :key=\"skillObj.name\" v-if=\"skillValues[skillObj.name]>0\">{{ skillObj.name }}:<b>{{skillValues[skillObj.name]}}</b></span></span></h3>\r\n\t\t\t<div class=\"opencloselink\"><a href=\"#\" v-show=\"showEditSkills\" v-on:click.prevent=\"showEditSkills=false\">^ Hide</a><a href=\"#\" v-show=\"!showEditSkills\" v-on:click.prevent=\"showEditSkills=true\">Show More &gt;</a> &nbsp;&nbsp;</div>\r\n\t\t\t<div v-show=\"showEditSkills\">\r\n\t\t\t\t<div class=\"new-skills\">\r\n\t\t\t\t\t<div class=\"skill-lib\">\r\n\t\t\t\t\t\t<SkillLibInput v-for=\"(skillObj, i) in skillObjs\" v-if=\"!skillsTable.requiresSpecialisation[skillObj.name]\" :index=\"i\" :key=\"skillObj.name\" :obj=\"skillValues\" :prop=\"skillObj.name\" :skillsTable=\"skillsTable\" :canDelete=\"i>=startingSkillObjsCount\"  v-on:delete=\"deleteSkillInput\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<SkillSubjectCreator :skillSubjects=\"skillSubjects\" :skillValues=\"skillValues\" :skillList=\"specialisedSkills\" :skillSubjectHash=\"skillSubjectHash\" v-on:addSkill=\"addSkill\"  />\t\t\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<section class=\"gen-schoolprofs\"  id=\"gen-schoolprofs\">\r\n\t\t\t<h2>School &amp; Profeciencies <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockProfs\"></input></span></h2></h2>\r\n\t\t\t<div class=\"select-school\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<label class=\"lbl-school\">School:</label> <span v-if=\"char.school!=null\">{{char.school.name}}</span><b v-show=\"char.school==null\">-</b> , <label class=\"lbl-level\">Level:<InputInt :obj=\"char\" prop=\"schoolLevel\" :readonly=\"lockProfs\" /></label>\r\n\t\t\t\t</div>\r\n\t\r\n\t\t\t</div>\r\n\t\t\t<div class=\"school-info\" v-if=\"char.school != null\">\r\n\t\t\t\t<div>Max Profeciencies: {{ char.school.profLimit }}</div>\r\n\t\t\t\t<div class=\"cost-info\">Learning Profeciency/Arc Point Cost: ( <span :class=\"{selected:isHuman}\"><b class=\"color-free\">Free</b> - Human</span>, &nbsp; <span :class=\"{selected:!isHuman}\"><b>3 points</b> - Non-human)</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"prof-list\">\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Melee Profeciencies:</h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListMelee\" :labels=\"profCoreMeleeListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsMelee\" :maxLength=\"char.school!=null ? maxMeleeProfSlots : undefined\" :readonly=\"lockProfs\" />\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"gen-col\">\r\n\t\t\t\t\t<h5>Ranged Profeciencies:</h5>\r\n\t\t\t\t\t<ArrayOfBits :obj=\"$data\" prop=\"profCoreListRanged\" :labels=\"profCoreRangedListNames\" :bitmaskSetObj=\"char\" bitmaskSetProp=\"profsRanged\" :maxLength=\"char.school!=null ? maxRangedProfSlots : undefined\" :readonly=\"lockProfs\"  />\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"manuever-list gen-col\">\r\n\t\t\t\t<h5>Superior Manuevers:</h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"superiorManueverNotes\"  :maxLength=\"char.school!=null ? maxSuperiorSlots : undefined\" :readonly=\"lockProfs\" />\r\n\t\t\t\t<h5>Mastery Manuever:</h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"masteryManueverNotes\" :maxLength=\"char.school!=null ? maxMasterySlots : undefined\" :readonly=\"lockProfs\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"talent-list gen-col\">\r\n\t\t\t\t<h5>Talents:</h5>\r\n\t\t\t\t<ArrayOf of=\"String\" defaultValue=\"\" :obj=\"char\" prop=\"talentNotes\" :maxLength=\"char.school!=null ? maxTalentSlots : undefined\" :readonly=\"lockProfs\" />\r\n\t\t\t</div>\t\t\r\n\t\t\t<div class=\"school-benefits gen-col\" v-if=\"char.schoolBonuses != null\">\r\n\t\t\t\t<h5>Benefits: <span class=\"tag\" v-for=\"li in schoolTags\" :key=\"li\">{{li}}</span></h5>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t</section>\r\n\t\t\r\n\t\t<hr/>\r\n\t\r\n\t\t<div ref=\"inventoryHolder\">\r\n\t\t\t\r\n\t\t\t<inventory :inventory=\"char.inventory\" :maxWeight=\"CAR\" :injectWeight=\"inventoryWeight\" v-on:loadSheet=\"loadSheet\">\t\r\n\t\t\t\t<span slot=\"titleAfter\">&nbsp;&nbsp;<button v-on:click=\"proceedToInventory\">&#10064;</button></span>\r\n\t\t\t\t<span slot=\"weightAfter\"><span><b :style=\"{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}\">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></span>\r\n\t\t\t</inventory>\r\n\t\t</div>\r\n\t\r\n\t\t<hr/>\r\n\t</div>\r\n\t\t\t\r\n\t<div class=\"chargen__footer\" v-if=\"char!=null && !insideInventory\">\r\n\t\t\t\r\n\t\t<div class=\"sect-arc\">\r\n\t\t\t<h2>Arcs <span class=\"valuer\"><label>&#128274;</label><input type=\"checkbox\" v-model=\"lockArc\"></input></span></h2>\r\n\t\t\t<div><label>Arc awarded: <InputInt :obj=\"char\" :min=\"0\" prop=\"arcPointsAccum\" :readonly=\"lockArc\" /></label></div>\r\n\t\t\t<div><label>Arc spent: <InputInt :obj=\"char\" :min=\"0\" prop=\"arcSpent\" :readonly=\"lockArc\" :max=\"char.arcPointsAccum\" /></label></div>\r\n\t\t\t<div>Loaded (spent/awarded): <i>{{loadedArcSpent}}</i>/<i>{{loadedArcAccum}}</i></div>\r\n\t\t\t<br/>\r\n\t\t\t<div><label>Saga:</label><textarea v-model=\"char.arcSaga\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Epic:</label><textarea v-model=\"char.arcEpic\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Belief:</label><textarea v-model=\"char.arcBelief\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Glory:</label><textarea v-model=\"char.arcGlory\" class=\"notes\"></textarea></div>\r\n\t\t\t<div><label>Flaw:</label><textarea :disabled=\"!isHuman\" v-model=\"char.arcFlaw\" class=\"notes\"></textarea></div>\r\n\t\t</div>\r\n\t\t\t\r\n\t\t<hr/>\r\n\t\t\t\r\n\t\t<div><button v-on:click=\"saveCharacter()\">Save Character</button></div>\r\n\t\t<div><textarea ref=\"savedCharTextArea\" character-set=\"UTF-8\" v-model=\"savedCharContents\" style=\"min-height:60px;\">\r\n\t\t\t\r\n\t\t</textarea><button v-on:click=\"executeCopyContents()\" ref=\"copyButton\">Copy</button><i class=\"copy-notify\" ref=\"copyNotify\" style=\"display:none\">copied!</i></div>\r\n\t\t<div><button v-on:click=\"loadCharacter()\">Load Character!</button></div>\t\r\n\t</div>\r\n\r\n\t<div ref=\"inventoryHolder\" v-if=\"char!=null\">\r\n\t\t<inventory-manager v-if=\"insideInventory\" :backBtnCallback=\"exitInventory\" :inventory=\"char.inventory\" :maxWeight=\"CAR\">\r\n\t\t\t<span slot=\"weightAfter\"><span><b :style=\"{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}\">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></span>\r\n\t\t</inventory-manager>\r\n\t</div>\r\n</div>\r\n";
+	}
+	,get_placeholder: function() {
+		return "[placeholder]";
+	}
+	,watch_injectChar: function(newVal,oldVal) {
+		this["char"] = newVal;
+	}
+	,watch_char: function(newVal) {
+		this.$data.initNewChar();
+	}
+	,_Init: function() {
+		var cls = troshx_sos_vue_CharSheetVue;
+		var clsP = cls.prototype;
+		this.data = clsP.Data;
+		this.created = clsP.Created;
+		this.components = this.Components();
+		this.template = this.Template();
+		this.computed = { maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, maxRangedProfSlots : clsP.get_maxRangedProfSlots, maxTalentSlots : clsP.get_maxTalentSlots, maxSuperiorSlots : clsP.get_maxSuperiorSlots, domainId : clsP.get_domainId, availableTypes : clsP.get_availableTypes, hasSampleWound : clsP.get_hasSampleWound, woundFlagLabels : clsP.get_woundFlagLabels, damageTypeLabels : clsP.get_damageTypeLabels, talentsAvailable : clsP.get_talentsAvailable, superiorsAvailable : clsP.get_superiorsAvailable, placeholder : clsP.get_placeholder};
+		this.methods = { setInventory : clsP.setInventory, get_domainId : clsP.get_domainId, recoverFatique : clsP.recoverFatique, openTreeBrowser : clsP.openTreeBrowser, openClipboardWindow : clsP.openClipboardWindow, openFromTreeBrowser : clsP.openFromTreeBrowser, get_availableTypes : clsP.get_availableTypes, get_hasSampleWound : clsP.get_hasSampleWound, confirmAddWound : clsP.confirmAddWound, get_woundFlagLabels : clsP.get_woundFlagLabels, get_damageTypeLabels : clsP.get_damageTypeLabels, matchExistingSampleWound : clsP.matchExistingSampleWound, openAddNewWound : clsP.openAddNewWound, exitInventory : clsP.exitInventory, proceedToInventory : clsP.proceedToInventory, saveFinaliseSkills : clsP.saveFinaliseSkills, loadCharacter : clsP.loadCharacter, loadCharacterClipboardWindow : clsP.loadCharacterClipboardWindow, loadCharContents : clsP.loadCharContents, saveCharacter : clsP.saveCharacter, saveFinaliseCleanupChar : clsP.saveFinaliseCleanupChar, executeCopyContents : clsP.executeCopyContents, saveCharToBox : clsP.saveCharToBox, get_maxAvailableProfSlots : clsP.get_maxAvailableProfSlots, get_maxMeleeProfSlots : clsP.get_maxMeleeProfSlots, get_maxRangedProfSlots : clsP.get_maxRangedProfSlots, get_talentsAvailable : clsP.get_talentsAvailable, get_superiorsAvailable : clsP.get_superiorsAvailable, get_maxTalentSlots : clsP.get_maxTalentSlots, get_maxSuperiorSlots : clsP.get_maxSuperiorSlots, addSkill : clsP.addSkill, deleteSkillInput : clsP.deleteSkillInput, get_placeholder : clsP.get_placeholder, watch_injectChar : clsP.watch_injectChar, watch_char : clsP.watch_char};
+		this.props = { exitBtnCallback : { required : false, type : Function}, injectChar : { required : false, type : Object}, finaliseSaveCallback : { required : false, type : Function}};
+		this.watch = { injectChar : clsP.watch_injectChar, 'char' : clsP.watch_char};
+	}
+	,__class__: troshx_sos_vue_CharSheetVue
+});
+var troshx_sos_vue_CharSheetVueData = function($char) {
+	this.arcSpendQty = 0;
+	this.arcAwardQty = 0;
+	this.forceNewSampleWound = false;
+	this.savedCharContents = "";
+	this.clipboardLoadContents = "";
+	this.showEditSkills = false;
+	this.showBnBs = false;
+	this.treeBrowserInited = false;
+	this.lockWounds = true;
+	this.lockArc = true;
+	this.lockWealth = true;
+	this.lockProfs = true;
+	this.lockBanes = true;
+	this.lockBoons = true;
+	this.lockAttributes = true;
+	this["char"] = $char == null ? new troshx_sos_sheets_CharSheet() : $char;
+	this.initNewChar();
+};
+$hxClasses["troshx.sos.vue.CharSheetVueData"] = troshx_sos_vue_CharSheetVueData;
+troshx_sos_vue_CharSheetVueData.__name__ = ["troshx","sos","vue","CharSheetVueData"];
+troshx_sos_vue_CharSheetVueData.prototype = {
+	initNewChar: function() {
+		this.sampleWound = null;
+		this.profCoreListMelee = [];
+		this.profCoreListRanged = [];
+		this.sessionArcSpent = 0;
+		this.sessionArcAwarded = 0;
+		this.insideInventory = false;
+		this.loadedArcAccum = this["char"].arcPointsAccum;
+		this.loadedArcSpent = this["char"].arcSpent;
+		this.initBoons();
+		this.initSkills();
+		this.initProfs();
+	}
+	,initProfs: function() {
+		var _g = 0;
+		while(_g < 31) {
+			var i = _g++;
+			if((this["char"].profsMelee & 1 << i) != 0) {
+				this.profCoreListMelee.push(1 << i);
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < 31) {
+			var i1 = _g1++;
+			if((this["char"].profsRanged & 1 << i1) != 0) {
+				this.profCoreListRanged.push(1 << i1);
+			}
+		}
+	}
+	,initBoons: function() {
+		var boonList = troshx_sos_bnb_Boons.getList();
+		this.boonAssignList = [];
+		this.baneAssignList = [];
+		var bb;
+		var _g1 = 0;
+		var _g = boonList.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			bb = boonList[i];
+			var ba = Reflect.field(this["char"].boons.hash,bb.name);
+			if(ba != null) {
+				this.boonAssignList.push(ba);
+			} else if((bb.flags & 1) != 0) {
+				continue;
+			} else {
+				var tmp = this.boonAssignList;
+				ba = boonList[i].getAssign(0,this["char"]);
+				tmp.push(ba);
+			}
+			ba._remainingCached = 999;
+		}
+		var baneList = troshx_sos_bnb_Banes.getList();
+		var _g11 = 0;
+		var _g2 = baneList.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			bb = baneList[i1];
+			var ba1 = Reflect.field(this["char"].banes.hash,bb.name);
+			if(ba1 != null) {
+				this.baneAssignList.push(ba1);
+			} else if((bb.flags & 1) != 0) {
+				continue;
+			} else {
+				var tmp1 = this.baneAssignList;
+				ba1 = baneList[i1].getAssign(0,this["char"]);
+				tmp1.push(ba1);
+			}
+		}
+	}
+	,initSkills: function() {
+		this.skillsTable = troshx_sos_core_SkillTable.getNewDefaultSkillTable();
+		this.skillsTable.matchValuesWith(this["char"].skills);
+		this.skillObjs = this.skillsTable.getSkillObjectsAsArray(true);
+		this.specialisedSkills = this.skillsTable.getSpecialisationList();
+		this.setupEmptyMappings();
+		this.skillSubjectHash = { };
+		var _g = 0;
+		var _g1 = Reflect.fields(this.skillValues);
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			var arr = troshx_sos_core_Skill.getSplitFromSpecialisation(f);
+			if(arr != null) {
+				var skill = arr[0];
+				var special = arr[1];
+				var skillToSpecial;
+				var specialToSkill;
+				skillToSpecial = this.skillSubjectHash[skill];
+				if(skillToSpecial == null) {
+					skillToSpecial = [];
+					this.skillSubjectHash[skill] = skillToSpecial;
+				}
+				specialToSkill = this.skillSubjectHash[special];
+				if(specialToSkill == null) {
+					specialToSkill = [];
+					this.skillSubjectHash[special] = specialToSkill;
+				}
+				skillToSpecial.push(special);
+				specialToSkill.push(skill);
+			}
+		}
+		this.startingSkillObjsCount = this.skillObjs.length;
+	}
+	,setupEmptyMappings: function() {
+		var arrAdded = [];
+		this.skillValues = { };
+		var _g = 0;
+		var _g1 = Reflect.fields(this.skillsTable.skillHash);
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			if(!this.skillsTable.requiresSpecialisation[f]) {
+				var existingVal = this["char"].skills.skillHash[f];
+				this.skillValues[f] = existingVal != null ? existingVal : 0;
+			}
+		}
+		arrAdded.sort(troshx_sos_core_SkillTable.sortArrayMethod);
+		this.skillObjs = this.skillObjs.concat(arrAdded);
+		this.skillSubjects = this["char"].skills.getSubjects();
+		var reflectedExisting = { };
+		var _g11 = 0;
+		var _g2 = this.skillSubjects.length;
+		while(_g11 < _g2) {
+			var i = _g11++;
+			reflectedExisting[this.skillSubjects[i]] = true;
+		}
+		this.skillSubjectsInitial = reflectedExisting;
+	}
+	,__class__: troshx_sos_vue_CharSheetVueData
+};
 var troshx_sos_vue_CharVueMixin = function() {
 	haxevx_vuex_core_VComponent.call(this);
 };
@@ -11373,7 +11976,7 @@ troshx_sos_vue_CharVueMixin.getSampleInstance = function() {
 troshx_sos_vue_CharVueMixin.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Data: function() {
-		return { 'char' : null};
+		return { };
 	}
 	,get_encumbered: function() {
 		return this.totalWeight >= this.CAR;
@@ -11419,6 +12022,12 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		var _this = this["char"];
 		return 4;
 	}
+	,get_totalPain: function() {
+		return this["char"].get_totalPain();
+	}
+	,get_totalBloodLost: function() {
+		return this["char"].get_totalBloodLost();
+	}
 	,get_ADR: function() {
 		var _this = this["char"];
 		return _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0));
@@ -11426,7 +12035,7 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	,get_MOB: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.mobMult * _this.clampIntZero(_this.getModifiedValue(9,(_this.strength + _this.agility + _this.endurance) / 2 | 0) + row.mob);
+		return row.mobMult * _this.clampIntZero(_this.getModifiedValue(9,(_this.strength + _this.agility + _this.endurance) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].mob);
 	}
 	,get_CAR: function() {
 		var _this = this["char"];
@@ -11506,6 +12115,109 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	,get_perception: function() {
 		return this["char"].perception;
 	}
+	,get_raceName: function() {
+		var _this = this["char"];
+		if(_this.race != null) {
+			return _this.race.name;
+		} else {
+			return "Unspecified";
+		}
+	}
+	,get_schoolName: function() {
+		var _this = this["char"];
+		if(_this.school != null) {
+			return _this.school.name;
+		} else {
+			return "";
+		}
+	}
+	,get_socialClassName: function() {
+		var _this = this["char"];
+		if(_this.socialClass != null) {
+			return _this.socialClass.name;
+		} else {
+			return "";
+		}
+	}
+	,get_perceptionPenalty: function() {
+		return this["char"].inventory.getPerceptionPenalty();
+	}
+	,get_carriedShield: function() {
+		return this["char"].inventory.findHeldShield();
+	}
+	,get_masterHandItem: function() {
+		return this["char"].inventory.findMasterHandItem();
+	}
+	,get_offHandItem: function() {
+		return this["char"].inventory.findOffHandItem();
+	}
+	,get_inventoryWeight: function() {
+		return this["char"].inventory.calculateTotalWeight();
+	}
+	,get_inventoryWeightLbl: function() {
+		return parseFloat(this.inventoryWeight.toFixed(2));
+	}
+	,get_defaultProfs: function() {
+		var m = this.masterWeapon;
+		var o = this.offhandWeapon;
+		var cm = this["char"].profsMelee;
+		var cr = this["char"].profsRanged;
+		var amb = this.ambidextrous;
+		if(amb ? m == null && o == null : m == null) {
+			return "Puglism" + "\\" + "Wrestling";
+		}
+		var str = "";
+		if(m != null) {
+			var ranged = m.ranged;
+			if(!ranged) {
+				str += troshx_sos_core_Profeciency.getLabelsOfArrayProfs(ranged ? troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged() : troshx_sos_core_Profeciency.getCoreMelee(),m.profs).join(",");
+			}
+		}
+		if(amb && o != null) {
+			str += "/";
+			var ranged1 = o.ranged;
+			if(!ranged1) {
+				str += troshx_sos_core_Profeciency.getLabelsOfArrayProfs(ranged1 ? troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged() : troshx_sos_core_Profeciency.getCoreMelee(),o.profs).join(",");
+			}
+		}
+		return str;
+	}
+	,get_heldProfeciencies: function() {
+		var m = this.masterWeapon;
+		var o = this.offhandWeapon;
+		var str = "";
+		var cm = this["char"].profsMelee;
+		var cr = this["char"].profsRanged;
+		var amb = this.ambidextrous;
+		if(amb ? m == null && o == null : m == null) {
+			str = ((256 & cm) != 0 ? "Pugilism" : "") + "\\" + ((128 & cm) != 0 ? "Wrestling" : "");
+			if(str != "\\") {
+				return str;
+			} else {
+				return null;
+			}
+		}
+		if(m != null) {
+			var ranged = m.ranged;
+			str += troshx_sos_core_Profeciency.getLabelsOfArrayProfs(ranged ? troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged() : troshx_sos_core_Profeciency.getCoreMelee(),m.profs & (ranged ? cr : cm)).join(",");
+		}
+		if(amb && o != null) {
+			str += "/";
+			var ranged1 = o.ranged;
+			str += troshx_sos_core_Profeciency.getLabelsOfArrayProfs(ranged1 ? troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged() : troshx_sos_core_Profeciency.getCoreMelee(),o.profs & (ranged1 ? cr : cm)).join(",");
+		}
+		if(str != "") {
+			return str;
+		} else {
+			return null;
+		}
+	}
+	,get_ambidextrousId: function() {
+		return new troshx_sos_bnb_Ambidextrous().name;
+	}
+	,get_ambidextrous: function() {
+		return Object.prototype.hasOwnProperty.call(this["char"].boons.hash,this.ambidextrousId);
+	}
 	,get_SDB: function() {
 		return this["char"].get_STR() / 2 | 0;
 	}
@@ -11532,18 +12244,12 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	,get_CP: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) + row.cp);
+		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp);
 	}
 	,get_meleeCP: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) + row.cp) - _this.get_totalPain();
-	}
-	,get_totalPain: function() {
-		return this["char"].get_totalPain();
-	}
-	,get_totalBloodlost: function() {
-		return this["char"].get_totalBloodLost();
+		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp) - _this.get_totalPain();
 	}
 	,get_schoolCP: function() {
 		var _this = this["char"];
@@ -11578,15 +12284,334 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	,get_exhaustionRate: function() {
 		return this["char"].get_exhaustionRate();
 	}
+	,get_fatiqueLevel: function() {
+		return this["char"].get_fatiqueLevel();
+	}
+	,get_curFatiqueRow: function() {
+		return troshx_sos_sheets_FatiqueTable.getTable()[this.fatiqueLevel];
+	}
+	,get_fatiqueSkillPenalty: function() {
+		return this.curFatiqueRow.skill;
+	}
+	,get_fatiqueMobPenalty: function() {
+		return this.curFatiqueRow.mob;
+	}
+	,get_fatiqueCPPenalty: function() {
+		return this.curFatiqueRow.cp;
+	}
+	,get_addressedAs: function() {
+		return this["char"].get_uid();
+	}
+	,get_profCoreMeleeListNames: function() {
+		return troshx_sos_core_Profeciency.getLabelsOfArrayProfs(troshx_sos_core_Profeciency.getCoreMelee(),2147483647);
+	}
+	,get_profCoreRangedListNames: function() {
+		return troshx_sos_core_Profeciency.getLabelsOfArrayProfs(troshx_sos_core_Profeciency.CORE_RANGED != null ? troshx_sos_core_Profeciency.CORE_RANGED : troshx_sos_core_Profeciency.CORE_RANGED = troshx_sos_core_Profeciency.getNewCoreRanged(),2147483647);
+	}
+	,get_hasSchool: function() {
+		return this["char"].school != null;
+	}
+	,get_schoolProfLevel: function() {
+		if(this.hasSchool) {
+			return this["char"].schoolLevel;
+		} else {
+			return 0;
+		}
+	}
+	,get_schoolTags: function() {
+		if(this.hasSchool && this["char"].schoolBonuses != null) {
+			return this["char"].schoolBonuses.getTags();
+		} else {
+			return [];
+		}
+	}
+	,get_maxMasterySlots: function() {
+		var r = this["char"].schoolLevel >= 20 ? 1 : 0;
+		if(this.hasSchool) {
+			return r;
+		} else {
+			return 0;
+		}
+	}
+	,get_boonsArray: function() {
+		return this["char"].boons.list;
+	}
+	,get_banesArray: function() {
+		return this["char"].banes.list;
+	}
+	,get_maxBoonsSpendableLeft: function() {
+		return 999;
+	}
+	,consoleLog: function(dyn) {
+		console.log(dyn);
+	}
+	,getBracketLabelBnB: function(bba) {
+		var bb = bba.getBoonOrBane();
+		var qty = bba.getQty();
+		var noCostLadder = bb.costs == troshx_sos_core_BoonBane.COSTLESS_ARRAY;
+		var tmp = noCostLadder ? qty > 1 ? qty + "" : "" : bb.clampRank ? bba._costCached != null ? bba._costCached + "" : "" + bba.getCost(bba.rank) : this.getRomanDigit(bba.rank);
+		return (noCostLadder ? "x" : "(") + tmp + (noCostLadder ? "" : ")");
+	}
+	,getRomanDigit: function(num) {
+		switch(num) {
+		case 0:
+			return "0";
+		case 1:
+			return "i";
+		case 2:
+			return "ii";
+		case 3:
+			return "iii";
+		case 4:
+			return "iv";
+		case 5:
+			return "v";
+		case 6:
+			return "vi";
+		case 7:
+			return "vii";
+		case 8:
+			return "viii";
+		case 9:
+			return "ix";
+		case 10:
+			return "x";
+		default:
+			return ">x";
+		}
+	}
+	,getBnBSlug: function(name) {
+		return "bb-detail-" + name.split(" ").join("-").toLowerCase();
+	}
+	,getEmptyWealthAssign: function() {
+		return this["char"].getEmptyWealthAssetAssign(1);
+	}
+	,get_isHuman: function() {
+		var _this = this["char"];
+		return (_this.race != null ? _this.race.name : "Unspecified") == "Human";
+	}
+	,restoreAnyBnBWithMask: function(msk,superMask) {
+		var arr = this.baneAssignList;
+		var arr2 = this.boonAssignList;
+		var restored = false;
+		var restoredBane = null;
+		var restoredBoon = null;
+		msk |= superMask;
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var a = arr[i];
+			if(a._canceled && (a.bane.channels & msk) != 0) {
+				a._canceled = false;
+				if(a.rank > 0 && restoredBane == null) {
+					restoredBane = a;
+				}
+			}
+		}
+		if(restoredBane != null) {
+			msk &= ~(restoredBane.bane.channels | restoredBane.bane.superChannels);
+		}
+		var _g11 = 0;
+		var _g2 = arr2.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var a1 = arr2[i1];
+			if(a1._canceled && (a1.boon.channels & msk) != 0) {
+				a1._canceled = false;
+				if(a1.rank > 0 && restoredBoon == null) {
+					restoredBoon = a1;
+				}
+			}
+		}
+		if(restoredBoon != null) {
+			this.checkBoonAgainstOthers(restoredBoon);
+		} else if(restoredBane != null) {
+			this.checkBaneAgainstOthers(restoredBane);
+		}
+	}
+	,resetBB: function(bba,isBane) {
+		if(isBane) {
+			var bane = bba.getBoonOrBane();
+			var ba;
+			var i = this.baneAssignList.indexOf(bba);
+			ba = bane.getAssign(0,this["char"]);
+			ba._costCached = bane.costs[0];
+			ba._forcePermanent = bba._forcePermanent;
+			ba.discount = bba.discount;
+			ba._minRequired = bba._minRequired;
+			ba._canceled = bba._canceled;
+			Vue.set(this.baneAssignList,i,ba);
+		} else {
+			var boonAssign = bba;
+			var boon = boonAssign.boon;
+			var ba1;
+			var i1 = this.boonAssignList.indexOf(bba);
+			ba1 = boon.getAssign(0,this["char"]);
+			ba1.discount = boonAssign.discount;
+			ba1.rank = bba._minRequired;
+			ba1._remainingCached = this.maxBoonsSpendableLeft;
+			ba1._costCached = boon.costs[0];
+			ba1._forcePermanent = bba._forcePermanent;
+			ba1._minRequired = bba._minRequired;
+			ba1._canceled = bba._canceled;
+			Vue.set(this.boonAssignList,i1,ba1);
+			if(ba1.rank > 0) {
+				i1 = this["char"].boons.list.indexOf(boonAssign);
+				var oldBA = this["char"].boons.list[i1];
+				Vue.set(this["char"].boons.list,i1,ba1);
+				this["char"].boonAssignReplaced(ba1,oldBA);
+			}
+		}
+	}
+	,findBaneAssignIndexById: function(id) {
+		var i = this.baneAssignList.length;
+		while(--i > -1) if(this.baneAssignList[i].get_uid() == id) {
+			return i;
+		}
+		return -1;
+	}
+	,assignBrainDamage: function(bba) {
+		var arr = bba.baneQueue;
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var b = arr[i];
+			var ider = b.get_uid();
+			var index = this.findBaneAssignIndexById(ider);
+			if(index >= 0) {
+				troshx_sos_chargen_CharGenData.dynSetArray(this.baneAssignList,index,b);
+				var ci;
+				var existingBane = Reflect.field(this["char"].banes.hash,ider);
+				if(existingBane == null) {
+					this["char"].banes.add(b);
+				} else if(existingBane != b) {
+					ci = this["char"].banes.list.indexOf(existingBane);
+					troshx_sos_chargen_CharGenData.dynSetArray(this["char"].banes.list,ci,b);
+				}
+			} else {
+				throw new js__$Boot_HaxeError("Something went wrong, couldn't find brain damage assign bane: " + b.get_uid());
+			}
+		}
+	}
+	,onBaneCallbackReceived: function(bba) {
+		if(js_Boot.__instanceof(bba,troshx_sos_bnb_BrainDamageAssign)) {
+			this.assignBrainDamage(bba);
+		}
+	}
+	,checkBaneAgainstOthers: function(baneAssign) {
+		var arr = this.baneAssignList;
+		var arr2 = this.boonAssignList;
+		baneAssign._canceled = false;
+		var msk = baneAssign.bane.channels | baneAssign.bane.superChannels;
+		if(msk == 0) {
+			return;
+		}
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var a = arr[i];
+			if(a != baneAssign && (a.bane.channels & msk) != 0) {
+				a._canceled = true;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = arr2.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var a1 = arr2[i1];
+			if((a1.boon.channels & msk) != 0) {
+				a1._canceled = true;
+			}
+		}
+	}
+	,checkBoonAgainstOthers: function(boonAssign) {
+		var arr = this.baneAssignList;
+		var arr2 = this.boonAssignList;
+		boonAssign._canceled = false;
+		var msk = boonAssign.boon.channels | boonAssign.boon.superChannels;
+		if(msk == 0) {
+			return;
+		}
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var a = arr[i];
+			if((a.bane.channels & msk) != 0) {
+				a._canceled = true;
+			}
+		}
+		var _g11 = 0;
+		var _g2 = arr2.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var a1 = arr2[i1];
+			if(a1 != boonAssign && (a1.boon.channels & msk) != 0) {
+				a1._canceled = true;
+			}
+		}
+	}
+	,uncancel: function(bba,isBane) {
+		bba._canceled = false;
+		if(isBane) {
+			this.checkBaneAgainstOthers(bba);
+		} else {
+			this.checkBoonAgainstOthers(bba);
+		}
+	}
+	,addBB: function(bba,isBane) {
+		if(isBane) {
+			this["char"].banes.add(bba);
+			this.checkBaneAgainstOthers(bba);
+		} else {
+			this["char"].boons.add(bba);
+			this.checkBoonAgainstOthers(bba);
+		}
+	}
+	,removeBB: function(bba,isBane) {
+		if(isBane) {
+			var b = bba;
+			this["char"].banes["delete"](b);
+			if((b.bane.channels | b.bane.superChannels) != 0) {
+				this.restoreAnyBnBWithMask(b.bane.channels,b.bane.superChannels);
+			}
+		} else {
+			var b1 = bba;
+			this["char"].boons["delete"](b1);
+			if((b1.boon.channels | b1.boon.superChannels) != 0) {
+				this.restoreAnyBnBWithMask(b1.boon.channels,b1.boon.superChannels);
+			}
+		}
+	}
+	,updateRankBB: function(bba,isBane,newValue,oldValue) {
+		if(isBane) {
+			this["char"].baneRankUpdated(bba,newValue,oldValue);
+		} else {
+			this["char"].boonRankUpdated(bba,newValue,oldValue);
+		}
+	}
+	,updateCanceledBB: function(bba,isBane,newValue,oldValue) {
+		if(isBane) {
+			this["char"].baneRankCanceledChange(bba,newValue,oldValue);
+		} else {
+			this["char"].boonRankCanceledChange(bba,newValue,oldValue);
+		}
+	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_CharVueMixin;
 		var clsP = cls.prototype;
 		this.data = clsP.Data;
-		this.computed = { recoveryRateAmountBase : clsP.get_recoveryRateAmountBase, recoveryRateAmount : clsP.get_recoveryRateAmount, encumbered : clsP.get_encumbered, totalWeight : clsP.get_totalWeight, encumbranceLvl : clsP.get_encumbranceLvl, offhandWeapon : clsP.get_offhandWeapon, masterWeapon : clsP.get_masterWeapon, reachBase : clsP.get_reachBase, reach : clsP.get_reach, adr : clsP.get_adr, mob : clsP.get_mob, car : clsP.get_car, cha : clsP.get_cha, tou : clsP.get_tou, ADR : clsP.get_ADR, MOB : clsP.get_MOB, CAR : clsP.get_CAR, CHA : clsP.get_CHA, startingGrit : clsP.get_startingGrit, TOU : clsP.get_TOU, GRIT : clsP.get_GRIT, baseGrit : clsP.get_baseGrit, STR : clsP.get_STR, AGI : clsP.get_AGI, END : clsP.get_END, HLT : clsP.get_HLT, WIP : clsP.get_WIP, WIT : clsP.get_WIT, INT : clsP.get_INT, PER : clsP.get_PER, negativeOrZeroStat : clsP.get_negativeOrZeroStat, strength : clsP.get_strength, agility : clsP.get_agility, endurance : clsP.get_endurance, health : clsP.get_health, willpower : clsP.get_willpower, wit : clsP.get_wit, intelligence : clsP.get_intelligence, perception : clsP.get_perception, SDB : clsP.get_SDB, labelRace : clsP.get_labelRace, labelSchool : clsP.get_labelSchool, baseCP : clsP.get_baseCP, CP : clsP.get_CP, meleeCP : clsP.get_meleeCP, totalPain : clsP.get_totalPain, totalBloodlost : clsP.get_totalBloodlost, schoolCP : clsP.get_schoolCP, arcPointsAvailable : clsP.get_arcPointsAvailable, encumbranceLvlRow : clsP.get_encumbranceLvlRow, encumberedBeyond : clsP.get_encumberedBeyond, skillPenalty : clsP.get_skillPenalty, recoveryRate : clsP.get_recoveryRate, exhaustionRate : clsP.get_exhaustionRate};
-		this.methods = { get_encumbered : clsP.get_encumbered, get_totalWeight : clsP.get_totalWeight, get_encumbranceLvl : clsP.get_encumbranceLvl, get_offhandWeapon : clsP.get_offhandWeapon, get_masterWeapon : clsP.get_masterWeapon, get_reachBase : clsP.get_reachBase, get_reach : clsP.get_reach, get_adr : clsP.get_adr, get_mob : clsP.get_mob, get_car : clsP.get_car, get_cha : clsP.get_cha, get_tou : clsP.get_tou, get_ADR : clsP.get_ADR, get_MOB : clsP.get_MOB, get_CAR : clsP.get_CAR, get_CHA : clsP.get_CHA, get_startingGrit : clsP.get_startingGrit, get_TOU : clsP.get_TOU, get_GRIT : clsP.get_GRIT, get_baseGrit : clsP.get_baseGrit, get_STR : clsP.get_STR, get_AGI : clsP.get_AGI, get_END : clsP.get_END, get_HLT : clsP.get_HLT, get_WIP : clsP.get_WIP, get_WIT : clsP.get_WIT, get_INT : clsP.get_INT, get_PER : clsP.get_PER, get_negativeOrZeroStat : clsP.get_negativeOrZeroStat, get_strength : clsP.get_strength, get_agility : clsP.get_agility, get_endurance : clsP.get_endurance, get_health : clsP.get_health, get_willpower : clsP.get_willpower, get_wit : clsP.get_wit, get_intelligence : clsP.get_intelligence, get_perception : clsP.get_perception, get_SDB : clsP.get_SDB, get_labelRace : clsP.get_labelRace, get_labelSchool : clsP.get_labelSchool, get_baseCP : clsP.get_baseCP, get_CP : clsP.get_CP, get_meleeCP : clsP.get_meleeCP, get_totalPain : clsP.get_totalPain, get_totalBloodlost : clsP.get_totalBloodlost, get_schoolCP : clsP.get_schoolCP, get_arcPointsAvailable : clsP.get_arcPointsAvailable, get_encumbranceLvlRow : clsP.get_encumbranceLvlRow, get_encumberedBeyond : clsP.get_encumberedBeyond, get_skillPenalty : clsP.get_skillPenalty, get_recoveryRate : clsP.get_recoveryRate, get_recoveryRateAmountBase : clsP.get_recoveryRateAmountBase, get_recoveryRateAmount : clsP.get_recoveryRateAmount, get_exhaustionRate : clsP.get_exhaustionRate};
+		this.computed = { recoveryRateAmountBase : clsP.get_recoveryRateAmountBase, recoveryRateAmount : clsP.get_recoveryRateAmount, profCoreMeleeListNames : clsP.get_profCoreMeleeListNames, profCoreRangedListNames : clsP.get_profCoreRangedListNames, hasSchool : clsP.get_hasSchool, schoolProfLevel : clsP.get_schoolProfLevel, schoolTags : clsP.get_schoolTags, maxMasterySlots : clsP.get_maxMasterySlots, boonsArray : clsP.get_boonsArray, banesArray : clsP.get_banesArray, isHuman : clsP.get_isHuman, encumbered : clsP.get_encumbered, totalWeight : clsP.get_totalWeight, encumbranceLvl : clsP.get_encumbranceLvl, offhandWeapon : clsP.get_offhandWeapon, masterWeapon : clsP.get_masterWeapon, reachBase : clsP.get_reachBase, reach : clsP.get_reach, adr : clsP.get_adr, mob : clsP.get_mob, car : clsP.get_car, cha : clsP.get_cha, tou : clsP.get_tou, totalPain : clsP.get_totalPain, totalBloodLost : clsP.get_totalBloodLost, ADR : clsP.get_ADR, MOB : clsP.get_MOB, CAR : clsP.get_CAR, CHA : clsP.get_CHA, startingGrit : clsP.get_startingGrit, TOU : clsP.get_TOU, GRIT : clsP.get_GRIT, baseGrit : clsP.get_baseGrit, STR : clsP.get_STR, AGI : clsP.get_AGI, END : clsP.get_END, HLT : clsP.get_HLT, WIP : clsP.get_WIP, WIT : clsP.get_WIT, INT : clsP.get_INT, PER : clsP.get_PER, negativeOrZeroStat : clsP.get_negativeOrZeroStat, strength : clsP.get_strength, agility : clsP.get_agility, endurance : clsP.get_endurance, health : clsP.get_health, willpower : clsP.get_willpower, wit : clsP.get_wit, intelligence : clsP.get_intelligence, perception : clsP.get_perception, raceName : clsP.get_raceName, schoolName : clsP.get_schoolName, socialClassName : clsP.get_socialClassName, perceptionPenalty : clsP.get_perceptionPenalty, carriedShield : clsP.get_carriedShield, masterHandItem : clsP.get_masterHandItem, offHandItem : clsP.get_offHandItem, inventoryWeight : clsP.get_inventoryWeight, inventoryWeightLbl : clsP.get_inventoryWeightLbl, defaultProfs : clsP.get_defaultProfs, heldProfeciencies : clsP.get_heldProfeciencies, ambidextrousId : clsP.get_ambidextrousId, ambidextrous : clsP.get_ambidextrous, SDB : clsP.get_SDB, labelRace : clsP.get_labelRace, labelSchool : clsP.get_labelSchool, baseCP : clsP.get_baseCP, CP : clsP.get_CP, meleeCP : clsP.get_meleeCP, schoolCP : clsP.get_schoolCP, arcPointsAvailable : clsP.get_arcPointsAvailable, encumbranceLvlRow : clsP.get_encumbranceLvlRow, encumberedBeyond : clsP.get_encumberedBeyond, skillPenalty : clsP.get_skillPenalty, recoveryRate : clsP.get_recoveryRate, exhaustionRate : clsP.get_exhaustionRate, fatiqueLevel : clsP.get_fatiqueLevel, curFatiqueRow : clsP.get_curFatiqueRow, fatiqueSkillPenalty : clsP.get_fatiqueSkillPenalty, fatiqueMobPenalty : clsP.get_fatiqueMobPenalty, fatiqueCPPenalty : clsP.get_fatiqueCPPenalty, addressedAs : clsP.get_addressedAs, maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft};
+		this.methods = { get_encumbered : clsP.get_encumbered, get_totalWeight : clsP.get_totalWeight, get_encumbranceLvl : clsP.get_encumbranceLvl, get_offhandWeapon : clsP.get_offhandWeapon, get_masterWeapon : clsP.get_masterWeapon, get_reachBase : clsP.get_reachBase, get_reach : clsP.get_reach, get_adr : clsP.get_adr, get_mob : clsP.get_mob, get_car : clsP.get_car, get_cha : clsP.get_cha, get_tou : clsP.get_tou, get_totalPain : clsP.get_totalPain, get_totalBloodLost : clsP.get_totalBloodLost, get_ADR : clsP.get_ADR, get_MOB : clsP.get_MOB, get_CAR : clsP.get_CAR, get_CHA : clsP.get_CHA, get_startingGrit : clsP.get_startingGrit, get_TOU : clsP.get_TOU, get_GRIT : clsP.get_GRIT, get_baseGrit : clsP.get_baseGrit, get_STR : clsP.get_STR, get_AGI : clsP.get_AGI, get_END : clsP.get_END, get_HLT : clsP.get_HLT, get_WIP : clsP.get_WIP, get_WIT : clsP.get_WIT, get_INT : clsP.get_INT, get_PER : clsP.get_PER, get_negativeOrZeroStat : clsP.get_negativeOrZeroStat, get_strength : clsP.get_strength, get_agility : clsP.get_agility, get_endurance : clsP.get_endurance, get_health : clsP.get_health, get_willpower : clsP.get_willpower, get_wit : clsP.get_wit, get_intelligence : clsP.get_intelligence, get_perception : clsP.get_perception, get_raceName : clsP.get_raceName, get_schoolName : clsP.get_schoolName, get_socialClassName : clsP.get_socialClassName, get_perceptionPenalty : clsP.get_perceptionPenalty, get_carriedShield : clsP.get_carriedShield, get_masterHandItem : clsP.get_masterHandItem, get_offHandItem : clsP.get_offHandItem, get_inventoryWeight : clsP.get_inventoryWeight, get_inventoryWeightLbl : clsP.get_inventoryWeightLbl, get_defaultProfs : clsP.get_defaultProfs, get_heldProfeciencies : clsP.get_heldProfeciencies, get_ambidextrousId : clsP.get_ambidextrousId, get_ambidextrous : clsP.get_ambidextrous, get_SDB : clsP.get_SDB, get_labelRace : clsP.get_labelRace, get_labelSchool : clsP.get_labelSchool, get_baseCP : clsP.get_baseCP, get_CP : clsP.get_CP, get_meleeCP : clsP.get_meleeCP, get_schoolCP : clsP.get_schoolCP, get_arcPointsAvailable : clsP.get_arcPointsAvailable, get_encumbranceLvlRow : clsP.get_encumbranceLvlRow, get_encumberedBeyond : clsP.get_encumberedBeyond, get_skillPenalty : clsP.get_skillPenalty, get_recoveryRate : clsP.get_recoveryRate, get_recoveryRateAmountBase : clsP.get_recoveryRateAmountBase, get_recoveryRateAmount : clsP.get_recoveryRateAmount, get_exhaustionRate : clsP.get_exhaustionRate, get_fatiqueLevel : clsP.get_fatiqueLevel, get_curFatiqueRow : clsP.get_curFatiqueRow, get_fatiqueSkillPenalty : clsP.get_fatiqueSkillPenalty, get_fatiqueMobPenalty : clsP.get_fatiqueMobPenalty, get_fatiqueCPPenalty : clsP.get_fatiqueCPPenalty, get_addressedAs : clsP.get_addressedAs, get_profCoreMeleeListNames : clsP.get_profCoreMeleeListNames, get_profCoreRangedListNames : clsP.get_profCoreRangedListNames, get_hasSchool : clsP.get_hasSchool, get_schoolProfLevel : clsP.get_schoolProfLevel, get_schoolTags : clsP.get_schoolTags, get_maxMasterySlots : clsP.get_maxMasterySlots, get_boonsArray : clsP.get_boonsArray, get_banesArray : clsP.get_banesArray, get_maxBoonsSpendableLeft : clsP.get_maxBoonsSpendableLeft, consoleLog : clsP.consoleLog, getBracketLabelBnB : clsP.getBracketLabelBnB, getRomanDigit : clsP.getRomanDigit, getBnBSlug : clsP.getBnBSlug, getEmptyWealthAssign : clsP.getEmptyWealthAssign, get_isHuman : clsP.get_isHuman, restoreAnyBnBWithMask : clsP.restoreAnyBnBWithMask, resetBB : clsP.resetBB, findBaneAssignIndexById : clsP.findBaneAssignIndexById, assignBrainDamage : clsP.assignBrainDamage, onBaneCallbackReceived : clsP.onBaneCallbackReceived, checkBaneAgainstOthers : clsP.checkBaneAgainstOthers, checkBoonAgainstOthers : clsP.checkBoonAgainstOthers, uncancel : clsP.uncancel, addBB : clsP.addBB, removeBB : clsP.removeBB, updateRankBB : clsP.updateRankBB, updateCanceledBB : clsP.updateCanceledBB};
 	}
 	,__class__: troshx_sos_vue_CharVueMixin
 });
+var troshx_sos_vue_Globals = function() { };
+$hxClasses["troshx.sos.vue.Globals"] = troshx_sos_vue_Globals;
+troshx_sos_vue_Globals.__name__ = ["troshx","sos","vue","Globals"];
 var troshx_sos_vue_InventoryManager = function() {
 	haxevx_vuex_core_VComponent.call(this);
 	this["inheritAttrs"] = false;
@@ -11678,7 +12703,7 @@ troshx_sos_vue_InventoryManager.prototype = $extend(haxevx_vuex_core_VComponent.
 		return tabName;
 	}
 	,Template: function() {
-		return "<div>\r\n\t<br/>\r\n\t<br/>\r\n\t<tree-browser :availableTypes=\"availableTypes\" v-on:open=\"openFromTreeBrowser\" v-if=\"showBrowser\" />\r\n\t<hr/>\r\n\t\r\n\t<comp :inventory=\"tabs[curInventoryIndex].inventory\" :inventoryLabel=\"tabs[curInventoryIndex].tabName\" v-on:loadSheet=\"loadSheet\" :loadAvailable=\"curInventoryIndex==0 && loadAvailable\" v-bind=\"$attrs\" :maxCostCopper=\"curInventoryIndex == 0 ? maxCostCopper : null\" :maxWeight=\"curInventoryIndex == 0 ? maxWeight : null\">\r\n\t\t<button class=\"exit-btn\" slot=\"exitBtn\" v-if=\"backBtnCallback!=null\" v-on:click=\"backBtnCallback()\">&lt;&lt; Back</button>\r\n\t\t\r\n\t\t<div class=\"open-new-tab-zone\" slot=\"loadNewTabZone\">\r\n\t\t\t<div>\r\n\t\t\t\t<div class=\"show-browser-cta\"><label><input type=\"checkbox\" v-model=\"showBrowser\"></input>Show File Tree Browser?</label></div>\r\n\t\t\t\t<textarea class=\"openbox\" character-set=\"UTF-8\" v-model=\"clipboardContents\"></textarea>\r\n\t\t\t\t<div><button v-on:click=\"loadNewTabClick\">Load Inventory in New Tab</button><i><br/>(excludes drop zone)</i></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\r\n\t\t<div v-for=\"\" class=\"tab-list\" slot=\"tabList\">\r\n\t\t\t<label :class=\"{selected:curInventoryIndex==i}\" v-for=\"(li, i) in tabs\"><input type=\"radio\" v-on:click=\"curInventoryIndex=i\" name=\"tabname\" :checked=\"curInventoryIndex==i\"></input>{{li.tabName}}</label>\r\n\t\t\t<button class=\"close-btn\" v-show=\"curInventoryIndex!=0\" v-on:click=\"closeBtnClick\">[X] Close</button>\r\n\t\t</div>\r\n\r\n\t</comp>\r\n</div>";
+		return "<div>\r\n\t<br/>\r\n\t<br/>\r\n\t<tree-browser :availableTypes=\"availableTypes\" v-on:open=\"openFromTreeBrowser\" v-if=\"showBrowser\" />\r\n\t<hr/>\r\n\t\r\n\t<comp :inventory=\"tabs[curInventoryIndex].inventory\" :inventoryLabel=\"tabs[curInventoryIndex].tabName\" v-on:loadSheet=\"loadSheet\" :loadAvailable=\"curInventoryIndex==0 && loadAvailable\" v-bind=\"$attrs\" :maxCostCopper=\"curInventoryIndex == 0 ? maxCostCopper : null\" :maxWeight=\"curInventoryIndex == 0 ? maxWeight : null\">\r\n\t\t<span slot=\"weightAfter\"><slot name=\"weightAfter\"></slot></span>\r\n\t\t\r\n\t\t<button class=\"exit-btn\" slot=\"exitBtn\" v-if=\"backBtnCallback!=null\" v-on:click=\"backBtnCallback()\">&lt;&lt; Back</button>\r\n\t\t\r\n\t\t<div class=\"open-new-tab-zone\" slot=\"loadNewTabZone\">\r\n\t\t\t<div>\r\n\t\t\t\t<div class=\"show-browser-cta\"><label><input type=\"checkbox\" v-model=\"showBrowser\"></input>View a Catalog? ^</label></div>\r\n\t\t\t\t<textarea class=\"openbox\" character-set=\"UTF-8\" v-model=\"clipboardContents\"></textarea>\r\n\t\t\t\t<div><button v-on:click=\"loadNewTabClick\">Load Inventory in New Tab</button><i><br/>(excludes drop zone)</i></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\r\n\t\t<div v-for=\"\" class=\"tab-list\" slot=\"tabList\">\r\n\t\t\t<label :class=\"{selected:curInventoryIndex==i}\" v-for=\"(li, i) in tabs\"><input type=\"radio\" v-on:click=\"curInventoryIndex=i\" name=\"tabname\" :checked=\"curInventoryIndex==i\"></input>{{li.tabName}}</label>\r\n\t\t\t<button class=\"close-btn\" v-show=\"curInventoryIndex!=0\" v-on:click=\"closeBtnClick\">[X] Close</button>\r\n\t\t</div>\r\n\r\n\t</comp>\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_InventoryManager;
@@ -11692,6 +12717,60 @@ troshx_sos_vue_InventoryManager.prototype = $extend(haxevx_vuex_core_VComponent.
 		this.watch = { inventory : clsP.watch_inventory};
 	}
 	,__class__: troshx_sos_vue_InventoryManager
+});
+var troshx_sos_vue_InventoryStandalone = function(theComp) {
+	haxevx_vuex_core_VComponent.call(this);
+	if(theComp != null) {
+		this.components = { "comp" : theComp};
+	} else {
+		Reflect.deleteField(this,"data");
+	}
+};
+$hxClasses["troshx.sos.vue.InventoryStandalone"] = troshx_sos_vue_InventoryStandalone;
+troshx_sos_vue_InventoryStandalone.__name__ = ["troshx","sos","vue","InventoryStandalone"];
+troshx_sos_vue_InventoryStandalone.__super__ = haxevx_vuex_core_VComponent;
+troshx_sos_vue_InventoryStandalone.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
+	getNewInventory: function(contents) {
+		var newInventory;
+		try {
+			newInventory = new haxe_Unserializer(contents).unserialize();
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			console.log(e);
+			js_Browser.alert("Sorry, failed to unserialize save-content string!");
+			return null;
+		}
+		if(!js_Boot.__instanceof(newInventory,troshx_sos_core_Inventory)) {
+			console.log(newInventory);
+			js_Browser.alert("Sorry, unserialized type isn't Inventory!");
+			return null;
+		}
+		return js_Boot.__instanceof(newInventory,troshx_sos_core_Inventory) ? newInventory : null;
+	}
+	,setInventory: function(chk) {
+		this.inventory = chk;
+	}
+	,loadSheet: function(contents) {
+		var chk = this.getNewInventory(contents);
+		if(chk == null) {
+			return;
+		}
+		this.setInventory(chk);
+	}
+	,Data: function() {
+		return { inventory : new troshx_sos_core_Inventory()};
+	}
+	,Template: function() {
+		return "<comp :inventory=\"inventory\" v-on:loadSheet=\"loadSheet\"></comp>";
+	}
+	,_Init: function() {
+		var cls = troshx_sos_vue_InventoryStandalone;
+		var clsP = cls.prototype;
+		this.data = clsP.Data;
+		this.template = this.Template();
+		this.methods = { getNewInventory : clsP.getNewInventory, setInventory : clsP.setInventory, loadSheet : clsP.loadSheet};
+	}
+	,__class__: troshx_sos_vue_InventoryStandalone
 });
 var troshx_sos_vue_InventoryVue = $hx_exports["troshx"]["sos"]["vue"]["InventoryVue"] = function() {
 	haxevx_vuex_core_VComponent.call(this);
@@ -11748,6 +12827,9 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_weightRemaining: function() {
 		return this.maxWeight - this.totalWeight;
+	}
+	,get_weightRemainingLbl: function() {
+		return parseFloat(this.weightRemaining.toFixed(2));
 	}
 	,get_exceededWeight: function() {
 		return this.weightRemaining <= 0;
@@ -12033,7 +13115,7 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		var hitLocations = body.hitLocations;
 		var fields = Reflect.fields(coverage);
 		var _g1 = 0;
-		var _g = body.rearStartIndex;
+		var _g = hitLocations.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var ider = hitLocations[i].id;
@@ -12109,7 +13191,7 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		Vue.nextTick($bind(this,this.resetItemTransitionName));
 	}
 	,get_coverageHitLocations: function() {
-		return this.body.getNewHitLocationsFrontSlice();
+		return this.body.hitLocations;
 	}
 	,get_hitLocationZeroAVValues: function() {
 		var ch = this.coverageHitLocations;
@@ -12448,7 +13530,7 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		return "";
 	}
 	,Template: function() {
-		return "<div class=\"inventory\" v-on:click=\"onBaseInventoryClick\">\r\n\r\n\t<h2>{{whoseInventoryPrefix}}Inventory</h2>\r\n\t\r\n\t<div class=\"tally-zone\">\r\n\t\t<div>\r\n\t\t\t<div class=\"tallycta\"><label><input type=\"checkbox\" v-model=\"userShowTally\"></input><i>Tally?</i></label></div>\r\n\t\t</div>\r\n\t\t<div class=\"checkout\" v-if=\"showTally\">\r\n\t\t\t<div><b>Tally:</b> <i>(excluding dropped)</i></div>\r\n\t\t\t<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>\r\n\t\t\t<div v-if=\"maxCostCopper!=null\" :class=\"{exceeded:exceededCost}\">Max Cost: <b>{{ maxCostGP }}gp  {{ maxCostSP }}sp {{ maxCostCP }}cp</b> ({{moneyLeftStr}} remaining)</div>\r\n\t\t\t<div>Total Weight: <b>{{ totalWeight }}</b></div>\r\n\t\t\t<div v-if=\"maxWeight!=null\" :class=\"{exceeded:exceededWeight}\">Weight Threshold: <b>{{ totalWeight }}</b> / <b>{{ maxWeight }}</b> (~~{{weightRemaining}})</div>\r\n\t\t</div>\r\n\t\t<slot name=\"exitBtn\"></slot>\r\n\t</div>\t\r\n\t\t\r\n\t<div class=\"manage-multi-zone\">\r\n\t\t<slot name=\"loadNewTabZone\"></slot>\r\n\t\t<div class=\"save-drop-zone\">\r\n\t\t\t<div>\r\n\t\t\t\t<div><button v-on:click=\"saveDropList()\">Save Dropped Zone</button></div>\r\n\t\t\t\t<textarea class=\"savebox\" character-set=\"UTF-8\" v-model=\"copyToClipboardDropList\"></textarea>\r\n\t\t\t\t<div><button v-on:click=\"loadDropList()\">Load Dropped Zone</button></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\t\r\n\t<div style=\"clear:both\"></div>\t\r\n\t\t\t\r\n\t<sweet-modal ref=\"overwriteItemWarning\">\r\n\t\t<div  v-if=\"itemToOverwriteWith!=null\" v-on:close=\"closeOverwriteModal()\">\r\n\t\t\t<div>\r\n\t\t\tThe item{{itemToOverwriteWith.qty > 1 ? \"s\":\"\"}} <b>\"{{ itemToOverwriteWith.get_uid()}}\"</b><b v-show=\"itemToOverwriteWith.qty>1\">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? \"pack\" : \"drop\" }} might be <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? \"in \"+(isYourInventory ? \"your\" : \"the\")+\" pack\" : \"on the ground\" }} with the same label! Either confirm to overwrite the existing item(s) {{  itemToOverwriteToPacked ? \"in \"+(isYourInventory ? \"your\" : \"the\")+\" pack\" : \"on the ground\" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? \"packing\" : \"dropping\" }} it.\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<div>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"itemToOverwriteWithChecked\"></input> <i>Confirm Overwrite?</i></label></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" :disabled=\"!itemToOverwriteWithChecked\" v-on:click=\"confirmOverwriteItem()\">Confirm Overwrite</button>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" v-on:click=\"closeOverwriteModal(true)\">Cancel</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\t\t\r\n\t<sweet-modal ref=\"itemQtyMultipleModal\" v-on:close=\"closeMultipleQtyItem()\">\r\n\t\t<div v-if=\"itemQtyMultiple!=null\">\r\n\t\t\t<div>\r\n\t\t\t\tHow much of <b>{{itemQtyMultiple.get_uid()}}</b><b>({{itemQtyMultipleMax}})</b> do you wish to {{ itemToOverwriteToPacked ? \"pack\" : \"drop\" }}?\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<div>\r\n\t\t\t\t<InputInt :obj=\"itemQtyMultiple\" prop=\"qty\" :min=\"1\" :max=\"itemQtyMultipleMax\" />\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<button slot=\"button\" v-on:click=\"confirmQtyMultipleSend()\">Confirm</button>\r\n\t\t\t<button slot=\"button\" v-on:click=\"closeMultipleQtyItem(true)\">Cancel</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\r\n\t\r\n\t<h4>Dropped:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Item Name</td>\r\n\t\t\t\t<td class=\"qty\">Qty</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('dropped', $event)\" v-on:touchstart.native=\"setCurWidgetSection('dropped', $event)\">\r\n\t\t\t\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.dropped.list\" :key=\"entry.item.get_uid()\">\r\n\t\t\t\t<td><input-name-qty :itemQty=\"entry\" v-on:updated=\"onInputNameUpdated\" :customValidateName=\"validateQtyNameDropped\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry\" prop=\"qty\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :floating=\"true\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>{{ entry.item.getTypeLabel() }}</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packItemEntryFromGround(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.equipItemEntryFromGround(entry)\">Equip</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.deleteDropped(entry)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t\r\n\t\t\t\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"droppedEntry.e.item.name\" required v-on:focus=\"focusInRowField(droppedEntry, 1)\" v-on:blur=\"focusOutRowField(droppedEntry, 1)\"></input></td>\r\n\t\t\t\t<td><InputInt :obj=\"droppedEntry.e\" prop=\"qty\" :min=\"1\" v-on:focus.native=\"focusInRowField(droppedEntry, 2)\" v-on:blur.native=\"focusOutRowField(droppedEntry, 2)\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"droppedEntry.e\" prop=\"weight\" :min=\"0\" v-on:focus.native=\"focusInRowField(droppedEntry, 4)\" v-on:blur.native=\"focusOutRowField(droppedEntry, 4)\"></InputNumber></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\tMiscItem\r\n\t\t\t\t</td>\r\n\t\t\t\t\r\n\t\t\t</tr>\r\n\t\t\r\n\t\t\t\r\n\t\t</tbody>\r\n\t</table>\r\n\t\r\n\t<hr/>\r\n\t\t\t\t\r\n\t<slot name=\"tabList\"></slot>\r\n\t\t\t\r\n\t<h4>Packed: <label style=\"font-size:10px\">Drop?<input type=\"checkbox\" v-model=\"inventory.dropPack\"></input></label></h4>\t\t\t\t\r\n\t\r\n\t\r\n\t<table border=\"1\" style=\"display:inline-block\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Item Name</td>\r\n\t\t\t\t<td class=\"qty\">Qty</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('packed', $event)\" v-on:touchstart.native=\"setCurWidgetSection('packed', $event)\">\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.packed.list\" :key=\"entry.item.get_uid()\">\r\n\t\t\t\t<td><input-name-qty :itemQty=\"entry\" v-on:updated=\"onInputNameUpdated\" :customValidateName=\"validateQtyNamePacked\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry\" prop=\"qty\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :floating=\"true\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>{{ entry.item.getTypeLabel() }}</td>\r\n\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropItemEntryFromPack(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.equipItemEntryFromPack(entry)\">Equip</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.deletePacked(entry)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"packedEntry.e.item.name\" required v-on:focus=\"focusInRowField(packedEntry, 1)\" v-on:blur=\"focusOutRowField(packedEntry, 1)\"></input></td>\r\n\t\t\t\t<td><InputInt :obj=\"packedEntry.e\" prop=\"qty\" :min=\"1\" v-on:focus.native=\"focusInRowField(packedEntry, 2)\" v-on:blur.native=\"focusOutRowField(packedEntry, 2)\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"packedEntry.e\" prop=\"weight\" :min=\"0\" v-on:focus.native=\"focusInRowField(packedEntry, 4)\" v-on:blur.native=\"focusOutRowField(packedEntry, 4)\"></InputNumber></td>\r\n\t\t\t\t<td>MiscItem</td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\r\n\t\t\t\t\r\n\t<h3>Equipment details</h3>\r\n\t\r\n\t\r\n\t<h4>Shields:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td style=\"width:155px\">Shield Name</td>\r\n\t\t\t\t<td style=\"width:35px\">AV</td>\r\n\t\t\t\t<td style=\"width:35px\">Block</td>\r\n\t\t\t\t<td style=\"width:45px\">Weight</td>\r\n\t\t\t\t<td style=\"width:67px\">Size</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td style=\"width:130px\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('shield',$event)\" v-on:touchstart.native=\"setCurWidgetSection('shield',$event)\">\r\n\t\t\t<tr :key=\"entry.key\" v-for=\"(entry,i) in inventory.shields\">\r\n\t\t\t\t<td><input-name :item=\"entry.shield\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.shield\" prop=\"AV\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.shield\" prop=\"blockTN\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"entry.shield\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"entry.shield.size \">\r\n\t\t\t\t\t\t<option :value=\"0\">Small</option>\r\n\t\t\t\t\t\t<option :value=\"1\">Medium</option>\r\n\t\t\t\t\t\t<option :value=\"2\">Large</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.shield)\" :index=\"i\" :showWidget=\"isVisibleWidget('shield','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"i\" :showWidget=\"isVisibleWidget('shield', 'td-unheld', i)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedShield(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedShield(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedShield(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-on:focus=\"focusInRowField(shieldEntry, 1)\" v-on:blur=\"focusOutRowField(shieldEntry, 1)\" v-model=\"shieldEntry.e.shield.name\" required></input></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 2)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 2)\" :obj=\"shieldEntry.e.shield\" prop=\"AV\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 4)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 4)\" :obj=\"shieldEntry.e.shield\" prop=\"blockTN\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 8)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 8)\" :obj=\"shieldEntry.e.shield\" prop=\"weight\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select v-model.number=\"shieldEntry.e.shield.size\" v-on:focus=\"focusInRowField(shieldEntry, 16)\" v-on:blur=\"focusOutRowField(shieldEntry, 16)\">\r\n\t\t\t\t\t\t<option :value=\"0\">Small</option>\r\n\t\t\t\t\t\t<option :value=\"1\">Medium</option>\r\n\t\t\t\t\t\t<option :value=\"2\">Large</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(shieldEntry.e.shield)\" :index=\"-1\" :showWidget=\"(shieldEntry.focusedFlags & (32|(1<<21))) !=0\" :entry=\"shieldEntry.e\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\tv-on:focus-in-row=\"focusInRowField(shieldEntry, 32)\" v-on:focus-out-row=\"focusOutRowField(shieldEntry, 32)\" v-on:focus-widget=\"focusInRowField(shieldEntry, (1<<21))\" />\r\n\t\t\t\t<td><input type=\"text\" v-model=\"shieldEntry.e.unheldRemark\" v-on:focus=\"focusInRowField(shieldEntry,64)\" v-on:blur=\"focusOutRowField(shieldEntry,64)\"></input></td>\t\r\n\t\t\t\t\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\r\n\t\r\n\t<h4>Munitions:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Melee Weap name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td class=\"reach\">Reach</td>\r\n\t\t\t\t<td style=\"width:65px\">Swing</td>\r\n\t\t\t\t<td style=\"width:65px\">Thrust</td>\r\n\t\t\t\t<td style=\"width:35px\">DTN(G)</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('meleeWeap', $event)\" v-on:touchstart.native=\"setCurWidgetSection('meleeWeap', $event)\">\r\n\t\t\t<tr v-for=\"(entry,itemIndex) in filteredMelee\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"meleeWeap\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"entry.weapon.reach\">\r\n\t\t\t\t\t\t<option :value=\"1\">HA</option>\r\n\t\t\t\t\t\t<option :value=\"2\">H</option>\r\n\t\t\t\t\t\t<option :value=\"3\">S</option>\r\n\t\t\t\t\t\t<option :value=\"4\">M</option>\r\n\t\t\t\t\t\t<option :value=\"5\">L</option>\r\n\t\t\t\t\t\t<option :value=\"6\">VL</option>\r\n\t\t\t\t\t\t<option :value=\"7\">EL</option>\r\n\t\t\t\t\t\t<option :value=\"8\">LL</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:false}\" :value=\"getSwingAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk2\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:true}\" :value=\"getThrustAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-atk2', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-def\" widgetTagName=\"w-melee-def\" :value=\"getDefGuard(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-def', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" v-if=\"weaponEntry.e.weapon.isMelee()\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"meleeWeap\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\"  v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"weaponEntry.e.weapon.reach\"  v-on:focus=\"focusInRowField(weaponEntry,8)\" v-on:blur=\"focusOutRowField(weaponEntry,8)\">\r\n\t\t\t\t\t\t<option value=\"1\">HA</option>\r\n\t\t\t\t\t\t<option value=\"2\">H</option>\r\n\t\t\t\t\t\t<option value=\"3\">S</option>\r\n\t\t\t\t\t\t<option value=\"4\">M</option>\r\n\t\t\t\t\t\t<option value=\"5\">L</option>\r\n\t\t\t\t\t\t<option value=\"6\">VL</option>\r\n\t\t\t\t\t\t<option value=\"7\">EL</option>\r\n\t\t\t\t\t\t<option value=\"8\">LL</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:false}\" :value=\"getSwingAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk2\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:true}\" :value=\"getThrustAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (32|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\"  v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,32)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,32)\" />\t\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-def\" widgetTagName=\"w-melee-def\" :value=\"getDefGuard(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<23))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<23))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t\t\t\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead v-on:mousedown=\"setCurWidgetSection('bowheader', $event)\" v-on:touchstart=\"setCurWidgetSection('bowheader', $event)\">\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Bow name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Req STR</td>\r\n\t\t\t\t<td class=\"voidna focus gotbtn w-holder w-ammo-spawner\" v-on:click.stop=\"\">\r\n\t\t\t\t\t<button v-on:click=\"requestCurWidget('ammo-spawner',-1)\">&#8610;</button>\r\n\t\t\t\t\t<div class=\"pop-widget\"  v-if=\"isVisibleWidget('bowheader', 'ammo-spawner', -1)\">\r\n\t\t\t\t\t\t<w-ammo-spawner :mask=\"bowSlingAndCrossbowMask\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('bow', $event)\" v-on:touchstart.native=\"setCurWidgetSection('bow', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredBow\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"entry\" :weapon=\"entry.weapon\" section=\"bow\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"bowMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"requiredStr\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" v-if=\"weaponEntry.e.weapon.isBow()\" :key=\"-2\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"bow\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"bowMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\"  v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry, 4)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :obj=\"weaponEntry.e.weapon\" prop=\"requiredStr\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Crossbow name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Span</td>\r\n\t\t\t\t<td>SpanTool</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('crossbow', $event)\" v-on:touchstart.native=\"setCurWidgetSection('crossbow', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredCrossbow\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"entry\" :weapon=\"entry.weapon\" section=\"crossbow\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"crossbowMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon.crossbow\" prop=\"span\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"span-tools\" widgetTagName=\"w-span-tools\" :value=\"getSpanTools(entry.weapon.crossbow)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','span-tools', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-3\" v-if=\"weaponEntry.e.weapon.isCrossbow()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"crossbow\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"crossbowMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\t\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon.crossbow\" prop=\"span\"  v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"span-tools\" widgetTagName=\"w-span-tools\" :value=\"getSpanTools(weaponEntry.e.weapon.crossbow)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" />\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead v-on:mousedown=\"setCurWidgetSection('firearmheader', $event)\" v-on:touchstart=\"setCurWidgetSection('firearmheader', $event)\">\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Firearm name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Load</td>\r\n\t\t\t\t<td class=\"w-holder w-ammo-spawner\" v-on:click.stop=\"\">\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"requestCurWidget('ammo-spawner',-1)\">Ammunition</a>\r\n\t\t\t\t\t<div class=\"pop-widget\"  v-if=\"isVisibleWidget('firearmheader', 'ammo-spawner', -1)\">\r\n\t\t\t\t\t\t<w-ammo-spawner :mask=\"firearmMask\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('firearm', $event)\" v-on:touchstart.native=\"setCurWidgetSection('firearm', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredFirearm\" :key=\"entry.key\">\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"firearm-name\" widgetTagName=\"w-firearm-name\" :value=\"entry.weapon.get_label()\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','firearm-name', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\"  :entry=\"entry\" :weapon=\"entry.weapon\" section=\"firearm\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"firearmMask\"  />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :min=\"0\" :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon.firearm\" prop=\"load\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"ammunition\" widgetTagName=\"w-ammunition\" :value=\"getAmmunitions(entry.weapon.firearm)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','ammunition', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-4\" v-if=\"weaponEntry.e.weapon.isFirearm()\">\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"firearm-name\" widgetTagName=\"w-firearm-name\" :value=\"weaponEntry.e.weapon.get_label()\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (1|(1<<25))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<25))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,1)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,1)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"firearm\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"firearmMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\t\r\n\t\t\t\t<td><InputInt :obj=\"weaponEntry.e.weapon.firearm\" prop=\"load\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"ammunition\" widgetTagName=\"w-ammunition\" :value=\"getAmmunitions(weaponEntry.e.weapon.firearm)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" :addAmmo=\"addAmmo\" />\t\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Throwing/Sling name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td class=\"d10\">Stuck</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('throwing', $event)\" v-on:touchstart.native=\"setCurWidgetSection('throwing', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredThrowing\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"throwing\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"throwMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"entry.weapon\" prop=\"stuckChance\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-5\" v-if=\"weaponEntry.e.weapon.isThrowing() || weaponEntry.e.weapon.isSling()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"throwing\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"throwMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"weaponEntry.e.weapon\" prop=\"stuckChance\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td class=\"gotbtn focus\">Ammo name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td class=\"d10\">Catch</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('ammo', $event)\" v-on:touchstart.native=\"setCurWidgetSection('ammo', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredAmmo\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"ammo\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"entry.weapon\" prop=\"stuckChance\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-6\" v-if=\"weaponEntry.e.weapon.isAmmunition()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"ammo\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"-1\" />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td><InputInt :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"weaponEntry.e.weapon\" prop=\"stuckChance\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t\t\r\n\t</table>\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t<h4>MiscItems:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>MiscItem Name</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('miscItem', $event)\" v-on:touchstart.native=\"setCurWidgetSection('miscItem', $event)\">\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.equipedNonMeleeItems\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.item\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.item)\" :index=\"i\" :showWidget=\"isVisibleWidget('miscItem','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"i\" :showWidget=\"isVisibleWidget('miscItem', 'td-unheld', i)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packMiscItem(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropMiscItem(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropMiscItem(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"miscItemEntry.e.item.name\" v-on:focus=\"focusInRowField(miscItemEntry,1)\" v-on:blur=\"focusOutRowField(miscItemEntry,1)\"></input></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(miscItemEntry.e.item)\" :index=\"-1\" :showWidget=\"(miscItemEntry.focusedFlags & (2|(1<<21))) !=0\" :entry=\"miscItemEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(miscItemEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(miscItemEntry,2)\" v-on:focus-out-row=\"focusOutRowField(miscItemEntry,2)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"miscItemEntry.e.item\" prop=\"weight\" v-on:focus.native=\"focusInRowField(miscItemEntry,4)\" v-on:blur.native=\"focusOutRowField(miscItemEntry,4)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"miscItemEntry.e.unheldRemark\" v-on:focus=\"focusInRowField(miscItemEntry,8)\" v-on:blur=\"focusOutRowField(miscItemEntry,8)\"></input></td>\t\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\t\t\r\n\t\t\r\n\t\r\n\t<h4>Armor:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Armor Name</td>\r\n\t\t\t\t<td>AVC</td>\r\n\t\t\t\t<td>AVP</td>\r\n\t\t\t\t<td>AVB</td>\r\n\t\t\t\t<td>Coverage</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('armor', $event)\"  v-on:touchstart.native=\"setCurWidgetSection('armor', $event)\">\r\n\t\t\t<tr v-for=\"(entry, i) in inventory.wornArmor\" :key=\"i\">\r\n\t\t\t\t<td><input-name :item=\"entry.armor\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVC\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVP\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVB\"></InputInt></td>\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"coverage\" widgetTagName=\"w-coverage\" :value=\"getCoverage(entry.armor)\" :index=\"i\" :showWidget=\"isVisibleWidget('armor','coverage', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.armor\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.armor)\" :index=\"i\" :showWidget=\"isVisibleWidget('armor','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packWornArmor(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropWornArmor(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropWornArmor(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"armorEntry.e.armor.name\" v-on:focus=\"focusInRowField(armorEntry,1)\" v-on:blur=\"focusOutRowField(armorEntry,1)\"></input></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVC\" v-on:focus.native=\"focusInRowField(armorEntry,2)\" v-on:blur.native=\"focusOutRowField(armorEntry,2)\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVP\" v-on:focus.native=\"focusInRowField(armorEntry,4)\" v-on:blur.native=\"focusOutRowField(armorEntry,4)\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVB\" v-on:focus.native=\"focusInRowField(armorEntry,8)\" v-on:blur.native=\"focusOutRowField(armorEntry,8)\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"coverage\" widgetTagName=\"w-coverage\" :value=\"getCoverage(armorEntry.e.armor)\" :index=\"-1\" :showWidget=\"(armorEntry.focusedFlags & (16|(1<<20))) !=0\" :entry=\"armorEntry.e.armor\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\t\tv-on:focus-in-row=\"focusInRowField(armorEntry, 16)\" v-on:focus-out-row=\"focusOutRowField(armorEntry, 16)\" v-on:focus-widget=\"focusInRowField(armorEntry, (1<<20))\" />\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"armorEntry.e.armor\" prop=\"weight\" v-on:focus.native=\"focusInRowField(armorEntry,32)\" v-on:blur.native=\"focusOutRowField(armorEntry,32)\"></InputNumber></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(armorEntry.e.armor)\" :index=\"-1\" :showWidget=\"(armorEntry.focusedFlags & (64|(1<<21))) !=0\" :entry=\"armorEntry.e.armor\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\tv-on:focus-in-row=\"focusInRowField(armorEntry, 64)\" v-on:focus-out-row=\"focusOutRowField(armorEntry, 64)\" v-on:focus-widget=\"focusInRowField(armorEntry, (1<<21))\" />\r\n\t\t\t\t<td><input type=\"text\" readonly class=\"focusable\" v-on:focus=\"focusInRowField(armorEntry,64)\" v-on:blur=\"focusOutRowField(armorEntry,64)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\t\t\r\n\t\r\n\t\r\n\t<hr/>\r\n\t\t\r\n\t\t<div class=\"overall-armor-coverage\" v-if=\"showArmorCoverage\">\r\n\t\t\t<h4>Overall Armor Coverage:</h4>\t\r\n\t\t\t<div v-if=\"carriedShield!=null\">Held Shield: <b>{{carriedShield.name}}</b> <span class=\"shield-icon-inv\">☗</span></div>\r\n\t\t\t<div v-if=\"carriedShield!=null\">Size: <b>{{shieldSizeLabels[carriedShield.size]}}</b></div>\r\n\t\t\t<div><label>Prefered Shield Position:\r\n\t\t\t\t<select v-model.number=\"inventory.shieldPosition\">\r\n\t\t\t\t\t<option :value=\"0\">Low</option>\r\n\t\t\t\t\t<option :value=\"1\">High</option>\r\n\t\t\t\t</select>\t\r\n\t\t\t</label> <span v-show=\"carriedShield==null\"> (if held)</span></div>\r\n\t\t\t<div style=\"display:inline-block;vertical-align:top;\">\r\n\t\t\t\t<table border=\"1\" class=\"table-coverage\">\r\n\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t<td></td>\r\n\t\t\t\t\t\t\t<td></td>\r\n\t\t\t\t\t\t\t<td>AVC</td>\r\n\t\t\t\t\t\t\t<td>AVP<span v-show=\"calcArmorNonFirearmMissile\"> ↢</span></td>\r\n\t\t\t\t\t\t\t<td>AVB</td>\r\n\t\t\t\t\t\t\t<td v-if=\"carriedShield !=null\">sAV\t<span class=\"shield-icon-inv\">☗</span></td>\r\n\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t</thead>\r\n\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t<tr v-for=\"(li, i) in coverageHitLocations\">\r\n\t\t\t\t\t\t\t<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>\r\n\t\t\t\t\t\t\t<td>{{i+1}}. {{li.name}}</td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avc\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(1, i)\" v-on:blur=\"focusOutAVColumnRowIndex(1,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avp\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(2, i)\" v-on:blur=\"focusOutAVColumnRowIndex(2,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avb\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(3, i)\" v-on:blur=\"focusOutAVColumnRowIndex(3,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td v-if=\"carriedShield!=null\" v-show=\"shieldCoverage[li.id]!=null\" class=\"td-shield\" :class=\"{active:calcAVRowIndex==i && shieldAVHigherOrEqual }\">{{ shieldCoverage[li.id] ===false ? \"~\" : \"\"}}{{ carriedShield.AV }}</td>\r\n\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t</tbody>\r\n\t\t\t\t</table>\r\n\t\t\t</div>\r\n\t\t\t<div style=\"display:inline-block;vertical-align:top;margin-left:8px;\">\r\n\t\t\t\t<div><i class=\"consider\">Consider against:</i></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"calcArmorCrushing\"></input>Crushing attack</label></div>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"calcArmorNonFirearmMissile\"></input>Non-Firearm Missile attack ↢</label></div>\r\n\t\t\t\t<div><label :class=\"{disabled:calcArmorNonFirearmMissile}\" :style=\"{'pointer-events':calcArmorNonFirearmMissile ? 'none': 'auto'}\"><input type=\"checkbox\" v-model=\"calcArmorMeleeTargeting\"></input> <span :class=\"{disabled:!shouldCalcMeleeAiming}\">Melee Targeting:</span> </label><select number :disabled=\"!shouldCalcMeleeAiming\" v-model.number=\"calcMeleeTargetingZoneIndex\">\r\n\t\t\t\t\t<option :value=\"i\" v-for=\"(li, i) in body.targetZones\">{{ body.getDescLabelTargetZone(i) }}</option>\r\n\t\t\t\t</select></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>\r\n\t\t\t\t<i class=\"cta\" v-show=\"calcAVColumn==0\">&lt;- Focus-click on table cells to inspect result.</i>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div v-show=\"calcAVColumn!=0\">\r\n\t\t\t\t\t<div><span class=\"outline-dominant\">AV Armor protecting: <b>{{ calcArmorResults.av }} AV</b></span></div>\r\n\t\t\t\t\t<ul v-show=\"hasArmorResultProtecting\">\r\n\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsProtectable\">{{ li.name }}</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t<br v-show=\"!hasArmorResultProtecting\" />\r\n\t\t\t\t\t<div><span class=\"outline-layer\">Layer protecting: <b>+{{ calcArmorResults.layer }} AV</b></span></div>\r\n\t\t\t\t\t<ul v-show=\"hasArmorResultLayers\">\r\n\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsLayer\">{{ li.name }}</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t<br v-show=\"!hasArmorResultLayers\" />\r\n\t\t\t\t\t<div v-show=\"calcArmorCrushing\">\r\n\t\t\t\t\t\t<div><span class=\"outline-crushed\">Crushable Hard Armor: <b><span v-show=\"!hasArmorCrushables\"> <i>none</i></span></b></span></div>\r\n\t\t\t\t\t\t<ul v-show=\"hasArmorCrushables\">\r\n\t\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsCrushable\">{{ li.name }}</li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t<hr/>\r\n\t<div v-show=\"saveAvailable\"><button v-on:click=\"saveSheet()\">Save Inventory</button> <i>(also includes Dropped zone)</i></div>\r\n\t\r\n\t<div v-show=\"saveAvailable || loadAvailable\">\r\n\t\t<br/>\r\n\t\t<textarea class=\"savebox\" character-set=\"UTF-8\" v-model=\"copyToClipboard\" ref=\"savedTextArea\" :readonly=\"!loadAvailable\"></textarea><button v-on:click=\"executeCopyContents()\" ref=\"copyButton\">Copy</button><i class=\"copy-notify\" ref=\"copyNotify\" style=\"display:none\">copied!</i>\r\n\t</div>\r\n\t\t\t\t\r\n\t<div v-show=\"loadAvailable\"><button v-on:click=\"loadSheet()\">Load Inventory</button> <i>(also replaces Dropped zone)</i></div>\r\n\t\t\t\r\n\t\t\t\r\n\t<div class=\"focus-value-bar\"><input type=\"text\" :value=\"focusValueText\" readonly></input></div>\r\n</div>";
+		return "<div class=\"inventory\" v-on:click=\"onBaseInventoryClick\">\r\n\r\n\t<h2>{{whoseInventoryPrefix}}Inventory<slot name=\"titleAfter\"></slot></h2>\r\n\t\r\n\t<div class=\"tally-zone\">\r\n\t\t<div>\r\n\t\t\t<div class=\"tallycta\"><label><input type=\"checkbox\" v-model=\"userShowTally\"></input><i>Tally?</i></label></div>\r\n\t\t</div>\r\n\t\t<div class=\"checkout\" v-if=\"showTally\">\r\n\t\t\t<div><b>Tally:</b> <i>(excluding dropped)</i></div>\r\n\t\t\t<div>Total Cost: <b>{{ totalCostGP }}gp  {{ totalCostSP }}sp {{ totalCostCP }}cp</b></div>\r\n\t\t\t<div v-if=\"maxCostCopper!=null\" :class=\"{exceeded:exceededCost}\">Max Cost: <b>{{ maxCostGP }}gp  {{ maxCostSP }}sp {{ maxCostCP }}cp</b> ({{moneyLeftStr}} remaining)</div>\r\n\t\t\t<div>Total Weight: <b>{{ totalWeightLbl }}</b></div>\r\n\t\t\t<div v-if=\"maxWeight!=null\" :class=\"{exceeded:exceededWeight}\">Weight Threshold: <b>{{ totalWeightLbl }}</b> / <b>{{ maxWeight }}</b> (~~{{weightRemainingLbl}}) <slot name=\"weightAfter\"></slot></div>\r\n\t\t\t\r\n\t\t</div>\r\n\t\t<slot name=\"exitBtn\"></slot>\r\n\t</div>\t\r\n\t\t\r\n\t<div class=\"manage-multi-zone\">\r\n\t\t<slot name=\"loadNewTabZone\"></slot>\r\n\t\t<div class=\"save-drop-zone\">\r\n\t\t\t<div>\r\n\t\t\t\t<div><button v-on:click=\"saveDropList()\">Save Dropped Zone</button></div>\r\n\t\t\t\t<textarea class=\"savebox\" character-set=\"UTF-8\" v-model=\"copyToClipboardDropList\"></textarea>\r\n\t\t\t\t<div><button v-on:click=\"loadDropList()\">Load Dropped Zone</button></div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\t\r\n\t<div style=\"clear:both\"></div>\t\r\n\t\t\t\r\n\t<sweet-modal ref=\"overwriteItemWarning\">\r\n\t\t<div  v-if=\"itemToOverwriteWith!=null\" v-on:close=\"closeOverwriteModal()\">\r\n\t\t\t<div>\r\n\t\t\tThe item{{itemToOverwriteWith.qty > 1 ? \"s\":\"\"}} <b>\"{{ itemToOverwriteWith.get_uid()}}\"</b><b v-show=\"itemToOverwriteWith.qty>1\">({{itemToOverwriteWith.qty}})</b> you intend to {{ itemToOverwriteToPacked ? \"pack\" : \"drop\" }} might be <b>different</b> from existing item(s) already {{  itemToOverwriteToPacked ? \"in \"+(isYourInventory ? \"your\" : \"the\")+\" pack\" : \"on the ground\" }} with the same label! Either confirm to overwrite the existing item(s) {{  itemToOverwriteToPacked ? \"in \"+(isYourInventory ? \"your\" : \"the\")+\" pack\" : \"on the ground\" }}, or re-name the item to something else before {{  itemToOverwriteToPacked ? \"packing\" : \"dropping\" }} it.\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<div>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"itemToOverwriteWithChecked\"></input> <i>Confirm Overwrite?</i></label></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" :disabled=\"!itemToOverwriteWithChecked\" v-on:click=\"confirmOverwriteItem()\">Confirm Overwrite</button>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<button slot=\"button\" v-on:click=\"closeOverwriteModal(true)\">Cancel</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\t\t\r\n\t<sweet-modal ref=\"itemQtyMultipleModal\" v-on:close=\"closeMultipleQtyItem()\">\r\n\t\t<div v-if=\"itemQtyMultiple!=null\">\r\n\t\t\t<div>\r\n\t\t\t\tHow much of <b>{{itemQtyMultiple.get_uid()}}</b><b>({{itemQtyMultipleMax}})</b> do you wish to {{ itemToOverwriteToPacked ? \"pack\" : \"drop\" }}?\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<div>\r\n\t\t\t\t<InputInt :obj=\"itemQtyMultiple\" prop=\"qty\" :min=\"1\" :max=\"itemQtyMultipleMax\" />\r\n\t\t\t</div>\r\n\t\t\t<br/>\r\n\t\t\t<button slot=\"button\" v-on:click=\"confirmQtyMultipleSend()\">Confirm</button>\r\n\t\t\t<button slot=\"button\" v-on:click=\"closeMultipleQtyItem(true)\">Cancel</button>\r\n\t\t</div>\r\n\t</sweet-modal>\r\n\t\r\n\t\r\n\t<h4>Dropped:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Item Name</td>\r\n\t\t\t\t<td class=\"qty\">Qty</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('dropped', $event)\" v-on:touchstart.native=\"setCurWidgetSection('dropped', $event)\">\r\n\t\t\t\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.dropped.list\" :key=\"entry.item.get_uid()\">\r\n\t\t\t\t<td><input-name-qty :itemQty=\"entry\" v-on:updated=\"onInputNameUpdated\" :customValidateName=\"validateQtyNameDropped\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry\" prop=\"qty\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :floating=\"true\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>{{ entry.item.getTypeLabel() }}</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packItemEntryFromGround(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.equipItemEntryFromGround(entry)\">Equip</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.deleteDropped(entry)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t\r\n\t\t\t\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"droppedEntry.e.item.name\" required v-on:focus=\"focusInRowField(droppedEntry, 1)\" v-on:blur=\"focusOutRowField(droppedEntry, 1)\"></input></td>\r\n\t\t\t\t<td><InputInt :obj=\"droppedEntry.e\" prop=\"qty\" :min=\"1\" v-on:focus.native=\"focusInRowField(droppedEntry, 2)\" v-on:blur.native=\"focusOutRowField(droppedEntry, 2)\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"droppedEntry.e\" prop=\"weight\" :min=\"0\" v-on:focus.native=\"focusInRowField(droppedEntry, 4)\" v-on:blur.native=\"focusOutRowField(droppedEntry, 4)\"></InputNumber></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\tMiscItem\r\n\t\t\t\t</td>\r\n\t\t\t\t\r\n\t\t\t</tr>\r\n\t\t\r\n\t\t\t\r\n\t\t</tbody>\r\n\t</table>\r\n\t\r\n\t<hr/>\r\n\t\t\t\t\r\n\t<slot name=\"tabList\"></slot>\r\n\t\t\t\r\n\t<h4>Packed: <label style=\"font-size:10px\">Drop?<input type=\"checkbox\" v-model=\"inventory.dropPack\"></input></label></h4>\t\t\t\t\r\n\t\r\n\t\r\n\t<table border=\"1\" style=\"display:inline-block\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Item Name</td>\r\n\t\t\t\t<td class=\"qty\">Qty</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('packed', $event)\" v-on:touchstart.native=\"setCurWidgetSection('packed', $event)\">\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.packed.list\" :key=\"entry.item.get_uid()\">\r\n\t\t\t\t<td><input-name-qty :itemQty=\"entry\" v-on:updated=\"onInputNameUpdated\" :customValidateName=\"validateQtyNamePacked\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry\" prop=\"qty\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :floating=\"true\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>{{ entry.item.getTypeLabel() }}</td>\r\n\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropItemEntryFromPack(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.equipItemEntryFromPack(entry)\">Equip</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"inventory.deletePacked(entry)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"packedEntry.e.item.name\" required v-on:focus=\"focusInRowField(packedEntry, 1)\" v-on:blur=\"focusOutRowField(packedEntry, 1)\"></input></td>\r\n\t\t\t\t<td><InputInt :obj=\"packedEntry.e\" prop=\"qty\" :min=\"1\" v-on:focus.native=\"focusInRowField(packedEntry, 2)\" v-on:blur.native=\"focusOutRowField(packedEntry, 2)\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"packedEntry.e\" prop=\"weight\" :min=\"0\" v-on:focus.native=\"focusInRowField(packedEntry, 4)\" v-on:blur.native=\"focusOutRowField(packedEntry, 4)\"></InputNumber></td>\r\n\t\t\t\t<td>MiscItem</td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\r\n\t\t\t\t\r\n\t<h3>Equipment details</h3>\r\n\t\r\n\t\r\n\t<h4>Shields:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td style=\"width:155px\">Shield Name</td>\r\n\t\t\t\t<td style=\"width:35px\">AV</td>\r\n\t\t\t\t<td style=\"width:35px\">Block</td>\r\n\t\t\t\t<td style=\"width:45px\">Weight</td>\r\n\t\t\t\t<td style=\"width:67px\">Size</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td style=\"width:130px\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('shield',$event)\" v-on:touchstart.native=\"setCurWidgetSection('shield',$event)\">\r\n\t\t\t<tr :key=\"entry.key\" v-for=\"(entry,i) in inventory.shields\">\r\n\t\t\t\t<td><input-name :item=\"entry.shield\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.shield\" prop=\"AV\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.shield\" prop=\"blockTN\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td><InputNumber :step=\"0.5\" :obj=\"entry.shield\" prop=\"weight\" :min=\"0\"></InputNumber></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"entry.shield.size \">\r\n\t\t\t\t\t\t<option :value=\"0\">Small</option>\r\n\t\t\t\t\t\t<option :value=\"1\">Medium</option>\r\n\t\t\t\t\t\t<option :value=\"2\">Large</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.shield)\" :index=\"i\" :showWidget=\"isVisibleWidget('shield','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"i\" :showWidget=\"isVisibleWidget('shield', 'td-unheld', i)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedShield(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedShield(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedShield(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-on:focus=\"focusInRowField(shieldEntry, 1)\" v-on:blur=\"focusOutRowField(shieldEntry, 1)\" v-model=\"shieldEntry.e.shield.name\" required></input></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 2)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 2)\" :obj=\"shieldEntry.e.shield\" prop=\"AV\" :min=\"1\"></InputInt></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 4)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 4)\" :obj=\"shieldEntry.e.shield\" prop=\"blockTN\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td><InputInt v-on:focus.native=\"focusInRowField(shieldEntry, 8)\" v-on:blur.native=\"focusOutRowField(shieldEntry, 8)\" :obj=\"shieldEntry.e.shield\" prop=\"weight\" :min=\"0\"></InputInt></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select v-model.number=\"shieldEntry.e.shield.size\" v-on:focus=\"focusInRowField(shieldEntry, 16)\" v-on:blur=\"focusOutRowField(shieldEntry, 16)\">\r\n\t\t\t\t\t\t<option :value=\"0\">Small</option>\r\n\t\t\t\t\t\t<option :value=\"1\">Medium</option>\r\n\t\t\t\t\t\t<option :value=\"2\">Large</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(shieldEntry.e.shield)\" :index=\"-1\" :showWidget=\"(shieldEntry.focusedFlags & (32|(1<<21))) !=0\" :entry=\"shieldEntry.e\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\tv-on:focus-in-row=\"focusInRowField(shieldEntry, 32)\" v-on:focus-out-row=\"focusOutRowField(shieldEntry, 32)\" v-on:focus-widget=\"focusInRowField(shieldEntry, (1<<21))\" />\r\n\t\t\t\t<td><input type=\"text\" v-model=\"shieldEntry.e.unheldRemark\" v-on:focus=\"focusInRowField(shieldEntry,64)\" v-on:blur=\"focusOutRowField(shieldEntry,64)\"></input></td>\t\r\n\t\t\t\t\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\r\n\t\r\n\t<h4>Munitions:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Melee Weap name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td class=\"reach\">Reach</td>\r\n\t\t\t\t<td style=\"width:65px\">Swing</td>\r\n\t\t\t\t<td style=\"width:65px\">Thrust</td>\r\n\t\t\t\t<td style=\"width:35px\">DTN(G)</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('meleeWeap', $event)\" v-on:touchstart.native=\"setCurWidgetSection('meleeWeap', $event)\">\r\n\t\t\t<tr v-for=\"(entry,itemIndex) in filteredMelee\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"meleeWeap\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"entry.weapon.reach\">\r\n\t\t\t\t\t\t<option :value=\"1\">HA</option>\r\n\t\t\t\t\t\t<option :value=\"2\">H</option>\r\n\t\t\t\t\t\t<option :value=\"3\">S</option>\r\n\t\t\t\t\t\t<option :value=\"4\">M</option>\r\n\t\t\t\t\t\t<option :value=\"5\">L</option>\r\n\t\t\t\t\t\t<option :value=\"6\">VL</option>\r\n\t\t\t\t\t\t<option :value=\"7\">EL</option>\r\n\t\t\t\t\t\t<option :value=\"8\">LL</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:false}\" :value=\"getSwingAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk2\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:true}\" :value=\"getThrustAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-atk2', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-def\" widgetTagName=\"w-melee-def\" :value=\"getDefGuard(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','melee-def', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('meleeWeap', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" v-if=\"weaponEntry.e.weapon.isMelee()\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"meleeWeap\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\"  v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select number v-model.number=\"weaponEntry.e.weapon.reach\"  v-on:focus=\"focusInRowField(weaponEntry,8)\" v-on:blur=\"focusOutRowField(weaponEntry,8)\">\r\n\t\t\t\t\t\t<option value=\"1\">HA</option>\r\n\t\t\t\t\t\t<option value=\"2\">H</option>\r\n\t\t\t\t\t\t<option value=\"3\">S</option>\r\n\t\t\t\t\t\t<option value=\"4\">M</option>\r\n\t\t\t\t\t\t<option value=\"5\">L</option>\r\n\t\t\t\t\t\t<option value=\"6\">VL</option>\r\n\t\t\t\t\t\t<option value=\"7\">EL</option>\r\n\t\t\t\t\t\t<option value=\"8\">LL</option>\r\n\t\t\t\t\t</select>\r\n\t\t\t\t</td>\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:false}\" :value=\"getSwingAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-atk2\" widgetTagName=\"w-melee-atk\" :widgetProps=\"{thrusting:true}\" :value=\"getThrustAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (32|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\"  v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,32)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,32)\" />\t\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"melee-def\" widgetTagName=\"w-melee-def\" :value=\"getDefGuard(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<23))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<23))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t\t\t\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead v-on:mousedown=\"setCurWidgetSection('bowheader', $event)\" v-on:touchstart=\"setCurWidgetSection('bowheader', $event)\">\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Bow name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Req STR</td>\r\n\t\t\t\t<td class=\"voidna focus gotbtn w-holder w-ammo-spawner\" v-on:click.stop=\"\">\r\n\t\t\t\t\t<button v-on:click=\"requestCurWidget('ammo-spawner',-1)\">&#8610;</button>\r\n\t\t\t\t\t<div class=\"pop-widget\"  v-if=\"isVisibleWidget('bowheader', 'ammo-spawner', -1)\">\r\n\t\t\t\t\t\t<w-ammo-spawner :mask=\"bowSlingAndCrossbowMask\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('bow', $event)\" v-on:touchstart.native=\"setCurWidgetSection('bow', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredBow\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"entry\" :weapon=\"entry.weapon\" section=\"bow\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"bowMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"requiredStr\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('bow', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" v-if=\"weaponEntry.e.weapon.isBow()\" :key=\"-2\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"bow\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"bowMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\"  v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry, 4)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :obj=\"weaponEntry.e.weapon\" prop=\"requiredStr\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Crossbow name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Span</td>\r\n\t\t\t\t<td>SpanTool</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('crossbow', $event)\" v-on:touchstart.native=\"setCurWidgetSection('crossbow', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredCrossbow\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"entry\" :weapon=\"entry.weapon\" section=\"crossbow\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"crossbowMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon.crossbow\" prop=\"span\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"span-tools\" widgetTagName=\"w-span-tools\" :value=\"getSpanTools(entry.weapon.crossbow)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','span-tools', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('crossbow', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-3\" v-if=\"weaponEntry.e.weapon.isCrossbow()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"crossbow\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"crossbowMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\t\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon.crossbow\" prop=\"span\"  v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"span-tools\" widgetTagName=\"w-span-tools\" :value=\"getSpanTools(weaponEntry.e.weapon.crossbow)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" />\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead v-on:mousedown=\"setCurWidgetSection('firearmheader', $event)\" v-on:touchstart=\"setCurWidgetSection('firearmheader', $event)\">\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Firearm name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td>Load</td>\r\n\t\t\t\t<td class=\"w-holder w-ammo-spawner\" v-on:click.stop=\"\">\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"requestCurWidget('ammo-spawner',-1)\">Ammunition</a>\r\n\t\t\t\t\t<div class=\"pop-widget\"  v-if=\"isVisibleWidget('firearmheader', 'ammo-spawner', -1)\">\r\n\t\t\t\t\t\t<w-ammo-spawner :mask=\"firearmMask\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('firearm', $event)\" v-on:touchstart.native=\"setCurWidgetSection('firearm', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredFirearm\" :key=\"entry.key\">\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"firearm-name\" widgetTagName=\"w-firearm-name\" :value=\"entry.weapon.get_label()\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','firearm-name', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\"  :entry=\"entry\" :weapon=\"entry.weapon\" section=\"firearm\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"firearmMask\"  />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :min=\"0\" :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.weapon.firearm\" prop=\"load\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"ammunition\" widgetTagName=\"w-ammunition\" :value=\"getAmmunitions(entry.weapon.firearm)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','ammunition', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :addAmmo=\"addAmmo\" />\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('firearm', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-4\" v-if=\"weaponEntry.e.weapon.isFirearm()\">\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"firearm-name\" widgetTagName=\"w-firearm-name\" :value=\"weaponEntry.e.weapon.get_label()\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (1|(1<<25))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<25))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,1)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,1)\" />\r\n\t\t\t\t\t\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :entry=\"weaponEntry.e\" :weapon=\"weaponEntry.e.weapon\" section=\"firearm\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"firearmMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\t\r\n\t\t\t\t<td><InputInt :obj=\"weaponEntry.e.weapon.firearm\" prop=\"load\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"ammunition\" widgetTagName=\"w-ammunition\" :value=\"getAmmunitions(weaponEntry.e.weapon.firearm)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (64|(1<<22))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<22))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,64)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,64)\" :addAmmo=\"addAmmo\" />\t\r\n\t\t\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Throwing/Sling name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"hands\">Hands</td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td class=\"d10\">Stuck</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('throwing', $event)\" v-on:touchstart.native=\"setCurWidgetSection('throwing', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredThrowing\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"throwing\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"throwMask\" />\r\n\t\t\t\t<td-hands :entry=\"entry\" />\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"entry.weapon\" prop=\"stuckChance\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('throwing', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-5\" v-if=\"weaponEntry.e.weapon.isThrowing() || weaponEntry.e.weapon.isSling()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"throwing\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"throwMask\" />\r\n\t\t\t\t<td-hands :entry=\"weaponEntry.e\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 4)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,4)\" />\r\n\t\t\t\t<td><InputInt :step=\"1\" :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"weaponEntry.e.weapon\" prop=\"stuckChance\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td class=\"gotbtn focus\">Ammo name</td>\r\n\t\t\t\t<td class=\"munition-type\">Type</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td>Range</td>\r\n\t\t\t\t<td>TN(dmg)</td>\r\n\t\t\t\t<td class=\"d10\">Catch</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('ammo', $event)\" v-on:touchstart.native=\"setCurWidgetSection('ammo', $event)\">\r\n\t\t\t<tr v-for=\"(entry, itemIndex) in filteredAmmo\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.weapon\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"entry.weapon\" section=\"ammo\" :index=\"itemIndex\"  :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\"  />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td><InputInt :obj=\"entry.weapon\" prop=\"range\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo','missile-atk', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"entry.weapon\" prop=\"stuckChance\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.weapon)\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo','tags', itemIndex)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.weapon\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"itemIndex\" :showWidget=\"isVisibleWidget('ammo', 'td-unheld', itemIndex)\" />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packEquipedWeapon(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropEquipedWeapon(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-6\" v-if=\"weaponEntry.e.weapon.isAmmunition()\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.weapon.name\" v-on:focus=\"focusInRowField(weaponEntry,1)\" v-on:blur=\"focusOutRowField(weaponEntry,1)\"></input></td>\r\n\t\t\t\t<td-prof :curWidgetRequest=\"curWidgetRequest\" :isVisibleWidget=\"isVisibleWidget\" :weapon=\"weaponEntry.e.weapon\" section=\"ammo\" :index=\"-1\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<20))\" v-on:focus-in-row=\"focusInRowField(weaponEntry, 2)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,2)\" :meleeProfs=\"coreMeleeProfs\" :rangedProfs=\"coreRangedProfs\" :profMask=\"-1\" />\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td><InputInt :obj=\"weaponEntry.e.weapon\" prop=\"range\" v-on:focus.native=\"focusInRowField(weaponEntry,8)\" v-on:blur.native=\"focusOutRowField(weaponEntry,8)\"  /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"missile-atk\" widgetTagName=\"w-missile-atk\" :value=\"getMissileAtkStr(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (16|(1<<21))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,16)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,16)\" />\r\n\t\t\t\t<td><InputInt :min=\"0\" :max=\"10\" :obj=\"weaponEntry.e.weapon\" prop=\"stuckChance\" v-on:focus.native=\"focusInRowField(weaponEntry,32)\" v-on:blur.native=\"focusOutRowField(weaponEntry,32)\"></InputInt></td>\r\n\t\t\t\t<td class=\"voidna\"></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(weaponEntry.e.weapon)\" :index=\"-1\" :showWidget=\"(weaponEntry.focusedFlags & (128|(1<<24))) !=0\" :entry=\"weaponEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(weaponEntry,(1<<24))\" v-on:focus-in-row=\"focusInRowField(weaponEntry,128)\" v-on:focus-out-row=\"focusOutRowField(weaponEntry,128)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"weaponEntry.e.weapon\" prop=\"weight\" v-on:focus.native=\"focusInRowField(weaponEntry,256)\" v-on:blur.native=\"focusOutRowField(weaponEntry,256)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"weaponEntry.e.unheldRemark\"v-on:focus=\"focusInRowField(weaponEntry,512)\" v-on:blur=\"focusOutRowField(weaponEntry,512)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t\t\t\r\n\t</table>\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t<h4>MiscItems:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>MiscItem Name</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"keptat\">Kept at?</td>\r\n\t\t\t\t<td class=\"held\">Held?</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('miscItem', $event)\" v-on:touchstart.native=\"setCurWidgetSection('miscItem', $event)\">\r\n\t\t\t<tr v-for=\"(entry,i) in inventory.equipedNonMeleeItems\" :key=\"entry.key\">\r\n\t\t\t\t<td><input-name :item=\"entry.item\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.item)\" :index=\"i\" :showWidget=\"isVisibleWidget('miscItem','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.item\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-unheld :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" :index=\"i\" :showWidget=\"isVisibleWidget('miscItem', 'td-unheld', i)\" />\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<select-held :entry=\"entry\" :inventory=\"inventory\" />\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packMiscItem(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropMiscItem(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropMiscItem(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"miscItemEntry.e.item.name\" v-on:focus=\"focusInRowField(miscItemEntry,1)\" v-on:blur=\"focusOutRowField(miscItemEntry,1)\"></input></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(miscItemEntry.e.item)\" :index=\"-1\" :showWidget=\"(miscItemEntry.focusedFlags & (2|(1<<21))) !=0\" :entry=\"miscItemEntry.e\" :requestCurWidget=\"requestCurWidget\" v-on:focus-widget=\"focusInRowField(miscItemEntry,(1<<21))\" v-on:focus-in-row=\"focusInRowField(miscItemEntry,2)\" v-on:focus-out-row=\"focusOutRowField(miscItemEntry,2)\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"miscItemEntry.e.item\" prop=\"weight\" v-on:focus.native=\"focusInRowField(miscItemEntry,4)\" v-on:blur.native=\"focusOutRowField(miscItemEntry,4)\"></InputNumber></td>\r\n\t\t\t\t<td><input type=\"text\" v-model=\"miscItemEntry.e.unheldRemark\" v-on:focus=\"focusInRowField(miscItemEntry,8)\" v-on:blur=\"focusOutRowField(miscItemEntry,8)\"></input></td>\t\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\t\t\r\n\t\t\r\n\t\r\n\t<h4>Armor:</h4>\r\n\t<table border=\"1\">\r\n\t\t<thead>\r\n\t\t\t<tr>\r\n\t\t\t\t<td>Armor Name</td>\r\n\t\t\t\t<td>AVC</td>\r\n\t\t\t\t<td>AVP</td>\r\n\t\t\t\t<td>AVB</td>\r\n\t\t\t\t<td>Coverage</td>\r\n\t\t\t\t<td class=\"weight\">Weight</td>\r\n\t\t\t\t<td class=\"tags\">Tags</td>\r\n\t\t\t\t<td class=\"actions\"><i>Actions</i></td>\r\n\t\t\t</tr>\r\n\t\t</thead>\r\n\t\t<tbody :name=\"itemTransitionName\" is=\"transition-group\" v-on:mousedown.native=\"setCurWidgetSection('armor', $event)\"  v-on:touchstart.native=\"setCurWidgetSection('armor', $event)\">\r\n\t\t\t<tr v-for=\"(entry, i) in inventory.wornArmor\" :key=\"i\">\r\n\t\t\t\t<td><input-name :item=\"entry.armor\" v-on:updated=\"onInputNameUpdated\" /></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVC\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVP\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"entry.armor\" prop=\"AVB\"></InputInt></td>\t\t\t\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"coverage\" widgetTagName=\"w-coverage\" :value=\"getCoverage(entry.armor)\" :index=\"i\" :showWidget=\"isVisibleWidget('armor','coverage', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"entry.armor\" prop=\"weight\"></InputNumber></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(entry.armor)\" :index=\"i\" :showWidget=\"isVisibleWidget('armor','tags', i)\" :entry=\"entry\" :requestCurWidget=\"requestCurWidget\" />\r\n\t\t\t\t\r\n\t\t\t\t<td>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"packWornArmor(entry)\">Pack</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropWornArmor(entry)\">Drop</a>\r\n\t\t\t\t\t<a href=\"javascript:;\" v-on:click=\"dropWornArmor(entry, true)\">Delete</a>\r\n\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t\t<tr class=\"entry-row\" :key=\"-1\">\r\n\t\t\t\t<td><input type=\"text\" v-model=\"armorEntry.e.armor.name\" v-on:focus=\"focusInRowField(armorEntry,1)\" v-on:blur=\"focusOutRowField(armorEntry,1)\"></input></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVC\" v-on:focus.native=\"focusInRowField(armorEntry,2)\" v-on:blur.native=\"focusOutRowField(armorEntry,2)\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVP\" v-on:focus.native=\"focusInRowField(armorEntry,4)\" v-on:blur.native=\"focusOutRowField(armorEntry,4)\"></InputInt></td>\r\n\t\t\t\t<td><InputInt :min=\"0\" :obj=\"armorEntry.e.armor\" prop=\"AVB\" v-on:focus.native=\"focusInRowField(armorEntry,8)\" v-on:blur.native=\"focusOutRowField(armorEntry,8)\"></InputInt></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"coverage\" widgetTagName=\"w-coverage\" :value=\"getCoverage(armorEntry.e.armor)\" :index=\"-1\" :showWidget=\"(armorEntry.focusedFlags & (16|(1<<20))) !=0\" :entry=\"armorEntry.e.armor\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\t\tv-on:focus-in-row=\"focusInRowField(armorEntry, 16)\" v-on:focus-out-row=\"focusOutRowField(armorEntry, 16)\" v-on:focus-widget=\"focusInRowField(armorEntry, (1<<20))\" />\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t<td><InputNumber :min=\"0\" :step=\"0.5\" :obj=\"armorEntry.e.armor\" prop=\"weight\" v-on:focus.native=\"focusInRowField(armorEntry,32)\" v-on:blur.native=\"focusOutRowField(armorEntry,32)\"></InputNumber></td>\r\n\t\t\t\t<td-widget v-on:focus-widget-value=\"focusWidgetValue\" widgetName=\"tags\" widgetTagName=\"w-tags\" :value=\"getTags(armorEntry.e.armor)\" :index=\"-1\" :showWidget=\"(armorEntry.focusedFlags & (64|(1<<21))) !=0\" :entry=\"armorEntry.e.armor\" :requestCurWidget=\"requestCurWidget\"\r\n\t\t\t\tv-on:focus-in-row=\"focusInRowField(armorEntry, 64)\" v-on:focus-out-row=\"focusOutRowField(armorEntry, 64)\" v-on:focus-widget=\"focusInRowField(armorEntry, (1<<21))\" />\r\n\t\t\t\t<td><input type=\"text\" readonly class=\"focusable\" v-on:focus=\"focusInRowField(armorEntry,64)\" v-on:blur=\"focusOutRowField(armorEntry,64)\"></input></td>\r\n\t\t\t</tr>\r\n\t\t</tbody>\r\n\t</table>\t\t\r\n\t\r\n\t\r\n\t<hr/>\r\n\t\t\r\n\t\t<div class=\"overall-armor-coverage\" v-if=\"showArmorCoverage\">\r\n\t\t\t<h4>Overall Armor Coverage:</h4>\t\r\n\t\t\t<div v-if=\"carriedShield!=null\">Held Shield: <b>{{carriedShield.name}}</b> <span class=\"shield-icon-inv\">☗</span></div>\r\n\t\t\t<div v-if=\"carriedShield!=null\">Size: <b>{{shieldSizeLabels[carriedShield.size]}}</b></div>\r\n\t\t\t<div><label>Prefered Shield Position:\r\n\t\t\t\t<select v-model.number=\"inventory.shieldPosition\" number>\r\n\t\t\t\t\t<option :value=\"0\">Low</option>\r\n\t\t\t\t\t<option :value=\"1\">High</option>\r\n\t\t\t\t</select>\t\r\n\t\t\t</label> <span v-show=\"carriedShield==null\"> (if held)</span></div>\r\n\t\t\t<div style=\"display:inline-block;vertical-align:top;\">\r\n\t\t\t\t<table border=\"1\" class=\"table-coverage\">\r\n\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t<td></td>\r\n\t\t\t\t\t\t\t<td></td>\r\n\t\t\t\t\t\t\t<td>AVC</td>\r\n\t\t\t\t\t\t\t<td>AVP<span v-show=\"calcArmorNonFirearmMissile\"> ↢</span></td>\r\n\t\t\t\t\t\t\t<td>AVB</td>\r\n\t\t\t\t\t\t\t<td v-if=\"carriedShield !=null\">sAV\t<span class=\"shield-icon-inv\">☗</span></td>\r\n\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t</thead>\r\n\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t<tr v-for=\"(li, i) in coverageHitLocations\">\r\n\t\t\t\t\t\t\t<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>\r\n\t\t\t\t\t\t\t<td>{{i+1}}. {{li.name}}</td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avc\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(1, i)\" v-on:blur=\"focusOutAVColumnRowIndex(1,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avp\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(2, i)\" v-on:blur=\"focusOutAVColumnRowIndex(2,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td><input type=\"number\" readonly :value=\"hitLocationArmorValues[li.id].avb\" :disabled=\"isDisabledHitLocation(i)\" v-on:focus=\"calcAVColumnRowIndex(3, i)\" v-on:blur=\"focusOutAVColumnRowIndex(3,i)\"></input></td>\r\n\t\t\t\t\t\t\t<td v-if=\"carriedShield!=null\" v-show=\"shieldCoverage[li.id]!=null\" class=\"td-shield\" :class=\"{active:calcAVRowIndex==i && shieldAVHigherOrEqual }\">{{ shieldCoverage[li.id] ===false ? \"~\" : \"\"}}{{ carriedShield.AV }}</td>\r\n\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t</tbody>\r\n\t\t\t\t</table>\r\n\t\t\t</div>\r\n\t\t\t<div style=\"display:inline-block;vertical-align:top;margin-left:8px;\">\r\n\t\t\t\t<div><i class=\"consider\">Consider against:</i></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"calcArmorCrushing\"></input>Crushing attack</label></div>\r\n\t\t\t\t<div><label><input type=\"checkbox\" v-model=\"calcArmorNonFirearmMissile\"></input>Non-Firearm Missile attack ↢</label></div>\r\n\t\t\t\t<div><label :class=\"{disabled:calcArmorNonFirearmMissile}\" :style=\"{'pointer-events':calcArmorNonFirearmMissile ? 'none': 'auto'}\"><input type=\"checkbox\" v-model=\"calcArmorMeleeTargeting\"></input> <span :class=\"{disabled:!shouldCalcMeleeAiming}\">Melee Targeting:</span> </label><select number :disabled=\"!shouldCalcMeleeAiming\" v-model.number=\"calcMeleeTargetingZoneIndex\">\r\n\t\t\t\t\t<option :value=\"i\" v-for=\"(li, i) in body.targetZones\">{{ body.getDescLabelTargetZone(i) }}</option>\r\n\t\t\t\t</select></div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>\r\n\t\t\t\t<i class=\"cta\" v-show=\"calcAVColumn==0\">&lt;- Focus-click on table cells to inspect result.</i>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<div v-show=\"calcAVColumn!=0\">\r\n\t\t\t\t\t<div><span class=\"outline-dominant\">AV Armor protecting: <b>{{ calcArmorResults.av }} AV</b></span></div>\r\n\t\t\t\t\t<ul v-show=\"hasArmorResultProtecting\">\r\n\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsProtectable\">{{ li.name }}</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t<br v-show=\"!hasArmorResultProtecting\" />\r\n\t\t\t\t\t<div><span class=\"outline-layer\">Layer protecting: <b>+{{ calcArmorResults.layer }} AV</b></span></div>\r\n\t\t\t\t\t<ul v-show=\"hasArmorResultLayers\">\r\n\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsLayer\">{{ li.name }}</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t<br v-show=\"!hasArmorResultLayers\" />\r\n\t\t\t\t\t<div v-show=\"calcArmorCrushing\">\r\n\t\t\t\t\t\t<div><span class=\"outline-crushed\">Crushable Hard Armor: <b><span v-show=\"!hasArmorCrushables\"> <i>none</i></span></b></span></div>\r\n\t\t\t\t\t\t<ul v-show=\"hasArmorCrushables\">\r\n\t\t\t\t\t\t\t<li v-for=\"li in calcArmorResults.armorsCrushable\">{{ li.name }}</li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t<hr/>\r\n\t<div v-show=\"saveAvailable\"><button v-on:click=\"saveSheet()\">Save Inventory</button> <i>(also includes Dropped zone)</i></div>\r\n\t\r\n\t<div v-show=\"saveAvailable || loadAvailable\">\r\n\t\t<br/>\r\n\t\t<textarea class=\"savebox\" character-set=\"UTF-8\" v-model=\"copyToClipboard\" ref=\"savedTextArea\" :readonly=\"!loadAvailable\"></textarea><button v-on:click=\"executeCopyContents()\" ref=\"copyButton\">Copy</button><i class=\"copy-notify\" ref=\"copyNotify\" style=\"display:none\">copied!</i>\r\n\t</div>\r\n\t\t\t\t\r\n\t<div v-show=\"loadAvailable\"><button v-on:click=\"loadSheet()\">Load Inventory</button> <i>(also replaces Dropped zone)</i></div>\r\n\t\t\t\r\n\t\t\t\r\n\t<div class=\"focus-value-bar\"><input type=\"text\" :value=\"focusValueText\" readonly></input></div>\r\n</div>";
 	}
 	,shiftIndex: function(i) {
 		return 1 << i;
@@ -12576,7 +13658,14 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		}
 	}
 	,get_totalWeight: function() {
-		return this.inventory.calculateTotalWeight();
+		if(this.injectWeight != null) {
+			return this.injectWeight;
+		} else {
+			return this.inventory.calculateTotalWeight();
+		}
+	}
+	,get_totalWeightLbl: function() {
+		return parseFloat(this.totalWeight.toFixed(2));
 	}
 	,get_showTally: function() {
 		return this.userShowTally;
@@ -12643,9 +13732,9 @@ troshx_sos_vue_InventoryVue.prototype = $extend(haxevx_vuex_core_VComponent.prot
 		this.components = this.Components();
 		this.created = clsP.Created;
 		this.template = this.Template();
-		this.computed = { copperMaxToPieces : clsP.get_copperMaxToPieces, moneyLeft : clsP.get_moneyLeft, moneyLeftStr : clsP.get_moneyLeftStr, exceededCost : clsP.get_exceededCost, weightRemaining : clsP.get_weightRemaining, exceededWeight : clsP.get_exceededWeight, maxCostGP : clsP.get_maxCostGP, maxCostSP : clsP.get_maxCostSP, maxCostCP : clsP.get_maxCostCP, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, shouldCalcMeleeAiming : clsP.get_shouldCalcMeleeAiming, targetingZoneMask : clsP.get_targetingZoneMask, hasArmorResultProtecting : clsP.get_hasArmorResultProtecting, hasArmorResultLayers : clsP.get_hasArmorResultLayers, hasArmorCrushables : clsP.get_hasArmorCrushables, targetZoneHitAreaMasks : clsP.get_targetZoneHitAreaMasks, isYourInventory : clsP.get_isYourInventory, whoseInventoryPrefix : clsP.get_whoseInventoryPrefix, hitLocationArmorValues : clsP.get_hitLocationArmorValues, shieldAVHigherOrEqual : clsP.get_shieldAVHigherOrEqual, hasPopup : clsP.get_hasPopup, isValidDroppedEntry : clsP.get_isValidDroppedEntry, isValidPackedEntry : clsP.get_isValidPackedEntry, crossbowMask : clsP.get_crossbowMask, bowMask : clsP.get_bowMask, bowSlingAndCrossbowMask : clsP.get_bowSlingAndCrossbowMask, firearmMask : clsP.get_firearmMask, throwMask : clsP.get_throwMask, droppedEntryGotFocus : clsP.get_droppedEntryGotFocus, packedEntryGotFocus : clsP.get_packedEntryGotFocus, miscEntryGotFocus : clsP.get_miscEntryGotFocus, weaponEntryGotFocus : clsP.get_weaponEntryGotFocus, shieldEntryGotFocus : clsP.get_shieldEntryGotFocus, armorEntryGotFocus : clsP.get_armorEntryGotFocus, carriedShield : clsP.get_carriedShield, shieldSizeLabels : clsP.get_shieldSizeLabels, shieldCoverage : clsP.get_shieldCoverage, totalCostMoney : clsP.get_totalCostMoney, totalCostGP : clsP.get_totalCostGP, totalCostSP : clsP.get_totalCostSP, totalCostCP : clsP.get_totalCostCP, totalWeight : clsP.get_totalWeight, showTally : clsP.get_showTally, body : clsP.get_body, filteredMelee : clsP.get_filteredMelee, filteredCrossbow : clsP.get_filteredCrossbow, filteredFirearm : clsP.get_filteredFirearm, filteredBow : clsP.get_filteredBow, filteredThrowing : clsP.get_filteredThrowing, filteredAmmo : clsP.get_filteredAmmo};
-		this.methods = { get_copperMaxToPieces : clsP.get_copperMaxToPieces, get_moneyLeft : clsP.get_moneyLeft, get_moneyLeftStr : clsP.get_moneyLeftStr, get_exceededCost : clsP.get_exceededCost, get_weightRemaining : clsP.get_weightRemaining, get_exceededWeight : clsP.get_exceededWeight, get_maxCostGP : clsP.get_maxCostGP, get_maxCostSP : clsP.get_maxCostSP, get_maxCostCP : clsP.get_maxCostCP, onInventorySignalReceived : clsP.onInventorySignalReceived, loadSheet : clsP.loadSheet, watch_inventory : clsP.watch_inventory, saveSheet : clsP.saveSheet, loadDropList : clsP.loadDropList, saveDropList : clsP.saveDropList, resetItemTransitionName : clsP.resetItemTransitionName, onBaseInventoryClick : clsP.onBaseInventoryClick, confirmOverwriteItem : clsP.confirmOverwriteItem, confirmQtyMultipleSend : clsP.confirmQtyMultipleSend, closeMultipleQtyItem : clsP.closeMultipleQtyItem, closeOverwriteModal : clsP.closeOverwriteModal, watch_itemToOverwriteWith : clsP.watch_itemToOverwriteWith, watch_itemQtyMultiple : clsP.watch_itemQtyMultiple, packItemEntryFromGround : clsP.packItemEntryFromGround, dropItemEntryFromPack : clsP.dropItemEntryFromPack, dropEquipedShield : clsP.dropEquipedShield, dropMiscItem : clsP.dropMiscItem, dropEquipedWeapon : clsP.dropEquipedWeapon, dropWornArmor : clsP.dropWornArmor, packEquipedShield : clsP.packEquipedShield, packMiscItem : clsP.packMiscItem, packEquipedWeapon : clsP.packEquipedWeapon, packWornArmor : clsP.packWornArmor, getSuperscriptNum : clsP.getSuperscriptNum, getCoverage : clsP.getCoverage, getTags : clsP.getTags, getDefGuard : clsP.getDefGuard, getSwingAtkStr : clsP.getSwingAtkStr, getThrustAtkStr : clsP.getThrustAtkStr, getMissileAtkStr : clsP.getMissileAtkStr, getAmmunitions : clsP.getAmmunitions, getSpanTools : clsP.getSpanTools, clearWidgets : clsP.clearWidgets, stopPropagation : clsP.stopPropagation, setCurWidgetSection : clsP.setCurWidgetSection, requestCurWidget : clsP.requestCurWidget, isVisibleWidget : clsP.isVisibleWidget, openPopup : clsP.openPopup, closePopup : clsP.closePopup, getValidName : clsP.getValidName, onInputNameUpdated : clsP.onInputNameUpdated, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_shouldCalcMeleeAiming : clsP.get_shouldCalcMeleeAiming, get_targetingZoneMask : clsP.get_targetingZoneMask, get_hasArmorResultProtecting : clsP.get_hasArmorResultProtecting, get_hasArmorResultLayers : clsP.get_hasArmorResultLayers, get_hasArmorCrushables : clsP.get_hasArmorCrushables, isDisabledHitLocation : clsP.isDisabledHitLocation, get_targetZoneHitAreaMasks : clsP.get_targetZoneHitAreaMasks, get_isYourInventory : clsP.get_isYourInventory, get_whoseInventoryPrefix : clsP.get_whoseInventoryPrefix, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, sortArmorLayers : clsP.sortArmorLayers, calcAVColumnRowIndex : clsP.calcAVColumnRowIndex, get_shieldAVHigherOrEqual : clsP.get_shieldAVHigherOrEqual, focusOutAVColumnRowIndex : clsP.focusOutAVColumnRowIndex, test : clsP.test, focusOutRowField : clsP.focusOutRowField, focusInRowField : clsP.focusInRowField, focusWidgetValue : clsP.focusWidgetValue, executeQtyEntry : clsP.executeQtyEntry, validateQtyName : clsP.validateQtyName, validateQtyNamePacked : clsP.validateQtyNamePacked, validateQtyNameDropped : clsP.validateQtyNameDropped, executeEquipEntry : clsP.executeEquipEntry, addAmmo : clsP.addAmmo, getHitLocationMaskNameOf : clsP.getHitLocationMaskNameOf, shiftIndex : clsP.shiftIndex, get_hasPopup : clsP.get_hasPopup, get_isValidDroppedEntry : clsP.get_isValidDroppedEntry, get_isValidPackedEntry : clsP.get_isValidPackedEntry, get_crossbowMask : clsP.get_crossbowMask, get_bowMask : clsP.get_bowMask, get_bowSlingAndCrossbowMask : clsP.get_bowSlingAndCrossbowMask, get_firearmMask : clsP.get_firearmMask, get_throwMask : clsP.get_throwMask, get_droppedEntryGotFocus : clsP.get_droppedEntryGotFocus, get_packedEntryGotFocus : clsP.get_packedEntryGotFocus, get_miscEntryGotFocus : clsP.get_miscEntryGotFocus, get_weaponEntryGotFocus : clsP.get_weaponEntryGotFocus, get_shieldEntryGotFocus : clsP.get_shieldEntryGotFocus, get_armorEntryGotFocus : clsP.get_armorEntryGotFocus, get_carriedShield : clsP.get_carriedShield, get_shieldSizeLabels : clsP.get_shieldSizeLabels, get_shieldCoverage : clsP.get_shieldCoverage, get_totalCostMoney : clsP.get_totalCostMoney, get_totalCostGP : clsP.get_totalCostGP, get_totalCostSP : clsP.get_totalCostSP, get_totalCostCP : clsP.get_totalCostCP, executeCopyContents : clsP.executeCopyContents, get_totalWeight : clsP.get_totalWeight, get_showTally : clsP.get_showTally, get_body : clsP.get_body, get_filteredMelee : clsP.get_filteredMelee, get_filteredCrossbow : clsP.get_filteredCrossbow, get_filteredFirearm : clsP.get_filteredFirearm, get_filteredBow : clsP.get_filteredBow, get_filteredThrowing : clsP.get_filteredThrowing, get_filteredAmmo : clsP.get_filteredAmmo, on_packedEntryGotFocus : clsP.on_packedEntryGotFocus, on_droppedEntryGotFocus : clsP.on_droppedEntryGotFocus, on_shieldEntryGotFocus : clsP.on_shieldEntryGotFocus, on_weaponEntryGotFocus : clsP.on_weaponEntryGotFocus, on_miscEntryGotFocus : clsP.on_miscEntryGotFocus, on_armorEntryGotFocus : clsP.on_armorEntryGotFocus};
-		this.props = { inventory : { required : true, type : Object}, maxWeight : { required : false, type : Number}, maxCostCopper : { required : false, type : Number}, includeOwnerSlash : { required : false, "default" : false, type : Boolean}, saveAvailable : { required : false, "default" : true, type : Boolean}, showArmorCoverage : { required : false, "default" : true, type : Boolean}, bodyChar : { required : false, type : Object}, loadAvailable : { required : false, "default" : true, type : Boolean}, inventoryLabel : { required : false, type : String}};
+		this.computed = { copperMaxToPieces : clsP.get_copperMaxToPieces, moneyLeft : clsP.get_moneyLeft, moneyLeftStr : clsP.get_moneyLeftStr, exceededCost : clsP.get_exceededCost, weightRemaining : clsP.get_weightRemaining, weightRemainingLbl : clsP.get_weightRemainingLbl, exceededWeight : clsP.get_exceededWeight, maxCostGP : clsP.get_maxCostGP, maxCostSP : clsP.get_maxCostSP, maxCostCP : clsP.get_maxCostCP, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, shouldCalcMeleeAiming : clsP.get_shouldCalcMeleeAiming, targetingZoneMask : clsP.get_targetingZoneMask, hasArmorResultProtecting : clsP.get_hasArmorResultProtecting, hasArmorResultLayers : clsP.get_hasArmorResultLayers, hasArmorCrushables : clsP.get_hasArmorCrushables, targetZoneHitAreaMasks : clsP.get_targetZoneHitAreaMasks, isYourInventory : clsP.get_isYourInventory, whoseInventoryPrefix : clsP.get_whoseInventoryPrefix, hitLocationArmorValues : clsP.get_hitLocationArmorValues, shieldAVHigherOrEqual : clsP.get_shieldAVHigherOrEqual, hasPopup : clsP.get_hasPopup, isValidDroppedEntry : clsP.get_isValidDroppedEntry, isValidPackedEntry : clsP.get_isValidPackedEntry, crossbowMask : clsP.get_crossbowMask, bowMask : clsP.get_bowMask, bowSlingAndCrossbowMask : clsP.get_bowSlingAndCrossbowMask, firearmMask : clsP.get_firearmMask, throwMask : clsP.get_throwMask, droppedEntryGotFocus : clsP.get_droppedEntryGotFocus, packedEntryGotFocus : clsP.get_packedEntryGotFocus, miscEntryGotFocus : clsP.get_miscEntryGotFocus, weaponEntryGotFocus : clsP.get_weaponEntryGotFocus, shieldEntryGotFocus : clsP.get_shieldEntryGotFocus, armorEntryGotFocus : clsP.get_armorEntryGotFocus, carriedShield : clsP.get_carriedShield, shieldSizeLabels : clsP.get_shieldSizeLabels, shieldCoverage : clsP.get_shieldCoverage, totalCostMoney : clsP.get_totalCostMoney, totalCostGP : clsP.get_totalCostGP, totalCostSP : clsP.get_totalCostSP, totalCostCP : clsP.get_totalCostCP, totalWeight : clsP.get_totalWeight, totalWeightLbl : clsP.get_totalWeightLbl, showTally : clsP.get_showTally, body : clsP.get_body, filteredMelee : clsP.get_filteredMelee, filteredCrossbow : clsP.get_filteredCrossbow, filteredFirearm : clsP.get_filteredFirearm, filteredBow : clsP.get_filteredBow, filteredThrowing : clsP.get_filteredThrowing, filteredAmmo : clsP.get_filteredAmmo};
+		this.methods = { get_copperMaxToPieces : clsP.get_copperMaxToPieces, get_moneyLeft : clsP.get_moneyLeft, get_moneyLeftStr : clsP.get_moneyLeftStr, get_exceededCost : clsP.get_exceededCost, get_weightRemaining : clsP.get_weightRemaining, get_weightRemainingLbl : clsP.get_weightRemainingLbl, get_exceededWeight : clsP.get_exceededWeight, get_maxCostGP : clsP.get_maxCostGP, get_maxCostSP : clsP.get_maxCostSP, get_maxCostCP : clsP.get_maxCostCP, onInventorySignalReceived : clsP.onInventorySignalReceived, loadSheet : clsP.loadSheet, watch_inventory : clsP.watch_inventory, saveSheet : clsP.saveSheet, loadDropList : clsP.loadDropList, saveDropList : clsP.saveDropList, resetItemTransitionName : clsP.resetItemTransitionName, onBaseInventoryClick : clsP.onBaseInventoryClick, confirmOverwriteItem : clsP.confirmOverwriteItem, confirmQtyMultipleSend : clsP.confirmQtyMultipleSend, closeMultipleQtyItem : clsP.closeMultipleQtyItem, closeOverwriteModal : clsP.closeOverwriteModal, watch_itemToOverwriteWith : clsP.watch_itemToOverwriteWith, watch_itemQtyMultiple : clsP.watch_itemQtyMultiple, packItemEntryFromGround : clsP.packItemEntryFromGround, dropItemEntryFromPack : clsP.dropItemEntryFromPack, dropEquipedShield : clsP.dropEquipedShield, dropMiscItem : clsP.dropMiscItem, dropEquipedWeapon : clsP.dropEquipedWeapon, dropWornArmor : clsP.dropWornArmor, packEquipedShield : clsP.packEquipedShield, packMiscItem : clsP.packMiscItem, packEquipedWeapon : clsP.packEquipedWeapon, packWornArmor : clsP.packWornArmor, getSuperscriptNum : clsP.getSuperscriptNum, getCoverage : clsP.getCoverage, getTags : clsP.getTags, getDefGuard : clsP.getDefGuard, getSwingAtkStr : clsP.getSwingAtkStr, getThrustAtkStr : clsP.getThrustAtkStr, getMissileAtkStr : clsP.getMissileAtkStr, getAmmunitions : clsP.getAmmunitions, getSpanTools : clsP.getSpanTools, clearWidgets : clsP.clearWidgets, stopPropagation : clsP.stopPropagation, setCurWidgetSection : clsP.setCurWidgetSection, requestCurWidget : clsP.requestCurWidget, isVisibleWidget : clsP.isVisibleWidget, openPopup : clsP.openPopup, closePopup : clsP.closePopup, getValidName : clsP.getValidName, onInputNameUpdated : clsP.onInputNameUpdated, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_shouldCalcMeleeAiming : clsP.get_shouldCalcMeleeAiming, get_targetingZoneMask : clsP.get_targetingZoneMask, get_hasArmorResultProtecting : clsP.get_hasArmorResultProtecting, get_hasArmorResultLayers : clsP.get_hasArmorResultLayers, get_hasArmorCrushables : clsP.get_hasArmorCrushables, isDisabledHitLocation : clsP.isDisabledHitLocation, get_targetZoneHitAreaMasks : clsP.get_targetZoneHitAreaMasks, get_isYourInventory : clsP.get_isYourInventory, get_whoseInventoryPrefix : clsP.get_whoseInventoryPrefix, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, sortArmorLayers : clsP.sortArmorLayers, calcAVColumnRowIndex : clsP.calcAVColumnRowIndex, get_shieldAVHigherOrEqual : clsP.get_shieldAVHigherOrEqual, focusOutAVColumnRowIndex : clsP.focusOutAVColumnRowIndex, test : clsP.test, focusOutRowField : clsP.focusOutRowField, focusInRowField : clsP.focusInRowField, focusWidgetValue : clsP.focusWidgetValue, executeQtyEntry : clsP.executeQtyEntry, validateQtyName : clsP.validateQtyName, validateQtyNamePacked : clsP.validateQtyNamePacked, validateQtyNameDropped : clsP.validateQtyNameDropped, executeEquipEntry : clsP.executeEquipEntry, addAmmo : clsP.addAmmo, getHitLocationMaskNameOf : clsP.getHitLocationMaskNameOf, shiftIndex : clsP.shiftIndex, get_hasPopup : clsP.get_hasPopup, get_isValidDroppedEntry : clsP.get_isValidDroppedEntry, get_isValidPackedEntry : clsP.get_isValidPackedEntry, get_crossbowMask : clsP.get_crossbowMask, get_bowMask : clsP.get_bowMask, get_bowSlingAndCrossbowMask : clsP.get_bowSlingAndCrossbowMask, get_firearmMask : clsP.get_firearmMask, get_throwMask : clsP.get_throwMask, get_droppedEntryGotFocus : clsP.get_droppedEntryGotFocus, get_packedEntryGotFocus : clsP.get_packedEntryGotFocus, get_miscEntryGotFocus : clsP.get_miscEntryGotFocus, get_weaponEntryGotFocus : clsP.get_weaponEntryGotFocus, get_shieldEntryGotFocus : clsP.get_shieldEntryGotFocus, get_armorEntryGotFocus : clsP.get_armorEntryGotFocus, get_carriedShield : clsP.get_carriedShield, get_shieldSizeLabels : clsP.get_shieldSizeLabels, get_shieldCoverage : clsP.get_shieldCoverage, get_totalCostMoney : clsP.get_totalCostMoney, get_totalCostGP : clsP.get_totalCostGP, get_totalCostSP : clsP.get_totalCostSP, get_totalCostCP : clsP.get_totalCostCP, executeCopyContents : clsP.executeCopyContents, get_totalWeight : clsP.get_totalWeight, get_totalWeightLbl : clsP.get_totalWeightLbl, get_showTally : clsP.get_showTally, get_body : clsP.get_body, get_filteredMelee : clsP.get_filteredMelee, get_filteredCrossbow : clsP.get_filteredCrossbow, get_filteredFirearm : clsP.get_filteredFirearm, get_filteredBow : clsP.get_filteredBow, get_filteredThrowing : clsP.get_filteredThrowing, get_filteredAmmo : clsP.get_filteredAmmo, on_packedEntryGotFocus : clsP.on_packedEntryGotFocus, on_droppedEntryGotFocus : clsP.on_droppedEntryGotFocus, on_shieldEntryGotFocus : clsP.on_shieldEntryGotFocus, on_weaponEntryGotFocus : clsP.on_weaponEntryGotFocus, on_miscEntryGotFocus : clsP.on_miscEntryGotFocus, on_armorEntryGotFocus : clsP.on_armorEntryGotFocus};
+		this.props = { injectWeight : { required : false, type : Number}, inventory : { required : true, type : Object}, maxWeight : { required : false, type : Number}, maxCostCopper : { required : false, type : Number}, includeOwnerSlash : { required : false, "default" : false, type : Boolean}, saveAvailable : { required : false, "default" : true, type : Boolean}, showArmorCoverage : { required : false, "default" : true, type : Boolean}, bodyChar : { required : false, type : Object}, loadAvailable : { required : false, "default" : true, type : Boolean}, inventoryLabel : { required : false, type : String}};
 		this.watch = { inventory : clsP.watch_inventory, itemToOverwriteWith : clsP.watch_itemToOverwriteWith, itemQtyMultiple : clsP.watch_itemQtyMultiple, packedEntryGotFocus : clsP.on_packedEntryGotFocus, droppedEntryGotFocus : clsP.on_droppedEntryGotFocus, shieldEntryGotFocus : clsP.on_shieldEntryGotFocus, weaponEntryGotFocus : clsP.on_weaponEntryGotFocus, miscEntryGotFocus : clsP.on_miscEntryGotFocus, armorEntryGotFocus : clsP.on_armorEntryGotFocus};
 	}
 	,__class__: troshx_sos_vue_InventoryVue
@@ -13096,13 +14185,13 @@ troshx_sos_vue_input_InputInt.__name__ = ["troshx","sos","vue","input","InputInt
 troshx_sos_vue_input_InputInt.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_input_InputInt.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<input type=\"number\" :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"1\"></input>";
+		return "<input type=\"number\" :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"1\" :readonly=\"readonly\"></input>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_input_InputInt;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_input_InputInt
 });
@@ -13115,13 +14204,13 @@ troshx_sos_vue_input_InputNumber.__name__ = ["troshx","sos","vue","input","Input
 troshx_sos_vue_input_InputNumber.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_input_InputNumber.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<input type=\"number\" :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"step\"></input>";
+		return "<input type=\"number\" :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"step\" :readonly=\"readonly\"></input>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_input_InputNumber;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}};
+		this.props = { prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_input_InputNumber
 });
@@ -13133,13 +14222,13 @@ troshx_sos_vue_input_InputString.__name__ = ["troshx","sos","vue","input","Input
 troshx_sos_vue_input_InputString.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_input_InputString.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<input type=\"text\" :disabled=\"disabled\"  v-model=\"obj[prop]\"></input>";
+		return "<input type=\"text\" :disabled=\"disabled\"  :readonly=\"readonly\" v-model=\"obj[prop]\"></input>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_input_InputString;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_input_InputString
 });
@@ -13260,7 +14349,7 @@ troshx_sos_vue_inputs_NumericInput.prototype = $extend(haxevx_vuex_core_VCompone
 		this.mounted = clsP.Mounted;
 		this.computed = { min : clsP.get_min, max : clsP.get_max, valid : clsP.get_valid, current : clsP.get_current};
 		this.methods = { get_min : clsP.get_min, get_max : clsP.get_max, get_valid : clsP.get_valid, checkConstraints : clsP.checkConstraints, watch_min : clsP.watch_min, watch_max : clsP.watch_max, blurHandler : clsP.blurHandler, inputHandler : clsP.inputHandler, get_current : clsP.get_current};
-		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { min : clsP.watch_min, max : clsP.watch_max};
 	}
 	,__class__: troshx_sos_vue_inputs_NumericInput
@@ -13309,7 +14398,7 @@ troshx_sos_vue_inputs_impl_AttributeInput.prototype = $extend(haxevx_vuex_core_V
 		var clsP = cls.prototype;
 		this.computed = { bareMinAttribute : clsP.get_bareMinAttribute, current : clsP.get_current, valid : clsP.get_valid, min : clsP.get_min, max : clsP.get_max};
 		this.methods = { get_bareMinAttribute : clsP.get_bareMinAttribute, get_current : clsP.get_current, get_valid : clsP.get_valid, get_min : clsP.get_min, get_max : clsP.get_max};
-		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, magic : { required : false, "default" : false, type : Boolean}, racialModifier : { required : false, "default" : 0, type : Number}, remainingAttributePoints : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, magic : { required : false, "default" : false, type : Boolean}, racialModifier : { required : false, "default" : 0, type : Number}, remainingAttributePoints : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_AttributeInput
 });
@@ -13322,7 +14411,7 @@ troshx_sos_vue_inputs_impl_BoonBaneInput.__name__ = ["troshx","sos","vue","input
 troshx_sos_vue_inputs_impl_BoonBaneInput.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_inputs_impl_BoonBaneInput.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<span class=\"gen-comp-bb\" :class=\"{canceled:obj._canceled, 'required':min>0, 'force-perm':obj._forcePermanent, disabled:max<1, selected:obj[prop]>0}\">\r\n\t\t<label><input type=\"checkbox\" :disabled=\"obj._canceled || cannotUncheck\" v-if=\"coreMax<2\" :checked=\"obj[prop]>=1\" v-on:click.stop=\"checkboxHandler($" + "event.target, $" + "event)\"></input><input type=\"number\" :disabled=\"obj._canceled\" v-if=\"coreMax>=2\" number v-on:input=\"inputHandler($" + "event.target)\" v-on:blur=\"blurHandler($" + "event.target)\" :value=\"obj[prop]\" :class=\"{invalid:!valid}\" :min=\"min\" :max=\"max\"></input><span v-html=\"label\" v-on:click=\"toggleIfPossible($" + "event)\"></span><span class=\"close-btn\" v-show=\"showClose\">&nbsp;<a href=\"#\" v-on:click.stop.prevent=\"closeBB()\">[x]</a></span><span style=\"opacity:1;pointer-events:auto;\" v-show=\"showReset && !(isBane && cannotUncheck)\" class=\"reset-btb\">[<a href=\"#\" v-on:click.stop.prevent=\"resetBB()\">c</a>]</span></label>\r\n\t\t</span>";
+		return "<span class=\"gen-comp-bb\" :class=\"{canceled:obj._canceled, 'required':min>0, 'force-perm':obj._forcePermanent, disabled:max<1||disabled, selected:obj[prop]>0}\" :style=\"{pointerEvents:(readonly ? 'none' : 'auto')}\">\r\n\t\t<label><input type=\"checkbox\" :disabled=\"obj._canceled || cannotUncheck\" v-if=\"coreMax<2\" :checked=\"obj[prop]>=1\" v-on:click.stop=\"checkboxHandler($" + "event.target, $" + "event)\"></input><input type=\"number\" :disabled=\"obj._canceled\" v-if=\"coreMax>=2\" number v-on:input=\"inputHandler($" + "event.target)\" v-on:blur=\"blurHandler($" + "event.target)\" :value=\"obj[prop]\" :class=\"{invalid:!valid}\" :min=\"min\" :max=\"max\"></input><span v-html=\"label\" v-on:click=\"toggleIfPossible($" + "event)\"></span><span class=\"close-btn\" v-show=\"showClose\">&nbsp;<a href=\"#\" v-on:click.stop.prevent=\"closeBB()\">[x]</a></span><span style=\"opacity:1;pointer-events:auto;\" v-show=\"showReset && !(isBane && cannotUncheck)\" class=\"reset-btb\">[<a href=\"#\" v-on:click.stop.prevent=\"resetBB()\">c</a>]</span></label>\r\n\t\t</span>";
 	}
 	,get_cannotUncheck: function() {
 		if(this.bba._minRequired >= 1) {
@@ -13518,7 +14607,7 @@ troshx_sos_vue_inputs_impl_BoonBaneInput.prototype = $extend(haxevx_vuex_core_VC
 		this.template = this.Template();
 		this.computed = { cannotUncheck : clsP.get_cannotUncheck, canceled : clsP.get_canceled, showReset : clsP.get_showReset, discount : clsP.get_discount, min : clsP.get_min, max : clsP.get_max, coreMax : clsP.get_coreMax, current : clsP.get_current, showClose : clsP.get_showClose, cost : clsP.get_cost, qty : clsP.get_qty, gotDiscount : clsP.get_gotDiscount, label : clsP.get_label, bba : clsP.get_bba, isBane : clsP.get_isBane, bb : clsP.get_bb};
 		this.methods = { get_cannotUncheck : clsP.get_cannotUncheck, get_canceled : clsP.get_canceled, watch_canceled : clsP.watch_canceled, get_showReset : clsP.get_showReset, resetBB : clsP.resetBB, get_discount : clsP.get_discount, get_min : clsP.get_min, get_max : clsP.get_max, get_coreMax : clsP.get_coreMax, get_current : clsP.get_current, toggleIfPossible : clsP.toggleIfPossible, closeBB : clsP.closeBB, get_showClose : clsP.get_showClose, checkboxHandler : clsP.checkboxHandler, watch_current : clsP.watch_current, get_cost : clsP.get_cost, get_qty : clsP.get_qty, get_gotDiscount : clsP.get_gotDiscount, watch_cost : clsP.watch_cost, get_label : clsP.get_label, get_bba : clsP.get_bba, get_isBane : clsP.get_isBane, get_bb : clsP.get_bb};
-		this.props = { prop : { required : true, type : String}, obj : { required : true}, remaining : { type : Number}, disabled : { required : false, "default" : false, type : Boolean}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true, type : String}, obj : { required : true}, remaining : { type : Number}, disabled : { required : false, "default" : false, type : Boolean}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { canceled : clsP.watch_canceled, current : clsP.watch_current, cost : clsP.watch_cost};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_BoonBaneInput
@@ -13562,7 +14651,7 @@ troshx_sos_vue_inputs_impl_CategoryPCPInput.prototype = $extend(haxevx_vuex_core
 		var clsP = cls.prototype;
 		this.computed = { current : clsP.get_current, valid : clsP.get_valid, min : clsP.get_min, max : clsP.get_max};
 		this.methods = { get_current : clsP.get_current, get_valid : clsP.get_valid, get_min : clsP.get_min, get_max : clsP.get_max};
-		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, magic : { required : false, "default" : false, type : Boolean}, remainingAssignable : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, maxPCPPerCategory : { required : true, type : Number}};
+		this.props = { prop : { required : true, type : String}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, magic : { required : false, "default" : false, type : Boolean}, remainingAssignable : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, maxPCPPerCategory : { required : true, type : Number}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_CategoryPCPInput
 });
@@ -13576,8 +14665,10 @@ troshx_sos_vue_inputs_impl_InputNameLabel.prototype = $extend(haxevx_vuex_core_V
 	onBlur: function(input) {
 		var val = input.value;
 		val = StringTools.trim(val);
+		if(val != input.value) {
+			input.value = val;
+		}
 		this.obj[this.prop] = val;
-		input.value = val;
 	}
 	,Template: function() {
 		return "<input type=\"text\" :disabled=\"disabled\" :value=\"obj[prop]\" v-on:blur=\"onBlur($" + "event.target)\"></input>";
@@ -13587,7 +14678,7 @@ troshx_sos_vue_inputs_impl_InputNameLabel.prototype = $extend(haxevx_vuex_core_V
 		var clsP = cls.prototype;
 		this.template = this.Template();
 		this.methods = { onBlur : clsP.onBlur};
-		this.props = { prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_InputNameLabel
 });
@@ -13625,7 +14716,7 @@ troshx_sos_vue_inputs_impl_SchoolLevelInput.prototype = $extend(haxevx_vuex_core
 		var clsP = cls.prototype;
 		this.computed = { max : clsP.get_max, min : clsP.get_min, current : clsP.get_current};
 		this.methods = { get_max : clsP.get_max, get_min : clsP.get_min, get_current : clsP.get_current};
-		this.props = { prop : { required : true, type : String}, remainingArc : { required : true, type : Number}, obj : { required : true}, minAmount : { required : false, "default" : 0, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, levelCosts : { required : true, type : Array}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true, type : String}, remainingArc : { required : true, type : Number}, obj : { required : true}, minAmount : { required : false, "default" : 0, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, levelCosts : { required : true, type : Array}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_SchoolLevelInput
 });
@@ -13644,11 +14735,15 @@ troshx_sos_vue_inputs_impl_SkillLibInput.prototype = $extend(haxevx_vuex_core_VC
 		this.interactedInput = false;
 	}
 	,get_min: function() {
-		var val = this.skillLevelsPacket[this.prop];
-		if(val >= 5) {
-			return 5;
+		if(this.skillLevelsPacket != null) {
+			var val = this.skillLevelsPacket[this.prop];
+			if(val >= 5) {
+				return 5;
+			} else {
+				return val;
+			}
 		} else {
-			return val;
+			return 0;
 		}
 	}
 	,checkConstraints: function() {
@@ -13719,8 +14814,18 @@ troshx_sos_vue_inputs_impl_SkillLibInput.prototype = $extend(haxevx_vuex_core_VC
 		}
 	}
 	,get_current: function() {
-		var val = this.skillLevelsPacket[this.prop];
-		return (val >= 5 ? 5 : val) + this.obj[this.prop];
+		var tmp;
+		if(this.skillLevelsPacket != null) {
+			var val = this.skillLevelsPacket[this.prop];
+			if(val >= 5) {
+				tmp = 5;
+			} else {
+				tmp = val;
+			}
+		} else {
+			tmp = 0;
+		}
+		return tmp + this.obj[this.prop];
 	}
 	,get_deleteBtnStyle: function() {
 		return { "visibility" : this.current == 0 ? "visible" : "hidden"};
@@ -13739,7 +14844,7 @@ troshx_sos_vue_inputs_impl_SkillLibInput.prototype = $extend(haxevx_vuex_core_VC
 		this.template = this.Template();
 		this.computed = { min : clsP.get_min, max : clsP.get_max, current : clsP.get_current, deleteBtnStyle : clsP.get_deleteBtnStyle};
 		this.methods = { get_min : clsP.get_min, checkConstraints : clsP.checkConstraints, watch_current : clsP.watch_current, inputHandler : clsP.inputHandler, get_max : clsP.get_max, clamp5 : clsP.clamp5, get_current : clsP.get_current, get_deleteBtnStyle : clsP.get_deleteBtnStyle, onDeleteClick : clsP.onDeleteClick};
-		this.props = { prop : { required : true, type : String}, obj : { required : true}, skillsTable : { required : true, type : Object}, remaining : { required : true, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, canDelete : { required : false, "default" : false, type : Boolean}, skillLevelsPacket : { required : true}, index : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { prop : { required : true, type : String}, obj : { required : true}, skillsTable : { required : true, type : Object}, remaining : { required : false, "default" : 10, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, canDelete : { required : false, "default" : false, type : Boolean}, skillLevelsPacket : { required : false}, index : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { current : clsP.watch_current};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_SkillLibInput
@@ -14021,7 +15126,7 @@ troshx_sos_vue_inputs_impl_SkillPacketInput.prototype = $extend(haxevx_vuex_core
 		this.template = this.Template();
 		this.computed = { current : clsP.get_current, min : clsP.get_min, max : clsP.get_max, packet : clsP.get_packet, showHistoryInterface : clsP.get_showHistoryInterface, packetValueList : clsP.get_packetValueList};
 		this.methods = { watch_current : clsP.watch_current, showCurrentHistory : clsP.showCurrentHistory, get_current : clsP.get_current, get_min : clsP.get_min, get_max : clsP.get_max, staticMaxQtyUntilUseless : clsP.staticMaxQtyUntilUseless, currentPacketClampedSkillLevel : clsP.currentPacketClampedSkillLevel, dynamicMaxQtyUntilUseless : clsP.dynamicMaxQtyUntilUseless, cloneCurrentState : clsP.cloneCurrentState, validation : clsP.validation, incrementBtnHit : clsP.incrementBtnHit, spliceBtnHit : clsP.spliceBtnHit, get_packet : clsP.get_packet, isLabelBinded : clsP.isLabelBinded, getLabel : clsP.getLabel, getBindedValue : clsP.getBindedValue, get_showHistoryInterface : clsP.get_showHistoryInterface, get_packetValueList : clsP.get_packetValueList, watch_skillSubjectHash : clsP.watch_skillSubjectHash, onOptionClickUnder : clsP.onOptionClickUnder, disabledFromCount : clsP.disabledFromCount, disabledFrom : clsP.disabledFrom, isArray : clsP.isArray};
-		this.props = { prop : { required : true, type : String}, labelMap : { required : true}, obj : { required : true}, skillSubjectHash : { required : true}, skillPacketsRemaining : { required : true, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, packetChoosy : { required : true, type : Boolean}, skillValues : { required : true}, index : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, labelSchema : { required : true}};
+		this.props = { prop : { required : true, type : String}, labelMap : { required : true}, obj : { required : true}, skillSubjectHash : { required : true}, skillPacketsRemaining : { required : true, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, packetChoosy : { required : true, type : Boolean}, skillValues : { required : true}, index : { required : true, type : Number}, floating : { required : false, "default" : false, type : Boolean}, labelSchema : { required : true}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { current : clsP.watch_current, skillSubjectHash : { deep : true, handler : clsP.watch_skillSubjectHash}};
 	}
 	,__class__: troshx_sos_vue_inputs_impl_SkillPacketInput
@@ -14156,7 +15261,7 @@ troshx_sos_vue_uifields_ArrayOf.prototype = $extend(haxevx_vuex_core_VComponent.
 		}
 	}
 	,Template: function() {
-		return "<div>\r\n\t\t<label v-if=\"label!=null\">{{label}}:&nbsp;| {{maxLength}}</label><label v-if=\"label==null && maxLength!=null\">| {{maxLength}} </label><button :disabled=\"!(maxLength == null || current.length + 1 <= maxLength)\" v-on:click=\"pushEntry()\">+</button> &nbsp;<button :disabled=\"!(current.length > (minLength != null ? minLength : 0))\" v-on:click=\"popEntry()\">-</button>\r\n\t\t<ul class=\"array-of\">\r\n\t\t\t<li v-for=\"(li, i) in current\" :class=\"{disabled:!(maxLength == null || i < maxLength)}\">\r\n\t\t\t\t<span :is=\"typeMap[of]\" v-bind=\"$" + "attrs\" :index=\"i\" :obj=\"current\" :prop=\"i\" :key=\"getKey(li, i)\" :class=\"{disabled:!(maxLength == null || i < maxLength)}\" :disabled=\"!(maxLength == null || i < maxLength)\"></span>\r\n\t\t\t</li>\r\n\t\t</ul>\r\n\t\t\r\n\t\t</div>";
+		return "<div>\r\n\t\t<label v-if=\"label!=null\">{{label}}:&nbsp;| {{maxLength}}</label><label v-if=\"label==null && maxLength!=null\">| {{maxLength}} </label><button v-show=\"!readonly\" :disabled=\"!(maxLength == null || current.length + 1 <= maxLength)\" v-on:click=\"pushEntry()\">+</button> &nbsp;<button  v-show=\"!readonly\" :disabled=\"!(current.length > (minLength != null ? minLength : 0))\" v-on:click=\"popEntry()\">-</button>\r\n\t\t<ul class=\"array-of\">\r\n\t\t\t<li v-for=\"(li, i) in current\" :class=\"{disabled:!(maxLength == null || i < maxLength)}\">\r\n\t\t\t\t<span :is=\"typeMap[of]\" v-bind=\"$" + "attrs\" :index=\"i\" :readonly=\"readonly\" :obj=\"current\" :prop=\"i\" :key=\"getKey(li, i)\" :class=\"{disabled:!(maxLength == null || i < maxLength)}\" :disabled=\"!(maxLength == null || i < maxLength)\"></span>\r\n\t\t\t</li>\r\n\t\t</ul>\r\n\t\t\r\n\t\t</div>";
 	}
 	,pushEntry: function() {
 		var arr = this.current;
@@ -14199,7 +15304,7 @@ troshx_sos_vue_uifields_ArrayOf.prototype = $extend(haxevx_vuex_core_VComponent.
 		this.template = this.Template();
 		this.computed = { current : clsP.get_current, typeMap : clsP.get_typeMap};
 		this.methods = { getKey : clsP.getKey, pushEntry : clsP.pushEntry, watch_maxLength : clsP.watch_maxLength, popEntry : clsP.popEntry, get_current : clsP.get_current, get_typeMap : clsP.get_typeMap};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, defaultValue : { required : true}, obj : { required : true}, of : { required : true, type : String}, disabled : { required : false, "default" : false, type : Boolean}, maxLength : { required : false, type : Number}, autoExpand : { required : false, "default" : false, type : Boolean}, minLength : { required : false, "default" : 0, type : Number}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, defaultValue : { required : true}, obj : { required : true}, of : { required : true, type : String}, disabled : { required : false, "default" : false, type : Boolean}, maxLength : { required : false, type : Number}, autoExpand : { required : false, "default" : false, type : Boolean}, minLength : { required : false, "default" : 0, type : Number}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { maxLength : clsP.watch_maxLength};
 	}
 	,__class__: troshx_sos_vue_uifields_ArrayOf
@@ -14350,7 +15455,7 @@ troshx_sos_vue_uifields_BaseNumMixin.prototype = $extend(haxevx_vuex_core_VCompo
 		var clsP = cls.prototype;
 		this.computed = { current : clsP.get_current};
 		this.methods = { checkConstraints : clsP.checkConstraints, watch_min : clsP.watch_min, watch_max : clsP.watch_max, get_current : clsP.get_current, blurHandler : clsP.blurHandler, inputHandler : clsP.inputHandler};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 		this.watch = { min : clsP.watch_min, max : clsP.watch_max};
 	}
 	,__class__: troshx_sos_vue_uifields_BaseNumMixin
@@ -14388,7 +15493,7 @@ troshx_sos_vue_uifields_Bitmask.prototype = $extend(haxevx_vuex_core_VComponent.
 		this.template = this.Template();
 		this.computed = { current : clsP.get_current};
 		this.methods = { checkboxHandler : clsP.checkboxHandler, valueAtIndex : clsP.valueAtIndex, get_current : clsP.get_current};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, disabled : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, disabled : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_Bitmask
 });
@@ -14429,7 +15534,7 @@ troshx_sos_vue_uifields_ButtonCounter.prototype = $extend(haxevx_vuex_core_VComp
 		this.template = this.Template();
 		this.computed = { showLabel : clsP.get_showLabel};
 		this.methods = { get_showLabel : clsP.get_showLabel, onClickButton : clsP.onClickButton};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, preventDefault : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, callback : { required : false, type : Function}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, preventDefault : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, callback : { required : false, type : Function}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_ButtonCounter
 });
@@ -14470,7 +15575,7 @@ troshx_sos_vue_uifields_ButtonPermaPress.prototype = $extend(haxevx_vuex_core_VC
 		this.template = this.Template();
 		this.computed = { showLabel : clsP.get_showLabel};
 		this.methods = { get_showLabel : clsP.get_showLabel, onClickButton : clsP.onClickButton};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, preventDefault : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, descriptionDone : { required : false, type : String}, callback : { required : false, type : Function}, description : { required : false, type : String}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, preventDefault : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, descriptionDone : { required : false, type : String}, callback : { required : false, type : Function}, description : { required : false, type : String}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_ButtonPermaPress
 });
@@ -14483,13 +15588,13 @@ troshx_sos_vue_uifields_FieldInt.__name__ = ["troshx","sos","vue","uifields","Fi
 troshx_sos_vue_uifields_FieldInt.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_uifields_FieldInt.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"number\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"1\"></input>\r\n\t\t</div>";
+		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"number\"  :readonly=\"readonly\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"1\"></input>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_FieldInt;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, floating : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, floating : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_FieldInt
 });
@@ -14502,13 +15607,13 @@ troshx_sos_vue_uifields_FieldNumber.__name__ = ["troshx","sos","vue","uifields",
 troshx_sos_vue_uifields_FieldNumber.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_uifields_FieldNumber.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"number\"  :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"step\"></input>\r\n\t\t</div>";
+		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"number\"  :readonly=\"readonly\" :disabled=\"disabled\" number v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :value=\"obj[prop]\" :min=\"min\" :max=\"max\" :step=\"step\"></input>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_FieldNumber;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, min : { required : false, type : Number}, disabled : { required : false, "default" : false, type : Boolean}, max : { required : false, type : Number}, step : { required : false, type : Number}, floating : { required : false, "default" : true, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_FieldNumber
 });
@@ -14520,13 +15625,13 @@ troshx_sos_vue_uifields_FieldString.__name__ = ["troshx","sos","vue","uifields",
 troshx_sos_vue_uifields_FieldString.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_uifields_FieldString.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"text\" v-model=\"obj[prop]\" :disabled=\"disabled\"></input>\r\n\t\t</div>";
+		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<input type=\"text\" v-model=\"obj[prop]\" :disabled=\"disabled\" :readonly=\"readonly\"></input>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_FieldString;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_FieldString
 });
@@ -14538,13 +15643,13 @@ troshx_sos_vue_uifields_FieldTextArea.__name__ = ["troshx","sos","vue","uifields
 troshx_sos_vue_uifields_FieldTextArea.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_uifields_FieldTextArea.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Template: function() {
-		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<textarea v-model=\"obj[prop]\" :disabled=\"disabled\"></textarea>\r\n\t\t</div>";
+		return "<div>\r\n\t\t\t<label v-if=\"label\">{{ label }}:&nbsp;</label>\r\n\t\t\t<textarea v-model=\"obj[prop]\" :disabled=\"disabled\" :readonly=\"readonly\"></textarea>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_FieldTextArea;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_FieldTextArea
 });
@@ -14586,7 +15691,7 @@ troshx_sos_vue_uifields_HitLocationMultiSelector.prototype = $extend(haxevx_vuex
 		this.render = clsP.Render;
 		this.computed = { labels : clsP.get_labels};
 		this.methods = { get_labels : clsP.get_labels};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, body : { required : true, type : Object}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, body : { required : true, type : Object}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_HitLocationMultiSelector
 });
@@ -14627,7 +15732,7 @@ troshx_sos_vue_uifields_HitLocationSelector.prototype = $extend(haxevx_vuex_core
 		this.render = clsP.Render;
 		this.computed = { labels : clsP.get_labels};
 		this.methods = { get_labels : clsP.get_labels};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, body : { required : true, type : Object}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, body : { required : true, type : Object}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_HitLocationSelector
 });
@@ -14643,7 +15748,7 @@ troshx_sos_vue_uifields_MoneyField.prototype = $extend(haxevx_vuex_core_VCompone
 		return this.obj[this.prop];
 	}
 	,Template: function() {
-		return "<div class=\"moneyfields\">\r\n\t\t\t<h6>Money:</h6>\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"gp\" :disabled=\"disabled\" style=\"width:70px\" />&nbsp;GP</label> &nbsp;\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"sp\" :disabled=\"disabled\"  style=\"width:70px\"/>&nbsp;SP</label> &nbsp;\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"cp\" :disabled=\"disabled\"  style=\"width:70px\"/>&nbsp;CP</label> &nbsp;\r\n\t\t</div>";
+		return "<div class=\"moneyfields\">\r\n\t\t\t<div>Money:</div>\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"gp\" :disabled=\"disabled\" :readonly=\"readonly\" style=\"width:70px\" />&nbsp;GP</label> &nbsp;\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"sp\" :disabled=\"disabled\" :readonly=\"readonly\" style=\"width:70px\"/>&nbsp;SP</label> &nbsp;\r\n\t\t\t<label><InputInt :obj=\"current\" prop=\"cp\" :disabled=\"disabled\" :readonly=\"readonly\"  style=\"width:70px\"/>&nbsp;CP</label> &nbsp;\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_MoneyField;
@@ -14651,12 +15756,13 @@ troshx_sos_vue_uifields_MoneyField.prototype = $extend(haxevx_vuex_core_VCompone
 		this.template = this.Template();
 		this.computed = { current : clsP.get_current};
 		this.methods = { get_current : clsP.get_current};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disabled : { required : false, "default" : false, type : Boolean}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_MoneyField
 });
 var troshx_sos_vue_uifields_SingleBitSelection = function() {
 	haxevx_vuex_core_VComponent.call(this);
+	this["inheritAttrs"] = false;
 };
 $hxClasses["troshx.sos.vue.uifields.SingleBitSelection"] = troshx_sos_vue_uifields_SingleBitSelection;
 troshx_sos_vue_uifields_SingleBitSelection.__name__ = ["troshx","sos","vue","uifields","SingleBitSelection"];
@@ -14705,14 +15811,14 @@ troshx_sos_vue_uifields_SingleSelection.prototype = $extend(haxevx_vuex_core_VCo
 		}
 	}
 	,Template: function() {
-		return "<div>\r\n\t\t\t<span v-if=\"label\"><label>{{ label }}</label>:<br/></span>\r\n\t\t\t<select number v-model.number=\"obj[prop]\" :disabled=\"disabled\">\r\n\t\t\t\t<option v-if=\"includeZeroOption\" :value=\"0\">{{ zeroValueLabel }}</option> \r\n\t\t\t\t<option v-for=\"(li, i) in labels\" :value=\"valueAtIndex(i)\" :disabled=\"!(validateOptionFunc == null || validateOptionFunc(i))\">{{ li }}</option> \r\n\t\t\t</select>\r\n\t\t</div>";
+		return "<div :style=\"{pointerEvents:readonly ? 'none' : 'auto'}\">\r\n\t\t\t<span v-if=\"label\"><label>{{ label }}</label>:<br/></span>\r\n\t\t\t<select number v-model.number=\"obj[prop]\" :disabled=\"disabled\">\r\n\t\t\t\t<option v-if=\"includeZeroOption\" :value=\"0\">{{ zeroValueLabel }}</option> \r\n\t\t\t\t<option v-for=\"(li, i) in labels\" :value=\"valueAtIndex(i)\" :disabled=\"!(validateOptionFunc == null || validateOptionFunc(i))\">{{ li }}</option> \r\n\t\t\t</select>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_uifields_SingleSelection;
 		var clsP = cls.prototype;
 		this.template = this.Template();
 		this.methods = { valueAtIndex : clsP.valueAtIndex};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, zeroValueLabel : { required : false, "default" : "", type : String}, disabled : { required : false, "default" : false, type : Boolean}, valueAtIndexFunc : { required : false, type : Function}, includeZeroOption : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, zeroValueLabel : { required : false, "default" : "", type : String}, disabled : { required : false, "default" : false, type : Boolean}, valueAtIndexFunc : { required : false, type : Function}, includeZeroOption : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_SingleSelection
 });
@@ -14738,7 +15844,7 @@ troshx_sos_vue_uifields_SingleSelectionStr.prototype = $extend(haxevx_vuex_core_
 		var clsP = cls.prototype;
 		this.template = this.Template();
 		this.methods = { valueAtIndex : clsP.valueAtIndex};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, disabled : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, values : { required : false, type : Array}, disabled : { required : false, "default" : false, type : Boolean}, validateOptionFunc : { required : false, type : Function}, labels : { required : true, type : Array}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_SingleSelectionStr
 });
@@ -14814,7 +15920,7 @@ troshx_sos_vue_uifields_WealthAssetField.prototype = $extend(haxevx_vuex_core_VC
 		this.template = this.Template();
 		this.computed = { current : clsP.get_current, residueWealth : clsP.get_residueWealth};
 		this.methods = { get_current : clsP.get_current, get_residueWealth : clsP.get_residueWealth};
-		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disableLiquidity : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, fixedWorth : { required : false, "default" : false, type : Boolean}, remainingWealth : { required : false, type : Number}};
+		this.props = { label : { required : false, "default" : null, type : String}, prop : { required : true}, obj : { required : true}, disableLiquidity : { required : false, "default" : false, type : Boolean}, disabled : { required : false, "default" : false, type : Boolean}, fixedWorth : { required : false, "default" : false, type : Boolean}, remainingWealth : { required : false, type : Number}, readonly : { required : false, "default" : false, type : Boolean}};
 	}
 	,__class__: troshx_sos_vue_uifields_WealthAssetField
 });
@@ -14967,6 +16073,7 @@ troshx_sos_vue_widgets_GingkoTreeBrowser.prototype = $extend(haxevx_vuex_core_VC
 		var _g = node.children.length;
 		while(_g1 < _g) {
 			var i = _g1++;
+			node.children[i].key = "_" + this.valueKeyCounter++;
 			this.cleanNode(node.children[i]);
 		}
 	}
@@ -15002,9 +16109,9 @@ troshx_sos_vue_widgets_GingkoTreeBrowser.prototype = $extend(haxevx_vuex_core_VC
 		return this.curLandingNode.content;
 	}
 	,get_curSerializable: function() {
-		var val = this.curSelectedValue;
+		var val = this.curSelectedNode != null ? this.curSelectedNode.content : null;
 		if(val != null) {
-			return this.isSerializableValue(this.curSelectedValue);
+			return this.isSerializableValue(val);
 		} else {
 			return false;
 		}
@@ -15018,7 +16125,7 @@ troshx_sos_vue_widgets_GingkoTreeBrowser.prototype = $extend(haxevx_vuex_core_VC
 		}
 	}
 	,get_compiledMarkdown: function() {
-		var val = this.curSelectedValue;
+		var val = this.curSelectedNode != null ? this.curSelectedNode.content : null;
 		if(val != null && !this.curSerializable) {
 			return marked(val,{ sanitize : true});
 		} else {
@@ -15150,10 +16257,17 @@ troshx_sos_vue_widgets_GingkoTreeBrowser.prototype = $extend(haxevx_vuex_core_VC
 	,onInputDomainBlur: function(inputField) {
 	}
 	,Template: function() {
-		return "\r\n\t\t\t<div class=\"gingko-tree\">\r\n\t\t\t\t<div><span v-show=\"loadedDomain!=''\" ><input type=\"text\" style=\"display:inline-block;width:auto;max-width:80px;background-color:#f3f5f6\" readonly :value=\"loadedDomain\"></input> <i>loaded.</i></span><span style=\"margin-left:30px;display:inline-block\"><input type=\"text\" :disabled=\"isLoading\" :value=\"requestedDomain\" v-on:blur=\"onInputDomainBlur($" + "event.target)\" @input=\"onInputDomain($" + "event.target)\"></input><button v-on:click=\"loadDomainClick\" :disabled=\"isLoading\">Load Domain ID</button></span></div>\r\n\t\t\t\t<treeview :value.sync=\"curSelectedValue\" v-on:treeview_click=\"onTreeViewClick\" :disabled=\"isLoading\" \r\n\t\t\t\t\t:style=\"treeviewStyle\"\r\n\t\t\t\t\t\r\n\t\t\t\t\t:model=\"model\"\r\n\t\t\t\t\tclass=\"form-control\"\r\n\t\t\t\t\tlabelname=\"content\"\r\n\t\t\t\t\tvaluename=\"content\"\r\n\t\t\t\t\tchildren = \"children\" \r\n\t\t\t\t\t:customLabelHandler = \"customLabelHandler\"\r\n\t\t\t\t\t:filterNodeHandler = \"filterNodeHandler\"\r\n\t\t\t\t\t:getCustomIcon = \"getCustomIcon\"\r\n\t\t\t\t\t\r\n\t\t\t\t\t:areValidNodesHandler = \"areValidNodesHandler\"\r\n\t\t\t\t/>\r\n\t\t\t\t<div class=\"markdown-view\">\r\n\t\t\t\t\t<div v-html=\"compiledMarkdown\" v-show=\"compiledMarkdown\"></div>\r\n\t\t\t\t\t<div v-show=\"curLandingSerializable\"><button v-on:click=\"onOpenClick\" ref=\"openButton\" :disabled=\"locked\">Open {{curSelectedType}}</button></div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t";
+		return "\r\n\t\t\t<div class=\"gingko-tree\">\r\n\t\t\t\t<div><span v-show=\"loadedDomain!=''\" ><input type=\"text\" style=\"display:inline-block;width:auto;max-width:80px;background-color:#f3f5f6\" readonly :value=\"loadedDomain\"></input> <i>loaded.</i></span><span style=\"margin-left:30px;display:inline-block\"><input type=\"text\" :disabled=\"isLoading\" :value=\"requestedDomain\" v-on:blur=\"onInputDomainBlur($" + "event.target)\" @input=\"onInputDomain($" + "event.target)\"></input><button v-on:click=\"loadDomainClick\" :disabled=\"isLoading\">Load Domain ID</button></span></div>\r\n\t\t\t\t<treeview :value.sync=\"curSelectedValue\" v-on:treeview_click=\"onTreeViewClick\" :disabled=\"isLoading\" \r\n\t\t\t\t\t:style=\"treeviewStyle\"\r\n\t\t\t\t\t\r\n\t\t\t\t\t:model=\"model\"\r\n\t\t\t\t\tclass=\"form-control\"\r\n\t\t\t\t\tlabelname=\"content\"\r\n\t\t\t\t\tvaluename=\"key\"\r\n\t\t\t\t\tchildren = \"children\" \r\n\t\t\t\t\t:customLabelHandler = \"customLabelHandler\"\r\n\t\t\t\t\t:filterNodeHandler = \"filterNodeHandler\"\r\n\t\t\t\t\t:getCustomIcon = \"getCustomIcon\"\r\n\t\t\t\t\t\r\n\t\t\t\t\t:areValidNodesHandler = \"areValidNodesHandler\"\r\n\t\t\t\t/>\r\n\t\t\t\t<div class=\"markdown-view\">\r\n\t\t\t\t\t<div v-html=\"compiledMarkdown\" v-show=\"compiledMarkdown\"></div>\r\n\t\t\t\t\t<div v-show=\"curLandingSerializable\"><button v-on:click=\"onOpenClick\" ref=\"openButton\" :disabled=\"locked\">Open {{curSelectedType}}</button></div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t";
+	}
+	,get_defaultDomain: function() {
+		if(this.initialDomain != null) {
+			return this.initialDomain;
+		} else {
+			return troshx_sos_vue_Globals.DOMAIN_INVENTORY;
+		}
 	}
 	,Data: function() {
-		return { requestEnteredDomain : "", curSelectedValue : null, curSelectedNode : null, loadedDomain : "", isLoading : false, curSelectedParentNode : null, model : []};
+		return { requestEnteredDomain : "", curSelectedValue : null, curSelectedNode : null, loadedDomain : "", isLoading : false, curSelectedParentNode : null, valueKeyCounter : 0, model : []};
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_widgets_GingkoTreeBrowser;
@@ -15162,9 +16276,9 @@ troshx_sos_vue_widgets_GingkoTreeBrowser.prototype = $extend(haxevx_vuex_core_VC
 		this.mounted = clsP.Mounted;
 		this.template = this.Template();
 		this.data = clsP.Data;
-		this.computed = { requestedDomain : clsP.get_requestedDomain, curIsHeadingNode : clsP.get_curIsHeadingNode, curLandingNode : clsP.get_curLandingNode, curLandingValue : clsP.get_curLandingValue, curSerializable : clsP.get_curSerializable, curLandingSerializable : clsP.get_curLandingSerializable, compiledMarkdown : clsP.get_compiledMarkdown, curSelectedType : clsP.get_curSelectedType, treeviewStyle : clsP.get_treeviewStyle};
-		this.methods = { loadDomainClick : clsP.loadDomainClick, loadDomain : clsP.loadDomain, get_requestedDomain : clsP.get_requestedDomain, onDataReceived : clsP.onDataReceived, nodeGotContent : clsP.nodeGotContent, cleanNode : clsP.cleanNode, cleanNodes : clsP.cleanNodes, getFirstChild : clsP.getFirstChild, onErrorLoad : clsP.onErrorLoad, get_curIsHeadingNode : clsP.get_curIsHeadingNode, get_curLandingNode : clsP.get_curLandingNode, get_curLandingValue : clsP.get_curLandingValue, get_curSerializable : clsP.get_curSerializable, get_curLandingSerializable : clsP.get_curLandingSerializable, get_compiledMarkdown : clsP.get_compiledMarkdown, customLabelHandler : clsP.customLabelHandler, onTreeViewClick : clsP.onTreeViewClick, isSerializable : clsP.isSerializable, isSerializableValue : clsP.isSerializableValue, onOpenClick : clsP.onOpenClick, filterNodeHandler : clsP.filterNodeHandler, getCustomIcon : clsP.getCustomIcon, areValidNodesHandler : clsP.areValidNodesHandler, disableOpenButton : clsP.disableOpenButton, getCustomIconForContent : clsP.getCustomIconForContent, get_curSelectedType : clsP.get_curSelectedType, getSerializeContentType : clsP.getSerializeContentType, onInputDomain : clsP.onInputDomain, get_treeviewStyle : clsP.get_treeviewStyle, onInputDomainBlur : clsP.onInputDomainBlur};
-		this.props = { locked : { required : false, "default" : false, type : Boolean}, availableTypes : { required : false}, defaultDomain : { required : false, "default" : "mwmzwn", type : String}, maxLabelLength : { required : false, "default" : 32, type : Number}};
+		this.computed = { requestedDomain : clsP.get_requestedDomain, curIsHeadingNode : clsP.get_curIsHeadingNode, curLandingNode : clsP.get_curLandingNode, curLandingValue : clsP.get_curLandingValue, curSerializable : clsP.get_curSerializable, curLandingSerializable : clsP.get_curLandingSerializable, compiledMarkdown : clsP.get_compiledMarkdown, curSelectedType : clsP.get_curSelectedType, treeviewStyle : clsP.get_treeviewStyle, defaultDomain : clsP.get_defaultDomain};
+		this.methods = { loadDomainClick : clsP.loadDomainClick, loadDomain : clsP.loadDomain, get_requestedDomain : clsP.get_requestedDomain, onDataReceived : clsP.onDataReceived, nodeGotContent : clsP.nodeGotContent, cleanNode : clsP.cleanNode, cleanNodes : clsP.cleanNodes, getFirstChild : clsP.getFirstChild, onErrorLoad : clsP.onErrorLoad, get_curIsHeadingNode : clsP.get_curIsHeadingNode, get_curLandingNode : clsP.get_curLandingNode, get_curLandingValue : clsP.get_curLandingValue, get_curSerializable : clsP.get_curSerializable, get_curLandingSerializable : clsP.get_curLandingSerializable, get_compiledMarkdown : clsP.get_compiledMarkdown, customLabelHandler : clsP.customLabelHandler, onTreeViewClick : clsP.onTreeViewClick, isSerializable : clsP.isSerializable, isSerializableValue : clsP.isSerializableValue, onOpenClick : clsP.onOpenClick, filterNodeHandler : clsP.filterNodeHandler, getCustomIcon : clsP.getCustomIcon, areValidNodesHandler : clsP.areValidNodesHandler, disableOpenButton : clsP.disableOpenButton, getCustomIconForContent : clsP.getCustomIconForContent, get_curSelectedType : clsP.get_curSelectedType, getSerializeContentType : clsP.getSerializeContentType, onInputDomain : clsP.onInputDomain, get_treeviewStyle : clsP.get_treeviewStyle, onInputDomainBlur : clsP.onInputDomainBlur, get_defaultDomain : clsP.get_defaultDomain};
+		this.props = { locked : { required : false, "default" : false, type : Boolean}, availableTypes : { required : false}, initialDomain : { required : false, type : String}, maxLabelLength : { required : false, "default" : 32, type : Number}};
 	}
 	,__class__: troshx_sos_vue_widgets_GingkoTreeBrowser
 });
@@ -15342,7 +16456,7 @@ troshx_sos_vue_widgets_SkillSubjectCreator.prototype = $extend(haxevx_vuex_core_
 	}
 	,get_withinEditableScope: function() {
 		var a = this.selectedSubject != "";
-		var b = !this.permaHash[this.selectedSubject];
+		var b = this.permaHash != null ? !this.permaHash[this.selectedSubject] : true;
 		if(a) {
 			return b;
 		} else {
@@ -15456,7 +16570,7 @@ troshx_sos_vue_widgets_SkillSubjectCreator.prototype = $extend(haxevx_vuex_core_
 		this.template = this.Template();
 		this.computed = { withinEditableScope : clsP.get_withinEditableScope, comboName : clsP.get_comboName, renameButtonInvalid : clsP.get_renameButtonInvalid, isDeleteSubjectDisabled : clsP.get_isDeleteSubjectDisabled, addButtonInvalid : clsP.get_addButtonInvalid, isAddSkillDisabled : clsP.get_isAddSkillDisabled};
 		this.methods = { get_withinEditableScope : clsP.get_withinEditableScope, onSelectSubjectChange : clsP.onSelectSubjectChange, notifyExistsIfNeeded : clsP.notifyExistsIfNeeded, onSelectSkillChange : clsP.onSelectSkillChange, onTouchEditField : clsP.onTouchEditField, watch_editMode : clsP.watch_editMode, deleteBtnClick : clsP.deleteBtnClick, onRenameBtnClick : clsP.onRenameBtnClick, onAddSkillClick : clsP.onAddSkillClick, get_comboName : clsP.get_comboName, onAddBtnClick : clsP.onAddBtnClick, get_renameButtonInvalid : clsP.get_renameButtonInvalid, get_isDeleteSubjectDisabled : clsP.get_isDeleteSubjectDisabled, get_addButtonInvalid : clsP.get_addButtonInvalid, get_isAddSkillDisabled : clsP.get_isAddSkillDisabled};
-		this.props = { skillSubjects : { required : true, type : Array}, skillSubjectHash : { required : true}, permaHash : { required : true}, skillValues : { required : true}, skillPacketValues : { required : true}, skillList : { required : true, type : Array}};
+		this.props = { skillSubjects : { required : true, type : Array}, skillSubjectHash : { required : true}, permaHash : { required : false}, skillValues : { required : true}, skillList : { required : true, type : Array}};
 		this.watch = { editMode : clsP.watch_editMode};
 	}
 	,__class__: troshx_sos_vue_widgets_SkillSubjectCreator
@@ -15603,9 +16717,9 @@ troshx_sos_vue_widgets_WCoverage.prototype = $extend(haxevx_vuex_core_VComponent
 	}
 	,get_hitLocations: function() {
 		if(!this.isCustomBody) {
-			return troshx_sos_core_BodyChar.getInstance().getNewHitLocationsFrontSlice();
+			return troshx_sos_core_BodyChar.getInstance().hitLocations;
 		} else {
-			return this.customBody.getNewHitLocationsFrontSlice();
+			return this.customBody.hitLocations;
 		}
 	}
 	,get_armor: function() {
@@ -15715,7 +16829,7 @@ troshx_sos_vue_widgets_WMeleeAtk.prototype = $extend(haxevx_vuex_core_VComponent
 		return troshx_sos_core_DamageType.getFlagLabels();
 	}
 	,Template: function() {
-		return "<div>\r\n\t<div style=\"width:50%;display:inline-block\">\r\n\t\t<label>TN:<br/>\r\n\t\t\t<InputInt v-if=\"!thrusting\" :obj=\"item\" prop=\"atnS\" style=\"width:100%\"/>\r\n\t\t\t<InputInt v-if=\"thrusting\" :obj=\"item\" prop=\"atnT\" style=\"width:100%\"/>\r\n\t\t</label>\r\n\t</div><div style=\"width:50%;display:inline-block\">\r\n\t\t<label>Damage:<br/>\r\n\t\t\t<InputInt v-if=\"!thrusting\" :obj=\"item\" prop=\"damageS\" style=\"width:100%\" />\r\n\t\t\t<InputInt v-if=\"thrusting\" :obj=\"item\" prop=\"damageT\" style=\"width:100%\" />\r\n\t\t</label>\r\n\t</div>\r\n\t<div>\r\n\t\t<label>Damage Type:</label>\r\n\t\t<select v-if=\"!thrusting\" number v-model.number=\"item.damageTypeS\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t\t<select v-if=\"thrusting\" number v-model.number=\"item.damageTypeT\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t</div>\r\n\t\r\n</div>";
+		return "<div>\r\n\t<div style=\"width:50%;display:inline-block\">\r\n\t\t<label>TN:<br/>\r\n\t\t\t<InputInt v-if=\"!thrusting\" :obj=\"item\" prop=\"atnS\" style=\"width:100%\"/>\r\n\t\t\t<InputInt v-if=\"thrusting\" :obj=\"item\" prop=\"atnT\" style=\"width:100%\"/>\r\n\t\t</label>\r\n\t</div><div style=\"width:50%;display:inline-block\">\r\n\t\t<label>Damage:<br/>\r\n\t\t\t<InputInt v-if=\"!thrusting\" :obj=\"item\" prop=\"damageS\" style=\"width:100%\" />\r\n\t\t\t<InputInt v-if=\"thrusting\" :obj=\"item\" prop=\"damageT\" style=\"width:100%\" />\r\n\t\t</label>\r\n\t</div>\r\n\t<div>\r\n\t\t<label>Damage Type:</label>\r\n\t\t<select v-if=\"!thrusting\" number v-model.number=\"item.damageTypeS\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\" :key=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t\t<select v-if=\"thrusting\" number v-model.number=\"item.damageTypeT\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\" :key=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t</div>\r\n\t\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_widgets_WMeleeAtk;
@@ -15758,7 +16872,7 @@ troshx_sos_vue_widgets_WMissileAtk.prototype = $extend(troshx_sos_vue_widgets_Ba
 		return troshx_sos_core_DamageType.getFlagLabels();
 	}
 	,Template: function() {
-		return "<div>\r\n\t<div style=\"width:50%;display:inline-block\">\r\n\t\t<label>TN:<br/>\r\n\t\t\t<InputInt :obj=\"item\" prop=\"atnM\" style=\"width:100%\"></InputInt>\r\n\t\t</label>\r\n\t</div><div style=\"width:50%;display:inline-block\">\r\n\t\t<label>Damage:<br/>\r\n\t\t\t<InputInt :obj=\"item\" prop=\"damageM\" style=\"width:100%\"></InputInt>\r\n\t\t</label>\r\n\t</div>\r\n\t<div>\r\n\t\t<label>Damage Type:</label>\r\n\t\t<select number v-model.number=\"item.damageTypeM\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t</div>\r\n</div>";
+		return "<div>\r\n\t<div style=\"width:50%;display:inline-block\">\r\n\t\t<label>TN:<br/>\r\n\t\t\t<InputInt :obj=\"item\" prop=\"atnM\" style=\"width:100%\"></InputInt>\r\n\t\t</label>\r\n\t</div><div style=\"width:50%;display:inline-block\">\r\n\t\t<label>Damage:<br/>\r\n\t\t\t<InputInt :obj=\"item\" prop=\"damageM\" style=\"width:100%\"></InputInt>\r\n\t\t</label>\r\n\t</div>\r\n\t<div>\r\n\t\t<label>Damage Type:</label>\r\n\t\t<select number v-model.number=\"item.damageTypeM\">\r\n\t\t\t<option v-for=\"(label, index) in damageTypeLabels\" :value=\"index\" :key=\"index\">{{ label }}</option>\r\n\t\t</select>\r\n\t</div>\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_widgets_WMissileAtk;
@@ -16163,7 +17277,7 @@ troshx_sos_vue_widgets_WTags.prototype = $extend(haxevx_vuex_core_VComponent.pro
 		arr.push("Two-Handed");
 		arr.push("Strapped");
 		arr.push("Eye-Corrective");
-		arr.push("Crutch");
+		arr.push("Prosthetic");
 		return arr;
 	}
 	,get_armorFlags: function() {
@@ -16706,6 +17820,9 @@ troshx_util_LibUtil.maxI_ = function(a,b) {
 troshx_util_LibUtil.removeArrayItemAtIndex = function(arr,index) {
 	arr.splice(index,1);
 };
+troshx_util_LibUtil.toFixed = function(value,digits) {
+	return value.toFixed(digits);
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -16754,6 +17871,7 @@ troshx_sos_core_BoonBane.CHARACTER_CREATION_ONLY = 1;
 troshx_sos_core_BoonBane.CANNOT_BE_REMOVED = 2;
 troshx_sos_core_BoonBane.TIMES_INFINITE = -1;
 troshx_sos_core_BoonBane.TIMES_VARYING = -2;
+troshx_sos_core_BoonBane.COSTLESS_ARRAY = [0];
 troshx_sos_bnb_Allies.COST_1 = 1;
 troshx_sos_bnb_Allies.COST_2 = 5;
 troshx_sos_bnb_Allies.COST_3 = 10;
@@ -16815,7 +17933,7 @@ troshx_sos_core_Item.UID_COUNT = 0;
 troshx_sos_core_Item.FLAG_TWO_HANDED = 1;
 troshx_sos_core_Item.FLAG_STRAPPED = 2;
 troshx_sos_core_Item.EYE_CORRECTIVE = 4;
-troshx_sos_core_Item.CRUTCH = 8;
+troshx_sos_core_Item.PROSTHETIC = 8;
 troshx_sos_core_Item.MASK_HANDED = 3;
 troshx_sos_core_Item.CP = 0;
 troshx_sos_core_Item.SP = 1;
@@ -17050,6 +18168,9 @@ troshx_sos_core_CustomMelee.CUSTOM_HILT = 1;
 troshx_sos_core_CustomMelee.RIDICULOUSLY_SHARP = 2;
 troshx_sos_core_CustomMelee.EXQUISITE_DECORATION = 4;
 troshx_sos_core_CustomMelee.BIZARRE_GIMMICK = 8;
+troshx_sos_core_Wound.STAUNCHED = 1;
+troshx_sos_core_Wound.TREATED = 2;
+troshx_sos_core_Wound.MASK_OPENWOUND = 3;
 troshx_sos_core_Wound.UNIQUE_COUNT = 0;
 troshx_sos_races_Races.PCP_FOR_TIERS = [1,2,4,6,8];
 troshx_sos_schools_EsotericSchoolBonuses.SIMPLICITY = 1;
@@ -17061,7 +18182,10 @@ troshx_sos_schools_OfficerBonuses.PROTECT_THE_BANNER = "Protect the Banner!";
 troshx_sos_schools_OfficerBonuses.RIDE_TO_RUIN = "Ride to Ruin!";
 troshx_sos_sheets_CharSheet.GENDER_MALE = 0;
 troshx_sos_sheets_CharSheet.GENDER_FEMALE = 1;
+troshx_sos_sheets_CharSheet.VERSION = 2;
 troshx_sos_sheets_CharSheet.LIQUIDATE_ASSET_BASE = 6;
+troshx_sos_vue_Globals.DOMAIN_INVENTORY = "sos-weapons-and-armour";
+troshx_sos_vue_Globals.DOMAIN_CHARACTER = "sos-sample-characters";
 troshx_sos_vue_InventoryVue.LABEL_YOUR = "Your";
 troshx_sos_vue_InventoryVue.SAMPLE_AV = { avc : 0, avp : 0, avb : 0};
 troshx_sos_vue_TDHands.NAME = "td-hands";
@@ -17071,7 +18195,7 @@ troshx_sos_vue_TDWidgetHolder.NAME = "td-widget";
 troshx_sos_vue_input_InputInt.NAME = "InputInt";
 troshx_sos_vue_input_InputNumber.NAME = "InputNumber";
 troshx_sos_vue_input_InputString.NAME = "InputString";
-troshx_sos_vue_inputs_NumericInput.TEMPLATE = "<input type=\"number\" number :disabled=\"disabled\" :value=\"obj[prop]\" v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :class=\"{invalid:!valid}\" :min=\"min\" :max=\"max\"></input>";
+troshx_sos_vue_inputs_NumericInput.TEMPLATE = "<input type=\"number\" number :disabled=\"disabled\" :value=\"obj[prop]\" :readonly=\"readonly\" v-on:blur=\"blurHandler($" + "event.target)\" v-on:input=\"inputHandler($" + "event.target)\" :class=\"{invalid:!valid}\" :min=\"min\" :max=\"max\"></input>";
 troshx_sos_vue_inputs_impl_AttributeInput.NAME = "AttributeInput";
 troshx_sos_vue_inputs_impl_BoonBaneInput.NAME = "BoonBaneInput";
 troshx_sos_vue_inputs_impl_CategoryPCPInput.NAME = "CategoryPCPInput";
@@ -17119,5 +18243,5 @@ troshx_sos_vue_widgets_WMissileAtk.NAME = "w-missile-atk";
 troshx_sos_vue_widgets_WProf.NAME = "w-prof";
 troshx_sos_vue_widgets_WSpanTools.NAME = "w-span-tools";
 troshx_sos_vue_widgets_WTags.NAME = "w-tags";
-MainSOSCharGenTest.main();
+MainSOS.main();
 })(typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

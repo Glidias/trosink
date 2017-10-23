@@ -11,7 +11,7 @@
 	<div>
 		<label>Damage Type:</label>
 		<select number v-model.number="item.damageTypeM">
-			<option v-for="(label, index) in damageTypeLabels" :value="index">{{ label }}</option>
+			<option v-for="(label, index) in damageTypeLabels" :value="index" :key="index">{{ label }}</option>
 		</select>
 	</div>
 </div>
