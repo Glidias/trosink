@@ -2,7 +2,7 @@
 	<br/>
 	<h1>Song of Swords: Character Sheet</h1>
 	
-	<div class="chargen__body" v-if="!insideInventory">
+	<div class="chargen__body" v-if="char!=null && !insideInventory">
 		
 		<section class="gen-general" id="gen-general">
 			<div class="gen-col">
@@ -177,13 +177,13 @@
 		<hr/>
 	
 		<div ref="inventoryHolder">
-			<inventory :inventory="char.inventory" :maxWeight="CAR" :injectWeight="inventoryWeight" />	
+			<inventory :inventory="char.inventory" :maxWeight="CAR" :injectWeight="inventoryWeight" v-on:loadSheet="loadSheet" />	
 		</div>
 	
 		<hr/>
 	</div>
 			
-	<div class="chargen__footer" v-if="!insideInventory">
+	<div class="chargen__footer" v-if="char!=null && !insideInventory">
 			
 		<div class="sect-arc">
 			<h2>Arcs</h2>

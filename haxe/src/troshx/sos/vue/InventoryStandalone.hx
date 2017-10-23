@@ -18,9 +18,14 @@ class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 	public function new(theComp:VComponent<Dynamic,Dynamic>) 
 	{
 		super();
-		untyped this.components = {
-			"comp":theComp
-		};
+		if (theComp != null) {
+			untyped this.components = {
+				"comp":theComp
+			};
+		}
+		else {
+			Reflect.deleteField(this, "data");
+		}
 	}
 	
 	public function getNewInventory(contents:String):Inventory {
@@ -43,12 +48,14 @@ class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 		return LibUtil.as(newInventory, Inventory);
 	}
 	
-	
+	public function setInventory(chk:Inventory):Void {
+		this.inventory = chk;
+	}
 	
 	public function loadSheet(contents:String):Void {
 		var chk:Inventory = getNewInventory(contents);
 		if (chk == null) return;
-		this.inventory = chk;
+		this.setInventory(chk);
 		
 	}
 	

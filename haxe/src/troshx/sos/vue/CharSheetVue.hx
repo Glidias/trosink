@@ -11,6 +11,7 @@ import troshx.sos.core.BoonBane;
 import troshx.sos.core.BoonBane.BaneAssign;
 import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
+import troshx.sos.core.Inventory;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Skill;
 import troshx.sos.core.Skill.SkillObj;
@@ -42,13 +43,18 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		super();
 		untyped this.mixins = [
 			CharVueMixin.getSampleInstance(),
-			MixinInput.getInstance()
+			MixinInput.getInstance(),
+			new InventoryStandalone(null)
 		];
+	}
+	
+	function setInventory(chk:Inventory):Void {
+		this.char.inventory = chk;
 	}
 	
 
 	override function Data():CharSheetVueData {
-		return new CharSheetVueData();
+		return new CharSheetVueData(this.injectChar);
 	}
 	
 	override function Created():Void {
@@ -211,11 +217,16 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	@:computed function get_placeholder():String {
 		return "[placeholder]";
 	}
+	
+	@:watch function watch_injectChar(newVal:CharSheet, oldVal:CharSheet):Void {
+		this.char = newVal;
+	}
 }
 
 typedef CharSheetVueProps = {
 	@:prop({required:false}) @:optional var exitBtnCallback:Void->Void;
 	@:prop({required:false}) @:optional var finaliseSaveCallback:String->Void;
+	@:prop({required:false}) @:optional var injectChar:CharSheet;
 }
 
 
