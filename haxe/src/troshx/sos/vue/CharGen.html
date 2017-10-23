@@ -231,7 +231,7 @@
 			<h2>Checkout <span class="legend valuer">( &#128167;Liquidity&nbsp;&nbsp; &#9650;Bonuses &#10060;Penalties&nbsp;&nbsp; &#9876;School&nbsp;&nbsp; &#10064;Inventory&nbsp;&nbsp; [Remaining] )</span><span class="valid" v-show="notBankrupt" style="color:green"> &nbsp;Ready.</span><span class="invalid" v-show="!notBankrupt" style="color:red"> &nbsp;Bankrupt!</span></h2>
 			<div class="checkout">
 				<div class="cash">Money Remaining: ({{ moneyAvailableStr }})  + &#128167;({{liquidity}}) + &#9650;({{checkoutBonuses}}) &nbsp; - &#10060;({{checkoutPenalties}}) - &#9876;({{checkoutSchool}}) - &#10064;({{checkoutInventory}}) = [{{ moneyLeftStr }}]</div>
-				<div class="carry">Carry: <b :class="{encumbered:encumbered}">{{totalWeight}}</b> / <span class="modified-attribute" :class="[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']"><b>{{CAR}}</b></span></div>
+				<div class="carry">Carry: <b :class="{encumbered:encumbered}">{{inventoryWeightLbl}}</b> / <span class="modified-attribute" :class="[CAR==car ?'base' : CAR<car ? 'lower' : 'higher']"><b>{{CAR}}</b></span></div>
 			</div>
 			<div class="inventory-section">
 				<button v-on:click="proceedToInventory()" v-show="!insideInventory">&#10064; Proceed to Inventory &gt;&gt;</button>
