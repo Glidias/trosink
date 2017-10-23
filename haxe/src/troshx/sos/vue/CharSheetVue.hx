@@ -107,6 +107,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	override function Created():Void {
 		//_vData.privateInit();
 		untyped CharSheet.dynSetField = Vue.set;
+		untyped CharSheet.dynDeleteField = Vue.delete;
 		//untyped CharGenData.dynDeleteField = Vue.delete;
 		//untyped CharGenData.dynSetArray = Vue.set;
 	}
@@ -166,6 +167,20 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	@:computed function get_hasSampleWound():Bool {
 		return this.char.hasWound(this.sampleWound);
+	}
+	
+	function deleteWound(w:Wound):Void {
+		this.char.removeWound(w);
+	}
+	
+	function checkConfirmDeleteWound(w:Wound):Void {
+		woundMayDelete = w;
+		_vRefs.confirmDeleteWoundWindow.open();
+	}
+	
+	function confirmDeleteWound():Void {
+		deleteWound(woundMayDelete);
+		_vRefs.confirmDeleteWoundWindow.close();
 	}
 
 	function confirmAddWound():Void {
@@ -470,6 +485,7 @@ class CharSheetVueData {
 	
 	// sampleWound
 	var sampleWound:Wound;
+	var woundMayDelete:Wound;
 	var forceNewSampleWound:Bool = false;
 	
 	// arc session
@@ -489,6 +505,7 @@ class CharSheetVueData {
 	
 	public function initNewChar():Void {
 		sampleWound = null;// Wound.getNewEmptyAssign();
+		woundMayDelete = null;
 		profCoreListMelee = [];
 		profCoreListRanged = [];
 		sessionArcSpent = 0;

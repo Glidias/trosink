@@ -470,7 +470,7 @@ class CharSheet implements IBuildListed
 	public function removeWound(w:Wound):Void {
 		var uid:String = w.uid;
 		if (Reflect.hasField(woundHash, uid)) {
-			Reflect.deleteField(woundHash, uid);
+			dynDelField(woundHash, uid);
 		}
 		else { 
 			trace("Warning: No wound found to be removed for uid:" + w.uid);
@@ -483,6 +483,11 @@ class CharSheet implements IBuildListed
 		else {
 			trace("Warning: No wound found to be removed for array index:" + index);
 		}		
+	}
+	
+	public static function dynDelField(woundHash:Dynamic<Wound>, uid:String):Void
+	{
+		Reflect.deleteField(woundHash, uid);
 	}
 	
 		
