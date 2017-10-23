@@ -1002,7 +1002,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 	
 	@:computed function get_totalCostMoney():Money {
-		return inventory.calculateTotalCost();
+		return inventory.calculateTotalCost(includeDroppedCost);
 	}
 	
 	@:computed function get_totalCostGP():Int {
@@ -1308,4 +1308,5 @@ typedef InventoryVueProps = {
 	@:prop({required:false}) @:optional var maxWeight:Float;
 	
 	@:prop({required:false}) @:optional var injectWeight:Float;
+	@:prop({required:false, 'default':false}) @:optional var includeDroppedCost:Bool;
 }

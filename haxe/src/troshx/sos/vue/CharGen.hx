@@ -405,7 +405,7 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	
 	var inventoryCost(get, never):Money;
 	function get_inventoryCost():Money {
-		return char.inventory.calculateTotalCost();
+		return char.inventory.calculateTotalCost(true);
 	}
 	
 	var moneyAvailable(get,never):Money;
