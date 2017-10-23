@@ -31,13 +31,20 @@ select {
 	max-height:250px;
 	overflow:auto;
 }
+.sweet-modal-overlay.reset {
+	font-size:inherit !important;
+}
+.sweet-modal-overlay.reset .sweet-content {
+	font-size:inherit !important;
+	text-align:left !important;	
+}
 
 // 
-.sweet-title {
+.sweet-modal-overlay.reset-tabs  .sweet-title {
   //reset overflow, height, white-space, line-height:48px
 }
 
-li.sweet-modal-tab {
+.sweet-modal-overlay.reset-tabs  li.sweet-modal-tab {
   //reset height
 }
 

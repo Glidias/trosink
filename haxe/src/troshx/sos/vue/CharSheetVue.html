@@ -1,6 +1,10 @@
 <div class="chargen">
 	<br/>
-	<h1>Song of Swords: Character Sheet</h1>
+	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button></h1>
+	
+	<sweet-modal ref="treeBrowser" :class="{reset:true}" >		
+		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser"  />
+	</sweet-modal>
 	
 	<div class="chargen__body" v-if="char!=null && !insideInventory">
 		
@@ -177,7 +181,10 @@
 		<hr/>
 	
 		<div ref="inventoryHolder">
-			<inventory :inventory="char.inventory" :maxWeight="CAR" :injectWeight="inventoryWeight" v-on:loadSheet="loadSheet" />	
+			
+			<inventory :inventory="char.inventory" :maxWeight="CAR" :injectWeight="inventoryWeight" v-on:loadSheet="loadSheet">	
+				<span slot="titleAfter">&nbsp;&nbsp;<button v-on:click="proceedToInventory">&#10064;</button></span>
+			</inventory>
 		</div>
 	
 		<hr/>
@@ -197,7 +204,17 @@
 			<div><label>Glory:</label><textarea v-model="char.arcGlory" class="notes"></textarea></div>
 			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw" class="notes"></textarea></div>
 		</div>
-		<button v-on:click="saveCharacter()">Save Character!</button>
+			
+		<hr/>
+			
+		<div><button v-on:click="saveCharacter()">Save Character</button></div>
+		<div><textarea ref="savedCharTextArea" character-set="UTF-8" v-model="savedCharContents" style="min-height:60px;">
+			
+		</textarea><button v-on:click="executeCopyContents()" ref="copyButton">Copy</button><i class="copy-notify" ref="copyNotify" style="display:none">copied!</i></div>
+		<div><button v-on:click="loadCharacter()">Load Character!</button></div>	
 	</div>
 
+	<div ref="inventoryHolder" v-if="char!=null">
+		<inventory-manager v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxWeight="CAR" />	
+	</div>
 </div>

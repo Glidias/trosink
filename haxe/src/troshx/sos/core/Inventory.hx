@@ -754,6 +754,60 @@ class Inventory
 	}
 	
 	
+	var version:Int = 2;
+	public function postSerialization():Void
+	{
+		postSerialize_2();
+	}
+	@:postSerialize function postSerialize_2():Bool {	// warning: ingame ONLY!
+		if (version == null || version < 2) version = 2
+		else return false;
+		
+		
+		for (i in 0...weapons.length) {
+			if ( weapons[i].weapon.burdinadin == null) {
+				weapons[i].weapon.burdinadin = null;
+			}
+		}
+		for (i in 0...wornArmor.length) {
+			if ( wornArmor[i].armor.burdinadin == null) {
+				wornArmor[i].armor.burdinadin = null;
+			}
+		}
+		
+		var armor:Armor;
+		var weap:Weapon;
+		for (i in 0...dropped.list.length) {
+			var item = dropped.list[i].item;
+			armor = LibUtil.as(item , Armor);
+			weap = LibUtil.as(item , Weapon);
+			if (armor != null) {
+				if (armor.burdinadin == null) armor.burdinadin = null;
+			}
+			if (weap != null) {
+				if (weap.burdinadin == null) weap.burdinadin = null;
+			}
+		}
+		
+		for (i in 0...packed.list.length) {
+			var item = packed.list[i].item;
+			armor = LibUtil.as(item , Armor);
+			weap = LibUtil.as(item , Weapon);
+			if (armor != null) {
+				if (armor.burdinadin == null) armor.burdinadin = null;
+			}
+			if (weap != null) {
+				if (weap.burdinadin == null) weap.burdinadin = null;
+			}
+			
+		}
+		
+
+		return true;
+	
+	}
+	
+	
 	
 }
 

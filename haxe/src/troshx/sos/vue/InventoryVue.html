@@ -1,6 +1,6 @@
 <div class="inventory" v-on:click="onBaseInventoryClick">
 
-	<h2>{{whoseInventoryPrefix}}Inventory</h2>
+	<h2>{{whoseInventoryPrefix}}Inventory<slot name="titleAfter"></slot></h2>
 	
 	<div class="tally-zone">
 		<div>

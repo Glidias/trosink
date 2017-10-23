@@ -1,9 +1,14 @@
 package troshx.sos.vue;
+import haxe.Serializer;
+import haxe.Timer;
 import haxe.Unserializer;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.core.VxMacros;
 import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
+import js.Browser;
+import js.html.HtmlElement;
+import js.html.TextAreaElement;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
 import troshx.sos.chargen.CharGenData;
@@ -25,6 +30,7 @@ import troshx.sos.vue.uifields.ArrayOf;
 import troshx.sos.vue.uifields.ArrayOfBits;
 import troshx.sos.vue.uifields.MoneyField;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
+import troshx.sos.vue.widgets.GingkoTreeBrowser;
 import troshx.sos.vue.widgets.SchoolSheetDetails;
 import troshx.sos.vue.widgets.SkillSubjectCreator;
 import troshx.util.LibUtil;
@@ -63,17 +69,60 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		//untyped CharGenData.dynDeleteField = Vue.delete;
 		//untyped CharGenData.dynSetArray = Vue.set;
 	}
+	
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
+		return [
+			
+			BoonBaneInput.NAME => new BoonBaneInput(),
+			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails(),
+			
+			SkillLibInput.NAME => new SkillLibInput(),
+			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
+			
+			InputNameLabel.NAME => new InputNameLabel(),
+			
+			ArrayOf.NAME => new ArrayOf(),
+			ArrayOfBits.NAME => new ArrayOfBits(),
+			
+			MoneyField.NAME => new MoneyField(),
+			
+			"inventory" => new InventoryVue(),
+			"inventory-manager" => new InventoryManager(),
+			"tree-browser" => new GingkoTreeBrowser()
+		];
+	}
+	
+	function openTreeBrowser():Void {
+		_vRefs.treeBrowser.open();
+	}
+	
+	function openFromTreeBrowser(contents:String, filename:String, disableCallback:Void->Void):Void {
+
+		if ( loadCharContents(contents) ) {
+			_vRefs.treeBrowser.close();
+		}
+		
+	}
+	
+	
+		
+	@:computed function get_availableTypes():Dynamic<Bool> {
+		return {
+			"troshx.sos.sheets.CharSheet": true
+		};
+	}
+
 
 	
 	function exitInventory():Void {
 		
 		insideInventory = false;
-		/*
+		///*
 		Vue.nextTick( function() {
-			var htmlElement:HtmlElement = _vRefs.checkoutHeader;
+			var htmlElement:HtmlElement = _vRefs.inventoryHolder;
 			Browser.window.scroll({top:htmlElement.offsetTop});
 		});
-		*/
+		//*/
 	}
 	
 	
@@ -81,12 +130,12 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		
 
 		insideInventory = true;
-		/*
+		///*
 		Vue.nextTick( function() {
 			var htmlElement:HtmlElement = _vRefs.inventoryHolder;
 			Browser.window.scroll({top:htmlElement.offsetTop});
 		});
-		*/
+		//*/
 	}
 
 	function saveFinaliseSkills():Void {
@@ -106,8 +155,78 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	}
 	
+	function loadCharacter():Void {
+		loadCharContents(this.savedCharContents);
+		
+	}
+	
+	function loadCharContents(contents:String):Bool 
+	{
+		var newItem:Dynamic;
+		
+		try {
+			newItem = new Unserializer(contents).unserialize();
+		}
+		catch (e:Dynamic) {
+			trace(e);
+			Browser.alert("Sorry, failed to unserialize save-content string!");
+			return false;
+		}
+		if (!Std.is(newItem, CharSheet) ) {
+		
+			trace(newItem);
+			Browser.alert("Sorry, unserialized type isn't CharSeet!");
+			return false;
+		}
+		var me:CharSheet =  LibUtil.as(newItem, CharSheet);
+		me.postSerialization();
+		this.char = me;
+		
+		return true;
+	}
+	
 	function saveCharacter():Void {
 		saveFinaliseSkills();
+		saveFinaliseCleanupChar();
+		
+		saveCharToBox();
+	}
+	
+	function saveFinaliseCleanupChar():Void {
+	
+		char.boons.filter(function(bb) { return !bb._canceled;  } );
+		char.banes.filter(function(bb) { return !bb._canceled;  } );
+		
+		char.inventory.cleanupBeforeSerialize();
+	}
+	
+	
+	function executeCopyContents():Void {
+		var textarea:TextAreaElement = _vRefs.savedCharTextArea;
+		
+		textarea.select();
+		var result:Bool = Browser.document.execCommand("copy");
+		if (result != null) {
+			//Browser.alert("Copied to clipboard.");
+			var htmlElem:HtmlElement = _vRefs.copyNotify;
+			htmlElem.style.display = "inline-block";
+			Timer.delay( function() {
+				htmlElem.style.display = "none";
+			}, 3000);
+		}
+		else {
+			Browser.alert("Sorry, failed to copy to clipboard!");
+		}
+	}
+	
+	function saveCharToBox():String
+	{
+		var s = new Serializer();
+		s.useCache = true;
+		s.serialize(this.char);
+		var str = s.toString();
+		this.savedCharContents = str;
+		return str;
 	}
 	
 	var maxAvailableProfSlots(get, never):Int;
@@ -173,26 +292,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		});
 	}
 	
-	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {
-		return [
-			
-			BoonBaneInput.NAME => new BoonBaneInput(),
-			BoonBaneApplyDetails.NAME => new BoonBaneApplyDetails(),
-			
-			SkillLibInput.NAME => new SkillLibInput(),
-			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
-			
-			InputNameLabel.NAME => new InputNameLabel(),
-			
-			ArrayOf.NAME => new ArrayOf(),
-			ArrayOfBits.NAME => new ArrayOfBits(),
-			
-			MoneyField.NAME => new MoneyField(),
-			
-			"inventory" => new InventoryVue()
-		];
-	}
-	
+
 	// duplicate from chargendata, but without the packet line at the end...
 	public function deleteSkillInput(index:Int):Void {
 		var obj = skillObjs[index];
@@ -242,6 +342,8 @@ class CharSheetVueData {
 	var showBnBs:Bool = false;
 	var showEditSkills:Bool = false;
 	
+	// save
+	var savedCharContents:String = "";
 	
 	// blah
 	var insideInventory:Bool = false;
@@ -270,14 +372,13 @@ class CharSheetVueData {
 		initSkills();
 		initProfs();
 	}
-	
-	
+
 	
 	function getSampleChar():CharSheet {
 		var s:Unserializer = new Unserializer( VHTMacros.getHTMLStringFromFile("src/troshx/sos/vue/samplechar", "txt") );
 		
 		var c:CharSheet =  s.unserialize();
-		c.postSerialize_2();
+		c.postSerialization();
 		//c.addBoon( new Ambidextrous().getAssign(1, c) );  // for testing
 		return c;
 	}

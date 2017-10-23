@@ -89,12 +89,18 @@ class CharSheet implements IBuildListed
 	public var version:Int = VERSION;
 	public var healthLoss:Int = 0;
 	public var prone:Bool = false;
-	@:postSerialize public function postSerialize_2():Void {	// warning: ingame ONLY!
-		if (version == null || version < 2) version = 2;
+	public function postSerialization():Void {
+		postSerialize_2();
+	}
+	@:postSerialize function postSerialize_2():Bool {	// warning: ingame ONLY!
+		if (version == null || version < 2) version = 2
+		else return false;
 		if (!ingame) ingame = true;  // a bug in prev chargen that needs to be monkey patched
 			
 		if (healthLoss == null) healthLoss = 0;
 		if (prone == null) prone = false;
+		inventory.postSerialization();
+		return true;
 	
 	}
 	

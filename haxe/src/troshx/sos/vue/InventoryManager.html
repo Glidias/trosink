@@ -5,6 +5,8 @@
 	<hr/>
 	
 	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable" v-bind="$attrs" :maxCostCopper="curInventoryIndex == 0 ? maxCostCopper : null" :maxWeight="curInventoryIndex == 0 ? maxWeight : null">
+		<slot name
+		
 		<button class="exit-btn" slot="exitBtn" v-if="backBtnCallback!=null" v-on:click="backBtnCallback()">&lt;&lt; Back</button>
 		
 		<div class="open-new-tab-zone" slot="loadNewTabZone">
