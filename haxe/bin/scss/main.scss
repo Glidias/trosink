@@ -32,6 +32,14 @@ select {
 	overflow:auto;
 }
 
+// 
+.sweet-title {
+  //reset overflow, height, white-space, line-height:48px
+}
+
+li.sweet-modal-tab {
+  //reset height
+}
 
 td input[type='text'] {
 	position:relative;
