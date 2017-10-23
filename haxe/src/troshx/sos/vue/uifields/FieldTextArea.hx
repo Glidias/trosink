@@ -18,7 +18,7 @@ class FieldTextArea extends VComponent<NoneT, BaseUIProps>
 	override function Template():String {
 		return '<div>
 			<label v-if="label">{{ label }}:&nbsp;</label>
-			<textarea v-model="obj[prop]" :disabled="disabled"></textarea>
+			<textarea v-model="obj[prop]" :disabled="disabled" :readonly="readonly"></textarea>
 		</div>';
 	}
 	

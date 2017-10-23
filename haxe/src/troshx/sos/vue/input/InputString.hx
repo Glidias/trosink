@@ -17,7 +17,7 @@ class InputString extends VComponent<NoneT, BaseInputProps>
 	}
 	
 	override function Template():String {
-		return '<input type="text" :disabled="disabled"  v-model="obj[prop]"></input>';
+		return '<input type="text" :disabled="disabled"  :readonly="readonly" v-model="obj[prop]"></input>';
 	}
 	
 }

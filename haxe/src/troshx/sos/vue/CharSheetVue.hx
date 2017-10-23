@@ -267,6 +267,7 @@ class CharSheetVueData {
 		
 		var c:CharSheet =  s.unserialize();
 		c.postSerialize_2();
+		//c.addBoon( new Ambidextrous().getAssign(1, c) );  // for testing
 		return c;
 	}
 	

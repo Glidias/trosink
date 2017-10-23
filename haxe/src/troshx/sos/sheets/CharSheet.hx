@@ -178,6 +178,7 @@ class CharSheet implements IBuildListed
 	public var labelRace(get, never):String;
 	public var labelGender(get, never):String;
 	public var labelSchool(get, never):String;
+	public var labelSocialClass(get, never):String;
 	
 	public var schoolCP(get, never):Int;
 	public var baseCP(get, never):Int;
@@ -597,6 +598,11 @@ class CharSheet implements IBuildListed
 	inline function get_labelSchool():String 
 	{
 		return school != null ? school.name : "";
+	}
+	
+	inline function get_labelSocialClass():String 
+	{
+		return socialClass != null ? socialClass.name : "";
 	}
 	
 	

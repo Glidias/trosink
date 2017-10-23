@@ -22,7 +22,7 @@ class SingleSelection extends VComponent<NoneT, SelectionProps>
 	}
 	
 	override function Template():String {
-		return '<div>
+		return '<div :style="{pointerEvents:readonly ? \'none\' : \'auto\'}">
 			<span v-if="label"><label>{{ label }}</label>:<br/></span>
 			<select number v-model.number="obj[prop]" :disabled="disabled">
 				<option v-if="includeZeroOption" :value="0">{{ zeroValueLabel }}</option> 

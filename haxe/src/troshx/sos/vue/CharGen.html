@@ -103,18 +103,25 @@
 				<div><b>CHA</b> (Charisma): <span class="modified-attribute" :class="[CHA==cha ?'base' : CHA<cha ? 'lower' : 'higher']"><b>{{CHA}}</b></span><i v-show="cha!=CHA" class="baseshow">({{cha}})</i></div>
 				
 				<div><i>TOU</i> (Toughness): <span class="modified-attribute" :class="[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']"><b>{{TOU}}</b></span><i v-show="tou!=TOU" class="baseshow">({{tou}})</i></div>
-				
+				<hr/>
+				<div>Weight/Carry: <b>{{inventoryWeightLbl}}</b> / <b :style="{fontWeight:encumbranceLvl>=1 ?'normal':'bold'}">{{CAR}}</b></div>
+				<div>Master-hand: <span v-if="masterHandItem!=null"><b>{{masterHandItem.name}}</b> <span v-show="masterWeapon!=null">&#9876;</span><span v-if="carriedShield!=null && carriedShield==masterHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
+				<div>Off-hand: <span v-if="offHandItem!=null"><b>{{offHandItem.name}}</b> <span v-show="offhandWeapon!=null">&#9876;</span><span v-if="carriedShield!=null && carriedShield==offHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
+				<div>Reach: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
+				<div>Perception Penalty: <b>{{ perceptionPenalty }}</b></div>
+				<div v-if="heldProfeciencies!=null">&#9876;: <b style="max-width:120px">{{heldProfeciencies}}</b></div>
+				<div v-else>Defaulting&#9876;from:<br/><b style="max-width:120px">{{defaultProfs}}</b></div>
 			</div>
 			<div class="gen-col">
-				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i></div>
-				<div> <i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b></div>
+				<div>School Level: <b>{{char.schoolLevel}}</b></div>
+				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i>  (<i>{{CP-char.schoolLevel}}</i> CP without &#9876;)</div>
+				
+				<div><i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>
 				<br/>
 				<div>Encumbrance Level: <span><b>{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
 				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
 				<div>Exhaustion Rate: <span><b>{{exhaustionRate}}x</b></span></div>
 				<div>Recovery Amount: <span class="modified-attribute" :class="[recoveryRateAmount==recoveryRateAmountBase ?'base' : recoveryRateAmount<recoveryRateAmountBase ? 'lower' : 'higher']"><b>{{recoveryRateAmount}} <i>({{recoveryRate}}x)</i></b></span><i v-show="recoveryRateAmount!=recoveryRateAmountBase" class="baseshow">({{recoveryRateAmountBase}})</i></div>
-				<br/>
-				<div><b>Reach</b>: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
 			</div>
 		</section>
 
@@ -236,11 +243,11 @@
 	<div class="chargen__footer" v-if="!insideInventory && !char.ingame">
 		<section class="arcs">
 			<h2>Arcs</h2>
-			<div><label>Saga:</label><textarea v-model="char.arcSaga"></textarea></div>
-			<div><label>Epic:</label><textarea v-model="char.arcEpic"></textarea></div>
-			<div><label>Belief:</label><textarea v-model="char.arcBelief"></textarea></div>
-			<div><label>Glory:</label><textarea v-model="char.arcGlory"></textarea></div>
-			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw"></textarea></div>
+			<div><label>Saga:</label><textarea v-model="char.arcSaga" class="notes"></textarea></div>
+			<div><label>Epic:</label><textarea v-model="char.arcEpic" class="notes"></textarea></div>
+			<div><label>Belief:</label><textarea v-model="char.arcBelief" class="notes"></textarea></div>
+			<div><label>Glory:</label><textarea v-model="char.arcGlory" class="notes"></textarea></div>
+			<div><label>Flaw:</label><textarea :disabled="!isHuman" v-model="char.arcFlaw" class="notes"></textarea></div>
 		</section>
 		<hr/>
 		

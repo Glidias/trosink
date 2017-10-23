@@ -10,4 +10,6 @@ typedef BaseUIProps = {
 	
 	@:prop({required:true}) var obj:Dynamic;
 	@:prop({required:true}) var prop:Dynamic;  // prop may be integer as well to account for array index prop
+	
+	@:optional @:prop({required:false, 'default':false}) var readonly:Bool;	
 }

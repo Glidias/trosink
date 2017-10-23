@@ -138,4 +138,23 @@ class LibUtil
 		arr.splice(index,1);
 	}
 	
+	static public #if !cs inline #end function toFixed(value:Float, digits:Int):String
+    {
+        #if (js || flash)
+        return untyped value.toFixed(digits);
+        #elseif php
+        return untyped __call__("number_format", value, digits, ".", "");
+        #elseif java
+        return untyped __java__("String.format({0}, {1})", '%.${digits}f', value);
+        #elseif cs
+        var separator:String = untyped __cs__('System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberGroupSeparator');
+        untyped __cs__('System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberGroupSeparator = ""');
+        var result = untyped value.ToString("N" + digits);
+        untyped __cs__('System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberGroupSeparator = separator');
+        return result;
+        #else
+        throw "未実装";
+        #end
+    }
+	
 }

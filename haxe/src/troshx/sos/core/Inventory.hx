@@ -96,6 +96,43 @@ class Inventory
 	}
 	*/
 	
+	public function findOffHandItem():Item {
+		for (i in 0...weapons.length) {
+			if (weapons[i].held == HELD_OFF) {
+				return weapons[i].weapon;
+			}
+		}
+		for (i in 0...shields.length) {
+			if (shields[i].held == HELD_OFF) {
+				return shields[i].shield;
+			}
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			if (equipedNonMeleeItems[i].held == HELD_OFF) {
+				return equipedNonMeleeItems[i].item;
+			}
+		}
+		return null;
+	}
+	public function findMasterHandItem():Item {
+		for (i in 0...weapons.length) {
+			if (( weapons[i].held & HELD_MASTER) != 0) {
+				return weapons[i].weapon;
+			}
+		}
+		for (i in 0...shields.length) {
+			if (( shields[i].held & HELD_MASTER) != 0) {
+				return shields[i].shield;
+			}
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			if (( equipedNonMeleeItems[i].held & HELD_MASTER) != 0) {
+				return equipedNonMeleeItems[i].item;
+			}
+		}
+		return null;
+	}
+	
 	public function getOffhandWeapon():Weapon {
 		for (i in 0...weapons.length) {
 			if (weapons[i].held == HELD_OFF) {
@@ -293,6 +330,14 @@ class Inventory
 		_unholdAllItems(held, Reflect.hasField(alreadyEquiped, "shield") ); 
 		alreadyEquiped.held = held;
 		dispatchSignal(InventorySignal.HoldItem);
+	}
+	
+	public function getPerceptionPenalty():Int {
+		var val = 0;
+		for (i in 0...wornArmor.length) {
+			val += wornArmor[i].armor.pp;
+		}
+		return val;
 	}
 	
 	public function calculateTotalWeight(forceIncludePacked:Bool=false, forceIncludeDropped:Bool=false):Float {

@@ -18,7 +18,7 @@ class FieldString extends VComponent<NoneT, BaseUIProps>
 	override function Template():String {
 		return '<div>
 			<label v-if="label">{{ label }}:&nbsp;</label>
-			<input type="text" v-model="obj[prop]" :disabled="disabled"></input>
+			<input type="text" v-model="obj[prop]" :disabled="disabled" :readonly="readonly"></input>
 		</div>';
 	}
 	

@@ -20,7 +20,7 @@ class FieldInt extends VComponent<NoneT, FieldIntProps>
 	override function Template():String {
 		return '<div>
 			<label v-if="label">{{ label }}:&nbsp;</label>
-			<input type="number" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="1"></input>
+			<input type="number"  :readonly="readonly" number v-on:blur="blurHandler($$event.target)" v-on:input="inputHandler($$event.target)" :value="obj[prop]" :min="min" :max="max" :step="1"></input>
 		</div>';
 	}
 	

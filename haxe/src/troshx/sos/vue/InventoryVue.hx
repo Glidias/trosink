@@ -127,6 +127,9 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	@:computed function get_weightRemaining():Float {
 		return maxWeight - totalWeight;
 	}
+	@:computed function get_weightRemainingLbl():Float {
+		return Std.parseFloat( LibUtil.toFixed( this.weightRemaining, 2) );
+	}
 	@:computed function get_exceededWeight():Bool {
 		return weightRemaining <= 0;
 	}
@@ -1031,7 +1034,10 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 	
 	@:computed function get_totalWeight():Float {
-		return inventory.calculateTotalWeight();
+		return injectWeight!=null ? injectWeight : inventory.calculateTotalWeight();
+	}
+	@:computed function get_totalWeightLbl():Float {
+		return Std.parseFloat( LibUtil.toFixed(this.totalWeight, 2) );
 	}
 	
 	@:computed function get_showTally():Bool {  // may include other props
@@ -1300,4 +1306,6 @@ typedef InventoryVueProps = {
 	
 	@:prop({required:false}) @:optional var maxCostCopper:Int;
 	@:prop({required:false}) @:optional var maxWeight:Float;
+	
+	@:prop({required:false}) @:optional var injectWeight:Float;
 }

@@ -2,6 +2,7 @@ package troshx.sos.vue;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue;
+import troshx.sos.bnb.Boons.Ambidextrous;
 import troshx.sos.bnb.BrainDamage.BrainDamageAssign;
 import troshx.sos.chargen.CharGenData;
 import troshx.sos.core.BoonBane.Bane;
@@ -10,13 +11,16 @@ import troshx.sos.core.BoonBane.Boon;
 import troshx.sos.core.BoonBane.BoonAssign;
 import troshx.sos.core.BoonBane.BoonBaneAssign;
 import troshx.sos.core.Inventory;
+import troshx.sos.core.Item;
 import troshx.sos.core.Modifier;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.School;
+import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
+import troshx.util.LibUtil;
 
 /**
  * Common charsheet related derived attributes cached by vue proxy, boilerplate.
@@ -37,6 +41,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	public static function getSampleInstance():CharVueMixin {
 		return (INSTANCE != null  ? INSTANCE : INSTANCE = new CharVueMixin());
 	}
+	
 	
 	
 	// inventory
@@ -134,6 +139,102 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed function get_intelligence():Int { return this.char.intelligence;  } 
 	@:computed function get_perception():Int { return this.char.perception;  } 
 	
+	@:computed function get_raceName():String {
+		return this.char.labelRace;
+	}
+	@:computed function get_schoolName():String {
+		return this.char.labelSchool;
+	}
+	@:computed function get_socialClassName():String {
+		return this.char.labelSocialClass;
+	}
+	
+	
+	@:computed function get_perceptionPenalty():Int {
+		return this.char.inventory.getPerceptionPenalty();
+	}
+	
+	@:computed function get_carriedShield():Shield {
+		return this.char.inventory.findHeldShield();
+	}
+	
+	@:computed function get_masterHandItem():Item {
+		return this.char.inventory.findMasterHandItem();
+	}
+	@:computed function get_offHandItem():Item {
+		return this.char.inventory.findOffHandItem();
+	}
+	
+	@:computed function get_inventoryWeight():Float {
+		return this.char.inventory.calculateTotalWeight();
+	}
+	
+	@:computed function get_inventoryWeightLbl():Float {
+		return Std.parseFloat( LibUtil.toFixed( this.inventoryWeight, 2) );
+	}
+	
+	
+	@:computed function get_defaultProfs():String {
+		var m = this.masterWeapon;
+		var o = this.offhandWeapon;
+		var cm = this.char.profsMelee;
+		var cr = this.char.profsRanged;
+		var amb:Bool = this.ambidextrous;
+		
+		if ( (amb ? m == null && o == null : m == null) ) return 'Puglism' + "\\" + 'Wrestling';
+		var str = "";
+		
+		if (m != null) {
+			var ranged:Bool = m.ranged;
+			if (!ranged) str += Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), m.profs ).join(",");
+		}
+		
+		if (amb && o!=null) {		
+			str += "/";
+			var ranged:Bool = o.ranged;
+			if (!ranged) str += Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(),  o.profs ).join(",");
+		}
+		
+		return str;
+	}
+	
+
+	@:computed function get_heldProfeciencies():String {
+		var m = this.masterWeapon;
+		var o = this.offhandWeapon;
+		var str:String = "";
+		var cm = this.char.profsMelee;
+		var cr = this.char.profsRanged;
+		var amb:Bool = this.ambidextrous;
+		
+		if ( (amb ? m == null && o == null : m==null) ) {
+			str =   ( (((1 << Profeciency.M_PUGILISM) & cm) != 0 ? "Pugilism" : "" )  + "\\" + (((1 << Profeciency.M_WRESTLING) & cm) != 0 ? "Wrestling" : "") );// (1 << Profeciency.M_WRESTLING) |
+			
+			return str != "\\" ? str : null;
+		}
+		
+		if (m != null) {
+			var ranged:Bool = m.ranged;
+			str += Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), (m.profs & (ranged ? cr : cm)) ).join(",");
+		}
+		
+		if (amb && o!=null) {		
+			str += "/";
+			var ranged:Bool = o.ranged;
+			str += Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), (o.profs & (ranged ? cr : cm)) ).join(",");
+		}
+		
+		return str != "" ? str : null;
+	}
+	
+	@:computed function get_ambidextrousId():String {
+		return new Ambidextrous().uid;
+	}
+	
+	@:computed function get_ambidextrous():Bool {
+		return this.char.boons.containsId( ambidextrousId);
+	}
+	
 	
 	// everything else bleh.. (violates DRY but ah well..)
 	
@@ -220,8 +321,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	{
 		return this.char.exhaustionRate;
 	}
-	
-	
+
 	
 	// ALl duplicates from charGenData (factored out), so long as  relavant to regular charsheet.
 	
@@ -315,7 +415,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	
 	var isHuman(get, never):Bool;
 	inline function get_isHuman():Bool {
-		return char.race.name == "Human";
+		return char.labelRace == "Human";
 	}
 		
 	public function restoreAnyBnBWithMask(msk:Int, superMask:Int):Void {

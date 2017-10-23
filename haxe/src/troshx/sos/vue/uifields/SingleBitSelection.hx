@@ -20,6 +20,7 @@ class SingleBitSelection extends VComponent<NoneT, SingleBitSelectionProps>
 	public function new() 
 	{
 		super();
+		untyped this["inheritAttrs"] = false;
 	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>>  {

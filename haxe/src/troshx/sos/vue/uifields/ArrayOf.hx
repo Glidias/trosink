@@ -38,7 +38,7 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 		<label v-if="label!=null">{{label}}:&nbsp;| {{maxLength}}</label><label v-if="label==null && maxLength!=null">| {{maxLength}} </label><button v-show="!readonly" :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button  v-show="!readonly" :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button>
 		<ul class="array-of">
 			<li v-for="(li, i) in current" :class="{disabled:!(maxLength == null || i < maxLength)}">
-				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
+				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :readonly="readonly" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
 			</li>
 		</ul>
 		
