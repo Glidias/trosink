@@ -35,7 +35,7 @@ class BoonBane
 	
 	public var customCostInnerSlashes(default, null):String;
 	
-	public var conditions(default, null):Array<CharSheet->Int->Bool>;
+	public var conditions(default, null):Array<BoonBaneCondition>;
 	
 	@:channel public static inline var __GOOD_EYES__BAD_EYES:Int = (1 << 0);
 	@:channel public static inline var __GOOD_EARS_BAD_EARS:Int = (1 << 1);
@@ -79,6 +79,14 @@ class BoonBane
 	
 }
 
+class BoonBaneCondition {
+	function new() {
+		
+	}
+	function valid(char:CharSheet):Bool {
+		return true;
+	}
+}
 class Boon extends BoonBane {
 	public function new(name:String, costs:Array<Int>) {
 		super(name, costs);

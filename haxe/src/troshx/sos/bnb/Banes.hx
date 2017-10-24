@@ -57,19 +57,6 @@ class BadReputation extends Bane {
 	}
 }
 
-class BarrenOrSterility extends Bane {
-	public function new() {
-		super("Barren/Sterility", [1, 3]);
-		flags = BoonBane.CANNOT_BE_REMOVED;
-		conditions = [null, canBeEunich];
-	}
-	
-	public static function canBeEunich(char:CharSheet, qty:Int):Bool {
-		return char.gender == CharSheet.GENDER_MALE;
-	}
-	
-}
-
 class Bigoted extends Bane {
 	public function new() {
 		super("Bigoted", [5]);
