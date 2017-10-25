@@ -105,8 +105,8 @@
 				<div><i>TOU</i> (Toughness): <span class="modified-attribute" :class="[TOU==tou ?'base' : TOU<tou ? 'lower' : 'higher']"><b>{{TOU}}</b></span><i v-show="tou!=TOU" class="baseshow">({{tou}})</i></div>
 				<hr/>
 				<div>Weight/Carry: <b>{{inventoryWeightLbl}}</b> / <b :style="{fontWeight:encumbranceLvl>=1 ?'normal':'bold'}">{{CAR}}</b></div>
-				<div>Master-hand: <span v-if="masterHandItem!=null"><b>{{masterHandItem.name}}</b> <span v-show="masterWeapon!=null">&#9876;</span><span v-if="carriedShield!=null && carriedShield==masterHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
-				<div>Off-hand: <span v-if="offHandItem!=null"><b>{{offHandItem.name}}</b> <span v-show="offhandWeapon!=null">&#9876;</span><span v-if="carriedShield!=null && carriedShield==offHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
+				<div>Master-hand: <span v-if="masterHandItem!=null"><b>{{masterHandItem.name}}</b> <span v-show="masterWeapon!=null"><span v-html="masterWeapon.ranged ? '&#9678;' : '&#9876;'"></span></span><span v-if="carriedShield!=null && carriedShield==masterHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
+				<div>Off-hand: <span v-if="offHandItem!=null"><b>{{offHandItem.name}}</b> <span v-show="offhandWeapon!=null"><span v-html="offhandWeapon.ranged ? '&#9678;' : '&#9876;'"></span></span><span v-if="carriedShield!=null && carriedShield==offHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
 				<div>Reach: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
 				<div>Perception Penalty: <b>{{ perceptionPenalty }}</b></div>
 				<div v-if="heldProfeciencies!=null">&#9876;: <b style="max-width:120px">{{heldProfeciencies}}</b></div>
@@ -200,11 +200,11 @@
 			</div>
 			<div class="prof-list">
 				<div class="gen-col">
-					<h5>Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<h5>&#9876; Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
 					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots"  />
 				</div>
 				<div class="gen-col">
-					<h5>Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<h5>&#9678; Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
 					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots"  />
 				</div>
 			</div>

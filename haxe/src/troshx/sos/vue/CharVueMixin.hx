@@ -185,7 +185,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		var cr = this.char.profsRanged;
 		var amb:Bool = this.ambidextrous;
 		
-		if ( (amb ? m == null && o == null : m == null) ) return 'Puglism' + "\\" + 'Wrestling';
+		if ( (amb ? m == null && o == null : m == null) ) return 'Pugilism' + "\\" + 'Wrestling';
 		var str = "";
 		
 		if (m != null) {
@@ -199,7 +199,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 			if (!ranged) str += Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(),  o.profs ).join(",");
 		}
 		
-		return str;
+		return str != "" ? str : "(ranged)";
 	}
 	
 
