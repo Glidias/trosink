@@ -3,12 +3,16 @@
 	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button> <button  v-show="!insideInventory" v-on:click="$refs.clipboardWindow.open()">&#128203;</button></h1>
 	
 	<sweet-modal ref="treeBrowser" :class="{reset:true}" v-if="treeBrowserInited" >		
-		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" :initialDomain="domainId" />
+		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" :initialDomain="domainId" :autoLoad="autoLoadChar" />
 	</sweet-modal>
 	
 	<sweet-modal ref="confirmDeleteWoundWindow" >
 		<h3>Delete Wound?</h3>
 		<button v-on:click="confirmDeleteWound">Confirm</button>
+	</sweet-modal>
+	
+	<sweet-modal ref="modifiersWindow" >
+		todo: include missing sweet-modal-tab
 	</sweet-modal>
 	
 	<sweet-modal ref="addWoundWindow" >
@@ -150,6 +154,9 @@
 				<hr/>
 				<div><b>Health Lost:</b><InputInt :min="0" :obj="char" prop="healthLoss" /></div>
 			</div>
+			<div class="gen-col" v-show="false">
+				<button v-on:click="openModifiersWindow">&#128200;</button>
+			</div>
 		</section>
 
 		<hr/>
@@ -289,7 +296,7 @@
 	</div>
 
 	<div ref="inventoryHolder" v-if="char!=null">
-		<inventory-manager v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxWeight="CAR">
+		<inventory-manager v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxWeight="CAR" v-on:loadSheet="loadSheet">
 			<span slot="weightAfter"><span><b :style="{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></span>
 		</inventory-manager>
 	</div>

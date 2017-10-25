@@ -34,6 +34,7 @@ import troshx.sos.vue.uifields.Bitmask;
 import troshx.sos.vue.uifields.MoneyField;
 import troshx.sos.vue.widgets.BoonBaneApplyDetails;
 import troshx.sos.vue.widgets.GingkoTreeBrowser;
+import troshx.sos.vue.widgets.ModifierList;
 import troshx.sos.vue.widgets.SchoolSheetDetails;
 import troshx.sos.vue.widgets.SkillSubjectCreator;
 import troshx.util.LibUtil;
@@ -63,6 +64,12 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	@:computed function get_domainId():String {
 		return Globals.DOMAIN_CHARACTER;
+	}
+	
+	override function Mounted():Void {
+		if (this.autoLoadChar != null) {
+			openTreeBrowser();
+		}
 	}
 
 	function recoverFatique(amt:Int):Void {
@@ -129,6 +136,8 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 			
 			MoneyField.NAME => new MoneyField(),
 			
+			ModifierList.NAME => new ModifierList(),
+			
 			"inventory" => new InventoryVue(),
 			"inventory-manager" => new InventoryManager(),
 			"tree-browser" => new GingkoTreeBrowser()
@@ -154,9 +163,12 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		if ( loadCharContents(contents) ) {
 			_vRefs.treeBrowser.close();
 		}
+		this.autoLoadChar = null;
 		
 	}
-	
+	function openModifiersWindow():Void {
+		_vRefs.modifiersWindow.open();
+	}
 	
 		
 	@:computed function get_availableTypes():Dynamic<Bool> {
@@ -496,9 +508,13 @@ class CharSheetVueData {
 	var arcAwardQty:Int = 0;
 	var arcSpendQty:Int = 0;
 	
+	var autoLoadChar:String;
+	
 	public function new(char:CharSheet = null) {
 		this.char = char == null ? new CharSheet() : char;
 		// getSampleChar()
+		
+		this.autoLoadChar = Globals.AUTO_LOAD;
 		
 		initNewChar();
 	}

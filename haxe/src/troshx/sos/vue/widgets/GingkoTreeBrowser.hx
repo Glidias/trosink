@@ -3,6 +3,7 @@ import haxe.Http;
 import haxe.Json;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import haxevx.vuex.native.Vue;
 import js.Browser;
 import js.html.ButtonElement;
 import js.html.InputElement;
@@ -37,8 +38,6 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 	}
 	
 	override function Mounted():Void {
-		
-		
 		loadDomain(defaultDomain);
 	}
 	
@@ -78,10 +77,31 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 		
 		loadedDomain = requestedDomain;
 		for (i in 0...gingkoData.length) {
+			setupNode(gingkoData[i]);
 			cleanNode(gingkoData[i]);
 		}
 		this.model = gingkoData;
 		_vEmit(EVENT_LOADED_DOMAIN, loadedDomain);
+		
+		
+		if (this.autoLoadNode != null) {
+			//trace("DETECTED AUTOload node");
+			Vue.nextTick( attemptLoadAutoNode);
+		}
+		else if (this.autoLoad != null) {
+			Browser.alert("Failed to find serializable node to load for ?autoload=" + this.autoLoad);
+		}
+	}
+	
+	function attemptLoadAutoNode():Void {
+		if (this.autoLoadNode != null) {
+			_vEmit(EVENT_OPEN, this.autoLoadNode.content,  "(loaded from url)",  disableOpenButton );
+			trace("Dispatching open:" + this.autoLoadNode.content);
+		}
+		else {
+			trace("Missing autoload node for some reason...");
+		}
+		this.autoLoadNode = null;
 	}
 	
 	function nodeGotContent(node:GingkoNode):Bool {
@@ -95,8 +115,22 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 			node.children = cleanNodes(node.children);
 		}
 		for (i in 0... node.children.length) {
-			node.children[i].key = "_"+(valueKeyCounter++);
+			setupNode(node.children[i]);
 			cleanNode(node.children[i]);
+		}
+	}
+	
+	function setupNode(node:GingkoNode):Void {
+		node.key =  "_" + (valueKeyCounter++);
+		if (autoLoad != null) {
+			if ( (node.children!=null && node.children.length > 0 && (node.children[0].content.substr(0,7) == "http://" || node.children[0].content.substr(0,8) == "https://" )  ) && isSerializable(node)  ) {
+				
+				var urlParams:Dynamic = LibUtil.getURLQueryStringParams(node.children[0].content);
+				if (urlParams.autoload == this.autoLoad) {
+					this.autoLoadNode = node;
+				}
+				
+			}
 		}
 	}
 	
@@ -185,6 +219,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 		var targNodeNamer:GingkoNode = curLandingNode != this.curSelectedNode ? this.curSelectedNode : this.curSelectedParentNode;
 		_vEmit(EVENT_OPEN, curLandingNode.content,  customLabelHandler(targNodeNamer.content), disableOpenButton );
 	}
+	
 	
 	
 	function filterNodeHandler(node:GingkoNode, parentNode:GingkoNode):Bool {
@@ -310,6 +345,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 			isLoading:false,
 			curSelectedParentNode:null,
 			valueKeyCounter:0,
+			autoLoadNode:null,
 			model: [
 				
 			]
@@ -334,6 +370,8 @@ typedef GingkoTreeData = {
 	var isLoading:Bool;
 	var valueKeyCounter:Int;
 	
+	var autoLoadNode:GingkoNode;
+	
 }
 
 
@@ -344,6 +382,8 @@ typedef GingkoDataType = {
 typedef GingkoTreeProps = {
 	@:prop({required:false, 'default':32})  @:optional var maxLabelLength:Int;
 	@:prop({required:false})  @:optional var initialDomain:String;
+	
+	@:prop({required:false}) @:optional var autoLoad:String;
 
 	@:prop({required:false}) @:optional var availableTypes:Dynamic<Bool>;
 	@:prop({required:false, 'default':false})  @:optional var locked:Bool;

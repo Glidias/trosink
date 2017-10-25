@@ -87,6 +87,8 @@ class StaticModifier
 	//public var applyMin:Float = 0;
 	public var next:StaticModifier;
 	
+	public var custom:Bool;
+	
 	function new() 
 	{
 		

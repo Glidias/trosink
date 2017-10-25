@@ -1,7 +1,7 @@
 <div>
 	<br/>
 	<br/>
-	<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" v-if="showBrowser" />
+	<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" v-if="showBrowser" :autoLoad="autoLoad" />
 	<hr/>
 	
 	<comp :inventory="tabs[curInventoryIndex].inventory" :inventoryLabel="tabs[curInventoryIndex].tabName" v-on:loadSheet="loadSheet" :loadAvailable="curInventoryIndex==0 && loadAvailable" v-bind="$attrs" :maxCostCopper="curInventoryIndex == 0 ? maxCostCopper : null" :maxWeight="curInventoryIndex == 0 ? maxWeight : null">

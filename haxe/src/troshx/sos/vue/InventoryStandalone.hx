@@ -62,17 +62,20 @@ class InventoryStandalone extends VComponent<InventoryStandaloneData, NoneT>
 	
 	override function Data():InventoryStandaloneData {
 		return {
-			inventory: new Inventory()
+			inventory: new Inventory(),
+			autoLoad: Globals.AUTO_LOAD
 		}
 	}
 	
 	override function Template():String {
-		return '<comp :inventory="inventory" v-on:loadSheet="loadSheet"></comp>';
+		return '<comp :inventory="inventory" v-on:loadSheet="loadSheet" :autoLoad="autoLoad"></comp>';
 	}
 	
 }
 
 typedef InventoryStandaloneData = {
 	var inventory:Inventory;
+	var autoLoad:String;
 }
+
 

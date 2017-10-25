@@ -22,6 +22,7 @@ import troshx.sos.core.Skill;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.CharSheet.WealthAssetAssign;
 import troshx.sos.vue.inputs.impl.InputNameLabel;
+import troshx.sos.vue.widgets.ModifierList;
 
 
 import troshx.sos.vue.inputs.impl.AttributeInput;
@@ -48,7 +49,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	{
 		super();
 		untyped this.mixins = [
-			CharVueMixin.getSampleInstance()
+			CharVueMixin.getSampleInstance(),
+			new InventoryStandalone(null)
 		];
 	}
 	
@@ -64,6 +66,10 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		untyped CharGenData.dynSetField = Vue.set;
 		untyped CharGenData.dynDeleteField = Vue.delete;
 		untyped CharGenData.dynSetArray = Vue.set;
+	}
+	
+	function setInventory(chk:Inventory):Void {
+		this.char.inventory = chk;
 	}
 	
 	
@@ -482,6 +488,8 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 			SkillSubjectCreator.NAME => new SkillSubjectCreator(),
 			
 			InputNameLabel.NAME => new InputNameLabel(),
+			
+			ModifierList.NAME => new ModifierList(),
 			
 			ArrayOf.NAME => new ArrayOf(),
 			ArrayOfBits.NAME => new ArrayOfBits(),

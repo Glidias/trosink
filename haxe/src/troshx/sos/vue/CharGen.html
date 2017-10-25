@@ -269,7 +269,7 @@
 	</div>
 	
 	<div ref="inventoryHolder">
-		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" :maxWeight="CAR" :includeDroppedCost="true" />	
+		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" v-on:loadSheet="loadSheet" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" :maxWeight="CAR" :includeDroppedCost="true" />	
 	</div>
 		
 	<sweet-modal ref="finaliseWarning">

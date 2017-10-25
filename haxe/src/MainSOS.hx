@@ -36,7 +36,11 @@ class MainSOS
 		if (params.get("characters")!=null) {
 			Globals.DOMAIN_CHARACTER = params.get("characters");
 		}
-		
+		if (params.get("autoload")!=null) {
+			Globals.AUTO_LOAD = params.get("autoload");
+		}
+
+
 		var url = urlSplit[0];
 		var hash:String = urlSplit.pop();
 		hash = hash.split("&")[0];

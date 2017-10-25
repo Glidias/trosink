@@ -157,4 +157,16 @@ class LibUtil
         #end
     }
 	
+	static public function getURLQueryStringParams(url:String):Dynamic {
+		var get : String = url.split("?").pop();
+		var params = {};
+		for( p in ~/[&;]/g.split(get) ) {
+			var pl = p.split("=");
+			if( pl.length < 2 ) continue;
+			var name = pl.shift();
+			LibUtil.setField(params, StringTools.urlDecode(name), StringTools.urlDecode(pl.join("=")));
+		}
+		return params;
+	}
+	
 }

@@ -29,7 +29,7 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 			clipboardContents:"",
 			curInventoryIndex:0,
 			newTabCounter:0,
-			showBrowser:false
+			showBrowser:this.autoLoad!=null
 		}
 	}
 	
@@ -57,15 +57,9 @@ class InventoryManager extends VComponent<InventoryManagerData, InventoryManager
 	}
 	
 	function openFromTreeBrowser(contents:String, filename:String, disableCallback:Void->Void):Void {
-		
-
 		loadNewTab(contents, filename);
-		
 	}
 	
-	
-	
-
 	
 	@:watch function watch_inventory(newValue:Inventory):Void {
 		// sync tabs dropped list if inventory changes
@@ -156,6 +150,7 @@ typedef InventoryManagerProps = {
 	
 	@:prop({required:false}) @:optional var maxCostCopper:Int;
 	@:prop({required:false}) @:optional var maxWeight:Float;
+	@:prop({required:false}) @:optional var autoLoad:String;
 }
 
 typedef InventoryTab = {
