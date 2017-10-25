@@ -221,6 +221,21 @@ class BodyChar
 		}
 		return null;
 	}
+	
+	public function getHitLocationById(id:String):HitLocation
+	{
+		var i:Int = LibUtil.field(hitLocationHash, id);
+		if (i != null) {
+			return hitLocations[i];
+		}
+		return null;
+	}
+	
+	public function gotSideWithId(locationId:String):Bool
+	{
+		var hitLoc:HitLocation =  getHitLocationById(locationId);
+		return hitLoc != null && hitLoc.twoSided;
+	}
 
 	
 }
@@ -261,11 +276,11 @@ class Humanoid implements IBodyHitZones {
 	@:hitLocation public static inline var FACE:Int = 1;
 	@:hitLocation public static inline var LOWER_HEAD:Int = 2;
 	@:hitLocation public static inline var NECK:Int = 3;
-	@:hitLocation public static inline var SHOULDER:Int = 4;
+	@:hitLocation("","",true) public static inline var SHOULDER:Int = 4;
 	@:hitLocation public static inline var CHEST:Int = 5;
 	@:hitLocation("","",true) public static inline var SIDE:Int = 6;
 	@:hitLocation public static inline var BELLY:Int = 7;
-	@:hitLocation public static inline var HIP:Int = 8;
+	@:hitLocation("","",true) public static inline var HIP:Int = 8;
 	@:hitLocation public static inline var GROIN:Int = 9;
 	@:hitLocation("","",true) public static inline var THIGH:Int = 10;
 	@:hitLocation("","",true) public static inline var KNEE:Int = 11;

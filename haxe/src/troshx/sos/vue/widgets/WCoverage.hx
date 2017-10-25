@@ -52,6 +52,10 @@ class WCoverage extends VComponent<NoneT, WCoverageProps>
 		return customBody != null && customBody != BodyChar.getInstance();
 	}
 	
+	@:computed function get_bodyChar():BodyChar {
+		return !this.isCustomBody ? BodyChar.getInstance()  : this.customBody;
+	}
+	
 	@:computed function get_hitLocations():Array<HitLocation> {
 		// etNewHitLocationsFrontSlice()
 		return !this.isCustomBody ? BodyChar.getInstance().hitLocations  : this.customBody.hitLocations;

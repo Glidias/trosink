@@ -6,14 +6,15 @@ import troshx.ds.IUpdateWith;
  * An actual live wound inflicted on a current character
  * @author Glidias
  */
-class Wound implements IUid implements IUpdateWith<Wound>
+class Wound implements IUpdateWith<Wound>  //implements IUid 
 {
 	
 	// these parameters uniquely identify the wound and should never be changed after being set through constructor
 	//public var location(default,null):HitLocation = null;
 	public var locationId:String;
 	public var level(default,null):Int = 0;
-	public var damageType(default,null):Int = 0;
+	public var damageType(default, null):Int = 0;
+	public var leftSide(default, null):Bool = false;
 	
 	// stateful applied damages for wound
 	public var stun:Int = 0;
@@ -38,7 +39,6 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	}
 	
 
-	public var uid(get, never):String;
 	
 	static  var UNIQUE_COUNT:Int = 0;
 	
@@ -65,8 +65,8 @@ class Wound implements IUid implements IUpdateWith<Wound>
 	
 	public function getDescLabel(body:BodyChar, damageTypeLabels:Array<String>):String {
 		var dmgLabel:String =  (damageType >= 0 && damageType < damageTypeLabels.length) ? " " +damageTypeLabels[damageType] : "";
-		
-		return "Level "+this.level + dmgLabel + " wound" + (locationId != "" ? " on the " + body.getHitLocationLabelFromId(locationId) : "" ) ;
+		var hitLoc:HitLocation = body.getHitLocationById(locationId);
+		return "Level "+this.level + dmgLabel + " wound" + (locationId != "" ? " on the " + (hitLoc != null && hitLoc.twoSided ? leftSide ?  "Left " : "Right " : "")  +  body.getHitLocationLabelFromId(locationId) : "" );
 	}
 	
 	public function updateAgainst(ref:Wound):Void {
@@ -97,9 +97,9 @@ class Wound implements IUid implements IUpdateWith<Wound>
 		return (flags & (STAUNCHED | TREATED))  == 0;
 	}
 	
-	inline function get_uid():String 
+	public function getUID(body:BodyChar):String 
 	{
-		return locationId + "_"+ level + "_"+ damageType + uidSuffix;
+		return locationId + "_"+ level + "_"+ damageType +  (body.gotSideWithId(locationId) ? (leftSide ? "l" : "r") : "" ) +  uidSuffix;
 	}
 	
 	

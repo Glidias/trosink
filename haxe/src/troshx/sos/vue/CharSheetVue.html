@@ -22,7 +22,7 @@
 			<select v-model="sampleWound.locationId">
 				<option value="" :key=""></option>
 				<option v-for="(li, i) in char.body.hitLocations" :value="li.get_uid()" :key="li.get_uid()">{{li.name}}</option>
-			</select></div>
+			</select> <span :style="!sampleWoundGotSide ? {'pointer-events':'none','opacity':.17} : undefined"><label>L<input type="radio" :checked="sampleWound.leftSide" v-on:click="sampleWound.leftSide=true"></input></label><label>R<input type="radio" v-on:click="sampleWound.leftSide=false" :checked="!sampleWound.leftSide"></input></label></span></div>
 			<div>Level: <InputInt :obj="sampleWound" prop="level" :min="0" /></div>
 			<div>Damage Type: 
 			<select v-model.number="sampleWound.damageType" number>
@@ -164,7 +164,7 @@
 		<section class="gen-wounds" id="gen-wounds">
 			<h2>Wounds <span class="valuer"><label>&#128274;</label><input type="checkbox" v-model="lockWounds"></input></span> <span class="valuer"><button v-on:click="openAddNewWound()">Add/Apply Wound</button></span></h2>
 			<ul v-if="char.wounds.length > 0" class="wounds">
-				<li v-for="(li, i) in char.wounds" :key="li.get_uid()">{{li.getDescLabel(char.body, damageTypeLabels)}} <span class="stats"><span><label>Stun:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="stun" /></label><i v-show="li.stun<0">infinite!</i></span> <span><label>Pain:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="pain" /></label><i v-show="li.pain<0">infinite!</i></span> <span><label>BL:<InputInt :readonly="lockWounds" :min="0" prop="BL" :obj="li"  /></label></span> <Bitmask :obj="li" prop="flags" :labels="woundFlagLabels" /> <span><label>Notes:<InputString :min="0" prop="notes" :obj="li" class="notes"  /></label></span> <span><label>Age:<InputNumber :min="0" prop="age" :obj="li"  /></label></span> <a href="javascript:;" v-on:click="checkConfirmDeleteWound(li)">[x]</a></span></li>
+				<li v-for="(li, i) in char.wounds" :key="li.getUID(char.body)">{{li.getDescLabel(char.body, damageTypeLabels)}} <span class="stats"><span><label>Stun:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="stun" /></label><i v-show="li.stun<0">infinite!</i></span> <span><label>Pain:<InputInt :readonly="lockWounds" :min="-1" :obj="li" prop="pain" /></label><i v-show="li.pain<0">infinite!</i></span> <span><label>BL:<InputInt :readonly="lockWounds" :min="0" prop="BL" :obj="li"  /></label></span> <Bitmask :obj="li" prop="flags" :labels="woundFlagLabels" /> <span><label>Notes:<InputString :min="0" prop="notes" :obj="li" class="notes"  /></label></span> <span><label>Age:<InputNumber :min="0" prop="age" :obj="li"  /></label></span> <a href="javascript:;" v-on:click="checkConfirmDeleteWound(li)">[x]</a></span></li>
 			</ul>
 			<div>
 				<div>Total Pain: <b>{{totalPain}}</b></div>

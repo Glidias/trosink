@@ -10,6 +10,7 @@ import js.Browser;
 import js.html.HtmlElement;
 import js.html.TextAreaElement;
 import troshx.sos.core.DamageType;
+import troshx.sos.core.HitLocation;
 import troshx.sos.core.Wound;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
@@ -179,6 +180,10 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	@:computed function get_hasSampleWound():Bool {
 		return this.char.hasWound(this.sampleWound);
+	}
+	
+	@:computed function get_sampleWoundGotSide():Bool {
+		return char.body.gotSideWithId( sampleWound.locationId );
 	}
 	
 	function deleteWound(w:Wound):Void {

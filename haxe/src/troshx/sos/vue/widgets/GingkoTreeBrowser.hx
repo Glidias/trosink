@@ -80,6 +80,13 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 			setupNode(gingkoData[i]);
 			cleanNode(gingkoData[i]);
 		}
+		
+		if (this.autoLoad != null) {
+			for (i in 0...gingkoData.length) {
+				checkNodes(gingkoData[i]);
+			}
+		}
+		
 		this.model = gingkoData;
 		_vEmit(EVENT_LOADED_DOMAIN, loadedDomain);
 		
@@ -96,7 +103,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 	function attemptLoadAutoNode():Void {
 		if (this.autoLoadNode != null) {
 			_vEmit(EVENT_OPEN, this.autoLoadNode.content,  "(loaded from url)",  disableOpenButton );
-			trace("Dispatching open:" + this.autoLoadNode.content);
+			//trace("Dispatching open:" + this.autoLoadNode.content);
 		}
 		else {
 			trace("Missing autoload node for some reason...");
@@ -120,18 +127,31 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 		}
 	}
 	
-	function setupNode(node:GingkoNode):Void {
+	function checkNodes(node:GingkoNode):Void {
+		if ( checkNode(node) ) return;
+		if (node.children == null) return;
+		
+		for (i in 0... node.children.length) {	
+			checkNodes(node.children[i]);
+		}
+	}
+	
+	inline function setupNode(node:GingkoNode):Void {
 		node.key =  "_" + (valueKeyCounter++);
-		if (autoLoad != null) {
-			if ( (node.children!=null && node.children.length > 0 && (node.children[0].content.substr(0,7) == "http://" || node.children[0].content.substr(0,8) == "https://" )  ) && isSerializable(node)  ) {
-				
-				var urlParams:Dynamic = LibUtil.getURLQueryStringParams(node.children[0].content);
-				if (urlParams.autoload == this.autoLoad) {
-					this.autoLoadNode = node;
-				}
-				
+	}
+	
+	function checkNode(node:GingkoNode):Bool {
+		//if (autoLoad != null) {
+		if ( (node.children!=null && node.children.length > 0 && (node.children[0].content.substr(0,7) == "http://" || node.children[0].content.substr(0,8) == "https://" )  ) && isSerializable(node)  ) {
+			
+			var urlParams:Dynamic = LibUtil.getURLQueryStringParams(node.children[0].content);
+			if (urlParams.autoload == this.autoLoad) {
+				this.autoLoadNode = node;
+				return true;
 			}
 		}
+		//}
+		return false;
 	}
 	
 

@@ -443,7 +443,7 @@ class CharSheet implements IBuildListed
 	}
 	
 	public function applyWound(w:Wound):Void {
-		var uid:String = w.uid;
+		var uid:String = w.getUID(body);
 		if (!Reflect.hasField(woundHash, uid)) {
 			dynSetField(woundHash, uid, w);
 			wounds.push(w); 
@@ -459,21 +459,21 @@ class CharSheet implements IBuildListed
 	}
 	
 	public function hasWound(w:Wound):Bool {
-		var uid:String = w.uid;
+		var uid:String = w.getUID(body);
 		return Reflect.hasField(woundHash, uid);
 	}
 	
 	public inline function getWound(w:Wound):Wound {
-		return LibUtil.field(woundHash, w.uid);
+		return LibUtil.field(woundHash, w.getUID(body));
 	}
 	
 	public function removeWound(w:Wound):Void {
-		var uid:String = w.uid;
+		var uid:String = w.getUID(body);
 		if (Reflect.hasField(woundHash, uid)) {
 			dynDelField(woundHash, uid);
 		}
 		else { 
-			trace("Warning: No wound found to be removed for uid:" + w.uid);
+			trace("Warning: No wound found to be removed for uid:" + w.getUID(body));
 		}
 		
 		var index:Int = wounds.indexOf(w);
