@@ -230,6 +230,33 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		
 		return str != "" ? str : null;
 	}
+	public static inline var CROSS_SWORDS:String = "⚔";
+	public static inline var BULLS_EYE:String = "◎";
+	
+	@:computed function get_heldProfeciencyIcons():String {
+		var m = this.masterWeapon;
+		var o = this.offhandWeapon;
+		var str:String = "";
+		var cm = this.char.profsMelee;
+		var cr = this.char.profsRanged;
+		var amb:Bool = this.ambidextrous;
+		
+		if ( (amb ? m == null && o == null : m==null) ) {
+			return CROSS_SWORDS;
+		}
+		
+		if (m != null) {
+			var ranged:Bool = m.ranged;
+			str += (m.profs & (ranged ? cr : cm))!=0 ? (ranged ? BULLS_EYE : CROSS_SWORDS) : "";
+		}
+		
+		if (amb && o!=null) {		
+			var ranged:Bool = o.ranged;
+			str += (o.profs & (ranged ? cr : cm))!=0 ? "/"+ (ranged ? BULLS_EYE : CROSS_SWORDS) : "/";
+		}
+		
+		return str;
+	}
 	
 	@:computed function get_ambidextrousId():String {
 		return new Ambidextrous().uid;
