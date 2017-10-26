@@ -4,6 +4,7 @@ import haxe.web.Request;
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
 import troshx.sos.vue.CharSheetVue;
+import troshx.util.LibUtil;
 
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.CharGen;
@@ -39,8 +40,11 @@ class MainSOS
 		if (params.get("autoload")!=null) {
 			Globals.AUTO_LOAD = params.get("autoload");
 		}
-
-
+		if (params.get("host")!=null || (untyped Browser.window["USE_HOST"]) ) {
+			Globals.CURL_DOMAIN = Browser.window.location.protocol + "//" + Browser.window.location.hostname;
+			//Browser.alert(Globals.CURL_DOMAIN);
+		}
+		
 		var url = urlSplit[0];
 		var hash:String = urlSplit.pop();
 		hash = hash.split("&")[0];
