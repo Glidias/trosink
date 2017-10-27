@@ -2,8 +2,10 @@ package;
 
 import haxe.web.Request;
 import haxevx.vuex.core.VxBoot;
+import haxevx.vuex.native.Vue;
 import js.Browser;
 import troshx.sos.vue.CharSheetVue;
+import troshx.sos.vue.externs.SweetModal;
 import troshx.util.LibUtil;
 
 import troshx.sos.sheets.CharSheet;
@@ -29,6 +31,9 @@ class MainSOS
 	}
 	
 	function new() {
+		
+		Vue.use(SweetModal);
+		
 		var urlSplit = Browser.window.location.href.split("#")[0].split("?");
 		var params = Request.getParams();
 		if (params.get("inventories")!=null) {

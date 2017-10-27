@@ -162,6 +162,7 @@ _$List_ListIterator.prototype = {
 };
 var MainSOS = function() {
 	this.boot = new haxevx_vuex_core_VxBoot();
+	Vue["use"](SweetModal);
 	var urlSplit = window.location.href.split("#")[0].split("?");
 	var params = haxe_web_Request.getParams();
 	if((__map_reserved["inventories"] != null ? params.getReserved("inventories") : params.h["inventories"]) != null) {
