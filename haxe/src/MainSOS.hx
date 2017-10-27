@@ -40,8 +40,12 @@ class MainSOS
 		if (params.get("autoload")!=null) {
 			Globals.AUTO_LOAD = params.get("autoload");
 		}
-		if (params.get("host")!=null || (untyped Browser.window["USE_HOST"]) ) {
-			Globals.CURL_DOMAIN = Browser.window.location.protocol + "//" + Browser.window.location.hostname;
+		if (params.get("host") != null || (untyped Browser.window["USE_HOST"]) ) {
+			var h;
+			if ( (h=params.get("host"))!=null && (h.substr(0, 7) == "http://" || h.substr(0, 8) == "https://" )) {
+				Globals.CURL_DOMAIN = h;
+			}
+			else Globals.CURL_DOMAIN = Browser.window.location.protocol + "//" + Browser.window.location.hostname;
 			//Browser.alert(Globals.CURL_DOMAIN);
 		}
 		

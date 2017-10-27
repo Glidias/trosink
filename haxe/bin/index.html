@@ -5,12 +5,24 @@
 	<title>TrosHAXE</title>
 	<meta name="description" content="" />
 	<script src="js/vue.js"></script>
-	<script src="js/vue-sweet-modal.js"></script>
 	<script src="js/marked.min.js"></script>
+	<script src="js/require.min.js"></script>	
+	<script>
+		requirejs.config({
+			paths: {
+				'SweetModal': 'js/sweet-modal-vue'
+			}
+		});
+
+		requirejs(['SweetModal'], function(SweetModal) {
+			var script = document.createElement('script');
+			Vue.use(SweetModal);
+			script.src = "TrosHAXE.js";
+		});
+	</script>
 	<link rel="stylesheet" type="text/css" href="scss/main.min.css"/>
 </head>
 <body>
 	<div id="app"></div>
-	<script src="TrosHAXE.js"></script>
 </body>
 </html>
