@@ -12,7 +12,7 @@
 	</sweet-modal>
 	
 	<sweet-modal ref="modifiersWindow" >
-		<sweet-modal-tab></sweet-modal-tab>
+		<sweet-modal-tab title="test" id="test"></sweet-modal-tab>
 	</sweet-modal>
 	
 	<sweet-modal ref="addWoundWindow" >
@@ -154,7 +154,7 @@
 				<hr/>
 				<div><b>Health Lost:</b><InputInt :min="0" :obj="char" prop="healthLoss" /></div>
 			</div>
-			<div class="gen-col" v-show="false">
+			<div class="gen-col">
 				<button v-on:click="openModifiersWindow">&#128200;</button>
 			</div>
 		</section>

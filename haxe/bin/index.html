@@ -10,14 +10,16 @@
 	<script>
 		requirejs.config({
 			paths: {
-				'SweetModal': 'js/sweet-modal-vue'
+				'sweet-modal': 'js/sweet-modal'
 			}
 		});
-
-		requirejs(['SweetModal'], function(SweetModal) {
+		requirejs(["sweet-modal"], function(m) {
+			Vue.component("SweetModal", m.SweetModal);
+			Vue.component("SweetModalTab", m.SweetModalTab);
+		
 			var script = document.createElement('script');
-			Vue.use(SweetModal);
 			script.src = "TrosHAXE.js";
+			document.body.append(script);
 		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="scss/main.min.css"/>
