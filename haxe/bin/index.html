@@ -6,25 +6,21 @@
 	<meta name="description" content="" />
 	<script src="js/vue.js"></script>
 	<script src="js/marked.min.js"></script>
-	<script src="js/require.min.js"></script>	
-	<script>
-		requirejs.config({
-			paths: {
-				'sweet-modal': 'js/sweet-modal'
-			}
-		});
-		requirejs(["sweet-modal"], function(m) {
-			Vue.component("SweetModal", m.SweetModal);
-			Vue.component("SweetModalTab", m.SweetModalTab);
-		
-			var script = document.createElement('script');
-			script.src = "TrosHAXE.js";
-			document.body.append(script);
-		});
-	</script>
+	<script src="js/sweet-modal.min.js"></script>	
+	
 	<link rel="stylesheet" type="text/css" href="scss/main.min.css"/>
 </head>
 <body>
 	<div id="app"></div>
+	<script>	
+		(function(m) {
+			Vue.component("SweetModal", m.SweetModal);
+			Vue.component("SweetModalTab", m.SweetModalTab);
+	
+			var script = document.createElement('script');
+			script.src = "TrosHAXE.js";
+			document.body.append(script);
+		})(SweetModalVue);
+	</script>
 </body>
 </html>
