@@ -67,6 +67,9 @@ select {
   line-height:26px !important;
 }
 
+ul.array-of > li > input[type='radio'] + div {
+	display:inline-block;
+}
 
 .sweet-modal-overlay.reset-tabs  ul.sweet-modal-tabs {
  display:block;

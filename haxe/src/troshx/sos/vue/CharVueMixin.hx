@@ -199,7 +199,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 			for (m in 0...mt.length) {
 				var modifier = mt[m];
 				if (modifier.custom) {
-					arr.push(prefix + modifier.name + "x"+modifier.multiply + "+" +modifier.add );
+					arr.push(prefix + modifier.name + ": x"+modifier.multiply + "+" +modifier.add );
 				}
 			}
 		}

@@ -8,7 +8,7 @@ import troshx.util.LibUtil;
  * ...
  * @author Glidias
  */
-class ArrayOf extends VComponent<NoneT, ArrayOfProps>
+class ArrayOf extends VComponent<ArrayOfData, ArrayOfProps>
 {
 
 	public static inline var NAME:String = "ArrayOf";
@@ -20,6 +20,11 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 		untyped this["inheritAttrs"] = false;
 	}
 	
+	override function Data():ArrayOfData {
+		return {
+			selectedIndex:-1,
+		};
+	}
 	
 	function getKey(obj:Dynamic, i:Int):Dynamic {
 		var castToIder = LibUtil.as(obj, IUid);
@@ -35,14 +40,19 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	
 	override public function Template():String {
 		return '<div>
-		<label v-if="label!=null">{{label}}:&nbsp;| {{maxLength}}</label><label v-if="label==null && maxLength!=null">| {{maxLength}} </label><button v-show="!readonly" :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button  v-show="!readonly" :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button>
-		<ul class="array-of">
-			<li v-for="(li, i) in current" :class="{disabled:!(maxLength == null || i < maxLength)}">
-				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :readonly="readonly" :obj="current" :prop="i" :key="getKey(li, i)" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
+		<label v-if="label!=null">{{label}}:&nbsp;| {{maxLength}}</label><label v-if="label==null && maxLength!=null">| {{maxLength}} </label><button v-show="!readonly" :disabled="!(maxLength == null || current.length + 1 <= maxLength)" v-on:click="pushEntry()">+</button> &nbsp;<button  v-show="!readonly" :disabled="!(current.length > (minLength != null ? minLength : 0))" v-on:click="popEntry()">-</button> &nbsp;<button v-on:click="clearSelect" v-show="selectedIndex>=0">No-Select</button>
+		<ul class="array-of" style="list-style-type:none">
+			<li v-for="(li, i) in current" :class="{disabled:!(maxLength == null || i < maxLength)}" :key="getKey(li, i)">
+				<input type="radio" v-on:click="selectedIndex=i" :checked="selectedIndex==i"></input>
+				<span :is="typeMap[of]" v-bind="$$attrs" :index="i" :readonly="readonly" :obj="current" :prop="i" :class="{disabled:!(maxLength == null || i < maxLength)}" :disabled="!(maxLength == null || i < maxLength)"></span>
 			</li>
 		</ul>
 		
 		</div>';
+	}
+	
+	function clearSelect():Void {
+		this.selectedIndex = -1;
 	}
 
 	function pushEntry():Void {
@@ -69,7 +79,8 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 			}
 		}
 		
-		arr.push(valueToUse);
+		if (this.selectedIndex < -1) arr.push(valueToUse);
+		else arr.insert(this.selectedIndex, valueToUse);
 	}
 	
 	@:watch function watch_maxLength(newValue:Int, oldValue:Int):Void {
@@ -81,7 +92,8 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	}
 	
 	function popEntry():Void {
-		current.pop();
+		if (this.selectedIndex < 0) current.pop();
+		else current.splice(this.selectedIndex, 1);
 	}
 	
 	@:computed inline function get_current():Array<Dynamic> {
@@ -91,6 +103,16 @@ class ArrayOf extends VComponent<NoneT, ArrayOfProps>
 	@:computed function get_typeMap():Dynamic<String> {
 		return UI.getTypeMapToComponentNames();
 	}
+	
+	@:computed function get_arrayLength():Int {
+		return this.current.length;
+	}
+	@:watch function watch_arrayLength(newVal:Int, oldVal:Int):Void {
+		if (newVal <= this.selectedIndex) {
+			this.selectedIndex = newVal - 1;
+		}
+	}
+	
 	
 }
 
@@ -105,4 +127,8 @@ typedef ArrayOfProps = {
 	@:prop({required:false, 'default':false}) @:optional var autoExpand:Bool;
 	@:prop({required:false, 'default':false}) @:optional var readonly:Bool;
 	
+}
+
+typedef ArrayOfData = {
+	var selectedIndex:Int;
 }
