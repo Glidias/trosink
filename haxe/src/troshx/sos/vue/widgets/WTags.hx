@@ -10,6 +10,7 @@ import troshx.sos.core.ArmorCustomise;
 import troshx.sos.core.BodyChar;
 import troshx.sos.core.Armor;
 import troshx.sos.core.ArmorSpecial;
+import troshx.sos.core.BurdinadinArmory.BurdinadinArmor;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
 import troshx.sos.core.Item;
@@ -20,6 +21,7 @@ import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.core.WeaponCustomise;
 import troshx.sos.vue.input.MixinInput;
+import troshx.sos.vue.uifields.UIMixin;
 import troshx.sos.vue.widgets.BaseItemWidget.BaseItemWidgetProps;
 import troshx.util.LibUtil;
 
@@ -34,7 +36,7 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	public function new() 
 	{
 		super();
-		untyped this.mixins = [ MixinInput.getInstance() ];
+		untyped this.mixins = [ MixinInput.getInstance(), UIMixin.getInstance() ];
 	}
 	
 	override function Data():WTagsData {
@@ -42,12 +44,15 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 			meleeSpecialCache:null,
 			missileSpecialCache:null,
 			armorSpecialCache:null,
+			armorBurdinadinCache:null,
 			armorSpecialHitModifierCache:null,
 			customise: null,
 			customMeleeCache:null,
 			customiseArmor:null,
 			restoreOriginal:false,
 			armorWornWith:null,
+			
+			armorCustomiseNotesCache:null,
 
 			
 			//layerCoverageBits:0
@@ -557,8 +562,37 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 		}
 	}
 	
+	function onArmorCustomiseNotesCheck(cb:InputElement) {
+		
+		var armor = this.armor;
+		if ( cb.checked ) {
+			if (!Reflect.hasField(armor.customise, "notes")) {
+				Vue.set( armor.customise, "notes", []);
+			}
+			else { 
+				armor.customise.notes = armor.customise.notes != null ? armor.customise.notes : armorCustomiseNotesCache != null ? armorCustomiseNotesCache  : [];
+			}
+		
+		}
+		else {
+			armorCustomiseNotesCache = armor.customise.notes;
+			armor.customise.notes = null;
+		}
+	}
 	
 	
+	function onArmorBurdinadinCheck(cb:InputElement) {
+		var armor = this.armor;
+		if ( cb.checked ) {
+			
+			armor.burdinadin = armor.burdinadin != null ? armor.burdinadin : armorBurdinadinCache != null ? armorBurdinadinCache  : new BurdinadinArmor();
+		
+		}
+		else {
+			armorBurdinadinCache = armor.burdinadin;
+			armor.burdinadin = null;
+		}
+	}
 	
 	function onArmorSpecialCheck(cb:InputElement) {
 		var armor = this.armor;
@@ -652,17 +686,17 @@ typedef WTagsData = {
 	var missileSpecialCache:MissileSpecial;
 	
 	var armorSpecialCache:ArmorSpecial;
+	var armorBurdinadinCache:BurdinadinArmor;
 	var armorWornWith:WornWith;
 	var armorSpecialHitModifierCache:HitModifier;
+	
+	var armorCustomiseNotesCache:Array<String>;
 	
 	var customise:WeaponCustomise;
 	var customiseArmor:ArmorCustomise;
 	
 	var customMeleeCache:CustomMelee;
 
-	
-	
-	
 	var restoreOriginal:Bool;
 	
 	

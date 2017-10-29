@@ -763,12 +763,13 @@ class Inventory
 		if (version == null || version < 2) version = 2
 		else return false;
 		
-		
+		/*
 		for (i in 0...weapons.length) {
 			if ( weapons[i].weapon.burdinadin == null) {
 				weapons[i].weapon.burdinadin = null;
 			}
 		}
+		*/
 		for (i in 0...wornArmor.length) {
 			if ( wornArmor[i].armor.burdinadin == null) {
 				wornArmor[i].armor.burdinadin = null;
@@ -784,9 +785,9 @@ class Inventory
 			if (armor != null) {
 				if (armor.burdinadin == null) armor.burdinadin = null;
 			}
-			if (weap != null) {
-				if (weap.burdinadin == null) weap.burdinadin = null;
-			}
+			//if (weap != null) {
+				//if (weap.burdinadin == null) weap.burdinadin = null;
+			//}
 		}
 		
 		for (i in 0...packed.list.length) {
@@ -796,9 +797,9 @@ class Inventory
 			if (armor != null) {
 				if (armor.burdinadin == null) armor.burdinadin = null;
 			}
-			if (weap != null) {
-				if (weap.burdinadin == null) weap.burdinadin = null;
-			}
+			//if (weap != null) {
+				//if (weap.burdinadin == null) weap.burdinadin = null;
+			//}
 			
 		}
 		
