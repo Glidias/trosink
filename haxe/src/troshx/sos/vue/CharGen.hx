@@ -346,7 +346,23 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	function executeCopyContents():Void {
 		var textarea:TextAreaElement = _vRefs.savedTextArea;
 		
-		textarea.select();
+		if ( new EReg("/ipad|ipod|iphone", "i").match(Browser.navigator.userAgent) ) {
+			var el = textarea;
+			var editable = el.contentEditable;
+			var readOnly = el.readOnly;
+			el.contentEditable = "true";
+			el.readOnly = false;
+			var range = Browser.document.createRange();
+			range.selectNodeContents(el);
+			var sel = Browser.window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+			el.setSelectionRange(0, 9999999);
+			el.contentEditable = editable;
+			el.readOnly = readOnly;
+		}
+		else textarea.select();
+		
 		var result:Bool = Browser.document.execCommand("copy");
 		if (result != null) {
 			//Browser.alert("Copied to clipboard.");

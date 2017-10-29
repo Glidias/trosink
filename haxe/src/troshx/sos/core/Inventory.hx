@@ -46,7 +46,7 @@ class Inventory
 	
 	public static function getUnheldLabelsArray():Array<String> {
 		var arr:Array<String> = [];
-		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", false, ":unheld");
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", true, ":unheld");
 		return arr;
 	}
 	

@@ -11,8 +11,19 @@
 		<button v-on:click="confirmDeleteWound">Confirm</button>
 	</sweet-modal>
 	
-	<sweet-modal ref="modifiersWindow" >
-		<sweet-modal-tab title="test" id="test"></sweet-modal-tab>
+	<sweet-modal ref="modifiersWindow" class="reset reset-tabs">
+		<sweet-modal-tab :title="getModifierTabTitle(li)" :key="li" :id="li" v-for="(li, i) in modifierVars" v-on:click.native="setModifierTabIndex(li)">
+			<ul>
+				<li v-for="(m, mi) in char.staticModifierTable[dynModifiers[li]]" :key="mi">{{ m.name }}: x{{m.multiply}}+{{m.add}}<span v-show="false"> [<a href="javascript:;" v-on:click="deleteStaticModifierAt(mi,i)">x</a>]</span><span v-show="m.custom">&nbsp;<a href="javascript:;" v-on:click="deleteStaticModifierAt(mi, i)">[x]</a></span></li>
+				<li v-for="(m, mi) in char.situationalModifierTable[dynModifiers[li]]" :key="'s'+mi">{{ m.name }}()}}<span v-show="true">&nbsp;[<a href="javascript:;" v-on:click="deleteSituationalCharModifierAt(mi, i)">x</a>]</span></li>
+			</ul>
+			<div v-if="customModifier!=null">
+				<h4>Add Custom Modifier</h4>
+				<div><label>Name: <InputString :obj="customModifier" prop="name"></InputString></label></div>
+				<div><label>x</label><InputNumber :obj="customModifier" prop="multiply" :step="0.5" :min="0" /> <label>+<InputInt :obj="customModifier" prop="add" /></label></div>
+				<div><button v-on:click="addCustomModifier" :disabled="customModifier.name==''">Add</button></div>
+			</div>
+		</sweet-modal-tab>
 	</sweet-modal>
 	
 	<sweet-modal ref="addWoundWindow" >
@@ -49,7 +60,7 @@
 		</div>
 	</sweet-modal>
 	
-	<div class="chargen__body" v-if="char!=null && !insideInventory">
+	<div class="chargen__body" v-if="char!=null && !insideInventory && !charIsSerializing">
 		
 		<sweet-modal ref="awardArcWindow" v-if="false">
 			<div>
@@ -90,7 +101,7 @@
 				<div><label>Gender:</label><select number v-model.number="char.gender"><option :value="0">Male</option><option :value="1">Female</option></select></div>
 				<div><label>Left-handed?:<input type="checkbox" v-model="char.leftHanded"></input></label></div>
 				<br/>
-				Known as: <b>{{addressedAs}}</b>
+				Known as: <b>{{addressedAs}}</b> &nbsp;&nbsp;&nbsp;&nbsp;<button class="inherit" v-on:click="setWindowTitleWithCharUID" v-show="addressedAs!='' && addressedAs!=theWindowTitle">Set as Window Title</button>
 				<div>Race: <b>{{raceName}}</b></div>
 				<div>Social Class/Wealth: <b>{{char.socialClass.name}} / {{char.socialClass.wealth}}</b> <label>&#128274;</label><input type="checkbox" v-model="lockWealth"></input></div>
 				<div><Money :obj="char" prop="money" :readonly="lockWealth"></Money></div>
@@ -134,7 +145,7 @@
 				<div>Master-hand: <span v-if="masterHandItem!=null"><b>{{masterHandItem.name}}</b> <span v-show="masterWeapon!=null"><span v-html="masterWeapon.ranged ? '&#9678;' : '&#9876;'"></span></span><span v-if="carriedShield!=null && carriedShield==masterHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
 				<div>Off-hand: <span v-if="offHandItem!=null"><b>{{offHandItem.name}}</b> <span v-show="offhandWeapon!=null"><span v-html="offhandWeapon.ranged ? '&#9678;' : '&#9876;'"></span></span><span v-if="carriedShield!=null && carriedShield==offHandItem"><span class="shield-icon-inv">☗</span><select v-model.number="char.inventory.shieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select></span></span></div>
 				<div>Reach: <span class="modified-attribute" :class="[reachBase==reach ?'base' : reach<reachBase ? 'lower' : 'higher']"><b>{{reach}}</b></span><i v-show="reachBase!=reach" class="baseshow">({{reachBase}})</i></div>
-				<div>Perception Penalty: <b>{{ perceptionPenalty }}</b></div>
+				<div>Perception Penalty: <b>{{ perceptionPenalty }}</b><span v-show="perceptionPenalty > 0"> (<b>{{perceptionPenalized }}</b> left.)</span></div>
 				<div v-if="heldProfeciencies!=null">{{heldProfeciencyIcons}}: <b style="max-width:120px">{{heldProfeciencies}}</b></div>
 				<div v-else>Defaulting&#9876;from:<br/><b style="max-width:120px">{{defaultProfs}}</b></div>
 			</div>
@@ -156,6 +167,9 @@
 			</div>
 			<div class="gen-col">
 				<button v-on:click="openModifiersWindow">&#128200;</button>
+				<ul v-if="customModifierListings.length > 0">
+					<li v-for="(li, i) in customModifierListings">{{li}}</li>
+				</ul>
 			</div>
 		</section>
 

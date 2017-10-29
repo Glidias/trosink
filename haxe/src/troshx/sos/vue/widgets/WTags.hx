@@ -295,7 +295,6 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	}
 	
 	@:computed function get_meleeVarNames():Array<String> {
-	
 		return MeleeSpecial.getIntVarNames();
 		
 	}

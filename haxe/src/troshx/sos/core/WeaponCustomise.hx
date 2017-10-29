@@ -20,7 +20,7 @@ class WeaponCustomise implements IUid
 	
 	public function  addMeleeTagsToStrArr(arr:Array<String>):Void {
 		var flags:Int = meleeFlags;
-		Item.pushFlagLabelsToArr(true, "troshx.sos.core.WeaponCustomise:CustomMelee", false, ":flag", "*");
+		Item.pushFlagLabelsToArr(true, "troshx.sos.core.WeaponCustomise:CustomMelee", true, ":flag", "*");
 		if (melee != null) {
 			var instance = melee;
 			Item.pushVarLabelsToArr(true, "troshx.sos.core.WeaponCustomise:CustomMelee", ":flag", "*");

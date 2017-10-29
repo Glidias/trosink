@@ -649,7 +649,7 @@
 							<td></td>
 							<td></td>
 							<td>AVC</td>
-							<td>AVP<span v-show="calcArmorNonFirearmMissile"> ↢</span></td>
+							<td>AVP<span v-show="calcArmorMissile"> ↢</span></td>
 							<td>AVB</td>
 							<td v-if="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
 						</tr>
@@ -670,10 +670,12 @@
 				<div><i class="consider">Consider against:</i></div>
 				<br/>
 				<div><label><input type="checkbox" v-model="calcArmorCrushing"></input>Crushing attack</label></div>
-				<div><label><input type="checkbox" v-model="calcArmorNonFirearmMissile"></input>Non-Firearm Missile attack ↢</label></div>
-				<div><label :class="{disabled:calcArmorNonFirearmMissile}" :style="{'pointer-events':calcArmorNonFirearmMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
+				<div><label><input type="checkbox" v-model="calcArmorMissile"></input>Missile attack ↢</label> <label :class="{disabled:!calcArmorMissile}" :style="{'pointer-events':!calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorFirearm"></input><i>Firearm?</i></label> Hit at:<select number v-model.number="selectedMissileTargetZoneIndex"><option :value="-1"></option><option :value="i" v-for="(li, i) in missileHitTargetZones" :key="i">{{i+2}}:{{li.tz.name}}</option></select> <a v-on:click="selectedMissileTargetZoneIndex=-1" href="javascript:;" v-show="selectedMissileTargetZoneIndex>=0">[x]</a></div>
+				<div><label :class="{disabled:calcArmorMissile}" :style="{'pointer-events':calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
 					<option :value="i" v-for="(li, i) in body.targetZones">{{ body.getDescLabelTargetZone(i) }}</option>
 				</select></div>
+				<div style="margin-top:5px" v-show="calcArmorMeleeTargeting && shouldCalcMeleeAiming">{{ calcMeleeTZProbabilities }}</div>
+				<div style="margin-top:5px" v-show="calcArmorMissile && selectedMissileTargetZoneIndex>=0">{{ calcRangedTZProbabilities }}</div>
 				<br/>
 				<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>
 				<i class="cta" v-show="calcAVColumn==0">&lt;- Focus-click on table cells to inspect result.</i>
