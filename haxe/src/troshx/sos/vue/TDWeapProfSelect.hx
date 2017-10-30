@@ -9,10 +9,12 @@ import js.html.SelectElement;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
 import troshx.sos.core.Inventory.ReadyAssign;
+import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.Weapon;
 import troshx.sos.vue.InventoryVue.WidgetItemRequest;
+import troshx.sos.vue.widgets.MeleeVariantMixin;
 import troshx.sos.vue.widgets.WProf;
 
 /**
@@ -26,7 +28,7 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	public function new() 
 	{
 		super();
-
+		untyped this["mixins"] = [MeleeVariantMixin.getInstance()];
 	}
 	
 		
@@ -60,8 +62,16 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 		
 	}
 	
+	@:computed function get_gotVariant():Bool {
+		return MeleeVariantMixin.inlineGotVariant(this.weaponAssign);
+	}
+	
+	@:computed function get_weaponVar():Weapon {
+		return this.gotVariant ? this.weaponAssign.weapon.variant : this.weapon;
+	}
+	
 	@:computed function get_gotCustomMultiCheck():Bool {
-		var weap:Weapon = this.weapon;
+		var weap:Weapon = this.weaponVar;
 		var a =  weap.isMultipleCoreProf();
 		var b = weap.hasCustomProf();
 		var c = weap.isAmmunition();
@@ -80,7 +90,7 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 	}
 	
 	@:computed function get_isSelectingMultiple():Bool {
-		return   isVisibleWidget(section, 'profs', index);
+		return isVisibleWidget(section, 'profs', index);
 	}
 	
 	@:computed function get_gotCustom():Bool {
@@ -116,6 +126,8 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 			weapon.profs = val;
 			
 			if (weapon.ranged) {
+				this.entry.holding1H = false;
+				weapon.variant = null;
 				if ( ( weapon.profs & Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW)) !=0 ) {
 					if (weapon.crossbow == null) weapon.crossbow = new Crossbow();
 				}
@@ -151,22 +163,23 @@ class TDWeapProfSelect extends VComponent<NoneT, TDWeapProfSelectProps>
 }
 
 typedef TDWeapProfSelectProps = {
-	var curWidgetRequest:WidgetItemRequest;
-	var weapon:Weapon;
-	var entry:ReadyAssign;
+	>MeleeVariantProps,
+	@:prop({required:true}) var curWidgetRequest:WidgetItemRequest;
+	@:prop({required:true}) var weapon:Weapon;
+	@:prop({required:true}) var entry:WeaponAssign;
 	
-	var section:String;
-	var index:Int;
-	var isVisibleWidget:String->String->Int->Bool;
+	@:prop({required:true}) var section:String;
+	@:prop({required:true}) var index:Int;
+	@:prop({required:true}) var isVisibleWidget:String->String->Int->Bool;
 	
-	var meleeProfs:Array<Profeciency>;
-	var rangedProfs:Array<Profeciency>;
+	@:prop({required:true}) var meleeProfs:Array<Profeciency>;
+	@:prop({required:true}) var rangedProfs:Array<Profeciency>;
 	
 	@:prop({required:false, "default":0}) 
 	@:optional var profMask:Int;
 	
-	@:prop({required:false}) 
-	@:optional var customProfs:Array<Profeciency>;
+
+	@:prop({required:false})  @:optional var customProfs:Array<Profeciency>;
 	
 
 }

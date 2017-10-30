@@ -20,8 +20,14 @@ class SelectHeld extends VComponent<NoneT, SelectHeldProps>
 	public function new() 
 	{
 		super();
-	
+		untyped this.mixins = [  MeleeVariantMixin.getInstance() ];
 	}
+	@:computed function get_gotVariant():Bool {
+		
+		return MeleeVariantMixin.inlineGotVariant(this.weaponAssign);
+	}
+	
+	
 	
 	@:computed function get_item():Item {
 		if (entry.weapon != null) return entry.weapon;
@@ -31,7 +37,9 @@ class SelectHeld extends VComponent<NoneT, SelectHeldProps>
 		else return entry.item;
 	}
 	@:computed function get_twoHanded():Bool {
-		return this.item.twoHanded;
+		var stdH = this.item.twoHanded;
+		var b = gotVariant ? this.weaponAssign.holding1H && this.weaponAssign.weapon.variant != null : false;
+		return b ? false : stdH;
 	}
 	
 	function holdItemHandler(itemEntry:ReadyAssign, held:Int):Void {
@@ -54,4 +62,5 @@ class SelectHeld extends VComponent<NoneT, SelectHeldProps>
 typedef SelectHeldProps = {
 	var entry:Dynamic;
 	var inventory:Inventory;
+	@:prop({required:false}) @:optional var weaponAssign:WeaponAssign;
 }

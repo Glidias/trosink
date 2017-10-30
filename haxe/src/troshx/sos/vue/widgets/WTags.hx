@@ -13,6 +13,7 @@ import troshx.sos.core.ArmorSpecial;
 import troshx.sos.core.BurdinadinArmory.BurdinadinArmor;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
+import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.MeleeSpecial;
 import troshx.sos.core.MissileSpecial;
@@ -29,14 +30,19 @@ import troshx.util.LibUtil;
  * Widget to handle various generic item tags for all class types
  * @author Glidias
  */
-class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
+class WTags extends VComponent<WTagsData, WTagProps>
 {
 	public static inline var NAME:String = "w-tags";
 
 	public function new() 
 	{
 		super();
-		untyped this.mixins = [ MixinInput.getInstance(), UIMixin.getInstance() ];
+		untyped this.mixins = [ MixinInput.getInstance(), UIMixin.getInstance(), MeleeVariantMixin.getInstance() ];
+	}
+	
+	@:computed function get_gotVariant():Bool {
+		
+		return MeleeVariantMixin.inlineGotVariant(this.weaponAssign);
 	}
 	
 	override function Data():WTagsData {
@@ -527,6 +533,11 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 		return LibUtil.as(this.item, Weapon);
 	}
 	
+	@:computed function get_weaponSpec():Weapon {
+		var weaponVar:Weapon = this.gotVariant ? this.weaponAssign.weapon.variant :  null;
+		return weaponVar != null ? weaponVar : this.weapon;
+	}
+	
 	@:computed inline function get_firearm():Firearm {
 		return this.weapon != null && this.weapon.isFirearm()  ? this.weapon.firearm : null;
 	}
@@ -637,12 +648,14 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 	
 	
 	function onWeapSpecialCheck(cb:InputElement, ranged:Bool) {
+		var weapon:Weapon = this.weaponSpec;
 		if ( cb.checked ) {
 			if (ranged) {
 				this.weapon.missileSpecial = this.weapon.missileSpecial != null ? this.weapon.missileSpecial : this.missileSpecialCache != null ? this.missileSpecialCache : new MissileSpecial();
 			}
 			else {
-				this.weapon.meleeSpecial = this.weapon.meleeSpecial != null ? this.weapon.meleeSpecial : this.meleeSpecialCache != null ? this.meleeSpecialCache  : new MeleeSpecial();
+				
+				weapon.meleeSpecial = weapon.meleeSpecial != null ? weapon.meleeSpecial : this.meleeSpecialCache != null ? this.meleeSpecialCache  : new MeleeSpecial();
 			}
 		}
 		else {
@@ -651,8 +664,8 @@ class WTags extends VComponent<WTagsData, BaseItemWidgetProps>
 				this.weapon.missileSpecial = null;
 			}
 			else {
-				this.meleeSpecialCache = this.weapon.meleeSpecial;
-				 this.weapon.meleeSpecial = null;
+				this.meleeSpecialCache = weapon.meleeSpecial;
+				weapon.meleeSpecial = null;
 			}
 		}
 	}
@@ -702,6 +715,10 @@ typedef WTagsData = {
 	
 }
 
+typedef WTagProps = {
+	>BaseItemWidgetProps,
+	@:prop({required:false}) @:optional var weaponAssign:WeaponAssign;
+}
 
 /*
 Tags:

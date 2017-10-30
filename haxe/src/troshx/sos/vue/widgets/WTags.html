@@ -43,13 +43,13 @@
 		-{{weapon.ranged ? 'Missile' : 'Melee'}} Flags:-
 		<div v-if="!weapon.ranged">
 			<div v-for="(li, i) in meleeFlags" :key="i" style="display:inline-block;margin-right:3px">
-				<label :class="{disabled:(meleeFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&item.meleeFlags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'meleeFlags')" :value="shiftIndex(i)" :disabled="(meleeFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
+				<label :class="{disabled:(meleeFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&weaponSpec.meleeFlags)!=0" v-on:click="checkboxHandler($event.target, i, weaponSpec, 'meleeFlags')" :value="shiftIndex(i)" :disabled="(meleeFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
 			</div>
 			<hr/>
-			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weapon.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
-			<div v-if="item.meleeSpecial">
+			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weaponSpec.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
+			<div v-if="weaponSpec.meleeSpecial">
 				<div v-for="(li, i) in meleeVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="item.meleeSpecial" :prop="meleeVarNames[i]" />
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="weaponSpec.meleeSpecial" :prop="meleeVarNames[i]" />
 					<div style="clear:both"></div>
 				</div>
 			</div>

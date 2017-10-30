@@ -466,20 +466,35 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 
 	
-	function getTags(item:Item):String {
+	function getTags(item:Item, entry:WeaponAssign=null):String {
 		var arr:Array<String> = [];
-		item.addTagsToStrArr(arr);
+		var gotVariant:Bool = entry != null && entry.holding1H && entry.weapon.variant != null;
+		if (!gotVariant) {
+			 item.addTagsToStrArr(arr);
+		}
+		else {
+			entry.weapon._showCustomTags = false;
+			entry.weapon.variant.addTagsToStrArr(arr);
+			entry.weapon._showCustomTags = true;
+			if (entry.weapon.customise != null) {
+				entry.weapon.customise.addMeleeTagsToStrArr(arr);
+			}
+		}
+	
 		return arr.join(", ");
 	}
 	
-	inline function getDefGuard(wpn:Weapon):String {
+	inline function getDefGuard(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.dtn + "(" + wpn.guard + ")";
 	}
 	
-	inline function getSwingAtkStr(wpn:Weapon):String {
+	inline function getSwingAtkStr(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.atnS + "(" + wpn.damageS + this.damageTypeSuffixes[wpn.damageTypeS]+ ")";
 	}
-	inline function getThrustAtkStr(wpn:Weapon):String {
+	inline function getThrustAtkStr(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.atnT + "(" + wpn.damageT + this.damageTypeSuffixes[wpn.damageTypeT]+ ")";
 	}
 	

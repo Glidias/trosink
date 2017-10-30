@@ -13,7 +13,7 @@ class WMeleeDef extends BaseItemWidget
 	public function new() 
 	{
 		super();
-		untyped this.mixins = [ MixinInput.getInstance() ];
+		untyped this.mixins = [ MixinInput.getInstance(), MeleeVariantMixin.getInstance() ];
 	}
 	
 

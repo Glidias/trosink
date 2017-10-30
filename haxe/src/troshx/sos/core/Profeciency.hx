@@ -30,6 +30,17 @@ class Profeciency implements IUid  implements IUpdateWith<Profeciency>
 	public static inline var M_PUGILISM:Int = 8;
 	static inline var TOTAL_M:Int = 9;
 	
+	static public function matchHandOffProfs(flags:Int):Int 
+	{
+		if (flags == (1<<M_2H_BLUNT)) {
+			return (1<<M_1H_BLUNT);
+		}
+		else if (flags == (1<<M_2H_SWORD)) {
+			return (1<<M_1H_SWORD);
+		}
+		else return flags;
+	}
+	
 	static var CORE_MELEE:Array<Profeciency>;  
 	public static function getCoreMelee():Array<Profeciency> {
 		return CORE_MELEE != null ? CORE_MELEE : (CORE_MELEE=getNewCoreMelee());
@@ -103,6 +114,8 @@ class Profeciency implements IUid  implements IUpdateWith<Profeciency>
 		}
 		return arr;
 	}
+	
+	
 	
 	public function new(name:String="", type:Int=0) 
 	{

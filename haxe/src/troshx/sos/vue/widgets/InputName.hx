@@ -3,7 +3,9 @@ import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
 import js.html.InputElement;
+import troshx.sos.core.Weapon;
 import troshx.sos.core.Item;
+import troshx.util.LibUtil;
 
 
 /**
@@ -25,7 +27,11 @@ class InputName extends VComponent<NoneT, InputNameProps>
 	}
 
 	@:computed function get_label():String {
-		return item.label;
+		var lbl = item.label;
+		return weaponHeldOff != null ? this.weapon.getLabelHeld(weaponHeldOff) : lbl;
+	}
+	@:computed function get_weapon():Weapon {
+		return LibUtil.as(item, Weapon);
 	}
 	
 	override public function Mounted():Void {
@@ -55,4 +61,5 @@ class InputName extends VComponent<NoneT, InputNameProps>
 
 typedef InputNameProps = {
 	var item:Item;
+	@:prop({required:false}) @:optional var weaponHeldOff:Bool;
 }
