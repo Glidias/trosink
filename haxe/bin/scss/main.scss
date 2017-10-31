@@ -60,11 +60,26 @@ select {
 
 // 
 .sweet-modal-overlay.reset-tabs  .sweet-title {
-  //reset overflow, height, white-space, line-height:48px
+  
+  overflow:auto !important;
+  height:auto !important;
+  white-space:normal !important;
+  line-height:26px !important;
 }
 
+ul.array-of > li > input[type='radio'] + div {
+	display:inline-block;
+}
+
+.sweet-modal-overlay.reset-tabs  ul.sweet-modal-tabs {
+ display:block;
+  height:auto !important;
+}
 .sweet-modal-overlay.reset-tabs  li.sweet-modal-tab {
-  //reset height
+  display:inline-block !important;
+  outline:solid 1px #dddddd;
+ 
+  height:auto !important;
 }
 
 td input[type='text'] {
@@ -582,6 +597,11 @@ section.gen-bnb .gen-comp-bb.canceled {
 	display:inline-block;
 	margin-left:10px;
 	
+}
+
+button.inherit, input.inherit {
+	font-size:inherit;
+	font-family:inherit;
 }
 
 .chargen  .header-liners > .canceled {

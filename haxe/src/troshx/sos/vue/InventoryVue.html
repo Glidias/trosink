@@ -222,11 +222,21 @@
 		</thead>
 		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('meleeWeap', $event)" v-on:touchstart.native="setCurWidgetSection('meleeWeap', $event)">
 			<tr v-for="(entry,itemIndex) in filteredMelee" :key="entry.key">
-				<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="meleeWeap" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
+				<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" :weaponHeldOff="entry.holding1H && entry.weapon.variant!=null" /></td>
+				<td-prof :entry="entry" :weaponAssign="entry" :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.holding1H && entry.weapon.variant!=null ? entry.weapon.variant : entry.weapon" section="meleeWeap" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 				<td-hands :entry="entry" />
 				<td>
-					<select number v-model.number="entry.weapon.reach">
+					<select number v-model.number="entry.weapon.reach" v-if="!entry.holding1H || entry.weapon.variant==null">
+						<option :value="1">HA</option>
+						<option :value="2">H</option>
+						<option :value="3">S</option>
+						<option :value="4">M</option>
+						<option :value="5">L</option>
+						<option :value="6">VL</option>
+						<option :value="7">EL</option>
+						<option :value="8">LL</option>
+					</select>
+					<select number v-model.number="entry.weapon.variant.reach" v-else>
 						<option :value="1">HA</option>
 						<option :value="2">H</option>
 						<option :value="3">S</option>
@@ -237,14 +247,14 @@
 						<option :value="8">LL</option>
 					</select>
 				</td>
-				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-atk" widgetTagName="w-melee-atk" :widgetProps="{thrusting:false}" :value="getSwingAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-atk2" widgetTagName="w-melee-atk" :widgetProps="{thrusting:true}" :value="getThrustAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk2', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-def" widgetTagName="w-melee-def" :value="getDefGuard(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-def', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
-				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-atk" widgetTagName="w-melee-atk" :widgetProps="{thrusting:false}" :value="getSwingAtkStr(entry.weapon, entry)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" :weaponAssign="entry" />
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-atk2" widgetTagName="w-melee-atk" :widgetProps="{thrusting:true}" :value="getThrustAtkStr(entry.weapon, entry)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-atk2', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget"  :weaponAssign="entry" />
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="melee-def" widgetTagName="w-melee-def" :value="getDefGuard(entry.weapon, entry)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','melee-def', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget"  :weaponAssign="entry" />
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" :weaponAssign="entry" widgetTagName="w-tags" :value="getTags(entry.weapon, entry)" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap','tags', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget"  />
 				<td><InputNumber :min="0" :step="0.5" :obj="entry.weapon" prop="weight"></InputNumber></td>
 				<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="itemIndex" :showWidget="isVisibleWidget('meleeWeap', 'td-unheld', itemIndex)" />
 				<td>
-					<select-held :entry="entry" :inventory="inventory" />
+					<select-held :entry="entry" :inventory="inventory" :weaponAssign="entry" />
 				</td>
 				<td>
 					<a href="javascript:;" v-on:click="packEquipedWeapon(entry)">Pack</a>
@@ -324,7 +334,7 @@
 			</tr>
 			<tr class="entry-row" v-if="weaponEntry.e.weapon.isBow()" :key="-2">
 				<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="bow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
+				<td-prof :entry="weaponEntry.e"  :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="bow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="bowMask" />
 				<td-hands :entry="weaponEntry.e"  v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry, 4)" />
 				<td><InputInt :min="0" :obj="weaponEntry.e.weapon" prop="range" v-on:focus.native="focusInRowField(weaponEntry,8)" v-on:blur.native="focusOutRowField(weaponEntry,8)"  /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (16|(1<<21))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<21))" v-on:focus-in-row="focusInRowField(weaponEntry,16)" v-on:focus-out-row="focusOutRowField(weaponEntry,16)" />
@@ -374,7 +384,7 @@
 			</tr>
 			<tr class="entry-row" :key="-3" v-if="weaponEntry.e.weapon.isCrossbow()">
 				<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="weaponEntry.e" :weapon="weaponEntry.e.weapon" section="crossbow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="crossbowMask" />
+				<td-prof  :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :entry="weaponEntry.e" :weapon="weaponEntry.e.weapon" section="crossbow" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="crossbowMask" />
 				<td-hands :entry="weaponEntry.e" v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry,4)" />	
 				<td><InputInt :min="0" :obj="weaponEntry.e.weapon" prop="range" v-on:focus.native="focusInRowField(weaponEntry,8)" v-on:blur.native="focusOutRowField(weaponEntry,8)"  /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (16|(1<<21))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<21))" v-on:focus-in-row="focusInRowField(weaponEntry,16)" v-on:focus-out-row="focusOutRowField(weaponEntry,16)" />
@@ -462,7 +472,7 @@
 		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('throwing', $event)" v-on:touchstart.native="setCurWidgetSection('throwing', $event)">
 			<tr v-for="(entry, itemIndex) in filteredThrowing" :key="entry.key">
 				<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="throwing" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
+				<td-prof :entry="entry" :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="throwing" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
 				<td-hands :entry="entry" />
 				<td><InputInt :obj="entry.weapon" prop="range" /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('throwing','missile-atk', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
@@ -482,7 +492,7 @@
 			</tr>
 			<tr class="entry-row" :key="-5" v-if="weaponEntry.e.weapon.isThrowing() || weaponEntry.e.weapon.isSling()">
 				<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="throwing" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
+				<td-prof :entry="weaponEntry.e" :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="throwing" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="throwMask" />
 				<td-hands :entry="weaponEntry.e" v-on:focus-in-row="focusInRowField(weaponEntry, 4)" v-on:focus-out-row="focusOutRowField(weaponEntry,4)" />
 				<td><InputInt :step="1" :obj="weaponEntry.e.weapon" prop="range" v-on:focus.native="focusInRowField(weaponEntry,8)" v-on:blur.native="focusOutRowField(weaponEntry,8)"  /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (16|(1<<21))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<21))" v-on:focus-in-row="focusInRowField(weaponEntry,16)" v-on:focus-out-row="focusOutRowField(weaponEntry,16)" />
@@ -511,8 +521,8 @@
 		</thead>
 		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('ammo', $event)" v-on:touchstart.native="setCurWidgetSection('ammo', $event)">
 			<tr v-for="(entry, itemIndex) in filteredAmmo" :key="entry.key">
-				<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated" /></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="ammo" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
+				<td><input-name :item="entry.weapon" v-on:updated="onInputNameUpdated"  /></td>
+				<td-prof :entry="entry" :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="entry.weapon" section="ammo" :index="itemIndex"  :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs"  />
 				<td class="voidna"></td>
 				<td><InputInt :obj="entry.weapon" prop="range" /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(entry.weapon)" :index="itemIndex" :showWidget="isVisibleWidget('ammo','missile-atk', itemIndex)" :entry="entry" :requestCurWidget="requestCurWidget" />
@@ -530,7 +540,7 @@
 			</tr>
 			<tr class="entry-row" :key="-6" v-if="weaponEntry.e.weapon.isAmmunition()">
 				<td><input type="text" v-model="weaponEntry.e.weapon.name" v-on:focus="focusInRowField(weaponEntry,1)" v-on:blur="focusOutRowField(weaponEntry,1)"></input></td>
-				<td-prof :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="ammo" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="-1" />
+				<td-prof :entry="weaponEntry.e" :curWidgetRequest="curWidgetRequest" :isVisibleWidget="isVisibleWidget" :weapon="weaponEntry.e.weapon" section="ammo" :index="-1" v-on:focus-widget="focusInRowField(weaponEntry,(1<<20))" v-on:focus-in-row="focusInRowField(weaponEntry, 2)" v-on:focus-out-row="focusOutRowField(weaponEntry,2)" :meleeProfs="coreMeleeProfs" :rangedProfs="coreRangedProfs" :profMask="-1" />
 				<td class="voidna"></td>
 				<td><InputInt :obj="weaponEntry.e.weapon" prop="range" v-on:focus.native="focusInRowField(weaponEntry,8)" v-on:blur.native="focusOutRowField(weaponEntry,8)"  /></td>
 				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="missile-atk" widgetTagName="w-missile-atk" :value="getMissileAtkStr(weaponEntry.e.weapon)" :index="-1" :showWidget="(weaponEntry.focusedFlags & (16|(1<<21))) !=0" :entry="weaponEntry.e" :requestCurWidget="requestCurWidget" v-on:focus-widget="focusInRowField(weaponEntry,(1<<21))" v-on:focus-in-row="focusInRowField(weaponEntry,16)" v-on:focus-out-row="focusOutRowField(weaponEntry,16)" />
@@ -649,7 +659,7 @@
 							<td></td>
 							<td></td>
 							<td>AVC</td>
-							<td>AVP<span v-show="calcArmorNonFirearmMissile"> ↢</span></td>
+							<td>AVP<span v-show="calcArmorMissile"> ↢</span></td>
 							<td>AVB</td>
 							<td v-if="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
 						</tr>
@@ -670,10 +680,12 @@
 				<div><i class="consider">Consider against:</i></div>
 				<br/>
 				<div><label><input type="checkbox" v-model="calcArmorCrushing"></input>Crushing attack</label></div>
-				<div><label><input type="checkbox" v-model="calcArmorNonFirearmMissile"></input>Non-Firearm Missile attack ↢</label></div>
-				<div><label :class="{disabled:calcArmorNonFirearmMissile}" :style="{'pointer-events':calcArmorNonFirearmMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
+				<div><label><input type="checkbox" v-model="calcArmorMissile"></input>Missile attack ↢</label> <label :class="{disabled:!calcArmorMissile}" :style="{'pointer-events':!calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorFirearm"></input><i>Firearm?</i></label> Hit at:<select number v-model.number="selectedMissileTargetZoneIndex"><option :value="-1"></option><option :value="i" v-for="(li, i) in missileHitTargetZones" :key="i">{{i+2}}:{{li.tz.name}}</option></select> <a v-on:click="selectedMissileTargetZoneIndex=-1" href="javascript:;" v-show="selectedMissileTargetZoneIndex>=0">[x]</a></div>
+				<div><label :class="{disabled:calcArmorMissile}" :style="{'pointer-events':calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
 					<option :value="i" v-for="(li, i) in body.targetZones">{{ body.getDescLabelTargetZone(i) }}</option>
 				</select></div>
+				<div style="margin-top:5px" v-show="calcArmorMeleeTargeting && shouldCalcMeleeAiming">{{ calcMeleeTZProbabilities }}</div>
+				<div style="margin-top:5px" v-show="calcArmorMissile && selectedMissileTargetZoneIndex>=0">{{ calcRangedTZProbabilities }}</div>
 				<br/>
 				<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>
 				<i class="cta" v-show="calcAVColumn==0">&lt;- Focus-click on table cells to inspect result.</i>

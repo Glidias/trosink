@@ -466,20 +466,35 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 
 	
-	function getTags(item:Item):String {
+	function getTags(item:Item, entry:WeaponAssign=null):String {
 		var arr:Array<String> = [];
-		item.addTagsToStrArr(arr);
+		var gotVariant:Bool = entry != null && entry.holding1H && entry.weapon.variant != null;
+		if (!gotVariant) {
+			 item.addTagsToStrArr(arr);
+		}
+		else {
+			entry.weapon._showCustomTags = false;
+			entry.weapon.variant.addTagsToStrArr(arr);
+			entry.weapon._showCustomTags = true;
+			if (entry.weapon.customise != null) {
+				entry.weapon.customise.addMeleeTagsToStrArr(arr);
+			}
+		}
+	
 		return arr.join(", ");
 	}
 	
-	inline function getDefGuard(wpn:Weapon):String {
+	inline function getDefGuard(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.dtn + "(" + wpn.guard + ")";
 	}
 	
-	inline function getSwingAtkStr(wpn:Weapon):String {
+	inline function getSwingAtkStr(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.atnS + "(" + wpn.damageS + this.damageTypeSuffixes[wpn.damageTypeS]+ ")";
 	}
-	inline function getThrustAtkStr(wpn:Weapon):String {
+	inline function getThrustAtkStr(wpn:Weapon, entry:WeaponAssign = null):String {
+		if (entry != null && entry.holding1H && entry.weapon.variant != null) wpn = entry.weapon.variant;
 		return wpn.atnT + "(" + wpn.damageT + this.damageTypeSuffixes[wpn.damageTypeT]+ ")";
 	}
 	
@@ -562,7 +577,10 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	}
 	
 	@:computed function get_shouldCalcMeleeAiming():Bool {
-		return !calcArmorNonFirearmMissile && calcArmorMeleeTargeting;
+		return !calcArmorMissile && calcArmorMeleeTargeting;
+	}
+	@:computed function get_shouldCalcRangedAiming():Bool {
+		return calcArmorMissile && this.selectedMissileTargetZoneIndex >=0;
 	}
 	
 	@:computed inline function get_targetingZoneMask():Int {
@@ -580,9 +598,12 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return this.calcArmorResults.armorsCrushable.length != 0;
 	}
 	
+	@:computed function get_showTargetingZoneIndex():Int {
+		return shouldCalcMeleeAiming ? this.calcMeleeTargetingZoneIndex : shouldCalcRangedAiming ? this.missileHitTargetZones[this.selectedMissileTargetZoneIndex].index : -1;
+	}
 	
 	function isDisabledHitLocation(i:Int):Bool {
-		return shouldCalcMeleeAiming && ( (1 << i) & targetZoneHitAreaMasks[calcMeleeTargetingZoneIndex] ) == 0;
+		return (shouldCalcMeleeAiming ||  shouldCalcRangedAiming ) &&  ( (1 << i) & targetZoneHitAreaMasks[showTargetingZoneIndex] ) == 0;
 	}
 	
 	@:computed inline function get_targetZoneHitAreaMasks():Array<Int> {
@@ -604,6 +625,8 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		var body:BodyChar = this.body;
 
 		var targMask:Int = targetingZoneMask;
+	
+		var nonFirearmMissile:Bool = this.calcArmorMissile && !this.calcArmorFirearm;
 		
 		for (i in 0...ch.length) {
 			var ider = ch[i].id;
@@ -620,10 +643,26 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
 				layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
 			}
-			a.writeAVVAluesTo(values, body, layerMask, this.calcArmorNonFirearmMissile, targMask);
+			a.writeAVVAluesTo(values, body, layerMask, nonFirearmMissile, targMask);
 		}
 		
 		return values;
+	}
+	
+	@:computed function get_missileHitTargetZones():Array<TargetZoneIndexed> {
+		var b = this.body;
+		var h = b.missileHitLocations;
+		var t = b.targetZones;
+		var arr:Array<TargetZoneIndexed> = [];
+		for (i in 1...h.length) {
+			arr.push( {tz:t[h[i]], index:h[i]} );
+		}
+		return arr;
+	}
+	
+	@:computed function get_missileTargetHitZone():TargetZone {
+		var mt = missileHitTargetZones;
+		return selectedMissileTargetZoneIndex >= 0 ? mt[selectedMissileTargetZoneIndex].tz : null;
 	}
 	
 	function sortArmorLayers(a:ArmorLayerCalc, b:ArmorLayerCalc):Int {
@@ -662,7 +701,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		var armorList = inventory.wornArmor;
 		var body:BodyChar = this.body;
 		var targetingZoneMask:Int = this.targetingZoneMask;
-		
+		var isNonFirearmMissile = this.calcArmorMissile &&  !this.calcArmorFirearm;
 
 		if (results.av != 0) {  // av found at location, find dominant armors and layers
 			var comparisonLayerMasks:Array<Int>  = [];  // temp for case to layers
@@ -682,7 +721,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 				comparisonLayerMasks.push(layerMask);
 				
 				
-				if ( a.writeAVsAtLocation(body, hitLocationId, hitLocationMask, sampleAV, layerMask, this.calcArmorNonFirearmMissile, targetingZoneMask, true) ) {
+				if ( a.writeAVsAtLocation(body, hitLocationId, hitLocationMask, sampleAV, layerMask, isNonFirearmMissile, targetingZoneMask, true) ) {
 					var compareAV:Int =  columnNum == 1 ? sampleAV.avc : columnNum == 2  ? sampleAV.avp : sampleAV.avb;
 					
 					if (compareAV == results.av) {
@@ -979,6 +1018,44 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return this.shieldEntry.focusedFlags != 0 || hasPopup;
 	}
 	
+	@:computed function get_calcMeleeTZProbabilities():String {
+		var bod:BodyChar = this.body;
+		var tz:TargetZone = bod.targetZones[this.calcMeleeTargetingZoneIndex];
+		
+		var str:String = "";
+		var count:Int = 0;
+		for (i in 0...tz.partWeights.length) {
+			var part:HitLocation = bod.hitLocations[tz.parts[i]];
+			str += "[" + part.name + ": ";
+			str += ++count;
+			for ( i in 1...Std.int(tz.partWeights[i])) {
+				str += ","+ (++count);
+			}
+			str += "] ";
+		}
+		return str;
+	}
+	
+	
+	@:computed function get_calcRangedTZProbabilities():String {
+		var bod:BodyChar = this.body;
+		var tz:TargetZone = this.selectedMissileTargetZoneIndex  >= 0 ? missileHitTargetZones[this.selectedMissileTargetZoneIndex].tz : null;
+		if (tz == null) return "";
+		
+		var str:String = "";
+		var count:Int = 0;
+		for (i in 0...tz.partWeights.length) {
+			var part:HitLocation = bod.hitLocations[tz.parts[i]];
+			str += "[" + part.name + ": ";
+			str += ++count;
+			for ( i in 1...Std.int(tz.partWeights[i])) {
+				str += ","+ (++count);
+			}
+			str += "] ";
+		}
+		return str;
+	}
+	
 	@:computed function get_armorEntryGotFocus():Bool 
 	{
 		var hasPopup = this.hasPopup;
@@ -1018,7 +1095,23 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 	function executeCopyContents():Void {
 		var textarea:TextAreaElement = _vRefs.savedTextArea;
 		
-		textarea.select();
+		if ( new EReg("/ipad|ipod|iphone", "i").match(Browser.navigator.userAgent) ) {
+			var el = textarea;
+			var editable = el.contentEditable;
+			var readOnly = el.readOnly;
+			el.contentEditable = "true";
+			el.readOnly = false;
+			var range = Browser.document.createRange();
+			range.selectNodeContents(el);
+			var sel = Browser.window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+			el.setSelectionRange(0, 9999999);
+			el.contentEditable = editable;
+			el.readOnly = readOnly;
+		}
+		else textarea.select();
+		
 		var result:Bool = Browser.document.execCommand("copy");
 		if (result != null) {
 			//Browser.alert("Copied to clipboard.");
@@ -1127,6 +1220,7 @@ class InventoryVueData  {
 	
 	var itemQtyMultiple:ItemQty = null;
 	var itemQtyMultipleMax:Int = 1;
+	var selectedMissileTargetZoneIndex:Int = -1;
 	
 	var privateData:InventoryVuePrivate = {};
 	
@@ -1164,7 +1258,8 @@ class InventoryVueData  {
 	var focusValueText:String = "";
 	
 	// armor hit calculator
-	var calcArmorNonFirearmMissile:Bool = false;
+	var calcArmorFirearm:Bool = false;
+	var calcArmorMissile:Bool = false;
 	var calcArmorCrushing:Bool = false;
 	var calcArmorMeleeTargeting:Bool = false;
 	var calcMeleeTargetingZoneIndex:Int = 0;
@@ -1309,4 +1404,9 @@ typedef InventoryVueProps = {
 	
 	@:prop({required:false}) @:optional var injectWeight:Float;
 	@:prop({required:false, 'default':false}) @:optional var includeDroppedCost:Bool;
+}
+
+typedef TargetZoneIndexed = {
+	var tz:TargetZone;
+	var index:Int;
 }

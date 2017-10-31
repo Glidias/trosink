@@ -11,6 +11,8 @@ import js.html.HtmlElement;
 import js.html.TextAreaElement;
 import troshx.sos.core.DamageType;
 import troshx.sos.core.HitLocation;
+import troshx.sos.core.Item;
+import troshx.sos.core.Modifier;
 import troshx.sos.core.Wound;
 import troshx.sos.bnb.Banes;
 import troshx.sos.bnb.Boons;
@@ -159,18 +161,22 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		_vRefs.clipboardWindow.open();
 	}
 	
+	
 	function openFromTreeBrowser(contents:String, filename:String, disableCallback:Void->Void):Void {
-
 		if ( loadCharContents(contents) ) {
 			_vRefs.treeBrowser.close();
+			setWindowTitleWithCharUID();
 		}
 		this.autoLoadChar = null;
-		
-	}
-	function openModifiersWindow():Void {
-		_vRefs.modifiersWindow.open();
 	}
 	
+	function setWindowTitleWithCharUID():Void {
+		var uid:String = this.char.uid;
+		if (uid == "" ) return;
+		
+		Browser.window.document.title = uid;
+		theWindowTitle = uid;
+	}
 		
 	@:computed function get_availableTypes():Dynamic<Bool> {
 		return {
@@ -289,6 +295,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	{
 		var newItem:Dynamic;
 		
+		
 		try {
 			newItem = new Unserializer(contents).unserialize();
 		}
@@ -304,7 +311,10 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 			return false;
 		}
 		var me:CharSheet =  LibUtil.as(newItem, CharSheet);
+		
+		this.charIsSerializing = true;
 		me.postSerialization();
+		
 		this.char = me;
 		
 		return true;
@@ -325,13 +335,36 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		char.inventory.cleanupBeforeSerialize();
 	}
 	
+	function deleteStaticModifierAt(i:Int, li:Int):Void {
+		this.char.staticModifierTable[li].splice(i, 1);
+	}
+	function deleteSituationalCharModifierAt(i:Int, li:Int):Void {
+		this.char.situationalModifierTable[li].splice(i, 1);
+	}
 	
 	function executeCopyContents():Void {
 		var textarea:TextAreaElement = _vRefs.savedCharTextArea;
 		
-		textarea.select();
+		if ( new EReg("/ipad|ipod|iphone", "i").match(Browser.navigator.userAgent) ) {
+			var el = textarea;
+			var editable = el.contentEditable;
+			var readOnly = el.readOnly;
+			el.contentEditable = "true";
+			el.readOnly = false;
+			var range = Browser.document.createRange();
+			range.selectNodeContents(el);
+			var sel = Browser.window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+			el.setSelectionRange(0, 9999999);
+			el.contentEditable = editable;
+			el.readOnly = readOnly;
+		}
+		else textarea.select();
+		
+		
 		var result:Bool = Browser.document.execCommand("copy");
-		if (result != null) {
+		if (result) {
 			//Browser.alert("Copied to clipboard.");
 			var htmlElem:HtmlElement = _vRefs.copyNotify;
 			htmlElem.style.display = "inline-block";
@@ -417,6 +450,24 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		});
 	}
 	
+	function setModifierTabIndex(refId:String):Void {
+		var dyn:Dynamic = untyped Modifier;
+		this.customModifier._setIndex(LibUtil.field(dyn, refId));
+	}
+
+	
+	function openModifiersWindow():Void {
+		this.customModifier = StaticModifier.create( (this.customModifier != null ? this.customModifier.index : 0), "", 0, 1);
+		this.customModifier.custom = true;
+		_vRefs.modifiersWindow.open();
+	}
+	
+	function addCustomModifier():Void {
+		var theModifier:StaticModifier = this.customModifier;
+		this.customModifier = StaticModifier.create( (this.customModifier != null ? this.customModifier.index : 0), "", 0, 1);
+		this.customModifier.custom = true;
+		this.char.addStaticModifier(theModifier);
+	}
 
 	// duplicate from chargendata, but without the packet line at the end...
 	public function deleteSkillInput(index:Int):Void {
@@ -449,6 +500,11 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	@:watch function watch_char(newVal:CharSheet):Void {
 		_vData.initNewChar();
+		Vue.nextTick(postCharChange);
+	}
+	
+	function postCharChange():Void {
+		this.charIsSerializing = false;
 	}
 }
 
@@ -471,12 +527,15 @@ class CharSheetVueData {
 	
 	var treeBrowserInited:Bool = false;
 	
+	var customModifier:StaticModifier = null;
+	
 	//  view hide/show
 	var showBnBs:Bool = false;
 	var showEditSkills:Bool = false;
 	
 	// load
 	var clipboardLoadContents:String = "";
+	var charIsSerializing:Bool = false;
 	
 	// save
 	var savedCharContents:String = "";
@@ -514,6 +573,9 @@ class CharSheetVueData {
 	var arcSpendQty:Int = 0;
 	
 	var autoLoadChar:String;
+	
+	// windows/broswer
+	var theWindowTitle:String = "";
 	
 	public function new(char:CharSheet = null) {
 		this.char = char == null ? new CharSheet() : char;

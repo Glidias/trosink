@@ -224,7 +224,7 @@ class Item
 		return combineOr;
 	}
 	
-	public static macro function pushFlagLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false, metadataLbl:String=null, prefix:String=""):Expr {  // todo when needed: metadata support
+	public static macro function pushFlagLabelsToArr(labelize:Bool=true, moduleStr:String=null, noLabelizeCapitalCase:Bool=false, metadataLbl:String=null, prefix:String=""):Expr { 
 	
 		var fields = null;
 		if (moduleStr != null) {
@@ -247,7 +247,7 @@ class Item
 				if (m != null) {
 					if (m.params == null || m.params.length == 0) {
 						//Context.error("Please specify string as parameter.", f.pos);
-						metaLabel = labelizeAllCaps(f.name);
+						metaLabel =  noLabelizeCapitalCase ? labelizeAllCaps(f.name) : f.name;
 					}
 					else {
 						var mp = m.params[0].expr;

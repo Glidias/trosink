@@ -43,13 +43,13 @@
 		-{{weapon.ranged ? 'Missile' : 'Melee'}} Flags:-
 		<div v-if="!weapon.ranged">
 			<div v-for="(li, i) in meleeFlags" :key="i" style="display:inline-block;margin-right:3px">
-				<label :class="{disabled:(meleeFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&item.meleeFlags)!=0" v-on:click="checkboxHandler($event.target, i, item, 'meleeFlags')" :value="shiftIndex(i)" :disabled="(meleeFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
+				<label :class="{disabled:(meleeFlagDisablingMask&shiftIndex(i))!=0}"><input type="checkbox" :checked="(shiftIndex(i)&weaponSpec.meleeFlags)!=0" v-on:click="checkboxHandler($event.target, i, weaponSpec, 'meleeFlags')" :value="shiftIndex(i)" :disabled="(meleeFlagDisablingMask&shiftIndex(i))!=0"></input>{{li}}</label>
 			</div>
 			<hr/>
-			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weapon.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
-			<div v-if="item.meleeSpecial">
+			<label><input type="checkbox" v-on:click="onWeapSpecialCheck($event.target, false)" :checked="weaponSpec.meleeSpecial!=null"><i>MeleeSpecial?</i></input></label>
+			<div v-if="weaponSpec.meleeSpecial">
 				<div v-for="(li, i) in meleeVarLabels" :key="i">
-					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="item.meleeSpecial" :prop="meleeVarNames[i]" />
+					<label style="width:50%; float:left;display:block;">{{ li }}: </label><InputInt style="width:50%;float:left;display:block;max-width:40px" :min="0" :obj="weaponSpec.meleeSpecial" :prop="meleeVarNames[i]" />
 					<div style="clear:both"></div>
 				</div>
 			</div>
@@ -197,6 +197,12 @@
 
 		</div>
 		<hr/>	
+		<div><label><input type="checkbox" v-on:click="onArmorBurdinadinCheck($event.target)" :checked="item.burdinadin!=null"></input><i>Burdinadin?</i></label></div>
+		<div v-if="item.burdinadin">
+			<div><label>Insulation: <InputInt :obj="item.burdinadin" prop="insulation" :min="0"  /></label><span v-if="item.customise !=null && item.customise.original!=null && item.customise.original.burdinadin != null && item.customise.original.burdinadin.insulation != item.burdinadin.insulation">&nbsp;({{(item.customise.original.burdinadin.insulation)}})</span></div>
+			<div><label>Augmentations: <InputInt :obj="item.burdinadin" prop="augmentations" :min="0"  /></label></div>
+		</div>
+		<hr/>
 		<div v-if="currentArmorCustomise!=null">
 			<div v-if="!isEnteredItem">
 				<div>-Armor State/Customisation-</div>
@@ -221,6 +227,13 @@
 				</div>
 				<div v-else>	
 					<i>Armor has been altered.</i>
+					<div v-if="item.customise!=null">
+						<div><label><input type="checkbox" :disabled="item.customise.notes!=null && item.customise.notes.length > 0" :checked="item.customise.notes!=null" v-on:click="onArmorCustomiseNotesCheck($event.target)"></input><i>Notes?</i></label></div>
+						<div v-if="item.customise.notes!=null">
+							<hr/>
+							<ArrayOf :obj="item.customise" of="String" prop="notes" defaultValue="''"></ArrayOf>
+						</div>
+					</div>
 					<br/>	
 					<div>
 						<label><i>Restore original?</i></label><input type="checkbox" v-model="restoreOriginal"></input><br/><br/>

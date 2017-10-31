@@ -5,6 +5,7 @@ import haxevx.vuex.util.VHTMacros;
 import js.html.InputElement;
 import troshx.sos.core.Crossbow;
 import troshx.sos.core.Firearm;
+import troshx.sos.core.Inventory.WeaponAssign;
 import troshx.sos.core.Item;
 import troshx.sos.core.Weapon;
 import troshx.sos.core.Profeciency;
@@ -23,6 +24,7 @@ class WProf extends VComponent<WProfData, WProfProps>
 	public function new() 
 	{
 		super();
+		
 	}
 	
 	override function Mounted():Void {
@@ -129,6 +131,10 @@ class WProf extends VComponent<WProfData, WProfProps>
 		var weap:Weapon = this.weapon;
 		if (this.ranged ) {
 			weap.isAmmo = this.isAmmo;
+			
+			weap.variant = null;
+			weaponAssign.holding1H = false;
+			
 			weap.profs = this.rangedFlags;
 		
 			if ( ( weap.profs & Item.getInstanceFlagsOf(Profeciency, R_CROSSBOW)) !=0 ) {
@@ -200,8 +206,9 @@ class WProfData {
 
 typedef WProfProps = {
 	> BaseItemWidgetProps,
-	var meleeProfs:Array<Profeciency>;
-	var rangedProfs:Array<Profeciency>;
+	@:prop({required:true}) var meleeProfs:Array<Profeciency>;
+	@:prop({required:true}) var rangedProfs:Array<Profeciency>;
+	@:prop({required:true}) var weaponAssign:WeaponAssign;
 	@:optional @:prop({required:false}) var curWidgetRequest:WidgetItemRequest;
 	
 	@:prop({required:false})  @:optional var customProfs:Array<Profeciency>;

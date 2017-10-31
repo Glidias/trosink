@@ -16,6 +16,7 @@ import troshx.sos.core.Modifier;
 import troshx.sos.core.Profeciency;
 import troshx.sos.core.School;
 import troshx.sos.core.Shield;
+import troshx.sos.core.TargetZone;
 import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.sheets.EncumbranceTable.EncumbranceRow;
@@ -127,6 +128,11 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed function get_INT():Int { return this.char.INT;  } 
 	@:computed function get_PER():Int { return this.char.PER;  } 
 	
+	@:computed function get_perceptionPenalized():Int { 
+		var r = this.PER - this.perceptionPenalty;
+		return r >= 0 ? r : 0;
+	}
+	
 	@:computed function get_negativeOrZeroStat():Bool {
 		return this.STR <= 0 || this.AGI <= 0 || this.END <= 0 	 || this.AGI <= 0 || this.HLT <= 0 
 		|| this.WIP  <= 0 || this.WIT <= 0 || this.INT <= 0 || this.PER <= 0;
@@ -177,6 +183,48 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		return Std.parseFloat( LibUtil.toFixed( this.inventoryWeight, 2) );
 	}
 	
+	@:computed function get_dynModifiers():Dynamic {
+		return Modifier;
+	}
+	
+	@:computed function get_customModifierListings():Array<String> {
+		var modTable = this.char.staticModifierTable;
+		var dyn:Dynamic = untyped Modifier;
+		var arr:Array<String> = [];
+		var modVars:Array<String> = modifierVars;
+		for ( i in 0...modVars.length) {
+			var index:Int = LibUtil.field(dyn, modVars[i]);
+			var prefix:String = "(" + getModifierTabTitle(modVars[i], true) + ") ";
+			var mt = modTable[index];
+			for (m in 0...mt.length) {
+				var modifier = mt[m];
+				if (modifier.custom) {
+					arr.push(prefix + modifier.name + ": x"+modifier.multiply + "+" +modifier.add );
+				}
+			}
+		}
+		return arr;
+	}
+	
+	function getModifierTabTitle(li:String, noCount:Bool = false):String {
+		var dyn:Dynamic = untyped Modifier;
+		var index:Int = LibUtil.field(dyn, li);
+		var arrStatic:Array<StaticModifier> = this.char.staticModifierTable[index];
+		var arrChar = this.char.situationalModifierTable[index];
+		var totalLen:Int = noCount ? 0 : arrStatic.length + arrChar.length;
+		var liStr:String = li.substr(0, 4) == "CMP_" ? li.substr(4) : li.substr(0, 5) == "ATTR_" ? li.substr(5) : li;
+		return totalLen > 0 ? liStr+"(" + totalLen +  ")" : liStr;
+	}
+	
+	@:computed function get_modifierVars():Array<String> {
+		var arr:Array<String> = [];
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Modifier", false, ":modifier");
+		return arr;
+	}
+	
+	function openModifiersWindow():Void {
+		_vRefs.modifiersWindow.open();
+	}
 	
 	@:computed function get_defaultProfs():String {
 		var m = this.masterWeapon;
@@ -372,6 +420,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		return curFatiqueRow.cp;
 	}
 	
+	
 	@:computed function get_addressedAs():String {
 		
 		return char.uid;
@@ -401,6 +450,7 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	inline function get_schoolTags():Array<String> {
 		return hasSchool  && char.schoolBonuses != null ? char.schoolBonuses.getTags() : [];	
 	}
+
 	
 	var maxMasterySlots(get, never):Int;
 	function get_maxMasterySlots():Int {

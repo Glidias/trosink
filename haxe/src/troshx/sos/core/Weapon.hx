@@ -1,6 +1,6 @@
 package troshx.sos.core;
 import troshx.ds.IDMatchArray;
-import troshx.sos.core.BurdinadinArmory.BurdinadinWeapon;
+//import troshx.sos.core.BurdinadinArmory.BurdinadinWeapon;
 import troshx.sos.core.MissileSpecial;
 
 /**
@@ -54,7 +54,7 @@ class Weapon extends Item
 	public var missileFlags:Int = 0;
 	public var missileSpecial:MissileSpecial = null;
 	
-	public var burdinadin:BurdinadinWeapon = null;
+	//public var burdinadin: BurdinadinWeapon= null;
 
 	public var stuckChance:Int = 0; // the use of ammunition may overwrite this, and defaults for ranged category will overwrite this
 	
@@ -74,6 +74,14 @@ class Weapon extends Item
 	{
 		super(id, name);
 	}
+	
+	public static inline function isTwoHandedOff(weap:Weapon):Bool {
+		var a = weap.meleeFlags;
+		var b = weap.flags;
+		var c = weap.isMelee();
+		return c &&  (a & MeleeSpecial.HAND_OFF) != 0 &&  (b & Item.FLAG_TWO_HANDED) != 0;
+	}
+	
 	
 	override public function normalize():Item {
 		if (ranged) {
@@ -202,7 +210,6 @@ class Weapon extends Item
 				firearm.addTagsToStrArr(arr, isAmmo, isAmmo);
 			}
 			
-			
 		}
 		else {
 		
@@ -211,11 +218,14 @@ class Weapon extends Item
 				 arr.push(myArr[i] );
 			}
 			
-			if (customise != null) {
+			if (customise != null && _showCustomTags) {
 				customise.addMeleeTagsToStrArr(arr);
 			}
 		}
 	}
+	
+	public var _showCustomTags:Bool = true;
+	
 	static inline function IsPowerOfTwoOrZero(x:Int)
 	{
 		return (x & (x - 1)) == 0;
@@ -245,9 +255,16 @@ class Weapon extends Item
 		return super.get_uid()  + (customise != null ?  "_" + customise.uid : "" ); // + (attachments != null ? attachments.uid : ""); // id != "" ? id : name;
 	}
 	
+	inline function getWeapLabel(handOff:Bool):String {
+		return (isFirearm() && firearm.firingMechanism != null  ? firearm.firingMechanism.name+ " " : "") + name + (handOff ? "*" : "") + (customise != null ? " *"+(customise.name != null ? customise.name : customise.uid)+"*" : ""); 
+	}
 	override function get_label():String {
 		
-		return (isFirearm() && firearm.firingMechanism != null  ? firearm.firingMechanism.name+ " " : "") + name + (customise != null ? " *"+(customise.name != null ? customise.name : customise.uid)+"*" : ""); 
+		return getWeapLabel(false);
+	}
+	
+	public function getLabelHeld(handOff:Bool):String {
+		return getWeapLabel(handOff);
 	}
 	
 	override public function getTypeLabel():String {

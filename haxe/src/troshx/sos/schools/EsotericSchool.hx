@@ -51,7 +51,7 @@ class EsotericSchoolBonuses extends SchoolBonuses {
 	override public function getTags():Array<String> {
 		var arr:Array<String> = [];
 		var flags:Int = this.flags;
-		Item.pushFlagLabelsToArr(true, "troshx.sos.schools.EsotericSchool:EsotericSchoolBonuses", false, ":flag");
+		Item.pushFlagLabelsToArr(true, "troshx.sos.schools.EsotericSchool:EsotericSchoolBonuses", true, ":flag");
 		return arr;
 	}
 }

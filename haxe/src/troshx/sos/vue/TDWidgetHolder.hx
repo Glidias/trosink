@@ -21,6 +21,8 @@ class TDWidgetHolder extends VComponent<NoneT, TDWidgetHolderProps>
 	public function new() 
 	{
 		super();
+		//untyped this["inheritAttrs"] = false;
+		untyped this["mixins"] = [ MeleeVariantMixin.getInstance() ];
 	}
 	
 	@:computed function get_itemLabel():String {

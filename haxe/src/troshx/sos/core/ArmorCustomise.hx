@@ -19,6 +19,8 @@ class ArmorCustomise implements IUid
 
 	public var original:Armor;
 	
+	public var notes:Array<String>;
+	
 	public function new() 
 	{
 		

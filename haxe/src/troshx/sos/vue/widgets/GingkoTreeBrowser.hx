@@ -50,7 +50,7 @@ class GingkoTreeBrowser extends VComponent<GingkoTreeData, GingkoTreeProps>
 		isLoading = true;
 		loadedDomain = "";
 		
-		var http:Http = new Http("https://effuse-church.000webhostapp.com/curlgink.php").setParameter("id", domainId);
+		var http:Http = new Http(Globals.CURL_DOMAIN+"/curlgink.php").setParameter("id", domainId);
 		http.onData = onDataReceived;
 		http.onError = onErrorLoad;
 		http.request();

@@ -46,7 +46,7 @@ class Inventory
 	
 	public static function getUnheldLabelsArray():Array<String> {
 		var arr:Array<String> = [];
-		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", false, ":unheld");
+		Item.pushFlagLabelsToArr(false, "troshx.sos.core.Inventory", true, ":unheld");
 		return arr;
 	}
 	
@@ -136,7 +136,8 @@ class Inventory
 	public function getOffhandWeapon():Weapon {
 		for (i in 0...weapons.length) {
 			if (weapons[i].held == HELD_OFF) {
-				return weapons[i].weapon;
+				var w = weapons[i];
+				return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
 			}
 		}
 		return null;
@@ -144,7 +145,8 @@ class Inventory
 	public function getMasterWeapon():Weapon {
 		for (i in 0...weapons.length) {
 			if (( weapons[i].held & HELD_MASTER) != 0) {
-				return weapons[i].weapon;
+				var w = weapons[i];
+				return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
 			}
 		}
 		return null;
@@ -631,7 +633,7 @@ class Inventory
 		
 		if (Std.is(item, Weapon)) {
 			
-			weapons.push(readyAssign = weaponAssign = {attached:false,  key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark});
+			weapons.push(readyAssign = weaponAssign = {attached:false,  key:UID_COUNT++, weapon:LibUtil.as(item, Weapon), held:0, unheld:UNHELD_UNSPECIFIED, unheldRemark:unheldRemark, holding1H:false});
 		}
 		else if (Std.is(item, Shield)) {
 			
@@ -679,7 +681,8 @@ class Inventory
 				weapon:cast item,
 				held:0, unheld:0, unheldRemark:"",
 				key:UID_COUNT++,
-				attached:false
+				attached:false,
+				holding1H:false,
 			};
 		}
 		else if (Std.is(item, Shield)) {
@@ -719,6 +722,7 @@ class Inventory
 				weapon:new Weapon(),
 				held:0, unheld:0, unheldRemark:"",
 				key:UID_COUNT++,
+				holding1H:false,
 				attached:false
 			};
 		}
@@ -763,12 +767,13 @@ class Inventory
 		if (version == null || version < 2) version = 2
 		else return false;
 		
-		
+		/*
 		for (i in 0...weapons.length) {
 			if ( weapons[i].weapon.burdinadin == null) {
 				weapons[i].weapon.burdinadin = null;
 			}
 		}
+		*/
 		for (i in 0...wornArmor.length) {
 			if ( wornArmor[i].armor.burdinadin == null) {
 				wornArmor[i].armor.burdinadin = null;
@@ -784,9 +789,9 @@ class Inventory
 			if (armor != null) {
 				if (armor.burdinadin == null) armor.burdinadin = null;
 			}
-			if (weap != null) {
-				if (weap.burdinadin == null) weap.burdinadin = null;
-			}
+			//if (weap != null) {
+				//if (weap.burdinadin == null) weap.burdinadin = null;
+			//}
 		}
 		
 		for (i in 0...packed.list.length) {
@@ -796,9 +801,9 @@ class Inventory
 			if (armor != null) {
 				if (armor.burdinadin == null) armor.burdinadin = null;
 			}
-			if (weap != null) {
-				if (weap.burdinadin == null) weap.burdinadin = null;
-			}
+			//if (weap != null) {
+				//if (weap.burdinadin == null) weap.burdinadin = null;
+			//}
 			
 		}
 		
@@ -836,6 +841,7 @@ typedef ItemAssign = {
 typedef WeaponAssign = {
 	> ReadyAssign,
 	weapon:Weapon,
+	holding1H:Bool,
 }
 
 typedef ArmorAssign = {

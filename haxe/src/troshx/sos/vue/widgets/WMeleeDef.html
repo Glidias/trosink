@@ -1,11 +1,11 @@
 <div>
 	<div style="width:50%;display:inline-block">
 		<label>DTN:<br/>
-			<InputInt :obj="item" prop="dtn" style="width:100%"></InputInt>
+			<InputInt :obj="gotVariant ? item.variant : item" prop="dtn" style="width:100%"></InputInt>
 		</label>
 	</div><div style="width:50%;display:inline-block">
 		<label>Guard:<br/>
-			<InputInt :obj="item" prop="guard" style="width:100%"></InputInt>
+			<InputInt :obj="gotVariant ? item.variant : item" prop="guard" style="width:100%"></InputInt>
 		</label>
 	</div>
 </div>

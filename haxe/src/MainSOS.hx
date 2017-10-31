@@ -2,8 +2,11 @@ package;
 
 import haxe.web.Request;
 import haxevx.vuex.core.VxBoot;
+import haxevx.vuex.native.Vue;
 import js.Browser;
 import troshx.sos.vue.CharSheetVue;
+import troshx.sos.vue.externs.SweetModal;
+import troshx.util.LibUtil;
 
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.CharGen;
@@ -28,6 +31,9 @@ class MainSOS
 	}
 	
 	function new() {
+		
+		Vue.use(SweetModal);
+		
 		var urlSplit = Browser.window.location.href.split("#")[0].split("?");
 		var params = Request.getParams();
 		if (params.get("inventories")!=null) {
@@ -39,8 +45,15 @@ class MainSOS
 		if (params.get("autoload")!=null) {
 			Globals.AUTO_LOAD = params.get("autoload");
 		}
-
-
+		if (params.get("host") != null || (untyped Browser.window["USE_HOST"]) ) {
+			var h;
+			if ( (h=params.get("host"))!=null && (h.substr(0, 7) == "http://" || h.substr(0, 8) == "https://" )) {
+				Globals.CURL_DOMAIN = h;
+			}
+			else Globals.CURL_DOMAIN = Browser.window.location.protocol + "//" + Browser.window.location.hostname;
+			//Browser.alert(Globals.CURL_DOMAIN);
+		}
+		
 		var url = urlSplit[0];
 		var hash:String = urlSplit.pop();
 		hash = hash.split("&")[0];

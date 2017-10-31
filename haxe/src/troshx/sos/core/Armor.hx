@@ -265,6 +265,10 @@ class Armor extends Item
 		if (special != null) {
 			special.addTagsToStrArr(arr, this);
 		}
+		
+		if (burdinadin != null) {
+			burdinadin.addTagsToStrArr(arr);
+		}
 
 		if (customise != null) {
 			customise.addTagsToStrArr(arr);

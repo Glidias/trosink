@@ -20,32 +20,32 @@ class Modifier
 {
 	
 	// Static and Situaional CharSheet-only hard context modifiers
-	public static inline var ATTR_STR:Int = 0;
-	public static inline var ATTR_AGI:Int = 1;
-	public static inline var ATTR_END:Int = 2;
-	public static inline var ATTR_HLT:Int = 3;
-	public static inline var ATTR_WIL:Int = 4;
-	public static inline var ATTR_WIT:Int = 5;
-	public static inline var ATTR_INT:Int = 6;
-	public static inline var ATTR_PER:Int = 7;
+	@:modifier public static inline var ATTR_STR:Int = 0;
+	@:modifier public static inline var ATTR_AGI:Int = 1;
+	@:modifier public static inline var ATTR_END:Int = 2;
+	@:modifier public static inline var ATTR_HLT:Int = 3;
+	@:modifier public static inline var ATTR_WIL:Int = 4;
+	@:modifier public static inline var ATTR_WIT:Int = 5;
+	@:modifier public static inline var ATTR_INT:Int = 6;
+	@:modifier public static inline var ATTR_PER:Int = 7;
 	
-	public static inline var CMP_ADR:Int = 8;
-	public static inline var CMP_MOB:Int = 9;
-	public static inline var CMP_CAR:Int = 10;
-	public static inline var CMP_CHA:Int = 11;
-	public static inline var CMP_TOU:Int = 12;
+	@:modifier public static inline var CMP_ADR:Int = 8;
+	@:modifier public static inline var CMP_MOB:Int = 9;
+	@:modifier public static inline var CMP_CAR:Int = 10;
+	@:modifier public static inline var CMP_CHA:Int = 11;
+	@:modifier public static inline var CMP_TOU:Int = 12;
 	
-	public static inline var CP:Int = 13;
-	public static inline var REACH:Int = 14;
-	public static inline var MP:Int = 15;
+	@:modifier public static inline var CP:Int = 13;
+	@:modifier public static inline var REACH:Int = 14;
+	@:modifier public static inline var MP:Int = 15;
 	
-	public static inline var CAR_END:Int = 16;
-	public static inline var FATIQUE_END:Int = 17;
+	@:modifier public static inline var CAR_END:Int = 16;
+	@:modifier public static inline var FATIQUE_END:Int = 17;
 
 	// Character generation modifiers
-	public static inline var STARTING_WEALTH:Int = 18;
-	public static inline var STARTING_MONEY:Int = 19;
-	public static inline var STARTING_GRIT:Int = 20;
+	@:charGenModifier public static inline var STARTING_WEALTH:Int = 18;
+	@:charGenModifier public static inline var STARTING_MONEY:Int = 19;
+	@:charGenModifier public static inline var STARTING_GRIT:Int = 20;
 	
 	public static inline var TOTAL_SLOTS:Int = 21;
 	
@@ -89,6 +89,11 @@ class StaticModifier
 	
 	public var custom:Bool;
 	
+	public inline function _setIndex(index:Int) 
+	{
+		this.index = index;
+	}
+	
 	function new() 
 	{
 		
@@ -119,6 +124,11 @@ class SituationalCharModifier
 	
 	public var next:SituationalCharModifier;
 	public var index(default, null):Int;
+	
+	public inline function _setIndex(index:Int) 
+	{
+		this.index = index;
+	}
 	
 	function new(index:Int, name:String) 
 	{
