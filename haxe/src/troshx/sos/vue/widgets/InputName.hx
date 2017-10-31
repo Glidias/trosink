@@ -28,7 +28,8 @@ class InputName extends VComponent<NoneT, InputNameProps>
 
 	@:computed function get_label():String {
 		var lbl = item.label;
-		return weaponHeldOff != null ? this.weapon.getLabelHeld(weaponHeldOff) : lbl;
+		//var wpn:Weapon = this.weapon;//&& wpn !=null
+		return weaponHeldOff != null   ? this.weapon.getLabelHeld(weaponHeldOff) : lbl;
 	}
 	@:computed function get_weapon():Weapon {
 		return LibUtil.as(item, Weapon);
@@ -61,5 +62,5 @@ class InputName extends VComponent<NoneT, InputNameProps>
 
 typedef InputNameProps = {
 	var item:Item;
-	@:prop({required:false}) @:optional var weaponHeldOff:Bool;
+	@:prop({required:false, 'default':null}) @:optional var weaponHeldOff:Bool;
 }

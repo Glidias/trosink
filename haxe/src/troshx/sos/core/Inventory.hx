@@ -758,10 +758,11 @@ class Inventory
 	}
 	
 	
-	var version:Int = 2;
+	var version:Int = 3;
 	public function postSerialization():Void
 	{
 		postSerialize_2();
+		postSerialize_3();
 	}
 	@:postSerialize function postSerialize_2():Bool {	// warning: ingame ONLY!
 		if (version == null || version < 2) version = 2
@@ -811,7 +812,17 @@ class Inventory
 		return true;
 	
 	}
-	
+	@:postSerialize function postSerialize_3():Bool {
+		if (version == null || version < 3) version = 3
+		else return false;
+		
+		for (i in 0...weapons.length) {
+			if (weapons[i].holding1H == null) {
+				weapons[i].holding1H = false;
+			}
+		}
+		return true;
+	}
 	
 	
 }

@@ -93,8 +93,10 @@ class CharSheet implements IBuildListed
 	public var prone:Bool = false;
 	public function postSerialization():Void {
 		postSerialize_2();
-	
+		
 		body = BodyChar.getInstance();  // enforce global human body instance for now.
+		
+		inventory.postSerialization();
 	}
 	@:postSerialize function postSerialize_2():Bool {	// warning: ingame ONLY!
 		if (version == null || version < 2) version = 2
@@ -103,7 +105,7 @@ class CharSheet implements IBuildListed
 			
 		if (healthLoss == null) healthLoss = 0;
 		if (prone == null) prone = false;
-		inventory.postSerialization();
+		
 		return true;
 	}
 	
