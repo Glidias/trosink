@@ -34,6 +34,12 @@ class InputNameQty extends VComponent<NoneT, InputNameQtyProps>
 		inputElem.value = this.itemQty.item.label;
 	}
 	
+	@:watch function watch_itemQty(newVal:ItemQty):Void {
+		var inputElem:InputElement = untyped _vEl; 
+		inputElem.value = newVal.item.label;
+		
+	}
+	
 	function setValidNameOfInput(inputElement:InputElement):Void {
 		
 		var tarName:String = StringTools.trim( inputElement.value);

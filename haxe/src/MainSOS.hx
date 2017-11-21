@@ -5,6 +5,7 @@ import haxevx.vuex.core.VxBoot;
 import haxevx.vuex.native.Vue;
 import js.Browser;
 import troshx.sos.vue.CharSheetVue;
+import troshx.sos.vue.RangeCalculator;
 import troshx.sos.vue.externs.SweetModal;
 import troshx.util.LibUtil;
 
@@ -68,6 +69,10 @@ class MainSOS
 		}
 		else if (hash == "inventory") {
 			boot.startVueWithRootComponent( "#app", new InventoryStandalone(new InventoryManager()));
+			VxBoot.notifyStarted();	
+		}
+		else if (hash == "range") {
+			boot.startVueWithRootComponent( "#app", new RangeCalculator());
 			VxBoot.notifyStarted();	
 		}
 		else {

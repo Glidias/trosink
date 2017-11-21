@@ -40,6 +40,12 @@ class InputName extends VComponent<NoneT, InputNameProps>
 		inputElem.value = this.item.label;
 	}
 	
+	@:watch function watch_item(newVal:Item):Void {
+		var inputElem:InputElement = untyped _vEl; 
+		inputElem.value = newVal.label;
+		
+	}
+	
 	function setValidNameOfInput(inputElement:InputElement):Void {
 		
 		var tarName:String = StringTools.trim( inputElement.value);
