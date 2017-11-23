@@ -40,6 +40,11 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		return this.shooterRapidShot ?  0.5 :  1;
 	}
 	
+	@:computed function get_additionalRSForAV():Int {
+		var d = this.shooterDamage;
+		return d > this.avValueToOvercome  ? 0 : this.avValueToOvercome - d;
+	}
+	
 	
 	override public function Template():String {
 		return '<div>
@@ -49,7 +54,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			<div><label>Aim Phases (Max 3 phases x2 MP): <InputInt :obj="$$data" prop="shooterAim" :min="0" :max="3" /></label> <b><i>{{ aimBonus }}</i></b></div>
 			<div><label>Misc MP Mod: <InputInt :obj="$$data" prop="shooterMiscMPMod"  /></label></div>
 			<div>Total MP: <b>{{ shooterTotalMP }}</b></div>
-			<div><label><input type="checkbox" v-model="shooterRapidShot"></input> Rapid Shot?</label> <i>(Half Aim Bonus)</i></div>
+			<div><label><input type="checkbox" v-model="shooterRapidShot"></input> Rapid Shot?</label> <i>(Halves Aim Bonus)</i></div>
 			<div><label>Weapon/Firer Range Band (yards): <InputInt :obj="$$data" prop="shooterRange" :min="1" /></label></div>
 			<div><label>Effective Weapon Damage: <InputInt :obj="$$data" prop="shooterDamage"  /></label></div>
 			
@@ -57,9 +62,17 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			<div><label>Misc RS Modifier: <InputInt :obj="$$data" prop="targetMiscRSMod"  /></label></div>
 			<div><label>Behaviour RS: <InputInt :obj="$$data" prop="targetBehaviourRS"  /></label></div>
 			<div><label>Environmental Cover RS:</label> <select number v-model.number="targetCoverRS"><option :value="li.value" :key="i" v-for="(li, i) in coverOptions">{{ li.label }} ({{li.value}})</option></select></div>
-			<div>Distance: <InputInt :obj="$$data" prop="targetDistance" :min="0" /><select number v-model.number="distRounding"><option v-for="(li, i) in roundingOptions" :key="i" :value="li.value">{{ li.label }}</option></select> <b>+{{targetDistanceRS}} RS</b></div>
-			<div>Total RS: <b>{{ targetTotalRS }}</b></div>
+			<div>Distance (yards): <InputInt :obj="$$data" prop="targetDistance" :min="0" /><select number v-model.number="distRounding"><option v-for="(li, i) in roundingOptions" :key="i" :value="li.value">{{ li.label }}</option></select> <b>+{{targetDistanceRS}} RS</b></div>
 			
+			<br/>
+			<div>Target RS: <b>{{ targetTotalRS }}</b></div>
+			<div>% Chance to at least Graze or Hit Fully (RS): </div>
+			<div>% Graze Percentage Margin: </div>
+			<div>% Chance to Hit Fully: </div>
+			
+			<div>Additional RS needed to overcome AV?: <span v-show="additionalRSForAV>0">+</span><b>{{additionalRSForAV}}</b></div>
+			<div>AV Value to overcome?: <InputInt :obj="$$data" prop="avValueToOvercome" :min="0" /></div>
+			<div v-show="additionalRSForAV>0">Target Armor RS: <b>{{targetTotalRS+additionalRSForAV}}</b></div>
 		</div>';
 	}
 	
@@ -88,6 +101,8 @@ class RangeCalculatorData  {
 	var targetDistance:Int = 0;
 	
 	var distRounding:Int = ROUND_OFF;
+	
+	var avValueToOvercome:Int = 0;
 	
 	var coverOptions:Array<Dynamic> = [
 		{label:"None", value:COVER_NONE },
