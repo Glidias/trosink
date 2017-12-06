@@ -521,6 +521,12 @@ class CharSheet implements IBuildListed
 		return c;
 	}
 	
+	public var pain(get, never):Int;
+	function get_pain():Int {
+		var r:Int =  this.totalPain - GRIT;
+		return r < 0 ? 0 : r;
+	}
+	
 	function get_totalPain():Int {
 		var c:Int = 0;
 		var gotInfinite:Bool = false;
@@ -659,7 +665,7 @@ class CharSheet implements IBuildListed
 	
 	inline function get_meleeCP():Int 
 	{
-		return CP - totalPain;
+		return CP - pain;
 	}
 	
 	inline function get_schoolCP():Int 

@@ -128,6 +128,7 @@
 				<div><label>Wit:</label><InputInt :obj="char" prop="wit" :min="1" :readonly="lockAttributes" /><span class="modified-attribute" v-show="wit != WIT" :class="[WIT<wit ? 'lower' : 'higher', {'zero-neg':WIT<=0}]">{{WIT}}</span></div>
 				<div><label>Intelligence:</label><InputInt :obj="char" prop="intelligence" :min="1" :readonly="lockAttributes" /><span class="modified-attribute" v-show="intelligence != INT" :class="[INT<intelligence ? 'lower' : 'higher', {'zero-neg':INT<=0}]">{{INT}}</span></div>
 				<div><label>Perception:</label><InputInt :obj="char" prop="perception" :min="1" :readonly="lockAttributes" /><span class="modified-attribute" v-show="perception != PER" :class="[PER<perception ? 'lower' : 'higher', {'zero-neg':PER<=0}]">{{PER}}</span></div>
+				<div><label>Grit Accum:</label><InputInt :obj="char" prop="gritAccum" :min="0" :readonly="lockAttributes" /></div>
 			</div>
 			<div class="gen-col">
 				<div><b>ADR</b> (Adroitness): <span class="modified-attribute" :class="[ADR==adr ?'base' : ADR<adr ? 'lower' : 'higher']"><b>{{ADR}}</b></span><i v-show="adr!=ADR" class="baseshow">({{adr}})</i></div>
@@ -153,7 +154,7 @@
 				<div>School Level: <b>{{char.schoolLevel}}</b></div>
 				<div class="cp"><b>CP</b> (Melee Combat Pool): <span :class="[CP==baseCP ?'base' : CP<baseCP ? 'lower' : 'higher', {'modified-attribute':CP != baseCP}]"><b>{{CP}}</b></span><i v-show="CP!=baseCP" class="baseshow">({{baseCP}})</i>  (<i>{{CP-char.schoolLevel}}</i> CP without &#9876;)</div>
 				
-				<div><i>CP - Pain(<span v-show="totalPain>0" class="got-pain">{{totalPain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>
+				<div><i>CP - Pain(<span v-show="pain>0" class="got-pain">{{pain}}</span>):</i> <b>{{meleeCP}}</b> (<i>{{meleeCP-char.schoolLevel}}</i> CP without &#9876;)</div>
 				<br/>
 				<div>Encumbrance Level: <span><b :style="{fontWeight:encumbranceLvl>=1 ?'bold':'normal'}">{{encumbranceLvlRow.name}}</b>({{encumbranceLvl}})</span></div>
 				<div>Skill Penalty: <span><b>{{skillPenalty}}</b></span></div>
@@ -182,6 +183,7 @@
 			</ul>
 			<div>
 				<div>Total Pain: <b>{{totalPain}}</b></div>
+				<div>Pain() felt: <b>{{pain}}</b></div>
 				<div>Total Blood Lost (BL): <b>{{totalBloodLost}}</b></div>
 			</div>
 		</section>

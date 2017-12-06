@@ -76,6 +76,10 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 	@:computed  function get_tou():Int   { return this.char.tou;  }
 	
 	@:computed function get_totalPain():Int { return this.char.totalPain;  }
+	@:computed function get_pain():Int {
+		var r:Int =  this.totalPain - this.GRIT;
+		return r < 0 ? 0 : r;
+	}
 	@:computed  function get_totalBloodLost():Int   { return this.char.totalBloodLost;  }
 
 	// derived with mods

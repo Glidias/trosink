@@ -42,7 +42,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 	
 	@:computed function get_additionalRSForAV():Int {
 		var d = this.shooterDamage;
-		return d > this.avValueToOvercome  ? 0 : this.avValueToOvercome - d;
+		return d > this.avValueToOvercome  ? 0 : 1 + this.avValueToOvercome - d;
 	}
 	
 	

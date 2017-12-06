@@ -192,6 +192,8 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		return char.body.gotSideWithId( sampleWound.locationId );
 	}
 	
+	
+	
 	function deleteWound(w:Wound):Void {
 		this.char.removeWound(w);
 	}
