@@ -29,8 +29,8 @@ class DiceRoller
 			numStacks += tn > 10 && result == 10 ? 1 : 0;
 		}
 		
-		// not too sure if stacking is handled this way..hmmm..
-		while(numStacks > 0) {
+		
+		if (numStacks > 0) {  // this method only supports tn MAX 20!
 			i = numStacks;
 			while (--i > -1) {
 				result = (Std.int(Math.random() * 10) + 1);

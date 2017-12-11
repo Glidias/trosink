@@ -101,7 +101,6 @@ class BodyChar
 		bodyChar.thrustStartIndex = Humanoid.thrustStartIndex;
 		bodyChar.rearStartIndex = Humanoid.rearStartIndex;
 		
-		// todo; remaining damage tables for actual game.
 		bodyChar.missileHitLocations = [-1, Humanoid.THRUST_HEAD, Humanoid.THRUST_CHEST,Humanoid.THRUST_CHEST, Humanoid.THRUST_BELLY, Humanoid.THRUST_GROIN, Humanoid.THRUST_UPPER_ARM, Humanoid.THRUST_LOWER_ARM, Humanoid.THRUST_UPPER_LEG, Humanoid.THRUST_LOWER_LEG ];
 		
 		bodyChar.bake();
