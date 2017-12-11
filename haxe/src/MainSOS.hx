@@ -77,11 +77,15 @@ class MainSOS
 		}
 		else {
 			var templateStr:String = '<div>
-					<h1>Song of Swords Utilities</h1>
+					<h1>Song of Swords Core Utilities</h1>
 					<ul>
 						<li><a href="${url}?chargen">Create a Character</a></li>
 						<li><a href="${url}?charsheet">Load a Character</a></li>
 						<li><a href="${url}?inventory">Inventory Manager</a></li>
+					</ul>
+					<h1>Song of Swords Tactical Utilities</h1>
+					<ul>
+						<li><a href="${url}?range">Range Viability Calculator</a></li>
 					</ul>
 					<h2>General TROSLike Utilities</h2>
 					<ul>

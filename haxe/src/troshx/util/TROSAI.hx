@@ -1,7 +1,4 @@
 package troshx.util;
-import troshx.tros.ai.TROSAiBot;
-import troshx.util.TROSAI.AIManueverChoice;
-
 /**
  * AI utility module for handling calculations/automating strategies. Can also reflect probability judgements to player. Also may contain alternative roll methods.
  * @author Glenn Ko
