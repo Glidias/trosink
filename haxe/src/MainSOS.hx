@@ -43,6 +43,9 @@ class MainSOS
 		if (params.get("characters")!=null) {
 			Globals.DOMAIN_CHARACTER = params.get("characters");
 		}
+		if (params.get("ranging")!=null) {
+			Globals.DOMAIN_RANGECALC = params.get("ranging");
+		}
 		if (params.get("autoload")!=null) {
 			Globals.AUTO_LOAD = params.get("autoload");
 		}
