@@ -823,10 +823,7 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 				if (highest == crushableSortList[i].layer) results.armorsCrushable.push(crushableSortList[i].armor);
 				
 			}
-		}
-		
-		
-		
+		}	
 		
 	}
 	

@@ -6,11 +6,13 @@ import haxevx.vuex.native.Vue;
 import js.Browser;
 import troshx.sos.core.Armor;
 import troshx.sos.core.BodyChar;
+import troshx.sos.core.DamageType;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Shield;
 import troshx.sos.core.TargetZone;
 import troshx.sos.sheets.CharSheet;
+import troshx.sos.vue.InventoryVue.ArmorLayerCalc;
 import troshx.sos.vue.input.MixinInput;
 import troshx.sos.vue.widgets.GingkoTreeBrowser;
 import troshx.util.DiceRoller;
@@ -118,8 +120,17 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
 				layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
 			}
-			a.writeAVVAluesTo(values, body, layerMask, nonFirearmMissile, 0);
+			a.writeAVVAluesTo(values, body, layerMask, nonFirearmMissile, 0);	
+		
+			
 		}
+		
+		/*
+		for (i in 0...values.length) {
+			values[i].avp += 
+		}
+		*/
+		
 		
 		return values;
 	}
@@ -160,7 +171,8 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			var tz = targetZones[i];
 			for (p in 0...tz.parts.length) {
 				var prob = tz.partWeights[p] / tz.weightsTotal;
-				var hitLoc =  body.hitLocations[tz.parts[p]];
+				var hitLocIndex:Int  = tz.parts[p];
+				var hitLoc =  body.hitLocations[hitLocIndex];
 				var gotShield:Bool = heldShield != null && LibUtil.field(coverageTruth, hitLoc.id) != null;
 				var shieldAV:Int =  gotShield ? heldShield.AV : 0;
 			
@@ -168,13 +180,15 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 				var av3:AV3 = LibUtil.field(hitAVs, hitLoc.id);
 				var av:Int = av3 != null ? av3.avp : 0;
 				
+				var layerAV:Int = av != 0 ? getLayerValue(av, hitLocIndex, hitLoc.id) : 0;
+				
 				if (gotShield && !LibUtil.field(coverageTruth, hitLoc.id)) {  // half half distribution
 					prob *= .5; 
 					var halfProb:Float = prob;
-					prob = halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, av + this.avValueToOvercome+shieldAV ) );
-					prob += halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, av + this.avValueToOvercome ) );
+					prob = halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av + 4+this.avValueToOvercome+shieldAV ) );
+					prob += halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av + 4+this.avValueToOvercome ) );
 				}
-				else prob *= TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, av+this.avValueToOvercome+shieldAV )  );
+				else prob *= TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av+ 4+this.avValueToOvercome+shieldAV )  );
 				
 				totalProb += prob;
 			}
@@ -251,7 +265,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 	
 	@:computed function get_additionalRSForAV():Int {
 		var d = this.shooterDamage;
-		return d > this.avValueToOvercome  ? 0 : 1 + this.avValueToOvercome - d;
+		return d > this.avValueToOvercome + 4  ? 0 : 1 + this.avValueToOvercome + 4 - d;
 	}
 	
 	@:computed function get_domainId():String {
@@ -310,6 +324,139 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		
 		
 		return false;
+	}
+	
+	
+	static var SAMPLE_AV:AV3 = {avc:0, avp:0, avb:0};
+	//static var SAMPLE_RESULTS:ArmorCalcResults =   new ArmorCalcResults();
+	
+	
+	function sortArmorLayers(a:ArmorLayerCalc, b:ArmorLayerCalc):Int {
+	  if (a.layer < b.layer) return -1;
+	  else if (a.layer > b.layer) return 1;
+	  return 0;
+	} 
+	
+	function getLayerValue(dominantAV:Int, hitLocationIndex:Int, hitLocationId:String):Int {
+		//this.calcAVColumn = columnNum;
+		//this.calcAVRowIndex = rowIndex;
+		
+		
+		// perfrorm calculation
+		
+		var hitLocArmorValues = this.hitLocationArmorValues;
+		var coverageLocs = coverageHitLocations;
+	
+		var hitLocationMask:Int = (1 << hitLocationIndex);
+		var curRow:AV3 = LibUtil.field( hitLocArmorValues, hitLocationId);
+		
+		//var results:ArmorCalcResults = SAMPLE_RESULTS; // this.calcArmorResults;
+		//results.damageType = DamageType.PIERCING;
+		//results.hitLocationIndex = hitLcati;
+		//results.layer = 0;
+		//results.av = columnNum == 1 ? curRow.avc : columnNum == 2  ? curRow.avp : curRow.avb;
+		//results.av = 0;
+		
+		//results.armorsLayer = [];
+		var armorsProtectable = [];
+		//results.armorsCrushable = [];
+		
+		// else look for armors whose computed AVs at hit location is tabulated to match results.av
+		var sampleAV:AV3 = SAMPLE_AV;
+		var inventory = targetInventory;
+		var armorList = inventory.wornArmor;
+		var body:BodyChar = BodyChar.getInstance();
+		var targetingZoneMask:Int = 0;// this.targetingZoneMask;
+		var isNonFirearmMissile = !this.shooterFirearm;
+
+		//if (dominantAV != 0) {  // av found at location, find dominant armors and layers
+			var comparisonLayerMasks:Array<Int>  = [];  // temp for case to layers
+		
+			for (i in 0...armorList.length) {
+				var a:Armor = armorList[i].armor;
+				if (LibUtil.field(a.coverage, hitLocationId) == null) {
+					comparisonLayerMasks.push(0);
+					continue;
+				}
+				
+				var layerMask:Int = 0;
+				
+				if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
+					layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+				}
+				comparisonLayerMasks.push(layerMask);
+				
+				
+				if ( a.writeAVsAtLocation(body, hitLocationId, hitLocationMask, sampleAV, layerMask, isNonFirearmMissile, targetingZoneMask, true) ) {
+					var compareAV:Int = sampleAV.avp;
+					
+					if (compareAV == dominantAV) {
+						armorsProtectable.push(a);
+					}
+					
+				}
+			}
+			
+			if (armorsProtectable.length != 0)  {
+				
+				// now, find highest possible layers
+				var highest:Int = 0;
+				
+				
+				var comparisonLayeredArmor:Array<ArmorLayerCalc> = [];
+				
+				for (i in 0...armorList.length) {
+					var a:Armor = armorList[i].armor;
+					if (LibUtil.field(a.coverage, hitLocationId) == null) continue;
+					
+					var c = a.getLayerValueAt(hitLocationMask, comparisonLayerMasks[i]);
+					// get layer value of armor.. get highest layer value among all to be sorted later on
+					if (c > 0) {
+						comparisonLayeredArmor.push({armor:a, layer:c});
+					}	
+				}
+				
+				if (comparisonLayeredArmor.length > 0) {
+				
+
+					haxe.ds.ArraySort.sort(comparisonLayeredArmor, sortArmorLayers);
+
+					if (armorsProtectable.length == 1 && armorsProtectable[0]== comparisonLayeredArmor[comparisonLayeredArmor.length-1].armor) {
+						comparisonLayeredArmor.pop();
+					}
+					if (comparisonLayeredArmor.length > 0) {
+						return comparisonLayeredArmor[comparisonLayeredArmor.length - 1].layer;
+
+						/*
+						var i = comparisonLayeredArmor.length;
+						while(--i > -1) {
+							if (comparisonLayeredArmor[i].layer == results.layer) {
+								results.armorsLayer.push(comparisonLayeredArmor[i].armor);
+							}
+						}
+						var ind:Int;
+						if (results.armorsProtectable.length == 1 && (ind = results.armorsLayer.indexOf(results.armorsProtectable[0])  )>=0 ) {
+							comparisonLayeredArmor.splice(ind, 1);
+						}
+						*/
+					
+						
+						/*
+						if (results.armorsProtectable.length >=2 && results.armorsLayer.length == 1 && (ind = results.armorsProtectable.indexOf(results.armorsLayer[0] ) )>=0 ) {
+							results.armorsProtectable.splice(ind, 1);
+						}
+						*/
+					}
+					
+					
+					
+				
+				}
+			
+			}
+			
+		//}
+		return 0;
 	}
 	
 	function openTreeBrowser():Void {
@@ -395,7 +542,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			<div v-if="targetInventory != null"><i>Armor Outfit Loaded...</i>:</div>
 			<div>{{ targetInventory != null ? "Global AV Modifier:" : "AV Value to overcome?:"}} <InputInt :obj="$$data" prop="avValueToOvercome" :min="0" /></div>
 			<div v-show="additionalRSForAV>0 && targetInventory == null">Target Armor RS: <b>{{breachArmorRS}}</b></div>
-			<div v-show="additionalRSForAV>0 || targetInventory != null"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} <span v-if="shooterRapidShot">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>
+			<div v-show="additionalRSForAV>0 || targetInventory != null"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} and TOU<span v-if="shooterRapidShot">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>
 			<div v-if="targetInventory == null">
 				<div><span class="shield-icon-inv">☗</span> With Shield? <select v-model.number="targetShield" number><option :value="0">None</option><option :value="1">Small</option><option :value="2">Medium</option><option :value="3">Large</option></select></div>
 				<div v-show="targetShield!=0">Shield Position: <select v-model.number="targetShieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select> <span class="shield-icon-inv">☗</span></div>
