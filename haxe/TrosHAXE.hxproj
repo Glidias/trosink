@@ -12,7 +12,6 @@
     <movie minorVersion="0" />
     <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="Haxe 3.4.2;3.4.2;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -25,7 +24,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="MainSOS" />
     <option enabledebug="False" />
-    <option additional="-D vue_global&#xA;-D production" />
+    <option additional="-D vue_global" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
@@ -46,7 +45,7 @@
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
-    <option showHiddenPaths="True" />
+    <option showHiddenPaths="False" />
     <option testMovie="OpenDocument" />
     <option testMovieCommand="bin/index.html" />
   </options>

@@ -1,0 +1,207 @@
+<div class="inventory" v-on:click="onBaseInventoryClick">
+	
+	<h4>Dropped:</h4>
+	<table border="1">
+		<thead>
+			<tr>
+				<td>Item Name</td>
+				<td class="qty">Qty</td>
+				<td class="weight">Weight</td>
+				<td class="munition-type">Type</td>
+				<td class="actions"><i>Actions</i></td>
+			</tr>
+		</thead>
+		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('dropped', $event)" v-on:touchstart.native="setCurWidgetSection('dropped', $event)">
+			
+			<tr v-for="(entry,i) in inventory.dropped.list" :key="entry.item.get_uid()">
+				<td><input-name-qty :itemQty="entry" v-on:updated="onInputNameUpdated" :customValidateName="validateQtyNameDropped" /></td>
+				<td><InputInt :obj="entry" prop="qty" :min="1"></InputInt></td>
+				<td><InputNumber :floating="true" :step="0.5" :obj="entry.item" prop="weight" :min="0"></InputNumber></td>
+				<td>{{ entry.item.getTypeLabel() }}</td>
+				<td>
+					<a href="javascript:;" v-on:click="inventory.equipItemEntryFromGround(entry)">Equip</a>
+					<a href="javascript:;" v-on:click="inventory.deleteDropped(entry)">Delete</a>
+				</td>
+			</tr>	
+		</tbody>
+	</table>
+
+	<h4>Shields:</h4>
+	<table border="1">
+		<thead>
+			<tr>
+				<td style="width:155px">Shield Name</td>
+				<td style="width:35px">AV</td>
+				<td style="width:35px">Block</td>
+				<td style="width:45px">Weight</td>
+				<td style="width:67px">Size</td>
+				<td class="tags">Tags</td>
+				<td style="width:130px">Kept at?</td>
+				<td class="held">Held?</td>
+				<td class="actions"><i>Actions</i></td>
+			</tr>
+		</thead>
+		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('shield',$event)" v-on:touchstart.native="setCurWidgetSection('shield',$event)">
+			<tr :key="entry.key" v-for="(entry,i) in inventory.shields">
+				<td><input-name :item="entry.shield" v-on:updated="onInputNameUpdated" /></td>
+				<td><InputInt :obj="entry.shield" prop="AV" :min="1"></InputInt></td>
+				<td><InputInt :obj="entry.shield" prop="blockTN" :min="0"></InputInt></td>
+				<td><InputNumber :step="0.5" :obj="entry.shield" prop="weight" :min="0"></InputNumber></td>
+				<td>
+					<select number v-model.number="entry.shield.size ">
+						<option :value="0">Small</option>
+						<option :value="1">Medium</option>
+						<option :value="2">Large</option>
+					</select>
+				</td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.shield)" :index="i" :showWidget="isVisibleWidget('shield','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
+				<td-unheld :entry="entry" :requestCurWidget="requestCurWidget" :index="i" :showWidget="isVisibleWidget('shield', 'td-unheld', i)" />
+				<td>
+					<select-held :entry="entry" :inventory="inventory" />
+				</td>
+				<td>
+					<a href="javascript:;" v-on:click="dropEquipedShield(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropEquipedShield(entry, true)">Delete</a>
+				</td>
+			</tr>
+			<tr class="entry-row" :key="-1">
+				<td><input type="text" v-on:focus="focusInRowField(shieldEntry, 1)" v-on:blur="focusOutRowField(shieldEntry, 1)" v-model="shieldEntry.e.shield.name" required></input></td>
+				<td><InputInt v-on:focus.native="focusInRowField(shieldEntry, 2)" v-on:blur.native="focusOutRowField(shieldEntry, 2)" :obj="shieldEntry.e.shield" prop="AV" :min="1"></InputInt></td>
+				<td><InputInt v-on:focus.native="focusInRowField(shieldEntry, 4)" v-on:blur.native="focusOutRowField(shieldEntry, 4)" :obj="shieldEntry.e.shield" prop="blockTN" :min="0"></InputInt></td>
+				<td><InputInt v-on:focus.native="focusInRowField(shieldEntry, 8)" v-on:blur.native="focusOutRowField(shieldEntry, 8)" :obj="shieldEntry.e.shield" prop="weight" :min="0"></InputInt></td>
+				<td>
+					<select v-model.number="shieldEntry.e.shield.size" v-on:focus="focusInRowField(shieldEntry, 16)" v-on:blur="focusOutRowField(shieldEntry, 16)">
+						<option :value="0">Small</option>
+						<option :value="1">Medium</option>
+						<option :value="2">Large</option>
+					</select>
+				</td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(shieldEntry.e.shield)" :index="-1" :showWidget="(shieldEntry.focusedFlags & (32|(1<<21))) !=0" :entry="shieldEntry.e" :requestCurWidget="requestCurWidget"
+				v-on:focus-in-row="focusInRowField(shieldEntry, 32)" v-on:focus-out-row="focusOutRowField(shieldEntry, 32)" v-on:focus-widget="focusInRowField(shieldEntry, (1<<21))" />
+				<td><input type="text" v-model="shieldEntry.e.unheldRemark" v-on:focus="focusInRowField(shieldEntry,64)" v-on:blur="focusOutRowField(shieldEntry,64)"></input></td>	
+				
+			</tr>
+		</tbody>
+	</table>
+	
+	<h4>Armor:</h4>
+	<table border="1">
+		<thead>
+			<tr>
+				<td>Armor Name</td>
+				<td>AVC</td>
+				<td>AVP</td>
+				<td>AVB</td>
+				<td>Coverage</td>
+				<td class="weight">Weight</td>
+				<td class="tags">Tags</td>
+				<td class="actions"><i>Actions</i></td>
+			</tr>
+		</thead>
+		<tbody :name="itemTransitionName" is="transition-group" v-on:mousedown.native="setCurWidgetSection('armor', $event)"  v-on:touchstart.native="setCurWidgetSection('armor', $event)">
+			<tr v-for="(entry, i) in inventory.wornArmor" :key="i">
+				<td><input-name :item="entry.armor" v-on:updated="onInputNameUpdated" /></td>
+				<td><InputInt :min="0" :obj="entry.armor" prop="AVC"></InputInt></td>
+				<td><InputInt :min="0" :obj="entry.armor" prop="AVP"></InputInt></td>
+				<td><InputInt :min="0" :obj="entry.armor" prop="AVB"></InputInt></td>			
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="coverage" widgetTagName="w-coverage" :value="getCoverage(entry.armor)" :index="i" :showWidget="isVisibleWidget('armor','coverage', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
+				<td><InputNumber :min="0" :step="0.5" :obj="entry.armor" prop="weight"></InputNumber></td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(entry.armor)" :index="i" :showWidget="isVisibleWidget('armor','tags', i)" :entry="entry" :requestCurWidget="requestCurWidget" />
+				
+				<td>
+					<a href="javascript:;" v-on:click="dropWornArmor(entry)">Drop</a>
+					<a href="javascript:;" v-on:click="dropWornArmor(entry, true)">Delete</a>
+				</td>
+			</tr>
+			<tr class="entry-row" :key="-1">
+				<td><input type="text" v-model="armorEntry.e.armor.name" v-on:focus="focusInRowField(armorEntry,1)" v-on:blur="focusOutRowField(armorEntry,1)"></input></td>
+				<td><InputInt :min="0" :obj="armorEntry.e.armor" prop="AVC" v-on:focus.native="focusInRowField(armorEntry,2)" v-on:blur.native="focusOutRowField(armorEntry,2)"></InputInt></td>
+				<td><InputInt :min="0" :obj="armorEntry.e.armor" prop="AVP" v-on:focus.native="focusInRowField(armorEntry,4)" v-on:blur.native="focusOutRowField(armorEntry,4)"></InputInt></td>
+				<td><InputInt :min="0" :obj="armorEntry.e.armor" prop="AVB" v-on:focus.native="focusInRowField(armorEntry,8)" v-on:blur.native="focusOutRowField(armorEntry,8)"></InputInt></td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="coverage" widgetTagName="w-coverage" :value="getCoverage(armorEntry.e.armor)" :index="-1" :showWidget="(armorEntry.focusedFlags & (16|(1<<20))) !=0" :entry="armorEntry.e.armor" :requestCurWidget="requestCurWidget"
+					v-on:focus-in-row="focusInRowField(armorEntry, 16)" v-on:focus-out-row="focusOutRowField(armorEntry, 16)" v-on:focus-widget="focusInRowField(armorEntry, (1<<20))" />
+				
+				
+				<td><InputNumber :min="0" :step="0.5" :obj="armorEntry.e.armor" prop="weight" v-on:focus.native="focusInRowField(armorEntry,32)" v-on:blur.native="focusOutRowField(armorEntry,32)"></InputNumber></td>
+				<td-widget v-on:focus-widget-value="focusWidgetValue" widgetName="tags" widgetTagName="w-tags" :value="getTags(armorEntry.e.armor)" :index="-1" :showWidget="(armorEntry.focusedFlags & (64|(1<<21))) !=0" :entry="armorEntry.e.armor" :requestCurWidget="requestCurWidget"
+				v-on:focus-in-row="focusInRowField(armorEntry, 64)" v-on:focus-out-row="focusOutRowField(armorEntry, 64)" v-on:focus-widget="focusInRowField(armorEntry, (1<<21))" />
+				<td><input type="text" readonly class="focusable" v-on:focus="focusInRowField(armorEntry,64)" v-on:blur="focusOutRowField(armorEntry,64)"></input></td>
+			</tr>
+		</tbody>
+	</table>		
+	
+	
+	<hr/>
+		
+		<div class="overall-armor-coverage" v-if="showArmorCoverage">
+			<h4>Overall Armor Coverage:</h4>	
+			<div v-if="carriedShield!=null">Held Shield: <b>{{carriedShield.name}}</b> <span class="shield-icon-inv">☗</span></div>
+			<div v-if="carriedShield!=null">Size: <b>{{shieldSizeLabels[carriedShield.size]}}</b></div>
+			<div><label>Prefered Shield Position:
+				<select v-model.number="inventory.shieldPosition" number>
+					<option :value="0">Low</option>
+					<option :value="1">High</option>
+				</select>	
+			</label> <span v-show="carriedShield==null"> (if held)</span></div>
+			<div style="display:inline-block;vertical-align:top;">
+				<table border="1" class="table-coverage">
+					<thead>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>AVC</td>
+							<td>AVP<span v-show="calcArmorMissile"> ↢</span></td>
+							<td>AVB</td>
+							<td v-if="carriedShield !=null">sAV	<span class="shield-icon-inv">☗</span></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(li, i) in coverageHitLocations">
+							<td><i>{{getHitLocationMaskNameOf(i)}}</i></td>
+							<td>{{i+1}}. {{li.name}}</td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avc" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(1, i)" v-on:blur="focusOutAVColumnRowIndex(1,i)"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avp" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(2, i)" v-on:blur="focusOutAVColumnRowIndex(2,i)"></input></td>
+							<td><input type="number" readonly :value="hitLocationArmorValues[li.id].avb" :disabled="isDisabledHitLocation(i)" v-on:focus="calcAVColumnRowIndex(3, i)" v-on:blur="focusOutAVColumnRowIndex(3,i)"></input></td>
+							<td v-if="carriedShield!=null" v-show="shieldCoverage[li.id]!=null" class="td-shield" :class="{active:calcAVRowIndex==i && shieldAVHigherOrEqual }">{{ shieldCoverage[li.id] ===false ? "~" : ""}}{{ carriedShield.AV }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div style="display:inline-block;vertical-align:top;margin-left:8px;">
+				<div><i class="consider">Consider against:</i></div>
+				<br/>
+				<div><label><input type="checkbox" v-model="calcArmorCrushing"></input>Crushing attack</label></div>
+				<div><label><input type="checkbox" v-model="calcArmorMissile"></input>Missile attack ↢</label> <label :class="{disabled:!calcArmorMissile}" :style="{'pointer-events':!calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorFirearm"></input><i>Firearm?</i></label> Hit at:<select number v-model.number="selectedMissileTargetZoneIndex"><option :value="-1"></option><option :value="i" v-for="(li, i) in missileHitTargetZones" :key="i">{{i+2}}:{{li.tz.name}}</option></select> <a v-on:click="selectedMissileTargetZoneIndex=-1" href="javascript:;" v-show="selectedMissileTargetZoneIndex>=0">[x]</a></div>
+				<div><label :class="{disabled:calcArmorMissile}" :style="{'pointer-events':calcArmorMissile ? 'none': 'auto'}"><input type="checkbox" v-model="calcArmorMeleeTargeting"></input> <span :class="{disabled:!shouldCalcMeleeAiming}">Melee Targeting:</span> </label><select number :disabled="!shouldCalcMeleeAiming" v-model.number="calcMeleeTargetingZoneIndex">
+					<option :value="i" v-for="(li, i) in body.targetZones">{{ body.getDescLabelTargetZone(i) }}</option>
+				</select></div>
+				<div style="margin-top:5px" v-show="calcArmorMeleeTargeting && shouldCalcMeleeAiming">{{ calcMeleeTZProbabilities }}</div>
+				<div style="margin-top:5px" v-show="calcArmorMissile && selectedMissileTargetZoneIndex>=0">{{ calcRangedTZProbabilities }}</div>
+				<br/>
+				<div><i>Result: </i><b>{{ calcArmorResults.av + calcArmorResults.layer }} AV</b></div>
+				<i class="cta" v-show="calcAVColumn==0">&lt;- Focus-click on table cells to inspect result.</i>
+				<br/>
+				<div v-show="calcAVColumn!=0">
+					<div><span class="outline-dominant">AV Armor protecting: <b>{{ calcArmorResults.av }} AV</b></span></div>
+					<ul v-show="hasArmorResultProtecting">
+						<li v-for="li in calcArmorResults.armorsProtectable">{{ li.name }}</li>
+					</ul>
+					<br v-show="!hasArmorResultProtecting" />
+					<div><span class="outline-layer">Layer protecting: <b>+{{ calcArmorResults.layer }} AV</b></span></div>
+					<ul v-show="hasArmorResultLayers">
+						<li v-for="li in calcArmorResults.armorsLayer">{{ li.name }}</li>
+					</ul>
+					<br v-show="!hasArmorResultLayers" />
+					<div v-show="calcArmorCrushing">
+						<div><span class="outline-crushed">Crushable Hard Armor: <b><span v-show="!hasArmorCrushables"> <i>none</i></span></b></span></div>
+						<ul v-show="hasArmorCrushables">
+							<li v-for="li in calcArmorResults.armorsCrushable">{{ li.name }}</li>
+						</ul>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	
+	<div class="focus-value-bar"><input type="text" :value="focusValueText" readonly></input></div>
+</div>
