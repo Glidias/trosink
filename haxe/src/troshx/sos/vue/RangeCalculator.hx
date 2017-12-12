@@ -542,14 +542,14 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			<div v-if="targetInventory != null"><i>Armor Outfit Loaded...</i>:</div>
 			<div>{{ targetInventory != null ? "Global AV Modifier:" : "AV Value to overcome?:"}} <InputInt :obj="$$data" prop="avValueToOvercome" :min="0" /></div>
 			<div v-show="additionalRSForAV>0 && targetInventory == null">Target Armor RS: <b>{{breachArmorRS}}</b></div>
-			<div v-show="additionalRSForAV>0 || targetInventory != null"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} and TOU<span v-if="shooterRapidShot">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>
+			<div v-show="additionalRSForAV>0 || targetInventory != null"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} + TOU4<span v-if="shooterRapidShot">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>
 			<div v-if="targetInventory == null">
 				<div><span class="shield-icon-inv">☗</span> With Shield? <select v-model.number="targetShield" number><option :value="0">None</option><option :value="1">Small</option><option :value="2">Medium</option><option :value="3">Large</option></select></div>
 				<div v-show="targetShield!=0">Shield Position: <select v-model.number="targetShieldPosition" number><option :value="0">Low</option><option :value="1">High</option></select> <span class="shield-icon-inv">☗</span></div>
 				<div v-if="targetShield > 0"><b>{{roundPerc(chanceToBypassShield)}}</b>% chance to bypass Shield alone</div>
 				<div v-if="targetShield > 0"><b>{{roundPerc(chanceToBypassShield*chanceToAtLeastGraze)}}</b>% chance bypass &amp; at least Graze</div>
 				<div v-if="targetShield > 0"><b>{{roundPerc(chanceToBypassShield*chanceToHitFully)}}</b>% chance bypass &amp; to Hit Fully</div>
-				<div v-if="targetShield > 0 && additionalRSForAV>0"><b>{{roundPerc(chanceToBypassShield*chanceToHitFully)}}</b>% chance to bypass &amp; Penetrate given AV</div>
+				<div v-if="targetShield > 0 && additionalRSForAV>0"><b>{{roundPerc(chanceToBypassShield*breachArmorRSChance)}}</b>% chance to bypass &amp; Penetrate given AV + TOU4</div>
 			</div>
 			<div v-else>
 				<inventory :inventory="targetInventory"></inventory>
