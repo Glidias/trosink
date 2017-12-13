@@ -176,7 +176,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		
 		var body:BodyChar = BodyChar.getInstance();
 		var targetZones = body.targetZones;
-		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(Math.floor(lowestAV*.5)+this.avValueToOvercome, this.shooterAP)+4 ) ) ; // assume 1st slot is critical hit always
+		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(Math.floor((lowestAV+this.avValueToOvercome)*.5), this.shooterAP)+4 ) ) ; // assume 1st slot is critical hit always
 		
 		for ( i in 1...body.missileHitLocations.length) {
 			var tz = targetZones[i];
