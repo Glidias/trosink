@@ -157,6 +157,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		
 		var shooterAP:Int = this.shooterAP;
 		if (lowestAV == 999999999) lowestAV = 0;
+		
 
 		
 		var inventory:Inventory = this.targetInventory;
@@ -175,7 +176,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		
 		var body:BodyChar = BodyChar.getInstance();
 		var targetZones = body.targetZones;
-		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(lowestAV+this.avValueToOvercome, this.shooterAP)) ) ; // assume 1st slot is critical hit always
+		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(Math.floor(lowestAV*.5)+this.avValueToOvercome, this.shooterAP)+4 ) ) ; // assume 1st slot is critical hit always
 		
 		for ( i in 1...body.missileHitLocations.length) {
 			var tz = targetZones[i];
