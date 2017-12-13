@@ -135,6 +135,11 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		return values;
 	}
 	
+	inline function pierceAV(av:Int, amt:Int):Int {
+		av -= amt;
+		return av  < 0 ? 0 : av;
+	}
+	
 	inline function getArmorRS(baseRS:Int, shooterDamage:Int, av:Int):Int {
 		return baseRS + (shooterDamage > av ? 0 : 1 + av - shooterDamage);
 	}
@@ -150,6 +155,10 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			if (av < lowestAV) lowestAV = av;
 		}
 		
+		var shooterAP:Int = this.shooterAP;
+		if (lowestAV == 999999999) lowestAV = 0;
+
+		
 		var inventory:Inventory = this.targetInventory;
 		
 		var heldShield:Shield =  inventory.findHeldShield();
@@ -163,9 +172,10 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 		var tn:Int = this.shooterTN;
 		var targetRS:Int = this.targetTotalRS;
 		var shooterDamage:Int = this.shooterDamage;
+		
 		var body:BodyChar = BodyChar.getInstance();
 		var targetZones = body.targetZones;
-		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, lowestAV+this.avValueToOvercome)  ) ; // assume 1st slot is critical hit always
+		var totalProb:Float = TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(lowestAV+this.avValueToOvercome, this.shooterAP)) ) ; // assume 1st slot is critical hit always
 		
 		for ( i in 1...body.missileHitLocations.length) {
 			var tz = targetZones[i];
@@ -185,10 +195,10 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 				if (gotShield && !LibUtil.field(coverageTruth, hitLoc.id)) {  // half half distribution
 					prob *= .5; 
 					var halfProb:Float = prob;
-					prob = halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av + 4+this.avValueToOvercome+shieldAV ) );
-					prob += halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av + 4+this.avValueToOvercome ) );
+					prob = halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(layerAV+ av +this.avValueToOvercome+shieldAV, shooterAP) + 4 ) );
+					prob += halfProb * TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(layerAV+ av +this.avValueToOvercome, shooterAP) + 4 ) );
 				}
-				else prob *= TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, layerAV+ av+ 4+this.avValueToOvercome+shieldAV )  );
+				else prob *= TROSAI.getAtLeastXSuccessesProb(totalMP, tn, getArmorRS(targetRS, shooterDamage, pierceAV(layerAV+av+this.avValueToOvercome+shieldAV, shooterAP) + 4 )  );
 				
 				totalProb += prob;
 			}
@@ -265,7 +275,8 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 	
 	@:computed function get_additionalRSForAV():Int {
 		var d = this.shooterDamage;
-		return d > this.avValueToOvercome + 4  ? 0 : 1 + this.avValueToOvercome + 4 - d;
+		var av = pierceAV(this.avValueToOvercome, this.shooterAP);
+		return d > av + 4  ? 0 : 1 + av + 4 - d;
 	}
 	
 	@:computed function get_domainId():String {
@@ -525,6 +536,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			<div><label><input type="checkbox" v-model="shooterRapidShot"></input> Rapid Shot?</label> <i>(Also includes house-rule that Halves Aim Bonus)</i></div>
 			<div><label>Weapon/Firer Range Band (yards): <InputInt :obj="$$data" prop="shooterRange" :min="1" /></label></div>
 			<div><label>Effective Weapon Damage: <InputInt :obj="$$data" prop="shooterDamage"  /></label></div>
+			<div><label>Weapon Armor Piercing (AP): <InputInt :obj="$$data" prop="shooterAP"  /></label></div>
 			<div><label>Weapon TN: <InputInt :obj="$$data" prop="shooterTN" :min="1" /></label></div>
 			<div><label>Firearm? <input type="checkbox" v-model="shooterFirearm"></input></label></div>
 			
@@ -568,6 +580,7 @@ class RangeCalculatorData  {
 	var shooterRange:Int = 1;
 	var shooterFirearm:Bool = false;
 	var shooterDamage:Int = 0;
+	var shooterAP:Int = 0;
 	
 	public static inline var ROUND_DOWN:Int = 0;
 	public static inline var ROUND_OFF:Int = 1;
