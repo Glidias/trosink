@@ -10671,32 +10671,32 @@ troshx_sos_sheets_CharSheet.prototype = {
 		return c;
 	}
 	,get_adr: function() {
-		return (this.agility + this.wit) / 2 | 0;
+		return (this.get_AGI() + this.get_WIT()) / 2 | 0;
 	}
 	,get_mob: function() {
-		return (this.strength + this.agility + this.endurance) / 2 | 0;
+		return (this.get_STR() + this.get_AGI() + this.get_END()) / 2 | 0;
 	}
 	,get_car: function() {
-		return this.strength + this.endurance;
+		return this.get_STR() + this.get_END();
 	}
 	,get_cha: function() {
-		return (this.willpower + this.wit + this.perception) / 2 | 0;
+		return (this.get_WIP() + this.get_WIT() + this.get_PER()) / 2 | 0;
 	}
 	,get_tou: function() {
 		return 4;
 	}
 	,get_ADR: function() {
-		return this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0));
+		return this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0));
 	}
 	,get_MOB: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.mobMult * this.clampIntZero(this.getModifiedValue(9,(this.strength + this.agility + this.endurance) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].mob);
+		return row.mobMult * this.clampIntZero(this.getModifiedValue(9,(this.get_STR() + this.get_AGI() + this.get_END()) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].mob);
 	}
 	,get_CAR: function() {
-		return this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance))));
+		return this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END()))));
 	}
 	,get_CHA: function() {
-		return this.clampIntZero(this.getModifiedValue(11,(this.willpower + this.wit + this.perception) / 2 | 0));
+		return this.clampIntZero(this.getModifiedValue(11,(this.get_WIP() + this.get_WIT() + this.get_PER()) / 2 | 0));
 	}
 	,get_startingGrit: function() {
 		return this.clampIntZero(this.getModifiedValue(20,this.willpower / 2 | 0));
@@ -10749,15 +10749,15 @@ troshx_sos_sheets_CharSheet.prototype = {
 		}
 	}
 	,get_baseCP: function() {
-		return (this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0));
+		return (this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0));
 	}
 	,get_CP: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp);
+		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp);
 	}
 	,get_meleeCP: function() {
 		var row = this.get_encumbranceLvlRow();
-		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.agility + this.wit) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp) - this.get_pain();
+		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel + 4 : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp) - this.get_pain();
 	}
 	,get_schoolCP: function() {
 		if(this.schoolLevel >= 1) {
@@ -10782,13 +10782,13 @@ troshx_sos_sheets_CharSheet.prototype = {
 	}
 	,get_encumbranceLvlRow: function() {
 		var tabler = troshx_sos_sheets_EncumbranceTable.getTable();
-		return tabler[Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance))))) >= tabler.length ? tabler.length - 1 : Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance))))) < 0 ? 0 : Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance)))))];
+		return tabler[Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END()))))) >= tabler.length ? tabler.length - 1 : Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END()))))) < 0 ? 0 : Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END())))))];
 	}
 	,get_encumbranceLvl: function() {
-		return Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance)))));
+		return Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END())))));
 	}
 	,get_encumberedBeyond: function() {
-		return Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.strength + this.endurance))))) >= 5;
+		return Math.floor(this.inventory.calculateTotalWeight() / this.clampIntZero(this.getModifiedValue(10,this.clampIntZero(this.getModifiedValue(16,this.get_STR() + this.get_END()))))) >= 5;
 	}
 	,get_exhaustionRate: function() {
 		return this.get_encumbranceLvlRow().exhaustion;
@@ -12314,7 +12314,7 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_encumbranceLvl: function() {
 		var _this = this["char"];
-		return Math.floor(_this.inventory.calculateTotalWeight() / _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.strength + _this.endurance)))));
+		return Math.floor(_this.inventory.calculateTotalWeight() / _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.get_STR() + _this.get_END())))));
 	}
 	,get_offhandWeapon: function() {
 		return this["char"].inventory.getOffhandWeapon();
@@ -12332,19 +12332,19 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_adr: function() {
 		var _this = this["char"];
-		return (_this.agility + _this.wit) / 2 | 0;
+		return (_this.get_AGI() + _this.get_WIT()) / 2 | 0;
 	}
 	,get_mob: function() {
 		var _this = this["char"];
-		return (_this.strength + _this.agility + _this.endurance) / 2 | 0;
+		return (_this.get_STR() + _this.get_AGI() + _this.get_END()) / 2 | 0;
 	}
 	,get_car: function() {
 		var _this = this["char"];
-		return _this.strength + _this.endurance;
+		return _this.get_STR() + _this.get_END();
 	}
 	,get_cha: function() {
 		var _this = this["char"];
-		return (_this.willpower + _this.wit + _this.perception) / 2 | 0;
+		return (_this.get_WIP() + _this.get_WIT() + _this.get_PER()) / 2 | 0;
 	}
 	,get_tou: function() {
 		var _this = this["char"];
@@ -12366,20 +12366,20 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_ADR: function() {
 		var _this = this["char"];
-		return _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0));
+		return _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0));
 	}
 	,get_MOB: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.mobMult * _this.clampIntZero(_this.getModifiedValue(9,(_this.strength + _this.agility + _this.endurance) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].mob);
+		return row.mobMult * _this.clampIntZero(_this.getModifiedValue(9,(_this.get_STR() + _this.get_AGI() + _this.get_END()) / 2 | 0) + row.mob + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].mob);
 	}
 	,get_CAR: function() {
 		var _this = this["char"];
-		return _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.strength + _this.endurance))));
+		return _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.get_STR() + _this.get_END()))));
 	}
 	,get_CHA: function() {
 		var _this = this["char"];
-		return _this.clampIntZero(_this.getModifiedValue(11,(_this.willpower + _this.wit + _this.perception) / 2 | 0));
+		return _this.clampIntZero(_this.getModifiedValue(11,(_this.get_WIP() + _this.get_WIT() + _this.get_PER()) / 2 | 0));
 	}
 	,get_startingGrit: function() {
 		var _this = this["char"];
@@ -12675,17 +12675,17 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_baseCP: function() {
 		var _this = this["char"];
-		return (_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0));
+		return (_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0));
 	}
 	,get_CP: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp);
+		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp);
 	}
 	,get_meleeCP: function() {
 		var _this = this["char"];
 		var row = _this.get_encumbranceLvlRow();
-		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.agility + _this.wit) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp) - _this.get_pain();
+		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel + 4 : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp) - _this.get_pain();
 	}
 	,get_schoolCP: function() {
 		var _this = this["char"];
@@ -12703,7 +12703,7 @@ troshx_sos_vue_CharVueMixin.prototype = $extend(haxevx_vuex_core_VComponent.prot
 	}
 	,get_encumberedBeyond: function() {
 		var _this = this["char"];
-		return Math.floor(_this.inventory.calculateTotalWeight() / _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.strength + _this.endurance))))) >= 5;
+		return Math.floor(_this.inventory.calculateTotalWeight() / _this.clampIntZero(_this.getModifiedValue(10,_this.clampIntZero(_this.getModifiedValue(16,_this.get_STR() + _this.get_END()))))) >= 5;
 	}
 	,get_skillPenalty: function() {
 		return this["char"].get_skillPenalty();
@@ -14511,6 +14511,14 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 		}
 		return values;
 	}
+	,pierceAV: function(av,amt) {
+		av -= amt;
+		if(av < 0) {
+			return 0;
+		} else {
+			return av;
+		}
+	}
 	,getArmorRS: function(baseRS,shooterDamage,av) {
 		return baseRS + (shooterDamage > av ? 0 : 1 + av - shooterDamage);
 	}
@@ -14528,6 +14536,10 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 				lowestAV = av;
 			}
 		}
+		var shooterAP = this.shooterAP;
+		if(lowestAV == 999999999) {
+			lowestAV = 0;
+		}
 		var inventory = this.targetInventory;
 		var heldShield = inventory.findHeldShield();
 		var shieldSize = heldShield != null ? heldShield.size + 1 : 0;
@@ -14540,8 +14552,10 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 		var shooterDamage = this.shooterDamage;
 		var body = troshx_sos_core_BodyChar.getInstance();
 		var targetZones = body.targetZones;
-		var av1 = lowestAV + this.avValueToOvercome;
-		var totalProb = troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av1 ? 0 : 1 + av1 - shooterDamage));
+		var av1 = Math.floor((lowestAV + this.avValueToOvercome) * .5);
+		av1 -= this.shooterAP;
+		var av2 = (av1 < 0 ? 0 : av1) + 4;
+		var totalProb = troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av2 ? 0 : 1 + av2 - shooterDamage));
 		var _g11 = 1;
 		var _g2 = body.missileHitLocations.length;
 		while(_g11 < _g2) {
@@ -14552,20 +14566,28 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 			while(_g3 < _g21) {
 				var p = _g3++;
 				var prob = tz.partWeights[p] / tz.weightsTotal;
-				var hitLoc = body.hitLocations[tz.parts[p]];
+				var hitLocIndex = tz.parts[p];
+				var hitLoc = body.hitLocations[hitLocIndex];
 				var gotShield = heldShield != null && coverageTruth[hitLoc.id] != null;
 				var shieldAV = gotShield ? heldShield.AV : 0;
 				var av3 = hitAVs[hitLoc.id];
-				var av2 = av3 != null ? av3.avp : 0;
+				var av4 = av3 != null ? av3.avp : 0;
+				var layerAV = av4 != 0 ? this.getLayerValue(av4,hitLocIndex,hitLoc.id) : 0;
 				if(gotShield && !coverageTruth[hitLoc.id]) {
 					var halfProb = prob *= .5;
-					var av4 = av2 + this.avValueToOvercome + shieldAV;
-					prob = halfProb * troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av4 ? 0 : 1 + av4 - shooterDamage));
-					var av5 = av2 + this.avValueToOvercome;
-					prob += halfProb * troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av5 ? 0 : 1 + av5 - shooterDamage));
+					var av5 = layerAV + av4 + this.avValueToOvercome + shieldAV;
+					av5 -= shooterAP;
+					var av6 = (av5 < 0 ? 0 : av5) + 4;
+					prob = halfProb * troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av6 ? 0 : 1 + av6 - shooterDamage));
+					var av7 = layerAV + av4 + this.avValueToOvercome;
+					av7 -= shooterAP;
+					var av8 = (av7 < 0 ? 0 : av7) + 4;
+					prob += halfProb * troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av8 ? 0 : 1 + av8 - shooterDamage));
 				} else {
-					var av6 = av2 + this.avValueToOvercome + shieldAV;
-					prob *= troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av6 ? 0 : 1 + av6 - shooterDamage));
+					var av9 = layerAV + av4 + this.avValueToOvercome + shieldAV;
+					av9 -= shooterAP;
+					var av10 = (av9 < 0 ? 0 : av9) + 4;
+					prob *= troshx_util_TROSAI.getAtLeastXSuccessesProb(totalMP,tn,targetRS + (shooterDamage > av10 ? 0 : 1 + av10 - shooterDamage));
 				}
 				totalProb += prob;
 			}
@@ -14653,10 +14675,13 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 	}
 	,get_additionalRSForAV: function() {
 		var d = this.shooterDamage;
-		if(d > this.avValueToOvercome) {
+		var av = this.avValueToOvercome;
+		av -= this.shooterAP;
+		var av1 = av < 0 ? 0 : av;
+		if(d > av1 + 4) {
 			return 0;
 		} else {
-			return 1 + this.avValueToOvercome - d;
+			return 1 + av1 + 4 - d;
 		}
 	}
 	,get_domainId: function() {
@@ -14707,6 +14732,82 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 		}
 		return false;
 	}
+	,sortArmorLayers: function(a,b) {
+		if(a.layer < b.layer) {
+			return -1;
+		} else if(a.layer > b.layer) {
+			return 1;
+		}
+		return 0;
+	}
+	,getLayerValue: function(dominantAV,hitLocationIndex,hitLocationId) {
+		var hitLocArmorValues = this.hitLocationArmorValues;
+		var coverageLocs = this.coverageHitLocations;
+		var hitLocationMask = 1 << hitLocationIndex;
+		var curRow = hitLocArmorValues[hitLocationId];
+		var armorsProtectable = [];
+		var sampleAV = troshx_sos_vue_RangeCalculator.SAMPLE_AV;
+		var inventory = this.targetInventory;
+		var armorList = inventory.wornArmor;
+		var body = troshx_sos_core_BodyChar.getInstance();
+		var targetingZoneMask = 0;
+		var isNonFirearmMissile = !this.shooterFirearm;
+		var comparisonLayerMasks = [];
+		var _g1 = 0;
+		var _g = armorList.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var a = armorList[i].armor;
+			if(a.coverage[hitLocationId] == null) {
+				comparisonLayerMasks.push(0);
+				continue;
+			}
+			var layerMask = 0;
+			if(a.special != null && a.special.wornWith != null && a.special.wornWith.name != "") {
+				layerMask = inventory.layeredWearingMaskWith(a,a.special.wornWith.name,body);
+			}
+			comparisonLayerMasks.push(layerMask);
+			if(a.writeAVsAtLocation(body,hitLocationId,hitLocationMask,sampleAV,layerMask,isNonFirearmMissile,targetingZoneMask,true)) {
+				var compareAV = sampleAV.avp;
+				if(compareAV == dominantAV) {
+					armorsProtectable.push(a);
+				}
+			}
+		}
+		if(armorsProtectable.length != 0) {
+			var highest = 0;
+			var comparisonLayeredArmor = [];
+			var _g11 = 0;
+			var _g2 = armorList.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				var a1 = armorList[i1].armor;
+				if(a1.coverage[hitLocationId] == null) {
+					continue;
+				}
+				var result = a1.special != null && a1.special.layer != 0 ? (a1.special.layerCoverage == 0 || (a1.special.layerCoverage & hitLocationMask) != 0 ? 1 : 0) * a1.special.layer : 0;
+				if(comparisonLayerMasks[i1] != 0 && a1.special.wornWith.layer > 0) {
+					if(a1.special.wornWith.layer > result) {
+						result = a1.special.wornWith.layer;
+					}
+				}
+				var c = result;
+				if(c > 0) {
+					comparisonLayeredArmor.push({ armor : a1, layer : c});
+				}
+			}
+			if(comparisonLayeredArmor.length > 0) {
+				haxe_ds_ArraySort.sort(comparisonLayeredArmor,$bind(this,this.sortArmorLayers));
+				if(armorsProtectable.length == 1 && armorsProtectable[0] == comparisonLayeredArmor[comparisonLayeredArmor.length - 1].armor) {
+					comparisonLayeredArmor.pop();
+				}
+				if(comparisonLayeredArmor.length > 0) {
+					return comparisonLayeredArmor[comparisonLayeredArmor.length - 1].layer;
+				}
+			}
+		}
+		return 0;
+	}
 	,openTreeBrowser: function() {
 		var _gthis = this;
 		if(!this.treeBrowserInited) {
@@ -14744,7 +14845,7 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 		this.targetChar = null;
 	}
 	,Template: function() {
-		return "<div>\r\n\t\t\t<sweet-modal ref=\"clipboardWindow\" :class=\"{reset:true}\" >\t\t\r\n\t\t\t\t<div>\r\n\t\t\t\t\tYou can manually paste saved data text stream into text-area and click on Load Character/Inventory to open a new target character/inventory for ranged testing!\r\n\t\t\t\t\t<div>\r\n\t\t\t\t\t\t<textarea ref=\"savedCharTextArea\" character-set=\"UTF-8\" v-model=\"clipboardLoadContents\" style=\"min-height:60px;\"></textarea>\t\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div><button v-on:click=\"loadCharacterClipboardWindow()\">{{!emptyClipboard ? \"Load Character/Inventory\" : \"New Inventory Outfit\" }}</button></div>\r\n\t\t\t\t</div>\r\n\t\t\t</sweet-modal>\r\n\t\t\t<sweet-modal ref=\"treeBrowser\" :class=\"{reset:true}\" v-if=\"treeBrowserInited\" >\t\t\r\n\t\t\t\t<tree-browser :availableTypes=\"availableTypes\" v-on:open=\"openFromTreeBrowser\" :initialDomain=\"domainId\" :autoLoad=\"autoLoadChar\" />\r\n\t\t\t</sweet-modal>\r\n\t\r\n\t\t\t<h1>Firing Range Viability Calculator &nbsp;&nbsp;<button v-on:click=\"openTreeBrowser\">&#127759;</button> <button v-on:click=\"$" + "refs.clipboardWindow.open()\">&#128203;</button> <button v-if=\"targetInventory!=null\" v-on:click=\"closeArmorOutfit\">&#10060; Close Armor Outfit</button></h1>\r\n\t\t\t<h4>Shooter</h4>\r\n\t\t\t<div><label>Profeciency Level: <InputInt :obj=\"$" + "data\" prop=\"shooterProf\" :min=\"0\" /></label></div>\r\n\t\t\t<div><label>Aim Phases (Max 3 phases x2 MP): <InputInt :obj=\"$" + "data\" prop=\"shooterAim\" :min=\"0\" :max=\"3\" /></label> <b><i>{{ aimBonus }}</i></b></div>\r\n\t\t\t<div><label>Misc MP Mod: <InputInt :obj=\"$" + "data\" prop=\"shooterMiscMPMod\"  /></label> <i>(eg. to deal with specific Rapid shot penalties and such..)</i></div>\r\n\t\t\t<div>Total MP: <b>{{ shooterTotalMP }}</b></div>\r\n\t\t\t<div><label><input type=\"checkbox\" v-model=\"shooterRapidShot\"></input> Rapid Shot?</label> <i>(Also includes house-rule that Halves Aim Bonus)</i></div>\r\n\t\t\t<div><label>Weapon/Firer Range Band (yards): <InputInt :obj=\"$" + "data\" prop=\"shooterRange\" :min=\"1\" /></label></div>\r\n\t\t\t<div><label>Effective Weapon Damage: <InputInt :obj=\"$" + "data\" prop=\"shooterDamage\"  /></label></div>\r\n\t\t\t<div><label>Weapon TN: <InputInt :obj=\"$" + "data\" prop=\"shooterTN\" :min=\"1\" /></label></div>\r\n\t\t\t<div><label>Firearm? <input type=\"checkbox\" v-model=\"shooterFirearm\"></input></label></div>\r\n\t\t\t\r\n\t\t\t<h4>Target</h4>\r\n\t\t\t<div><label>Misc RS Modifier: <InputInt :obj=\"$" + "data\" prop=\"targetMiscRSMod\"  /></label></div>\r\n\t\t\t<div><label>Behaviour RS: <InputInt :obj=\"$" + "data\" prop=\"targetBehaviourRS\"  /></label> <i>(eg. Moved:+1 RS, Sprint/Charged/In-Melee:+2 RS)</i></div>\r\n\t\t\t<div><label>Environmental Cover RS:</label> <select number v-model.number=\"targetCoverRS\"><option :value=\"li.value\" :key=\"i\" v-for=\"(li, i) in coverOptions\">{{ li.label }} ({{li.value}})</option></select></div>\r\n\t\t\t<div>Distance (yards): <InputInt :obj=\"$" + "data\" prop=\"targetDistance\" :min=\"0\" /><select number v-model.number=\"distRounding\"><option v-for=\"(li, i) in roundingOptions\" :key=\"i\" :value=\"li.value\">{{ li.label }}</option></select> <b>+{{targetDistanceRS}} RS</b></div>\r\n\t\t\t\r\n\t\t\t<br/>\r\n\t\t\t<div>Target RS: <b>{{ targetTotalRS }}</b></div>\r\n\t\t\t<div><b>{{ roundPerc(chanceToAtLeastGraze) }}</b>% Chance to at least Graze or Hit Fully (RS) <span v-if=\"shooterRapidShot\">({{roundPerc(chanceToAtLeastGrazeAtLeastOnce)}}% &gt;=once, {{roundPerc(chanceToAtLeastGrazeTwice)}}% twice)</span></div>\r\n\t\t\t<div>{{ grazePercMargin }}% Graze Percentage Margin</div>\r\n\t\t\t<div><b>{{ roundPerc(chanceToHitFully) }}</b>% Chance to Hit Fully <span v-if=\"shooterRapidShot\">({{roundPerc(chanceToHitFullyAtLeastOnce)}}% &gt;=once, {{roundPerc(chanceToHitFullyTwice)}}% twice)</span></div>\r\n\t\t\t<div v-if=\"targetInventory != null\"><i>Armor Outfit Loaded...</i>:</div>\r\n\t\t\t<div>{{ targetInventory != null ? \"Global AV Modifier:\" : \"AV Value to overcome?:\"}} <InputInt :obj=\"$" + "data\" prop=\"avValueToOvercome\" :min=\"0\" /></div>\r\n\t\t\t<div v-show=\"additionalRSForAV>0 && targetInventory == null\">Target Armor RS: <b>{{breachArmorRS}}</b></div>\r\n\t\t\t<div v-show=\"additionalRSForAV>0 || targetInventory != null\"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} <span v-if=\"shooterRapidShot\">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>\r\n\t\t\t<div v-if=\"targetInventory == null\">\r\n\t\t\t\t<div><span class=\"shield-icon-inv\">☗</span> With Shield? <select v-model.number=\"targetShield\" number><option :value=\"0\">None</option><option :value=\"1\">Small</option><option :value=\"2\">Medium</option><option :value=\"3\">Large</option></select></div>\r\n\t\t\t\t<div v-show=\"targetShield!=0\">Shield Position: <select v-model.number=\"targetShieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select> <span class=\"shield-icon-inv\">☗</span></div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield)}}</b>% chance to bypass Shield alone</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield*chanceToAtLeastGraze)}}</b>% chance bypass &amp; at least Graze</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield*chanceToHitFully)}}</b>% chance bypass &amp; to Hit Fully</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0 && additionalRSForAV>0\"><b>{{roundPerc(chanceToBypassShield*chanceToHitFully)}}</b>% chance to bypass &amp; Penetrate given AV</div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<inventory :inventory=\"targetInventory\"></inventory>\r\n\t\t\t</div>\r\n\t\t</div>";
+		return "<div>\r\n\t\t\t<sweet-modal ref=\"clipboardWindow\" :class=\"{reset:true}\" >\t\t\r\n\t\t\t\t<div>\r\n\t\t\t\t\tYou can manually paste saved data text stream into text-area and click on Load Character/Inventory to open a new target character/inventory for ranged testing!\r\n\t\t\t\t\t<div>\r\n\t\t\t\t\t\t<textarea ref=\"savedCharTextArea\" character-set=\"UTF-8\" v-model=\"clipboardLoadContents\" style=\"min-height:60px;\"></textarea>\t\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div><button v-on:click=\"loadCharacterClipboardWindow()\">{{!emptyClipboard ? \"Load Character/Inventory\" : \"New Inventory Outfit\" }}</button></div>\r\n\t\t\t\t</div>\r\n\t\t\t</sweet-modal>\r\n\t\t\t<sweet-modal ref=\"treeBrowser\" :class=\"{reset:true}\" v-if=\"treeBrowserInited\" >\t\t\r\n\t\t\t\t<tree-browser :availableTypes=\"availableTypes\" v-on:open=\"openFromTreeBrowser\" :initialDomain=\"domainId\" :autoLoad=\"autoLoadChar\" />\r\n\t\t\t</sweet-modal>\r\n\t\r\n\t\t\t<h1>Firing Range Viability Calculator &nbsp;&nbsp;<button v-on:click=\"openTreeBrowser\">&#127759;</button> <button v-on:click=\"$" + "refs.clipboardWindow.open()\">&#128203;</button> <button v-if=\"targetInventory!=null\" v-on:click=\"closeArmorOutfit\">&#10060; Close Armor Outfit</button></h1>\r\n\t\t\t<h4>Shooter</h4>\r\n\t\t\t<div><label>Profeciency Level: <InputInt :obj=\"$" + "data\" prop=\"shooterProf\" :min=\"0\" /></label></div>\r\n\t\t\t<div><label>Aim Phases (Max 3 phases x2 MP): <InputInt :obj=\"$" + "data\" prop=\"shooterAim\" :min=\"0\" :max=\"3\" /></label> <b><i>{{ aimBonus }}</i></b></div>\r\n\t\t\t<div><label>Misc MP Mod: <InputInt :obj=\"$" + "data\" prop=\"shooterMiscMPMod\"  /></label> <i>(eg. to deal with specific Rapid shot penalties and such..)</i></div>\r\n\t\t\t<div>Total MP: <b>{{ shooterTotalMP }}</b></div>\r\n\t\t\t<div><label><input type=\"checkbox\" v-model=\"shooterRapidShot\"></input> Rapid Shot?</label> <i>(Also includes house-rule that Halves Aim Bonus)</i></div>\r\n\t\t\t<div><label>Weapon/Firer Range Band (yards): <InputInt :obj=\"$" + "data\" prop=\"shooterRange\" :min=\"1\" /></label></div>\r\n\t\t\t<div><label>Effective Weapon Damage: <InputInt :obj=\"$" + "data\" prop=\"shooterDamage\"  /></label></div>\r\n\t\t\t<div><label>Weapon Armor Piercing (AP): <InputInt :obj=\"$" + "data\" prop=\"shooterAP\"  /></label></div>\r\n\t\t\t<div><label>Weapon TN: <InputInt :obj=\"$" + "data\" prop=\"shooterTN\" :min=\"1\" /></label></div>\r\n\t\t\t<div><label>Firearm? <input type=\"checkbox\" v-model=\"shooterFirearm\"></input></label></div>\r\n\t\t\t\r\n\t\t\t<h4>Target</h4>\r\n\t\t\t<div><label>Misc RS Modifier: <InputInt :obj=\"$" + "data\" prop=\"targetMiscRSMod\"  /></label></div>\r\n\t\t\t<div><label>Behaviour RS: <InputInt :obj=\"$" + "data\" prop=\"targetBehaviourRS\"  /></label> <i>(eg. Moved:+1 RS, Sprint/Charged/In-Melee:+2 RS)</i></div>\r\n\t\t\t<div><label>Environmental Cover RS:</label> <select number v-model.number=\"targetCoverRS\"><option :value=\"li.value\" :key=\"i\" v-for=\"(li, i) in coverOptions\">{{ li.label }} ({{li.value}})</option></select></div>\r\n\t\t\t<div>Distance (yards): <InputInt :obj=\"$" + "data\" prop=\"targetDistance\" :min=\"0\" /><select number v-model.number=\"distRounding\"><option v-for=\"(li, i) in roundingOptions\" :key=\"i\" :value=\"li.value\">{{ li.label }}</option></select> <b>+{{targetDistanceRS}} RS</b></div>\r\n\t\t\t\r\n\t\t\t<br/>\r\n\t\t\t<div>Target RS: <b>{{ targetTotalRS }}</b></div>\r\n\t\t\t<div><b>{{ roundPerc(chanceToAtLeastGraze) }}</b>% Chance to at least Graze or Hit Fully (RS) <span v-if=\"shooterRapidShot\">({{roundPerc(chanceToAtLeastGrazeAtLeastOnce)}}% &gt;=once, {{roundPerc(chanceToAtLeastGrazeTwice)}}% twice)</span></div>\r\n\t\t\t<div>{{ grazePercMargin }}% Graze Percentage Margin</div>\r\n\t\t\t<div><b>{{ roundPerc(chanceToHitFully) }}</b>% Chance to Hit Fully <span v-if=\"shooterRapidShot\">({{roundPerc(chanceToHitFullyAtLeastOnce)}}% &gt;=once, {{roundPerc(chanceToHitFullyTwice)}}% twice)</span></div>\r\n\t\t\t<div v-if=\"targetInventory != null\"><i>Armor Outfit Loaded...</i>:</div>\r\n\t\t\t<div>{{ targetInventory != null ? \"Global AV Modifier:\" : \"AV Value to overcome?:\"}} <InputInt :obj=\"$" + "data\" prop=\"avValueToOvercome\" :min=\"0\" /></div>\r\n\t\t\t<div v-show=\"additionalRSForAV>0 && targetInventory == null\">Target Armor RS: <b>{{breachArmorRS}}</b></div>\r\n\t\t\t<div v-show=\"additionalRSForAV>0 || targetInventory != null\"><b>{{roundPerc(breachArmorRSChance)}}</b>% Chance to Hit &amp; Breach Given {{breachLabel}} + TOU4<span v-if=\"shooterRapidShot\">({{roundPerc(breachArmorRSChanceAtLeastOnce)}}% &gt;=once, {{roundPerc(breachArmorRSChanceTwice)}}% twice)</span></div>\r\n\t\t\t<div v-if=\"targetInventory == null\">\r\n\t\t\t\t<div><span class=\"shield-icon-inv\">☗</span> With Shield? <select v-model.number=\"targetShield\" number><option :value=\"0\">None</option><option :value=\"1\">Small</option><option :value=\"2\">Medium</option><option :value=\"3\">Large</option></select></div>\r\n\t\t\t\t<div v-show=\"targetShield!=0\">Shield Position: <select v-model.number=\"targetShieldPosition\" number><option :value=\"0\">Low</option><option :value=\"1\">High</option></select> <span class=\"shield-icon-inv\">☗</span></div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield)}}</b>% chance to bypass Shield alone</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield*chanceToAtLeastGraze)}}</b>% chance bypass &amp; at least Graze</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0\"><b>{{roundPerc(chanceToBypassShield*chanceToHitFully)}}</b>% chance bypass &amp; to Hit Fully</div>\r\n\t\t\t\t<div v-if=\"targetShield > 0 && additionalRSForAV>0\"><b>{{roundPerc(chanceToBypassShield*breachArmorRSChance)}}</b>% chance to bypass &amp; Penetrate given AV + TOU4</div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<inventory :inventory=\"targetInventory\"></inventory>\r\n\t\t\t</div>\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_RangeCalculator;
@@ -14753,7 +14854,7 @@ troshx_sos_vue_RangeCalculator.prototype = $extend(haxevx_vuex_core_VComponent.p
 		this.components = this.Components();
 		this.template = this.Template();
 		this.computed = { chanceToAtLeastGraze : clsP.get_chanceToAtLeastGraze, chanceToAtLeastGrazeAtLeastOnce : clsP.get_chanceToAtLeastGrazeAtLeastOnce, chanceToAtLeastGrazeTwice : clsP.get_chanceToAtLeastGrazeTwice, chanceToHitFully : clsP.get_chanceToHitFully, chanceToHitFullyAtLeastOnce : clsP.get_chanceToHitFullyAtLeastOnce, chanceToHitFullyTwice : clsP.get_chanceToHitFullyTwice, grazePercMargin : clsP.get_grazePercMargin, lowShieldCoverage : clsP.get_lowShieldCoverage, highShieldCoverage : clsP.get_highShieldCoverage, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, hitLocationArmorValues : clsP.get_hitLocationArmorValues, rangedOutfitChanceToBreach : clsP.get_rangedOutfitChanceToBreach, chanceToBypassShield : clsP.get_chanceToBypassShield, shooterTotalMP : clsP.get_shooterTotalMP, breachArmorRSChance : clsP.get_breachArmorRSChance, breachArmorRSChanceAtLeastOnce : clsP.get_breachArmorRSChanceAtLeastOnce, breachArmorRSChanceTwice : clsP.get_breachArmorRSChanceTwice, breachArmorRS : clsP.get_breachArmorRS, aimBonus : clsP.get_aimBonus, targetTotalRS : clsP.get_targetTotalRS, targetDistanceRS : clsP.get_targetDistanceRS, aimMultiplier : clsP.get_aimMultiplier, additionalRSForAV : clsP.get_additionalRSForAV, domainId : clsP.get_domainId, emptyClipboard : clsP.get_emptyClipboard, availableTypes : clsP.get_availableTypes, breachLabel : clsP.get_breachLabel};
-		this.methods = { get_chanceToAtLeastGraze : clsP.get_chanceToAtLeastGraze, get_chanceToAtLeastGrazeAtLeastOnce : clsP.get_chanceToAtLeastGrazeAtLeastOnce, get_chanceToAtLeastGrazeTwice : clsP.get_chanceToAtLeastGrazeTwice, roundPerc : clsP.roundPerc, get_chanceToHitFully : clsP.get_chanceToHitFully, get_chanceToHitFullyAtLeastOnce : clsP.get_chanceToHitFullyAtLeastOnce, get_chanceToHitFullyTwice : clsP.get_chanceToHitFullyTwice, get_grazePercMargin : clsP.get_grazePercMargin, get_lowShieldCoverage : clsP.get_lowShieldCoverage, get_highShieldCoverage : clsP.get_highShieldCoverage, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, getArmorRS : clsP.getArmorRS, get_rangedOutfitChanceToBreach : clsP.get_rangedOutfitChanceToBreach, get_chanceToBypassShield : clsP.get_chanceToBypassShield, get_shooterTotalMP : clsP.get_shooterTotalMP, get_breachArmorRSChance : clsP.get_breachArmorRSChance, get_breachArmorRSChanceAtLeastOnce : clsP.get_breachArmorRSChanceAtLeastOnce, get_breachArmorRSChanceTwice : clsP.get_breachArmorRSChanceTwice, get_breachArmorRS : clsP.get_breachArmorRS, get_aimBonus : clsP.get_aimBonus, get_targetTotalRS : clsP.get_targetTotalRS, get_targetDistanceRS : clsP.get_targetDistanceRS, get_aimMultiplier : clsP.get_aimMultiplier, get_additionalRSForAV : clsP.get_additionalRSForAV, get_domainId : clsP.get_domainId, loadCharacterClipboardWindow : clsP.loadCharacterClipboardWindow, loadCharContents : clsP.loadCharContents, openTreeBrowser : clsP.openTreeBrowser, openClipboardWindow : clsP.openClipboardWindow, get_emptyClipboard : clsP.get_emptyClipboard, get_availableTypes : clsP.get_availableTypes, get_breachLabel : clsP.get_breachLabel, openFromTreeBrowser : clsP.openFromTreeBrowser, closeArmorOutfit : clsP.closeArmorOutfit};
+		this.methods = { get_chanceToAtLeastGraze : clsP.get_chanceToAtLeastGraze, get_chanceToAtLeastGrazeAtLeastOnce : clsP.get_chanceToAtLeastGrazeAtLeastOnce, get_chanceToAtLeastGrazeTwice : clsP.get_chanceToAtLeastGrazeTwice, roundPerc : clsP.roundPerc, get_chanceToHitFully : clsP.get_chanceToHitFully, get_chanceToHitFullyAtLeastOnce : clsP.get_chanceToHitFullyAtLeastOnce, get_chanceToHitFullyTwice : clsP.get_chanceToHitFullyTwice, get_grazePercMargin : clsP.get_grazePercMargin, get_lowShieldCoverage : clsP.get_lowShieldCoverage, get_highShieldCoverage : clsP.get_highShieldCoverage, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, pierceAV : clsP.pierceAV, getArmorRS : clsP.getArmorRS, get_rangedOutfitChanceToBreach : clsP.get_rangedOutfitChanceToBreach, get_chanceToBypassShield : clsP.get_chanceToBypassShield, get_shooterTotalMP : clsP.get_shooterTotalMP, get_breachArmorRSChance : clsP.get_breachArmorRSChance, get_breachArmorRSChanceAtLeastOnce : clsP.get_breachArmorRSChanceAtLeastOnce, get_breachArmorRSChanceTwice : clsP.get_breachArmorRSChanceTwice, get_breachArmorRS : clsP.get_breachArmorRS, get_aimBonus : clsP.get_aimBonus, get_targetTotalRS : clsP.get_targetTotalRS, get_targetDistanceRS : clsP.get_targetDistanceRS, get_aimMultiplier : clsP.get_aimMultiplier, get_additionalRSForAV : clsP.get_additionalRSForAV, get_domainId : clsP.get_domainId, loadCharacterClipboardWindow : clsP.loadCharacterClipboardWindow, loadCharContents : clsP.loadCharContents, sortArmorLayers : clsP.sortArmorLayers, getLayerValue : clsP.getLayerValue, openTreeBrowser : clsP.openTreeBrowser, openClipboardWindow : clsP.openClipboardWindow, get_emptyClipboard : clsP.get_emptyClipboard, get_availableTypes : clsP.get_availableTypes, get_breachLabel : clsP.get_breachLabel, openFromTreeBrowser : clsP.openFromTreeBrowser, closeArmorOutfit : clsP.closeArmorOutfit};
 	}
 	,__class__: troshx_sos_vue_RangeCalculator
 });
@@ -14773,6 +14874,7 @@ var troshx_sos_vue_RangeCalculatorData = function() {
 	this.targetCoverRS = 0;
 	this.targetBehaviourRS = 0;
 	this.targetMiscRSMod = 0;
+	this.shooterAP = 0;
 	this.shooterDamage = 0;
 	this.shooterFirearm = false;
 	this.shooterRange = 1;
@@ -20085,6 +20187,7 @@ troshx_sos_vue_Globals.DOMAIN_RANGECALC = "sos-sample-characters";
 troshx_sos_vue_Globals.CURL_DOMAIN = "https://effuse-church.000webhostapp.com";
 troshx_sos_vue_InventoryVue.LABEL_YOUR = "Your";
 troshx_sos_vue_InventoryVue.SAMPLE_AV = { avc : 0, avp : 0, avb : 0};
+troshx_sos_vue_RangeCalculator.SAMPLE_AV = { avc : 0, avp : 0, avb : 0};
 troshx_sos_vue_RangeCalculatorData.ROUND_DOWN = 0;
 troshx_sos_vue_RangeCalculatorData.ROUND_OFF = 1;
 troshx_sos_vue_RangeCalculatorData.ROUND_UP = 2;

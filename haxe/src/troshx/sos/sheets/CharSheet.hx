@@ -552,22 +552,22 @@ class CharSheet implements IBuildListed
 	
 	inline function get_adr():Int 
 	{
-		return Std.int( (agility + wit) / 2);
+		return Std.int( (AGI + WIT) / 2);
 	}
 	
 	inline function get_mob():Int 
 	{
-		return Std.int( (strength + agility + endurance) / 2 ) ;
+		return Std.int( (STR + AGI + END) / 2 ) ;
 	}
 	
 	inline function get_car():Int 
 	{
-		return strength + endurance;
+		return STR + END;
 	}
 	
 	inline function get_cha():Int 
 	{
-		return Std.int( (willpower + wit + perception) / 2 );
+		return Std.int( (WIP + WIT + PER) / 2 );
 	}
 	inline function get_tou():Int 
 	{
