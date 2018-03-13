@@ -279,10 +279,10 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		if (warnings != null) {
 			if (f  ) {
 				if (stillHaveProfSpend) warnings.push("School: You can still spend profeciency points on school/school-levels.");
-				if ( !(profCoreListMelee.length >= maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots) ) {
+				if ( !(profCoreListMelee.length >= maxMeleeProfSlots ) ) { //&& traceProfCoreMeleeCount == maxMeleeProfSlots
 					warnings.push("Profeciencies: You still have have melee profeciency slots to use.");
 				}
-				if ( !(profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots) ) {
+				if ( !(profCoreListRanged.length>=maxRangedProfSlots ) ) {  //&& traceProfCoreRangedCount == maxRangedProfSlots
 					warnings.push("Profeciencies: You still have have ranged profeciency slots to use.");
 				}
 				

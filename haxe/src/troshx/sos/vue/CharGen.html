@@ -212,11 +212,11 @@
 			</div>
 			<div class="prof-list">
 				<div class="gen-col">
-					<h5>&#9876; Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots && traceProfCoreMeleeCount == maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<h5>&#9876; Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
 					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots"  />
 				</div>
 				<div class="gen-col">
-					<h5>&#9678; Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots && traceProfCoreRangedCount == maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<h5>&#9678; Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
 					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots"  />
 				</div>
 			</div>
@@ -274,10 +274,6 @@
 			<i>You character's loadable contents is also listed on exit.</i>
 		</div>
 		<button v-if="exitBtnCallback!=null" v-on:click="exitBtnCallback()">Exit</button>
-		
-		<hr/>
-		Consider pasting the copied serialized data content into a Gingko card,<br/>and storing all your data (for free) in a Gingko tree which {{ exitBtnCallback!=null ? "is" : "will be"}} loadable online by {{exitBtnCallback!=null ? "the" : "an upcoming" }} integrated suite's file browser!<br/>
-		(eg. <a href="https://gingkoapp.com/sos-weapons-and-armour" target="_blank">https://gingkoapp.com/sos-weapons-and-armour</a> ).<br/> Create a Gingko account now and {{ exitBtnCallback!=null? "start sharing your creations!" : "prepare your creations to be viewable through combined inventory/character sheets coming your way." }} 
 	</div>
 	
 	<div ref="inventoryHolder">
