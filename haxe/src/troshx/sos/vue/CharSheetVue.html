@@ -56,7 +56,7 @@
 				<label style="display:block"><input type="radio" :checked="!selectedLastSaved" v-on:click="selectedLastSaved=false"></input> Last generated characters (Max {{maxGeneratedSavedChars}})</label>
 				
 				<select name="selectedchar" v-model.number="selectedCharIndex" size="5" style="min-width:176px" :disabled="selectedLastSaved">
-					<option v-for="(li, i) in generatedCharacters" :value="i">{{li.name}}</option>
+					<option v-for="(li, i) in generatedCharacters" :value="i" :key="i">{{li.name}}</option>
 				</select>
 				
 			</div>
