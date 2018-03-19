@@ -10,6 +10,7 @@ import js.Browser;
 import js.html.HtmlElement;
 import js.html.SelectElement;
 import js.html.TextAreaElement;
+import js.html.URLSearchParams;
 import troshx.sos.chargen.CampaignPowerLevel;
 import troshx.sos.chargen.CategoryPCP;
 import troshx.sos.chargen.CharGenData;
@@ -196,7 +197,14 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	}
 
 	
+	@:computed function get_redirectLink():String {
 
+		return Browser.window.location.pathname + "?charsheet&redirectload";
+	}
+	function gotoRedirectLink():Void {
+		Browser.window.open( redirectLink, "_self");
+	}
+	
 	// CHECKOUT  (for the interest of performance, need to move this section out to Vue instead)
 	
 	@:computed function get_notBankrupt():Bool {

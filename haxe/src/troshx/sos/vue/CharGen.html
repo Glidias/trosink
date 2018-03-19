@@ -264,24 +264,27 @@
 		<hr/>
 		
 		<button :disabled="char.ingame" v-on:click="saveFinaliseAll()">Save Character!</button>
-	</div>
+	</div>	
 				
 	<div class="chargen__done" v-if="char.ingame">
-		<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. Copy the loadable serialized stream text contents below to clipboard, and paste it somewhere else for saving it manually!</p>
+		<p>Congratulations <b>{{addressedAs}}</b>. Your character has been created. You may copy the loadable serialized stream text data contents below to clipboard, and paste it somewhere else (like into Notes/Notepad) for your own safekeeping!</p>
 		<div><textarea character-set="UTF-8"  readonly="readonly" ref="savedTextArea" v-model="savedCharContents">
 		</textarea><button v-on:click="executeCopyContents()" ref="copyButton">Copy</button><i class="copy-notify" ref="copyNotify" style="display:none">copied!</i></div>
 		<div v-if="exitBtnCallback!=null">
 			<i>You character's loadable contents is also listed on exit.</i>
 		</div>
 		<button v-if="exitBtnCallback!=null" v-on:click="exitBtnCallback()">Exit</button>
+		<hr/>
+		
+		<h3>Proceed to click the button <a :href="redirectLink">here:&nbsp;</a><button style="cursor:pointer" v-on:click="gotoRedirectLink">&#12320;</button>,&nbsp; to load your ingame character sheet of your generated character!</h3>
 	</div>
-	
+	 
 	<div ref="inventoryHolder">
 		<inventory v-if="insideInventory" :backBtnCallback="exitInventory" v-on:loadSheet="loadSheet" :inventory="char.inventory" :maxCostCopper="moneyLeft.getCPValue()" :maxWeight="CAR" :includeDroppedCost="true" />	
 	</div>
 		
 	<sweet-modal ref="finaliseWarning">
-		<div class="finalise-form finalise-warning">
+		<di	v class="finalise-form finalise-warning">
 			<h3>Warning!</h3>
 			<p>You may have missed out some things.</p>
 			<ul>

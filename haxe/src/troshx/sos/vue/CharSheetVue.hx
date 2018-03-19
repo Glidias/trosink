@@ -9,6 +9,7 @@ import haxevx.vuex.util.VHTMacros;
 import js.Browser;
 import js.html.HtmlElement;
 import js.html.TextAreaElement;
+import js.html.URLSearchParams;
 import troshx.sos.core.DamageType;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Item;
@@ -50,6 +51,7 @@ import troshx.util.LibUtil;
  */
 class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 {
+	static public inline var SESSION_KEY:String = "lastSavedCharacter";
 
 	public function new() 
 	{
@@ -69,10 +71,37 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		return Globals.DOMAIN_CHARACTER;
 	}
 	
+	@:computed function get_redirectChargenLink():String {
+
+		return Browser.window.location.pathname + "?chargen";
+	}
+	
 	override function Mounted():Void {
 		if (this.autoLoadChar != null) {
 			openTreeBrowser();
 		}
+		
+		var location = Browser.window.location;
+		
+		var params = new URLSearchParams(location.search);
+		
+		if (params.get("redirectload") != null) {
+			params.delete_("redirectload");
+			var str = '${location.pathname}?${params}';
+			if (str.charAt(str.length -1) == "=") {
+				str = str.substr(0, str.length - 1);
+			}
+			Browser.window.history.replaceState({}, Browser.window.document.title, str);
+			
+			
+			
+			openSavedCharacterList();
+			if (this.generatedCharacters != null && this.generatedCharacters.length > 0) {
+				this.selectedCharIndex = 0;
+				loadCharacterFromList();
+			}
+		}
+		
 	}
 
 	function recoverFatique(amt:Int):Void {
@@ -331,7 +360,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	
 	function openSavedCharacterList():Void {
 		//if (this.lastSavedSession == null) {
-			this.lastSavedSession = Browser.window.localStorage.getItem("lastSavedCharacter");
+			this.lastSavedSession = Browser.window.localStorage.getItem(SESSION_KEY);
 		//}
 		//if (this.generatedCharacters == null) {
 			var str = Browser.window.localStorage.getItem(CharGen.SAVED_CHARS_KEY);
@@ -380,7 +409,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		saveCharToBox();
 		
 		this.lastSavedSession = this.savedCharContents;
-		Browser.window.localStorage.setItem("lastSavedCharacter", this.savedCharContents);
+		Browser.window.localStorage.setItem(SESSION_KEY, this.savedCharContents);
 	}
 	
 	function saveFinaliseCleanupChar():Void {

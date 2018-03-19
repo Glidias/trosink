@@ -37,6 +37,8 @@ class MainSOS
 		
 		Vue.use(SweetModal);
 		
+		//Browser.window.localStorage.removeItem(CharSheetVue.SESSION_KEY );
+		//Browser.window.localStorage.removeItem(CharGen.SAVED_CHARS_KEY);
 		
 		var urlSplit = Browser.window.location.href.split("#")[0].split("?");
 		var params = Request.getParams();

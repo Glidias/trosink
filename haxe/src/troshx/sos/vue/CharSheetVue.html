@@ -69,7 +69,7 @@
 			<div><button v-on:click="loadCharacterFromList()" :disabled="!( (selectedCharIndex>=0 && generatedCharacters!=null) || (selectedLastSaved && lastSavedSession!=null) )">Load Character</button></div>
 		</div>
 		<div v-else>
-			There are currently no locally saved characters at the moment. Please create one first with the Character Generator, or save a character sheet with the "Save Character" button at the bottom of the sheet to save a single character sheet session in memory.
+			There are currently no locally saved characters at the moment.<br/><br/>Please <a :href="redirectChargenLink">create one</a> first, or save a character sheet with the "Save Character" button at the bottom of the sheet to save a single character sheet session in memory.
 		</div>
 	</sweet-modal>
 	
