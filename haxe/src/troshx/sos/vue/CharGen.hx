@@ -1,6 +1,7 @@
 package troshx.sos.vue;
 import haxe.Serializer;
 import haxe.Timer;
+import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.native.Vue;
@@ -307,6 +308,9 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 	}
 	
 	
+	public static inline var MAX_SAVED_CHARS:Int = 8;
+	public static inline var SAVED_CHARS_KEY:String = "generatedCharacters";
+	
 	public function saveFinaliseAll(finalising:Bool=false):Void { 
 		var warnings:Array<String> = finalising ? null : [];
 		if (isValidAll(warnings)) {
@@ -322,6 +326,22 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 				if (finaliseSaveCallback != null) {
 					finaliseSaveCallback(savedCharString);
 				}
+				
+				var arr:Array<Dynamic>;
+				var generatedCharsStr:String = Browser.window.localStorage.getItem(SAVED_CHARS_KEY);
+				if (generatedCharsStr != null) {
+					arr = new Unserializer(generatedCharsStr).unserialize();
+					if ( arr.length >= MAX_SAVED_CHARS ) arr.shift();
+					arr.push({name:this.char.uid, data:savedCharString});
+				}
+				else {
+					arr = [{name:this.char.uid, data:savedCharString}];
+					
+				}
+				
+				var s = new Serializer();
+				s.serialize(arr);
+				Browser.window.localStorage.setItem(SAVED_CHARS_KEY, s.toString() );
 			}
 		}
 		else {

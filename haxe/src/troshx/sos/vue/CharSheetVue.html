@@ -1,6 +1,6 @@
 <div class="chargen">
 	<br/>
-	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button> <button  v-show="!insideInventory" v-on:click="$refs.clipboardWindow.open()">&#128203;</button></h1>
+	<h1>Song of Swords: Character Sheet &nbsp;&nbsp;<button v-on:click="openTreeBrowser" v-show="!insideInventory">&#127759;</button> <button  v-show="!insideInventory" v-on:click="$refs.clipboardWindow.open()">&#128203;</button> <button  v-show="!insideInventory" v-on:click="openSavedCharacterList">&#12320;</button></h1>
 	
 	<sweet-modal ref="treeBrowser" :class="{reset:true}" v-if="treeBrowserInited" >		
 		<tree-browser :availableTypes="availableTypes" v-on:open="openFromTreeBrowser" :initialDomain="domainId" :autoLoad="autoLoadChar" />
@@ -47,6 +47,29 @@
 			<div>Stun: <InputInt :obj="sampleWound" prop="stun" :min="-1" /> <i v-show="sampleWound.stun<0">Infinite!</i></div>
 			<div>Pain: <InputInt :obj="sampleWound" prop="pain" :min="-1" /> <i v-show="sampleWound.pain<0">Infinite!</i></div>
 			<div>BloodLost (BL): <InputInt :obj="sampleWound" prop="BL" :min="0" /></div>
+		</div>
+	</sweet-modal>
+			
+	<sweet-modal ref="showSavedCharacters" :class="{reset:true}" >		
+		<div v-if="generatedCharacters != null || lastSavedSession !=null">
+			<div v-if="generatedCharacters!=null && generatedCharacters.length > 0">
+				<label style="display:block"><input type="radio" :checked="!selectedLastSaved" v-on:click="selectedLastSaved=false"></input> Last generated characters (Max {{maxGeneratedSavedChars}})</label>
+				
+				<select name="selectedchar" v-model.number="selectedCharIndex" size="5" style="min-width:176px" :disabled="selectedLastSaved">
+					<option v-for="(li, i) in generatedCharacters" :value="i">{{li.name}}</option>
+				</select>
+				
+			</div>
+			<div v-if="lastSavedSession!=null">
+				<hr/>
+				<label style="display:block"><input type="radio" :checked="selectedLastSaved" v-on:click="selectedLastSaved=true"></input> Last saved character session</label>
+				
+			</div>
+			<br/>
+			<div><button v-on:click="loadCharacterFromList()" :disabled="!( (selectedCharIndex>=0 && generatedCharacters!=null) || (selectedLastSaved && lastSavedSession!=null) )">Load Character</button></div>
+		</div>
+		<div v-else>
+			There are currently no locally saved characters at the moment. Please create one first with the Character Generator, or save a character sheet with the "Save Character" button at the bottom of the sheet to save a single character sheet session in memory.
 		</div>
 	</sweet-modal>
 	

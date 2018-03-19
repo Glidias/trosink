@@ -291,6 +291,7 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 	function loadCharacterClipboardWindow():Void {
 		if (loadCharContents(this.clipboardLoadContents)) {
 			_vRefs.clipboardWindow.close();
+			setWindowTitleWithCharUID();
 		}
 	}
 	function loadCharContents(contents:String):Bool 
@@ -322,11 +323,64 @@ class CharSheetVue extends VComponent<CharSheetVueData,CharSheetVueProps>
 		return true;
 	}
 	
+	@:computed function get_maxGeneratedSavedChars():Int {
+		return CharGen.MAX_SAVED_CHARS;
+	}
+	
+	
+	
+	function openSavedCharacterList():Void {
+		//if (this.lastSavedSession == null) {
+			this.lastSavedSession = Browser.window.localStorage.getItem("lastSavedCharacter");
+		//}
+		//if (this.generatedCharacters == null) {
+			var str = Browser.window.localStorage.getItem(CharGen.SAVED_CHARS_KEY);
+			if (str != null) {
+				var arr:Array<Dynamic> = new Unserializer(str).unserialize();
+				arr.reverse();
+				this.generatedCharacters = arr;
+				
+				
+			}
+			
+		//}
+		
+		if (this.generatedCharacters == null || this.generatedCharacters.length ==0 ) {
+			this.selectedLastSaved  = true;
+		}
+		
+		
+		
+		_vRefs.showSavedCharacters.open();
+	}
+	
+	function loadCharacterFromList():Void {
+		if (this.selectedLastSaved) {
+			if (loadCharContents(this.lastSavedSession)) {
+				_vRefs.showSavedCharacters.close();
+				setWindowTitleWithCharUID();
+			}
+		}
+		else {
+			if (loadCharContents(this.generatedCharacters[this.selectedCharIndex].data)) {
+				_vRefs.showSavedCharacters.close();
+				setWindowTitleWithCharUID();
+			}
+		}
+		
+		
+	}
+	
+	
+	
 	function saveCharacter():Void {
 		saveFinaliseSkills();
 		saveFinaliseCleanupChar();
 		
 		saveCharToBox();
+		
+		this.lastSavedSession = this.savedCharContents;
+		Browser.window.localStorage.setItem("lastSavedCharacter", this.savedCharContents);
 	}
 	
 	function saveFinaliseCleanupChar():Void {
@@ -578,6 +632,12 @@ class CharSheetVueData {
 	
 	// windows/broswer
 	var theWindowTitle:String = "";
+	
+	// last saved characters
+	var selectedLastSaved:Bool = false;
+	var selectedCharIndex:Int = -1;
+	var lastSavedSession:String = null;
+	var generatedCharacters:Array<Dynamic> = null;
 	
 	public function new(char:CharSheet = null) {
 		this.char = char == null ? new CharSheet() : char;

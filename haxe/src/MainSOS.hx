@@ -4,6 +4,8 @@ import haxe.web.Request;
 import haxevx.vuex.core.VxBoot;
 import haxevx.vuex.native.Vue;
 import js.Browser;
+import js.html.URLSearchParams;
+import js.html.Window;
 import troshx.sos.vue.CharSheetVue;
 import troshx.sos.vue.RangeCalculator;
 import troshx.sos.vue.externs.SweetModal;
@@ -35,6 +37,7 @@ class MainSOS
 		
 		Vue.use(SweetModal);
 		
+		
 		var urlSplit = Browser.window.location.href.split("#")[0].split("?");
 		var params = Request.getParams();
 		if (params.get("inventories")!=null) {
@@ -57,6 +60,8 @@ class MainSOS
 			else Globals.CURL_DOMAIN = Browser.window.location.protocol + "//" + Browser.window.location.hostname;
 			//Browser.alert(Globals.CURL_DOMAIN);
 		}
+		
+		
 		
 		var url = urlSplit[0];
 		var hash:String = urlSplit.pop();

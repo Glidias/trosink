@@ -49,7 +49,7 @@ class Arrow extends Weapon
 		f.range = -5;
 		
 		a[BROADHEAD] = f = new Arrow("Broadhead", 5).setWeightCost(0, 2, Item.SP).setUnit(20);
-		f.damageM = -1;
+		f.damageM = 1;
 		f.missileSpecial = new MissileSpecial();
 		f.missileSpecial.winged = 2;
 		
@@ -62,7 +62,7 @@ class Arrow extends Weapon
 		f.missileSpecial.flaming = 1;
 		
 		a[HEAVY_BROADHEAD] = f = new Arrow("Heavy Broadhead", 5).setWeightCost(0, 3, Item.SP).setUnit(20);
-		f.damageM = -2;
+		f.damageM = 2;
 		f.range = -5;
 		f.missileSpecial = new MissileSpecial();
 		f.missileSpecial.winged = 2;
