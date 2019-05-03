@@ -1,15 +1,15 @@
 package troshx.components;
-import troshx.core.ICharacterSheet;
+
 
 /**
  * ...
  * @author Glidias
  */
-class Bout
+class Bout<C>
 {
 
 	public var state:FightState = new FightState();
-	public var combatants:List<FightNode> = new List<FightNode>();
+	public var combatants:List<FightNode<C>> = new List<FightNode<C>>();
 	
 	public function new() 
 	{
@@ -19,7 +19,7 @@ class Bout
 }
 
 // if using Ash framework, will extend from Ash's Node class
-class FightNode { 
+class FightNode<C> { 
 	public var fight:FightState;
-	public var charSheet:ICharacterSheet;
+	public var charSheet:C;
 }

@@ -16,7 +16,6 @@ class Manuever
 	public var name:String;
 	public var cost:Int;
 	
-	
 	public var attackTypes:UInt;
 	public var damageType:Int;
 	public var defaultTN:Int;

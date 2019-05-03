@@ -11,18 +11,23 @@ typedef ManueverDeclare = {
 
 	// results dumped here, not ideal, but ah well..
 	@:optional var marginSuccess:Int;
-	@:optional var reflexScore:Float;
 	@:optional var successes:Int;
+	
+	
+
+	@:optional var reflexScore:Float;
+	
 
 	// manuever declare properties
 	var manuever:Manuever;
 	var numDice:Int;
+	var investments:Array<Int>;
 	@:optional var from:FightState;
 	@:optional var tn:Int;
 	@:optional var to:FightState;
 	@:optional var targetZone:Int;
 	@:optional var cost:Int;
-	@:optional var defManuever:Manuever;
+	@:optional var replies:ManueverDeclare;
 	
 }
 
@@ -79,59 +84,7 @@ class FightState
 		return true;
 	}
 	
-	// Fightstate initiative values
-	// values higher than zero indicate the possibility to perform actions with some form of Initiative (clear initiative or contesting for it)
-	public static inline var GOT_INITIATIVE:Int = 2;  // fighter has initiative (this also imples that the target lacks initiative)
-	public static inline var CONTESTING_INITIATIVE:Int = 1;  // both fighters have mutual initiative, or 1 side or both is forced to contest for it during the Action itself
-	public static inline var NO_INITIATIVE:Int = 0;  // fighter has no initiative
-	public static inline var REROLL_INITIATIVE:Int = -1;  // both fighters have no mutual initiative, and must re-roll for it in the next round via orientation.
-	public static inline var UNCERTAIN_INITATIVE:Int = -10; // both sides have uncertain initiative, but will determine it after targets are determined (if required) and before the action starts
-	public static inline var UNCERTAIN_INITIATIVE_RESOLVED:Int = 10;
 	
-	// Fight state orientation values  
-	public static inline var ORIENTATION_NONE:Int = 0; 	// a value of zero indicates no orientation selected, and this also happens after the first manuever is resolved at the start of a bout of after a Pause.
-	public static inline var ORIENTATION_DEFENSIVE:Int = 1;
-	public static inline var ORIENTATION_CAUTIOUS:Int = 2;
-	public static inline var ORIENTATION_AGGRESSIVE:Int = 3;
-	public var orientation:Int = 0;  // warning, this is used as an implicit multiplier for determining orientation initaitive (higher value higher targeting initiative..)
-	public static var ORIENTATION_STRINGS:Array<String> = ["None", "Defensive", "Cautious", "Aggressive"];
-
-	
-	public function hasOrientationInitiative(targetFight:FightState):Bool {
-		return orientation == ORIENTATION_AGGRESSIVE || (orientation != ORIENTATION_DEFENSIVE && ( (this.target==targetFight && targetFight.target !=this) || orientation > targetFight.orientation) );
-	}
-	
-	public function getInitiativeTowards(fightState:FightState):Int {
-		
-		if (orientation == 0 ) {   // legacy code  //|| s >=2 
-			return initiative ? fightState.initiative ? CONTESTING_INITIATIVE :  GOT_INITIATIVE   
-			:  NO_INITIATIVE;
-		}
-		else {  // orientation selected, need to determine
-			if (orientation != ORIENTATION_DEFENSIVE) {
-				// either cautious or aggressive, which means can attack
-				if (orientation != fightState.orientation ) {  // aggressive over cautious, or aggressive/cautious over defensive/no-orientation, vice versa
-					return orientation > fightState.orientation ? GOT_INITIATIVE : NO_INITIATIVE;
-				}
-				else {  // cautious vs cautious, or aggressive vs aggressive 
-					if (orientation == ORIENTATION_CAUTIOUS) {
-						if (fightState.orientation != ORIENTATION_CAUTIOUS)  throw "Equal assertion cautious failed:"+fightState.orientation;
-						return initiative != fightState.initiative ? UNCERTAIN_INITIATIVE_RESOLVED : UNCERTAIN_INITATIVE;
-					}
-					else if (orientation == ORIENTATION_AGGRESSIVE) {
-						if (fightState.orientation != ORIENTATION_AGGRESSIVE)  throw "Equal assertion aggressive failed:"+fightState.orientation;
-						return CONTESTING_INITIATIVE;
-					}
-					else {
-						throw "Missed out this case?? Orientation: " + orientation;
-					}
-				}
-			}
-			else {  // defensive, can never attack for this exchange...so absolutely no intiative
-				return NO_INITIATIVE;
-			}
-		}
-	}
 	
 	// Declared manuevers info
 	//public var manuever:int = -1;  // primary manuever index (declared move) for the current turn
@@ -145,9 +98,7 @@ class FightState
 	public var lastAttacking:Bool = false; // flag to indicate if was attacking on last declared move
 	public var combatPool:Int;
 	public var shock:Int;
-	
 
-	
 	
 	public function resetManueverObj(obj:ManueverDeclare):Void {
 		obj.manuever = null;
