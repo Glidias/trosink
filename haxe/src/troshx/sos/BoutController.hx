@@ -14,21 +14,20 @@ import troshx.util.LibUtil;
 class BoutController implements IBoutController
 {
 
-	 var model:BoutModel;
+	var model:BoutModel;
 	
 
 	// Song of Swords implementation
 	public static inline var STEP_ORIENTATION_OR_RESOLVE:Int = 0;
 	public static inline var STEP_TARGET_SELECTION:Int = 1;
 	public static inline var STEP_DECLARATION:Int = 2;
+	
 	public static inline var TOTAL_STEPS:Int = 3;
 			
 	public function waitForPlayer():FightState {
 		return null;
 	}
-	
-	
-	
+
 	public function new(model:BoutModel) 
 	{
 		this.model = model;
@@ -37,15 +36,12 @@ class BoutController implements IBoutController
 	
 	
 	public  function step():Void {
-		model.bout.state.step(model.bout.state.s == (TOTAL_STEPS - 1));
-		for (f in model.bout.combatants) {
-			f.fight.matchScheduleWith(model.bout.state);
-		}
+		model.bout.step(model.bout.s == (TOTAL_STEPS - 1));
 	}
 	
 	public function handleCurrentStep():Bool
 	{
-		var step:Int = model.bout.state.s;
+		var step:Int = model.bout.s;
 		if (step == STEP_ORIENTATION_OR_RESOLVE) {
 			//  resolve manuever  stacks
 			

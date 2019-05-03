@@ -17,6 +17,9 @@ import troshx.sos.vue.Globals;
 import troshx.sos.vue.InventoryManager;
 import troshx.sos.vue.InventoryStandalone;
 
+import troshx.sos.core.Manuever;
+import troshx.sos.BoutController;
+
 
 
 /**

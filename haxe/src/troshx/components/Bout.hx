@@ -8,11 +8,16 @@ package troshx.components;
 class Bout<C>
 {
 
-	public var state:FightState = new FightState();
+	public var r:Int = 0;
+	public var s:Int = 0;
 	public var combatants:List<FightNode<C>> = new List<FightNode<C>>();
 	
 	public function new() 
 	{
+		
+	}
+	
+	public function step(newRound:Bool):Void {
 		
 	}
 	

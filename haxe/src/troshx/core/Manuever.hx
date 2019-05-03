@@ -4,7 +4,7 @@ import troshx.components.FightState.ManueverDeclare;
 import troshx.core.BodyChar;
 
 /**
- * ...
+ * depcreated
  * @author Glidias
  */
  
