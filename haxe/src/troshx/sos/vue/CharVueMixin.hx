@@ -769,6 +769,12 @@ class CharVueMixin extends VComponent<CharVueMixinData,NoneT>
 		}
 	}
 	
+	@:computed var beyondMaxProfs(get, never):Bool;
+	inline function get_beyondMaxProfs():Bool {
+		return hasSchool ? char.getTotalProfeciencies() > char.school.profLimit 
+			: false;
+	}
+	
 	public function updateRankBB(bba:BoonBaneAssign, isBane:Bool, newValue:Int, oldValue:Int):Void {
 		//trace("AA");
 		if (isBane) {

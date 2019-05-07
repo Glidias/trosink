@@ -23,13 +23,13 @@ class School
 	
 	// truth tables for progression
 	public static function getLevels():Array<Int> {
-		return [1,1,1,1, 2,2,2,2,  3,3,3,3,3,  6,6,6,6,  8, 10,10];
+		return [0,1,1,1, 2,2,2,2,  3,3,3,3,3,  6,6,6,6,  8, 10,10];
 	}
 	
 	public static function getTalentAdds():Array<Int> { //
-		return [1,0,0,0  ,1,0,1,0  ,0,0,1,0  ,1,0,0,0  ,1,0,1,0];  // dunno what pattern this is, if any?
+		return [1,0,0,0  ,1,0,1,0  ,0,0,1,0  ,1,0,0,0  ,1,0,1,0];  // all prime numbers from level 5 onwards
 	}
-	public static function getSuperiorAdds():Array<Int> {  // like every 3rd interval until last 20th
+	public static function getSuperiorAdds():Array<Int> {  // every 3rd interval including "last" 20th
 		return [0,0,1,0,  0,1,0,0,  1,0,0,1,   0,0,1,0,  0,1,0,1];
 	}
 

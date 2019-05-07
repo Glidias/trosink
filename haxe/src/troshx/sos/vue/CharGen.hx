@@ -138,18 +138,27 @@ class CharGen extends VComponent<CharGenData,CharGenProps>
 		}
 	}
 	
-	@:computed function get_totalDraftedProfSlots():Int {
+	@:computed inline function get_totalDraftedProfSlots():Int {
 		return profCoreListRanged.length  + profCoreListMelee.length;
 	}
 	
 	@:computed function get_maxBuyableProfSlots():Int {
 		var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure;
-		var cost = this.profArcCost;
-		rm = cost > 0 ? Std.int(rm/cost) : this.totalAvailProfSlots;
+		var cost:Int = this.profArcCost;	
+		var totalAvailProfSlots = this.totalAvailProfSlots;	// alloted
+		if (cost > 0) {	// non-human case with >0 per prof cost
+			var canBuyWithinMax:Int = Std.int(rm / cost);
+			if (canBuyWithinMax > totalAvailProfSlots) canBuyWithinMax = totalAvailProfSlots;
+			rm -= (canBuyWithinMax * cost);
+			rm = canBuyWithinMax + (rm >= CharGenData.PROF_COST_BEYOND_MAX ? Std.int(rm / CharGenData.PROF_COST_BEYOND_MAX) : 0);
+		} else {	// human case with 0 prof cost from alloted
+			rm = totalAvailProfSlots + Std.int(rm / CharGenData.PROF_COST_BEYOND_MAX);
+		}
 		return char.school != null ? rm : 0;
 	}
 	
-	@:computed function get_excessDraftedSlots():Int {
+	
+	@:computed inline function get_excessDraftedSlots():Int {
 		return this.totalDraftedProfSlots - this.maxBuyableProfSlots;
 	}
 	

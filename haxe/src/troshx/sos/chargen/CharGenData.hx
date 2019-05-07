@@ -45,6 +45,8 @@ class CharGenData implements IBuildListed
 	
 	static public inline var INT_MAX:Int = 2147483647;
 	
+	static public inline var PROF_COST_BEYOND_MAX:Int = 2;
+	
 	var showBnBs:Bool = true;
 	public var shouldShowBnBs(get, never):Bool;
 	function get_shouldShowBnBs():Bool 
@@ -1351,7 +1353,7 @@ class CharGenData implements IBuildListed
 	
 	public var profArcCost(get, never):Int;
 	inline function get_profArcCost():Int {
-		return  isHuman ? 0 : 3;
+		return  isHuman ? 0 : 1;
 	}
 	
 	public var schoolArcCost(get, never):Int;
@@ -1359,27 +1361,30 @@ class CharGenData implements IBuildListed
 		return  hasSchool ? char.school.costArc : 0;
 	}
 	
-	public var profExpenditure(get, never):Int;
-	function get_profExpenditure():Int {
-		return  profArcCost * totalProfecienciesBought;
-	}
 	
 	public var totalProfSlotExpenditure(get, never):Int;
 	inline function get_totalProfSlotExpenditure():Int {
 		var c:Int = profArcCost;
-		return c * profCoreListRanged.length + c * profCoreListMelee.length;
+		var available:Int = totalAvailProfSlots;
+		var total:Int = profCoreListRanged.length + profCoreListMelee.length;
+		var totalCap:Int = total > available ? available : total;
+		return totalCap * c + 2 * (total - totalCap);
 	}
 	
 	
-	public var maxAvailableProfSlots(get, never):Int;
-	inline function get_maxAvailableProfSlots():Int {
-		return hasSchool ? char.school.profLimit : 0;
+	public var beyondMaxProfs(get, never):Bool;
+	inline function get_beyondMaxProfs():Bool {
+		return profCoreListRanged.length + profCoreListMelee.length > totalAvailProfSlots;
 	}
-
+	
+	public var atOrBeyondMaxProfString(get, never):String;
+	inline function get_atOrBeyondMaxProfString():String {
+		return beyondMaxProfs ? "Beyond Max" : "Max Reached";
+	}
 	
 	public var maxMeleeProfSlots(get, never):Int;
 	function get_maxMeleeProfSlots():Int {
-		var r =  maxAvailableProfSlots - profCoreListRanged.length;
+		var r =  totalAvailProfSlots - profCoreListRanged.length;
 		var c = profArcCost;
 		//if (c > 0) {
 			var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure  - profCoreListRanged.length * c;
@@ -1395,7 +1400,7 @@ class CharGenData implements IBuildListed
 	
 	public var maxRangedProfSlots(get, never):Int;
 	function get_maxRangedProfSlots():Int {
-		var r =  maxAvailableProfSlots - profCoreListMelee.length;
+		var r =  totalAvailProfSlots - profCoreListMelee.length;
 		var c = profArcCost;
 		//if (c > 0) {
 			var rm:Int = ProfPoints  - schoolArcCost - levelsExpenditure - profCoreListMelee.length * c;
@@ -1427,41 +1432,18 @@ class CharGenData implements IBuildListed
 		var r = char.schoolLevel >= School.MASTERY_LEVEL ? 1 : 0;
 	
 		return hasSchool ? r : 0;
-	}
-	
-
-	public var totalProfecienciesBought(get, never):Int;  // under school
-	function get_totalProfecienciesBought():Int {
-		return  maxClampedMeleeProfs + maxClampedRangedProfs;
-	}
-	public var maxClampedMeleeProfs(get, never):Int;
-	inline function get_maxClampedMeleeProfs():Int {
-		return LibUtil.minI_(maxMeleeProfSlots, profCoreListMelee.length);
-	
-	}
-	public var maxClampedRangedProfs(get, never):Int;
-	inline function get_maxClampedRangedProfs():Int {
-		return LibUtil.minI_(maxRangedProfSlots, profCoreListRanged.length);
-	}
-	
+	}	
 
 	public var levelsExpenditure(get, never):Int;
 	inline function get_levelsExpenditure():Int {
 		return char.school != null && char.schoolLevel > 0 ? schoolLevelCosts[char.schoolLevel - 1] : 0;
 	}
 	
-	public var totalProfArcExpenditure(get, never):Int;
-	inline function get_totalProfArcExpenditure():Int {
-		return totalProfecienciesBought * profArcCost;
-	}
-	
 	
 	public var profPointsLeft(get, never):Int;
 	inline function get_profPointsLeft():Int {
-		return ProfPoints  - totalProfArcExpenditure - schoolArcCost - levelsExpenditure;
+		return ProfPoints  - totalProfSlotExpenditure - schoolArcCost - levelsExpenditure;
 	}
-	
-	
 
 	
 	public var traceProfCoreRangedCurrent(get, never):Array<String>;
@@ -1486,7 +1468,7 @@ class CharGenData implements IBuildListed
 
 	
 	function saveFinaliseSchoolProfs():Void {
-		char.schoolLevel = schoolProfLevel;
+		char.schoolLevel = char.school != null ? schoolProfLevel : 0;
 		char.masteryManueverNotes = char.masteryManueverNotes.slice(0, maxMasterySlots);
 		char.superiorManueverNotes = char.superiorManueverNotes.slice(0, maxSuperiorSlots);
 		char.talentNotes = char.talentNotes.slice(0, maxTalentSlots);

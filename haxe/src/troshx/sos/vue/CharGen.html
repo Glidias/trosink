@@ -176,7 +176,7 @@
 		<hr/>
 			
 		<section class="gen-skills"  id="gen-skills">
-			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}})</span><span class="formula">(PCP-1)*3+INT*2</span></h2>
+			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}})</span><span class="formula">(PCP-1)*3+INT</span></h2>
 		<h3>Skill(s):</h3>
 			<div class="skill-lib">
 				<SkillLibInput v-for="(skillObj, i) in skillObjs" v-if="!skillsTable.requiresSpecialisation[skillObj.name]" :index="i" :key="skillObj.name" :obj="skillValues" :prop="skillObj.name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" :canDelete="i>=startingSkillObjsCount" v-on:change="onSkillIndividualChange" v-on:delete="deleteSkillInput" />
@@ -202,22 +202,23 @@
 			<h2>School &amp; Profeciencies <span class="valuer" :class="{'still-have':stillHaveProfSpend }">( {{profPointsLeft}} Profeciency Points remaining. )</span> <span class="valuer">(Available: {{ProfPoints}}) </span></h2>
 			<div class="select-school">
 				<div>
-					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints, moneyLeft, char.school) || !li.school.customRequire(char)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :disabled="char.school==null" /></label>
+					<label class="lbl-school">School: <select number v-on:change="schoolSelectChangeHandler($event.target)"><option :value="-1" :selected="char.school==null"></option><option :value="i" v-for="(li, i) in schoolAssignList" :disabled="!li.school.canAffordWith(ProfPoints, moneyLeft, char.school) || !li.school.customRequire(char)" :selected="char.school==li.school">{{ li.school.name }} ({{ li.school.costArc }}) {{ li.school.costMoney != null ? " - "+li.school.costMoney.getLabel() : "" }}</option></select></label> <label class="lbl-level">Level:<SchoolLevelInput :obj="char" prop="schoolLevel" :levelCosts="schoolLevelCosts" :remainingArc="profPointsLeft" :minAmount="char.school!=null ? 1 : 0" :disabled="char.school==null" /></label>
 				</div>
 	
 			</div>
 			<div class="school-info" v-if="hasSchool">
 				<div>Max Profeciencies: {{ char.school.profLimit }}</div>
-				<div class="cost-info">Learning Profeciency/Arc Point Cost: ( <span :class="{selected:isHuman}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman}"><b>3 points</b> - Non-human)</span></div>
+				<div class="cost-info">(Within Max) Learning Profeciency Cost: ( <span :class="{selected:isHuman && !beyondMaxProfs}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman && !beyondMaxProfs}"><b>1 point</b> - Non-human)</span></div>
+				<div class="cost-info">(Beyond Max) <span :class="{selected:beyondMaxProfs}"><b>2 points</b></span></div>
 			</div>
 			<div class="prof-list">
 				<div class="gen-col">
-					<h5>&#9876; Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots">{{ maxMeleeProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="maxMeleeProfSlots"  />
+					<h5>&#9876; Melee Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListMelee.length>=maxMeleeProfSlots">{{ maxMeleeProfSlots + maxRangedProfSlots > 0 ? atOrBeyondMaxProfString : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" />
 				</div>
 				<div class="gen-col">
-					<h5>&#9678; Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots">{{ maxRangedProfSlots > 0 ? "Full!" : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="maxRangedProfSlots"  />
+					<h5>&#9678; Ranged Profeciencies: <span class="valid ready" style="color:green" v-if="$data.profCoreListRanged.length>=maxRangedProfSlots">{{ maxMeleeProfSlots + maxRangedProfSlots > 0 ? atOrBeyondMaxProfString : "Not available." }}</span><span class="invalid" style="color:brown" v-else>Not Full!</span></h5>
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" />
 				</div>
 			</div>
 			<div class="manuever-list gen-col">

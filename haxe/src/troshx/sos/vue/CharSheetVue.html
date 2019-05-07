@@ -269,16 +269,17 @@
 			</div>
 			<div class="school-info" v-if="char.school != null">
 				<div>Max Profeciencies: {{ char.school.profLimit }}</div>
-				<div class="cost-info">Learning Profeciency/Arc Point Cost: ( <span :class="{selected:isHuman}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman}"><b>3 points</b> - Non-human)</span></div>
+				<div class="cost-info">(Within Max) Learning Profeciency Cost: ( <span :class="{selected:isHuman && !beyondMaxProfs}"><b class="color-free">Free</b> - Human</span>, &nbsp; <span :class="{selected:!isHuman && !beyondMaxProfs}"><b>1 point</b> - Non-human)</span></div>
+				<div class="cost-info">(Beyond Max) <span :class="{selected:beyondMaxProfs}"><b>2 points</b></span></div>
 			</div>
 			<div class="prof-list">
 				<div class="gen-col">
 					<h5>&#9876; Melee Profeciencies:</h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :maxLength="char.school!=null ? maxMeleeProfSlots : undefined" :readonly="lockProfs" />
+					<ArrayOfBits :obj="$data" prop="profCoreListMelee" :labels="profCoreMeleeListNames" :bitmaskSetObj="char" bitmaskSetProp="profsMelee" :readonly="lockProfs" />
 				</div>
 				<div class="gen-col">
 					<h5>&#9678; Ranged Profeciencies:</h5>
-					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :maxLength="char.school!=null ? maxRangedProfSlots : undefined" :readonly="lockProfs"  />
+					<ArrayOfBits :obj="$data" prop="profCoreListRanged" :labels="profCoreRangedListNames" :bitmaskSetObj="char" bitmaskSetProp="profsRanged" :readonly="lockProfs"  />
 				</div>
 			</div>
 			<div class="manuever-list gen-col">

@@ -182,6 +182,16 @@ class CharSheet implements IBuildListed
 	public var profsMelee:Int = 0;	// core melee profiecy mask
 	public var profsRanged:Int = 0;	// core ranged profiecy mask
 	public var profsCustom:Array<Profeciency> = null;  // gm-homebrews (if any) // consider: divide to melee and ranged?
+	public function getTotalProfeciencies():Int {
+		var count:Int = 0;
+		for (i in 0...Profeciency.getCoreMelee().length) {
+			count += profsMelee & (1 << i) != 0 ? 1 : 0;
+		}
+		for (i in 0...Profeciency.getCoreRanged().length) {
+			count += profsRanged & (1 << i) != 0 ? 1 : 0;
+		}
+		return count;
+	}
 	
 	public var superiorManueverNotes:Array<String> = [];
 	public var masteryManueverNotes:Array<String> = [];
