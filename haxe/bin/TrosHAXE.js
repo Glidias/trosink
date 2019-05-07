@@ -2585,116 +2585,11 @@ msignal_SlotList.prototype = {
 	}
 	,__class__: msignal_SlotList
 };
-var troshx_components_Bout = function() {
-	this.combatants = new List();
-	this.s = 0;
-	this.r = 0;
-};
-$hxClasses["troshx.components.Bout"] = troshx_components_Bout;
-troshx_components_Bout.__name__ = ["troshx","components","Bout"];
-troshx_components_Bout.prototype = {
-	step: function(newRound) {
-	}
-	,__class__: troshx_components_Bout
-};
-var troshx_components_FightNode = function() { };
-$hxClasses["troshx.components.FightNode"] = troshx_components_FightNode;
-troshx_components_FightNode.__name__ = ["troshx","components","FightNode"];
-troshx_components_FightNode.prototype = {
-	__class__: troshx_components_FightNode
-};
-var troshx_components_FightState = function() {
-	this.lastAttacking = false;
-	this.opponents = 0;
-	this.reachFlags = 0;
-	this.shock = 0;
-	this.cp = 0;
-	this.initiative = 0;
-};
-$hxClasses["troshx.components.FightState"] = troshx_components_FightState;
-troshx_components_FightState.__name__ = ["troshx","components","FightState"];
-troshx_components_FightState.prototype = {
-	__class__: troshx_components_FightState
-};
-var troshx_core_BoutMessage = function() {
-};
-$hxClasses["troshx.core.BoutMessage"] = troshx_core_BoutMessage;
-troshx_core_BoutMessage.__name__ = ["troshx","core","BoutMessage"];
-troshx_core_BoutMessage.create = function(type,text) {
-	if(type == null) {
-		type = 0;
-	}
-	var me = new troshx_core_BoutMessage();
-	me.type = type;
-	me.text = text;
-	return me;
-};
-troshx_core_BoutMessage.prototype = {
-	__class__: troshx_core_BoutMessage
-};
-var troshx_core_IBoutController = function() { };
-$hxClasses["troshx.core.IBoutController"] = troshx_core_IBoutController;
-troshx_core_IBoutController.__name__ = ["troshx","core","IBoutController"];
-troshx_core_IBoutController.prototype = {
-	__class__: troshx_core_IBoutController
-};
-var troshx_core_IBoutModel = function() { };
-$hxClasses["troshx.core.IBoutModel"] = troshx_core_IBoutModel;
-troshx_core_IBoutModel.__name__ = ["troshx","core","IBoutModel"];
-troshx_core_IBoutModel.prototype = {
-	__class__: troshx_core_IBoutModel
-};
-var troshx_core_IManuever = function() { };
-$hxClasses["troshx.core.IManuever"] = troshx_core_IManuever;
-troshx_core_IManuever.__name__ = ["troshx","core","IManuever"];
 var troshx_core_IUid = function() { };
 $hxClasses["troshx.core.IUid"] = troshx_core_IUid;
 troshx_core_IUid.__name__ = ["troshx","core","IUid"];
 troshx_core_IUid.prototype = {
 	__class__: troshx_core_IUid
-};
-var troshx_core_ManueverStack = function() {
-	this.stack = [];
-};
-$hxClasses["troshx.core.ManueverStack"] = troshx_core_ManueverStack;
-troshx_core_ManueverStack.__name__ = ["troshx","core","ManueverStack"];
-troshx_core_ManueverStack.prototype = {
-	reset: function() {
-		this.stack.length = 0;
-	}
-	,reverseOrder: function() {
-		this.stack.reverse();
-	}
-	,pushManuever: function(manueverObj) {
-		this.stack.push(manueverObj);
-	}
-	,sortOnLowestToHighestReflex: function() {
-		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
-			if(a.reflexScore != b.reflexScore) {
-				if(a.reflexScore > b.reflexScore) {
-					return 1;
-				} else {
-					return -1;
-				}
-			} else {
-				return 0;
-			}
-		});
-	}
-	,sortOnHighestToLowestReflex: function(property) {
-		haxe_ds_ArraySort.sort(this.stack,function(a,b) {
-			if(a.reflexScore != b.reflexScore) {
-				if(a.reflexScore > b.reflexScore) {
-					return -1;
-				} else {
-					return 1;
-				}
-			} else {
-				return 0;
-			}
-		});
-	}
-	,__class__: troshx_core_ManueverStack
 };
 var troshx_ds_IMatchArray = function() { };
 $hxClasses["troshx.ds.IMatchArray"] = troshx_ds_IMatchArray;
@@ -2901,57 +2796,6 @@ $hxClasses["troshx.ds.ValueHolder_Int"] = troshx_ds_ValueHolder_$Int;
 troshx_ds_ValueHolder_$Int.__name__ = ["troshx","ds","ValueHolder_Int"];
 troshx_ds_ValueHolder_$Int.prototype = {
 	__class__: troshx_ds_ValueHolder_$Int
-};
-var troshx_sos_BoutController = function(model) {
-	this.model = model;
-};
-$hxClasses["troshx.sos.BoutController"] = troshx_sos_BoutController;
-troshx_sos_BoutController.__name__ = ["troshx","sos","BoutController"];
-troshx_sos_BoutController.__interfaces__ = [troshx_core_IBoutController];
-troshx_sos_BoutController.prototype = {
-	waitForPlayer: function() {
-		return null;
-	}
-	,step: function() {
-		this.model.bout.step(this.model.bout.s == 2);
-	}
-	,handleCurrentStep: function() {
-		var step = this.model.bout.s;
-		if(step == 0) {
-			return true;
-		} else if(step == 1) {
-			return true;
-		} else if(step == 2) {
-			return true;
-		} else {
-			throw new js__$Boot_HaxeError("Unhandled step:" + step);
-		}
-	}
-	,__class__: troshx_sos_BoutController
-};
-var troshx_sos_BoutModel = function() {
-	this.defManueverStack = new troshx_core_ManueverStack();
-	this.manueverStack = new troshx_core_ManueverStack();
-	this._messages = [];
-	this.bout = new troshx_components_Bout();
-};
-$hxClasses["troshx.sos.BoutModel"] = troshx_sos_BoutModel;
-troshx_sos_BoutModel.__name__ = ["troshx","sos","BoutModel"];
-troshx_sos_BoutModel.__interfaces__ = [troshx_core_IBoutModel];
-troshx_sos_BoutModel.prototype = {
-	setBout: function(val) {
-		this.bout = val;
-	}
-	,getMessages: function() {
-		return this._messages;
-	}
-	,getMessagesCount: function() {
-		return this._messages.length;
-	}
-	,clearMessages: function() {
-		this._messages.length = 0;
-	}
-	,__class__: troshx_sos_BoutModel
 };
 var troshx_sos_core_BoonBane = function(name,costs) {
 	this.name = name;
@@ -8763,112 +8607,6 @@ troshx_sos_core_ItemQty.prototype = {
 	}
 	,__class__: troshx_sos_core_ItemQty
 };
-var troshx_sos_core_Manuever = function(id,name) {
-	this.costFuncInputs = 0;
-	this.cost = 0;
-	this.tn = 0;
-	this.usingHands = 0;
-	this.tags = 0;
-	this.requisites = 0;
-	this.attackTypes = 0;
-	this.types = 0;
-	this.instant = false;
-	this.advanced = false;
-	this.shooting = false;
-	this.id = id;
-	this.name = name;
-};
-$hxClasses["troshx.sos.core.Manuever"] = troshx_sos_core_Manuever;
-troshx_sos_core_Manuever.__name__ = ["troshx","sos","core","Manuever"];
-troshx_sos_core_Manuever.__interfaces__ = [troshx_core_IUid,troshx_core_IManuever];
-troshx_sos_core_Manuever.getMap = function() {
-	if(troshx_sos_core_Manuever.MAP != null) {
-		return troshx_sos_core_Manuever.MAP;
-	} else {
-		return troshx_sos_core_Manuever.MAP = troshx_sos_core_Manuever.getNewMap();
-	}
-};
-troshx_sos_core_Manuever.getNewMap = function() {
-	return troshx_util_UidStringMapCreator.createStrMapFromArray(troshx_sos_core_Manuever.getNewArray());
-};
-troshx_sos_core_Manuever.getArray = function() {
-	if(troshx_sos_core_Manuever.ARRAY != null) {
-		return troshx_sos_core_Manuever.ARRAY;
-	} else {
-		return troshx_sos_core_Manuever.ARRAY = troshx_sos_core_Manuever.getNewArray();
-	}
-};
-troshx_sos_core_Manuever.getNewArray = function() {
-	return [new troshx_sos_core_Manuever("swing","Swing")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_core_Manuever("thrust","Thrust")._types(2)._requisite(1)._attackTypes(2),new troshx_sos_core_Manuever("parry","Parry")._types(1)._requisite(1)._tags(64),new troshx_sos_core_Manuever("void","Void")._types(1)._tags(128)._tn(8),new troshx_sos_core_Manuever("mobileVoid","Mobile Void")._types(1)._tags(128)._tn(8),new troshx_sos_core_Manuever("flee","Flee")._types(1)._tags(128)._tn(5),new troshx_sos_core_Manuever("block","Block")._types(2)._requisite(2)._tags(256),new troshx_sos_manuevers_StealInitiative()];
-};
-troshx_sos_core_Manuever.prototype = {
-	_types: function(val) {
-		this.types = val;
-		return this;
-	}
-	,_attackTypes: function(val) {
-		this.attackTypes = val;
-		return this;
-	}
-	,_requisite: function(val) {
-		this.requisites = val;
-		return this;
-	}
-	,getAdditionalRequire: function(charSheet,fightState) {
-		return true;
-	}
-	,_superiorManuever: function(val) {
-		this.superiorManuever = val;
-		return this;
-	}
-	,clone: function() {
-		var manuever = Type.createEmptyInstance(js_Boot.getClass(this));
-		this.clonePropertiesFrom(manuever);
-		return manuever;
-	}
-	,clonePropertiesFrom: function(manuever) {
-		manuever.shooting = this.shooting;
-		manuever.advanced = this.advanced;
-		manuever.instant = this.instant;
-		manuever.cost = this.cost;
-		manuever.types = this.types;
-		manuever.attackTypes = this.attackTypes;
-		manuever.tags = this.tags;
-		manuever.usingHands = this.usingHands;
-	}
-	,_tags: function(val) {
-		this.tags = val;
-		return this;
-	}
-	,_usingHands: function(val) {
-		this.usingHands = val;
-		return this;
-	}
-	,_tn: function(val) {
-		this.tn = val;
-		return this;
-	}
-	,_costs: function(cost,costFuncInputs) {
-		if(costFuncInputs == null) {
-			costFuncInputs = 0;
-		}
-		this.cost = cost;
-		this.costFuncInputs = costFuncInputs;
-		return this;
-	}
-	,handleEvent: function(sheet,fightState,declare,event) {
-		return false;
-	}
-	,getCost: function(sheet,fightState,inputs) {
-		return this.cost;
-	}
-	,resolve: function(sheet,state,declare) {
-	}
-	,get_uid: function() {
-		return this.id;
-	}
-	,__class__: troshx_sos_core_Manuever
-};
 var troshx_sos_core_MeleeSpecial = function() {
 	this.custom = null;
 	this.spatulateTip = 0;
@@ -9819,22 +9557,6 @@ troshx_sos_events_SOSEvent.CHALLENGE_EXECUTE = function($char,attributes,skills,
 var troshx_sos_macro_MacroUtil = function() { };
 $hxClasses["troshx.sos.macro.MacroUtil"] = troshx_sos_macro_MacroUtil;
 troshx_sos_macro_MacroUtil.__name__ = ["troshx","sos","macro","MacroUtil"];
-var troshx_sos_manuevers_StealInitiative = function() {
-	troshx_sos_core_Manuever.call(this,"stealInitiative","Steal Initiative");
-	this.types = 16;
-	this.instant = true;
-};
-$hxClasses["troshx.sos.manuevers.StealInitiative"] = troshx_sos_manuevers_StealInitiative;
-troshx_sos_manuevers_StealInitiative.__name__ = ["troshx","sos","manuevers","StealInitiative"];
-troshx_sos_manuevers_StealInitiative.__super__ = troshx_sos_core_Manuever;
-troshx_sos_manuevers_StealInitiative.prototype = $extend(troshx_sos_core_Manuever.prototype,{
-	resolve: function(sheet,state,declare) {
-	}
-	,getCost: function(sheet,fightState,inputs) {
-		return this.cost;
-	}
-	,__class__: troshx_sos_manuevers_StealInitiative
-});
 var troshx_sos_races_Races = function() { };
 $hxClasses["troshx.sos.races.Races"] = troshx_sos_races_Races;
 troshx_sos_races_Races.__name__ = ["troshx","sos","races","Races"];
@@ -20166,25 +19888,6 @@ troshx_util_AIManueverChoice.prototype = {
 	}
 	,__class__: troshx_util_AIManueverChoice
 };
-var troshx_util_UidStringMapCreator = function() { };
-$hxClasses["troshx.util.UidStringMapCreator"] = troshx_util_UidStringMapCreator;
-troshx_util_UidStringMapCreator.__name__ = ["troshx","util","UidStringMapCreator"];
-troshx_util_UidStringMapCreator.createStrMapFromArray = function(arr) {
-	var map = new haxe_ds_StringMap();
-	var _g1 = 0;
-	var _g = arr.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		var key = arr[i].get_uid();
-		var value = arr[i];
-		if(__map_reserved[key] != null) {
-			map.setReserved(key,value);
-		} else {
-			map.h[key] = value;
-		}
-	}
-	return map;
-};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -20221,13 +19924,6 @@ haxevx_vuex_core_Singletons.SINGLETON_CACHE = new haxe_ds_StringMap();
 haxevx_vuex_core_ModuleStack.stack = [];
 js_Boot.__toStr = ({ }).toString;
 js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
-troshx_core_BoutMessage.TYPE_NONE = 0;
-troshx_core_BoutMessage.TYPE_PLAYERS_TURN = 1;
-troshx_core_BoutMessage.TYPE_RESOLVE_MANUEVER = 2;
-troshx_sos_BoutController.STEP_ORIENTATION_OR_RESOLVE = 0;
-troshx_sos_BoutController.STEP_TARGET_SELECTION = 1;
-troshx_sos_BoutController.STEP_DECLARATION = 2;
-troshx_sos_BoutController.TOTAL_STEPS = 3;
 troshx_sos_core_BoonBane.__GOOD_EYES__BAD_EYES = 1;
 troshx_sos_core_BoonBane.__GOOD_EARS_BAD_EARS = 2;
 troshx_sos_core_BoonBane.__GOOD_EARS_BAD_NOSE = 4;
@@ -20444,34 +20140,6 @@ troshx_sos_core_Inventory.PREFER_UNHELD_EQUIPPED = 4;
 troshx_sos_core_Inventory.UID_COUNT = 0;
 troshx_sos_core_Inventory.MONEY_CALC_CACHE = [0,0,0];
 troshx_sos_core_Inventory.MONEY_REF = new troshx_sos_core_Money();
-troshx_sos_core_Manuever.TYPE_DEFENSIVE = 1;
-troshx_sos_core_Manuever.TYPE_OFFENSIVE = 2;
-troshx_sos_core_Manuever.TYPE_BOTH = 3;
-troshx_sos_core_Manuever.TYPE_MOVEMENT = 4;
-troshx_sos_core_Manuever.TYPE_TRANSFORMATION = 8;
-troshx_sos_core_Manuever.TYPE_INITIATIVE = 16;
-troshx_sos_core_Manuever.TYPE_PASSING = 32;
-troshx_sos_core_Manuever.ATTACK_TYPE_SWING = 1;
-troshx_sos_core_Manuever.ATTACK_TYPE_THRUST = 2;
-troshx_sos_core_Manuever.ATTACK_TYPE_BOTH = 3;
-troshx_sos_core_Manuever.ATTACK_TYPE_BUTT = 4;
-troshx_sos_core_Manuever.REQ_WEAPON = 1;
-troshx_sos_core_Manuever.REQ_SHIELD = 2;
-troshx_sos_core_Manuever.REQ_UNARMED = 4;
-troshx_sos_core_Manuever.REQ_STUFF = 8;
-troshx_sos_core_Manuever.TAG_CROSS_FIGHTING = 1;
-troshx_sos_core_Manuever.TAG_GRAPPLE = 2;
-troshx_sos_core_Manuever.TAG_CLINCHING = 4;
-troshx_sos_core_Manuever.TAG_PUSH = 8;
-troshx_sos_core_Manuever.TAG_GRAB = 16;
-troshx_sos_core_Manuever.TAG_BASH = 32;
-troshx_sos_core_Manuever.TAG_PARRY = 64;
-troshx_sos_core_Manuever.TAG_VOID = 128;
-troshx_sos_core_Manuever.TAG_BLOCK = 256;
-troshx_sos_core_Manuever.HANDS_NONE = 0;
-troshx_sos_core_Manuever.HANDS_MASTER = 1;
-troshx_sos_core_Manuever.HANDS_SECONDARY = 2;
-troshx_sos_core_Manuever.HANDS_BOTH = 3;
 troshx_sos_core_MeleeSpecial.BRACE = 1;
 troshx_sos_core_MeleeSpecial.CALVARY_SWORD = 2;
 troshx_sos_core_MeleeSpecial.COMPANION_WEAPON = 4;
