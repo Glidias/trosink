@@ -529,6 +529,7 @@ class RangeCalculator extends VComponent<RangeCalculatorData, NoneT>
 			</sweet-modal>
 	
 			<h1>Firing Range Viability Calculator &nbsp;&nbsp;<button v-on:click="openTreeBrowser">&#127759;</button> <button v-on:click="$$refs.clipboardWindow.open()">&#128203;</button> <button v-if="targetInventory!=null" v-on:click="closeArmorOutfit">&#10060; Close Armor Outfit</button></h1>
+			<p>(A note of warning: this uses different set of rules from official SoS rules, akining more to Ballad)<p>
 			<h4>Shooter</h4>
 			<div><label>Profeciency Level: <InputInt :obj="$$data" prop="shooterProf" :min="0" /></label></div>
 			<div><label>Aim Phases (Max 3 phases x2 MP): <InputInt :obj="$$data" prop="shooterAim" :min="0" :max="3" /></label> <b><i>{{ aimBonus }}</i></b></div>
