@@ -670,7 +670,7 @@ class CharSheet implements IBuildListed
 	
 	inline function get_schoolCP():Int 
 	{
-		return schoolLevel >= 1 ? schoolLevel + 4 : 0;
+		return schoolLevel >= 1 ? schoolLevel : 0;
 	}
 	
 	function get_arcPointsAvailable():Int 

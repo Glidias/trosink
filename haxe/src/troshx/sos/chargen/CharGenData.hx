@@ -1201,7 +1201,7 @@ class CharGenData implements IBuildListed
 	public var totalSkillPointsProvided(get, never):Int;
 	function get_totalSkillPointsProvided():Int {
 		
-		return SkillPoints + char.intelligence * 2;
+		return SkillPoints + char.intelligence;
 	}
 	
 	public var skillPacketsRemaining(get, never):Int;

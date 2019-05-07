@@ -27,10 +27,10 @@ class School
 	}
 	
 	public static function getTalentAdds():Array<Int> { //
-		return [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0];  // like alternate 1s
+		return [1,0,0,0  ,1,0,1,0  ,0,0,1,0  ,1,0,0,0  ,1,0,1,0];  // dunno what pattern this is, if any?
 	}
-	public static function getSuperiorAdds():Array<Int> {  // like every 4th interval
-		return [0,0,0,1,  0,0,0,1,  0,0,0,1,   0,0,0,1,  0,0,0,1];
+	public static function getSuperiorAdds():Array<Int> {  // like every 3rd interval until last 20th
+		return [0,0,1,0,  0,1,0,0,  1,0,0,1,   0,0,1,0,  0,1,0,1];
 	}
 
 	// mastery adds assumed last level..
