@@ -176,7 +176,7 @@
 		<hr/>
 			
 		<section class="gen-skills"  id="gen-skills">
-			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}})</span><span class="formula">(PCP-1)*3+INT</span></h2>
+			<h2>Skills <span class="valuer" :class="{'still-have':totalSkillPointsLeft!=0}">({{totalSkillPointsLeft}} Skill Points remaining.) {{ individualSkillsRemaining }}</span> <span class="valuer">(Available: {{totalSkillPointsProvided}})</span><span class="formula">6+(PCP-1)*3+INT</span></h2>
 		<h3>Skill(s):</h3>
 			<div class="skill-lib">
 				<SkillLibInput v-for="(skillObj, i) in skillObjs" v-if="!skillsTable.requiresSpecialisation[skillObj.name]" :index="i" :key="skillObj.name" :obj="skillValues" :prop="skillObj.name" :skillsTable="skillsTable" :skillLevelsPacket="skillPacketValues" :remaining="individualSkillsRemaining" :canDelete="i>=startingSkillObjsCount" v-on:change="onSkillIndividualChange" v-on:delete="deleteSkillInput" />

@@ -1170,7 +1170,7 @@ class CharGenData implements IBuildListed
 	
 	public var SkillPoints(get, never):Int;
 	function get_SkillPoints():Int {
-		return (categories[CATEGORY_SKILLS].pcp-1) * 3;	
+		return 6 + (categories[CATEGORY_SKILLS].pcp-1) * 3;	
 	}
 	
 	public var individualSkillsSpent(get, never):Int;
