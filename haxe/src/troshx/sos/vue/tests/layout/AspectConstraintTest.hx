@@ -23,7 +23,7 @@ class AspectConstraintTest extends VComponent<AspectConstraintTestData, NoneT>
 	}
 	
 	override public function Created():Void {
-		this.aspectConstraint = AspectConstraint.createRelative(this.refWidth, this.refHeight, 1, 1);
+		this.aspectConstraint = AspectConstraint.createRelative(this.refWidth, this.refHeight, 1, 0);
 		trace(this.aspectConstraint.aspect * this.aspectConstraint.max );
 		trace(this.aspectConstraint.aspect * this.aspectConstraint.min);
 	}

@@ -16,19 +16,10 @@ class AspectConstraint
 	}
 	
 	public function findScales(result:Vec2, scaleX:Float, scaleY:Float):Void {
-		if (min > 0 && max > 0) {
-			result.x = Math.min(scaleX, max * scaleY);
-			//result.x = Math.max(scaleX, min * scaleY);
-			//if (max > 0) result.y = Math.max(scaleY, scaleX / max);
-			if (min > 0) result.y = Math.min(scaleY, scaleX / min);
-		}
-		else if (max > 0) {
-			result.x = Math.min(scaleX, max * scaleY);
-			result.y = result.x / aspect;
-		} else if (min > 0) {
-			result.y = Math.max(scaleY, scaleX / min);
-			result.x = aspect * result.y;
-		}
+	
+		result.x = Math.min(scaleX, max * scaleY);
+		result.y = min > 0 ? Math.min(scaleY, scaleX / min) : scaleY;
+		
 		
 		//result.x = scaleX;
 		//result.y = scaleY;
