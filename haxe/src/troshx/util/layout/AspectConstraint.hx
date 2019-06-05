@@ -2,7 +2,7 @@ package troshx.util.layout;
 import troshx.util.layout.Vec2;
 
 /**
- * ...
+ * This provides a constraint for min/max relative aspect ratio (of width/height)
  * @author Glidias
  */
 class AspectConstraint 
