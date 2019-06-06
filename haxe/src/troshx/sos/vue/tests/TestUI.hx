@@ -2,7 +2,12 @@ package troshx.sos.vue.tests;
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
 
+import troshx.util.layout.PointScaleConstraint;
+import troshx.util.layout.BorderConstraint;
+import troshx.util.layout.AspectConstraint;
+
 import troshx.sos.vue.tests.layout.AspectConstraintTest;
+
 
 /**
  * Testing simple ui constraint Layout engine

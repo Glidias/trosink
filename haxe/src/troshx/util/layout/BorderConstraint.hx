@@ -12,7 +12,7 @@ package troshx.util.layout;
 class BorderConstraint 
 {
 
-	public function new() 
+	function new() 
 	{
 		
 	}

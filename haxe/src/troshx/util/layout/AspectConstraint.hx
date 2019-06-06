@@ -10,17 +10,20 @@ class AspectConstraint
 	public var min:Float = 1;
 	public var max:Float = 1;
 	public var aspect:Float;
+	public var preflight:Bool = false;
 	
 	private function new() {
 		
 	}
 	
-	public function findScales(result:Vec2, scaleX:Float, scaleY:Float):Void {
+	public function enablePreflight():AspectConstraint {
+		preflight = true;
+		return this;
+	}
 	
+	public function findScales(result:Vec2, scaleX:Float, scaleY:Float):Void {
 		result.x = Math.min(scaleX, max * scaleY);
 		result.y = min > 0 ? Math.min(scaleY, scaleX / min) : scaleY;
-		
-		
 		//result.x = scaleX;
 		//result.y = scaleY;
 	}
