@@ -1,5 +1,4 @@
 package troshx.util.layout;
-import troshx.sos.vue.tests.layout.AspectConstraintTest;
 
 /**
  * A basic layout item in screen space
