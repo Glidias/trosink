@@ -23,9 +23,9 @@ class AspectConstraintTest extends VComponent<AspectConstraintTestData, NoneT>
 	}
 	
 	override public function Created():Void {
-		this.aspectConstraint = AspectConstraint.createRelative(this.refWidth, this.refHeight, 2, 0);
-		trace(this.aspectConstraint.aspect * this.aspectConstraint.max );
-		trace(this.aspectConstraint.aspect * this.aspectConstraint.min);
+		this.aspectConstraint = AspectConstraint.createRelative(2, 0);
+		trace(this.aspect * this.aspectConstraint.max );
+		trace(this.aspect * this.aspectConstraint.min);
 	}
 	
 	
@@ -39,7 +39,7 @@ class AspectConstraintTest extends VComponent<AspectConstraintTestData, NoneT>
 		
 		_vRefs.testAspect.attributes.style = this.testStyle;
 		
-		this.debugField = this.aspectConstraint.aspect + "<br/>" +  (_vRefs.testAspect.clientWidth / _vRefs.testAspect.clientHeight);
+		this.debugField = this.aspect + "<br/>" +  (_vRefs.testAspect.clientWidth / _vRefs.testAspect.clientHeight);
 		trace(this.debugField);
 	}
 	
@@ -53,6 +53,11 @@ class AspectConstraintTest extends VComponent<AspectConstraintTestData, NoneT>
 			testScale: new Vec2(1, 1),
 			debugField: ""
 		};
+	}
+	
+	@:computed var aspect(get, never):Float;
+	function get_aspect():Float {
+		return this.refWidth/ this.refHeight;
 	}
 	
 	@:computed var testStyle(get, never):Dynamic;

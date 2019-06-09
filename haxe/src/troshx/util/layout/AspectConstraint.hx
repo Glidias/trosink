@@ -9,7 +9,6 @@ class AspectConstraint
 {
 	public var min:Float = 1;
 	public var max:Float = 1;
-	public var aspect:Float;
 	public var preflight:Bool = false;
 	
 	private function new() {
@@ -28,9 +27,8 @@ class AspectConstraint
 		//result.y = scaleY;
 	}
 	
-	public static function createRelative(width:Float, height:Float, ?limit1:Float=null, ?limit2:Float=null):AspectConstraint {
+	public static function createRelative(?limit1:Float=null, ?limit2:Float=null):AspectConstraint {
 		var me = new AspectConstraint();
-		me.aspect = width / height;
 		
 		if (limit1 != null) {
 			if (limit1 > 1) {

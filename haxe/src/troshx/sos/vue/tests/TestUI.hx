@@ -7,7 +7,7 @@ import troshx.util.layout.BorderConstraint;
 import troshx.util.layout.AspectConstraint;
 
 import troshx.sos.vue.tests.layout.AspectConstraintTest;
-
+import troshx.sos.vue.tests.layout.LayoutItemTest;
 
 /**
  * Testing simple ui constraint Layout engine
@@ -21,7 +21,7 @@ class TestUI
 	{
 		Browser.document.body.style.padding = "0";
 		Browser.document.body.style.margin = "0";
-		boot.startVueWithRootComponent( "#app", new AspectConstraintTest() );
+		boot.startVueWithRootComponent( "#app", new LayoutItemTest() );
 	}
 	
 	static function main() 

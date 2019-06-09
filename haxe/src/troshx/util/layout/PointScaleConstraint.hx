@@ -8,9 +8,9 @@ package troshx.util.layout;
  */
 class PointScaleConstraint 
 {
-	public var scaleMin:Vec2;
-	public var scaleMax:Vec2;
-	public var pt:Vec2 = new Vec2();
+	public var scaleMin(default, null):Vec2;
+	public var scaleMax(default, null):Vec2;
+	public var pt(default, null):Vec2 = new Vec2();
 
 	function new() 
 	{
@@ -20,13 +20,14 @@ class PointScaleConstraint
 	public function findScaleRatios(result:Vec2, scaleX:Float, scaleY:Float):Void {
 		result.x = 1;
 		result.y = 1;
+	
 		if (scaleMax != null) {
-			if (scaleMax.x >= 1) result.x = 1 / scaleX * Math.min(scaleX, scaleMax.x);
-			if (scaleMax.y >= 1) result.y = 1 / scaleY * Math.min(scaleY, scaleMax.y);
+			if (scaleX > 1 && scaleMax.x >= 1) result.x = 1 / scaleX * Math.min(scaleX, scaleMax.x);
+			if (scaleY > 1 && scaleMax.y >= 1) result.y = 1 / scaleY * Math.min(scaleY, scaleMax.y);
 		}
 		if (scaleMin != null) {
-			if (scaleMin.x <= 1) result.x = 1 / scaleX * Math.max(scaleX, scaleMin.x);
-			if (scaleMin.y <= 1) result.y = 1 / scaleY * Math.max(scaleY, scaleMin.y);
+			if (scaleX < 1 && scaleMin.x <= 1) result.x = 1 / scaleX * Math.max(scaleX, scaleMin.x);
+			if (scaleY < 1 && scaleMin.y <= 1) result.y = 1 / scaleY * Math.max(scaleY, scaleMin.y);
 		}
 	}
 	
