@@ -1,6 +1,7 @@
 package troshx.sos.vue.tests;
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
+import troshx.sos.vue.combat.ImageMapTester;
 
 import troshx.util.layout.PointScaleConstraint;
 import troshx.util.layout.BorderConstraint;
@@ -21,7 +22,7 @@ class TestUI
 	{
 		Browser.document.body.style.padding = "0";
 		Browser.document.body.style.margin = "0";
-		boot.startVueWithRootComponent( "#app", new LayoutItemTest() );
+		boot.startVueWithRootComponent( "#app", new ImageMapTester() );
 	}
 	
 	static function main() 

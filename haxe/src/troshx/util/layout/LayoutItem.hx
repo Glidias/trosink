@@ -12,7 +12,7 @@ class LayoutItem
 	public var uDim(default, null):Float;
 	public var vDim(default, null):Float;
 	
-	var uvs:Array<Vec2>;	// local coordinate polygon uvs over base dimensions
+	var uvs(default, null):Array<Vec2>;	// local coordinate polygon uvs over base dimensions
 	
 	var shape:Int = 0;
 	public static inline var SHAPE_RECT:Int = 0;
@@ -123,8 +123,12 @@ class LayoutItem
 		
 	}
 	
-	public function resolvePolygon(resultUVs:Array<Vec2>, position:Vec2, scale:Vec2):Void {
-		
+	public function resolvePolygon(resultUVs:Array<Float>, position:Vec2, scale:Vec2):Void {
+		var c:Int = 0;
+		for (i in 0...uvs.length) {
+			resultUVs[c++] = position.x + uvs[i].x * scale.x;
+			resultUVs[c++] = position.y + uvs[i].y * scale.y;
+		}
 	}
 	
 	public static function createRectWIthUVs(u:Float, v:Float, uDim:Float, vDim:Float):LayoutItem {
@@ -138,6 +142,18 @@ class LayoutItem
 	
 	public static function createRect(scrnWidth:Float, scrnHeight:Float, x:Float, y:Float, width:Float, height:Float):LayoutItem {
 		return createRectWIthUVs(x/scrnWidth, y/scrnHeight, width/scrnWidth, height/scrnHeight);
+	}
+	public static function createCircle(scrnWidth:Float, scrnHeight:Float, x:Float, y:Float, radius:Float):LayoutItem {
+		var me =  createRectWIthUVs((x-radius) / scrnWidth, (y-radius) / scrnHeight, radius*2 / scrnWidth, radius*2 / scrnHeight);
+		me.shape = SHAPE_CIRCLE;
+		return me;
+	}
+	public static function createPolygon(scrnWidth:Float, scrnHeight:Float, coords:Array<Float>):LayoutItem {
+		// TODO: bounds from coords
+		// 
+		var me = new LayoutItem();
+		me.shape = SHAPE_POLYGON;
+		return me;
 	}
 	
 	public function pivot(val:PointScaleConstraint):LayoutItem {
@@ -153,6 +169,17 @@ class LayoutItem
 		return this;
 	}
 	
+	public static function fromHTMLImageMapArea(mapWidth:Int, mapHeight:Int, shape:String, coords:String):LayoutItem {
+		var coords:Array<Float> = coords.split(", ").map(function(str){return Std.parseFloat(str); });
+		if (shape == "rect") {
+			 return LayoutItem.createRect(mapWidth, mapHeight, coords[0], coords[1], coords[2] - coords[0], coords[3] - coords[1]);
+		} else if (shape == "circle") {
+			return LayoutItem.createCircle(mapWidth, mapHeight, coords[0], coords[1], coords[2]);
+		} else { // polygon
+			return LayoutItem.createPolygon(mapWidth, mapHeight, coords);
+		}
+		
+	}
 
 	
 }
