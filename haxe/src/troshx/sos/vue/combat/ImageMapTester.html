@@ -1,5 +1,5 @@
-<div>
-	<div class="image-map-holder">
+<div style="position:absolute;top:0;left:0;width:100%;height:100%">
+	<div class="image-map-holder" style="position:relative; display:inline-block"  ref="container">
 		<img src="images/dollscreen.png" style="transform-origin:0 0;" usemap="#map" ref="image" />
 		<map name="map" ref="map">
 			<area shape="poly" coords="316, 519, 314, 580, 305, 622, 317, 659, 374, 585" alt="swing" title="SWING_LOWER_LEG-l" />
@@ -70,5 +70,8 @@
 			<area shape="rect" coords="123, 684, 199, 721" title="handLeftAlt" />
 			<area shape="poly" coords="239, 605, 219, 619, 210, 727, 266, 727, 258, 617" title="initRange" />
 		</map>
+	</div>
+	<div>
+		<zone v-for="(li, i) in layoutItemList" :title="titleList[i]" :class="classList[i]" :key="i" :x="positionList[i].x*refWidth*scaleX" :y="positionList[i].y*refHeight*scaleY" :width="scaleList[i].x*refWidth*scaleX" :height="scaleList[i].y*refHeight*scaleY" :item="li" />
 	</div>
 </div>

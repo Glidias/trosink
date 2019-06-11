@@ -1,5 +1,4 @@
 package troshx.util.layout;
-
 /**
  * A basic layout item in screen space
  * @author Glidias
@@ -12,9 +11,9 @@ class LayoutItem
 	public var uDim(default, null):Float;
 	public var vDim(default, null):Float;
 	
-	var uvs(default, null):Array<Vec2>;	// local coordinate polygon uvs over base dimensions
+	public var uvs(default, null):Array<Vec2>;	// local coordinate polygon uvs over base dimensions
 	
-	var shape:Int = 0;
+	public var shape(default, null):Int = 0;
 	public static inline var SHAPE_RECT:Int = 0;
 	public static inline var SHAPE_CIRCLE:Int = 1;
 	public static inline var SHAPE_POLYGON:Int = 2;
@@ -149,11 +148,39 @@ class LayoutItem
 		return me;
 	}
 	public static function createPolygon(scrnWidth:Float, scrnHeight:Float, coords:Array<Float>):LayoutItem {
-		// TODO: bounds from coords
-		// 
+		var minX:Float = 2147483647;
+		var minY:Float = 2147483647;
+		var maxX:Float = 0;
+		var maxY:Float = 0;
 		var me = new LayoutItem();
 		me.shape = SHAPE_POLYGON;
+		var i:Int = 0;
+		var len:Int = coords.length;
+		me.uvs = [];
+		var v:Vec2;
+		while ( i < len) {
+			v = new Vec2(coords[i], coords[i + 1]);
+			me.uvs.push(v);
+			if (v.x < minX) minX = v.x;
+			if (v.y < minY) minY = v.y;
+			if (v.x > maxX) maxX = v.x;
+			if (v.y > maxY) maxY = v.y;
+			i += 2;
+		}
+		me.u = minX / scrnWidth;
+		me.v = minY / scrnHeight;
+		me.uDim = maxX / scrnWidth;
+		me.vDim = maxY / scrnHeight;
+		me.uDim -= me.u;
+		me.vDim -= me.v;
+		
+		for (i in 0...me.uvs.length) {
+			v = me.uvs[i];
+			v.x = (v.x / scrnWidth - me.u) / me.uDim;
+			v.y = (v.y / scrnHeight - me.v) / me.vDim;
+		}
 		return me;
+
 	}
 	
 	public function pivot(val:PointScaleConstraint):LayoutItem {

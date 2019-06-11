@@ -22,6 +22,9 @@ class TestUI
 	{
 		Browser.document.body.style.padding = "0";
 		Browser.document.body.style.margin = "0";
+		Browser.document.body.style.overflow = "hidden";
+		Browser.document.body.style.width = "100%";
+		Browser.document.body.style.height = "100%";
 		boot.startVueWithRootComponent( "#app", new ImageMapTester() );
 	}
 	
