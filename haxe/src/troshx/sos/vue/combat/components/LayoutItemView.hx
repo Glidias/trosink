@@ -69,7 +69,8 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 
 	
 	override function Template():String {
-		return '<div class="layout-item" :data-title="title" style="position:absolute;z-index:1;pointer-events:none;" :style="computedStyle">
+		//pointer-events:none;
+		return '<div class="layout-item" :data-title="title" style="position:absolute;z-index:1;" :style="computedStyle">
 			<svg v-if="gotSVG" xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" :width="width" :height="height">
 				<g style="transform-origin:0 0;" :style="gStyle">
 					<polygon :style="pStyle" style="stroke:#00F; fill:rgba(0,255,0,0.4)" :points="polyPoints"></polygon>

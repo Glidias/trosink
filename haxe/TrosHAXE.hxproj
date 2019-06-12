@@ -22,7 +22,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="MainSOS" />
+    <option mainClass="troshx.sos.vue.tests.TestUI" />
     <option enabledebug="False" />
     <option additional="-D vue_global" />
   </build>
@@ -33,7 +33,7 @@
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\MainSOS.hx" />
+    <compile path="src\troshx\sos\vue\tests\TestUI.hx" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

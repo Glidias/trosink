@@ -81,6 +81,8 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		}
 		_vData.layoutItemList = arr;
 		
+		LayoutConstraints.applyDollView(arr, this.titleList, this.classList, this.refWidth, this.refHeight);
+		
 		Browser.window.addEventListener("resize", onResize);
 		onResize();
 	}
