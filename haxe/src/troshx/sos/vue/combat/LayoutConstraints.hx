@@ -18,20 +18,41 @@ class LayoutConstraints
 			var tag:String = tags[i];
 			
 			if (tag == "part" || tag == "swing" || name == "enemyHandLeft" || name == "enemyHandRight" || name == "enemyStatus") {
-				item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMaxRelative(1.5, 1.5).scaleMinRelative(0.5, 0.5))
+				item.pin(PointScaleConstraint.createRelative(0.5, 0.5))
 				.aspect(AspectConstraint.createRelative(1,1).enablePreflight());
 			}
 			
+			var footMiddleOffset:Float = 0.06;
 			switch(name) {
 				case "initRange": 
-					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMinRelative(1, 0).scaleMaxRelative(1, 1000))
+					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMinRelative(1, 0))
 					.pivot(PointScaleConstraint.createRelative(0.5, 1))
 					.aspect(AspectConstraint.createRelative(1, 1).enablePreflight());		
 				case "advManuever1", "advManuever2", "advManuever3", "advManuever4": 
-					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMinRelative(1, 0).scaleMaxRelative(1.5, 1.5))
+					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMinRelative(0.5, 0).scaleMaxRelative(2.0, 0))
 					.pivot(PointScaleConstraint.createRelative(1, 0.5).scaleMinRelative(0.5, 0.5).scaleMaxRelative(1.5,1.5))
-					.aspect(AspectConstraint.createRelative(1, 0.5));
-				default:
+					.aspect(AspectConstraint.createRelative(1, 0.98));
+				case "btnBlock", "btnVoid", "btnParry": 
+					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMaxRelative(1.75, 0))
+					.pivot(PointScaleConstraint.createRelative(name != "btnParry" ? 1 : 0, 1).scaleMinRelative(0.5,0.5) )
+					.aspect(AspectConstraint.createRelative(1, 1));
+				case "cpMeter":
+					item.pivot(PointScaleConstraint.createRelative(0, 1).scaleMaxRelative(1.25, 1.2));
+				case "cpText":
+					item.pivot(PointScaleConstraint.createRelative(0, 1).scaleMinRelative(0.5, 0.5).scaleMaxRelative(1, 1.2))
+					.pin(PointScaleConstraint.createRelative(0,1).scaleMaxRelative(2.2,1));
+				case "vitals":
+					item.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0.82, 0.82).scaleMaxRelative(3, 3));
+				case "handLeftAlt", "handRightAlt": 
+					item.pin(PointScaleConstraint.createRelative(0.5+footMiddleOffset*(name=='handLeftAlt' ? -1 : 1), 1).scaleMaxRelative(1,1))
+					.pivot(PointScaleConstraint.createRelative( (name == "handLeftAlt" ? 1 : 0), 1).scaleMaxRelative(1.2, 1))
+					.aspect(AspectConstraint.createRelative(1.2, 1));
+				case "handLeftText", "handRightText": 
+					item.pin(PointScaleConstraint.createRelative(0.5+footMiddleOffset*(name=='handLeftText' ? -1 : 1), 1).scaleMaxRelative(1,1))
+					.pivot(PointScaleConstraint.createRelative( (name == "handLeftText" ? 1 : 0), 1).scaleMaxRelative(999, 1.6))
+					;
+					
+				
 			}
 		}
 	}
