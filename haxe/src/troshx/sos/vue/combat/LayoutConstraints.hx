@@ -43,7 +43,7 @@ class LayoutConstraints
 					item.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0, 0.5));
 				case "vitals":
 					item.pin(PointScaleConstraint.createRelative(0,0).scaleMinRelative(0, 0.5))
-					.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0.5, 0.5).scaleMaxRelative(3, 3));
+					.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0.85, 0.5).scaleMaxRelative(3, 3));
 				case "cpMeter":
 					item.pin(PointScaleConstraint.createRelative(0,0).scaleMinRelative(0.5, 0.5).scaleMaxRelative(3, 3))
 					.pivot(PointScaleConstraint.createRelative(0, 0).scaleMaxRelative(2.25, 0));
