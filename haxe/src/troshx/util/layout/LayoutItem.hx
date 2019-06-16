@@ -20,7 +20,7 @@ class LayoutItem
 	
 	public var _pivot(default, null):PointScaleConstraint;	// pivot in local space
 	public var _pin(default, null):PointScaleConstraint;	// constraint for pivot in parent space
-	public var _border(default, null):BorderConstraint;	// border constraints
+	public var _borders(default, null):Array<BorderConstraint>;	// border constraints
 	public var _aspect(default, null):AspectConstraint;		// relative aspect ratio constraint
 	
 	//static var PIN_FIXED:PointScaleConstraint = PointScaleConstraint.createRelative(0, 0).scaleMaxRelative(1,1).scaleMinRelative(1,1);
@@ -78,9 +78,25 @@ class LayoutItem
 		var maxV:Float = minV + resultScale.y * vDim;
 		
 		// apply border constraint stretching/clamping if needed
-		if (_border != null) {
-			
-			
+		if (_borders != null) {
+			var b:BorderConstraint;
+
+			if (_borders[BorderConstraint.SIDE_TOP] != null) {
+				b = _borders[BorderConstraint.SIDE_TOP];
+				minV = b.solveCoord(v, scaleY); 
+			}
+			if (_borders[BorderConstraint.SIDE_RIGHT] != null) {
+				b = _borders[BorderConstraint.SIDE_RIGHT];
+				maxU = b.solveCoord(u+uDim, scaleX);
+			}
+			if (_borders[BorderConstraint.SIDE_BOTTOM] != null) {
+				b = _borders[BorderConstraint.SIDE_BOTTOM];
+				maxV = b.solveCoord(v+vDim, scaleY);
+			}
+			if (_borders[BorderConstraint.SIDE_LEFT] != null) {
+				b = _borders[BorderConstraint.SIDE_LEFT];
+				minU = b.solveCoord(u, scaleX);
+			}
 		}
 
 		resultPosition.x = minU;
@@ -193,6 +209,31 @@ class LayoutItem
 	}
 	public function aspect(val:AspectConstraint):LayoutItem {
 		_aspect = val;
+		return this;
+	}
+	
+	public function border(side:Int, scaleMin:Float, scaleMax:Float, coord:Float=-1):LayoutItem {
+		if (_borders == null) {
+			_borders = [null, null, null, null];
+		}
+		if (coord < 0) {
+			coord = BorderConstraint.isMaximalSide(side) ? 1 : 0;
+		} else {
+			if (BorderConstraint.isMaximalSide(side)) {
+				if (BorderConstraint.isHorizontal(side)) {
+					if (coord < u + uDim) coord = u + uDim;
+				} else {
+					if (coord < v + vDim) coord = v + vDim;
+				}
+			} else {
+				if (BorderConstraint.isHorizontal(side)) {
+					if (coord > u) coord = u;
+				} else {
+					if (coord > v) coord = v;
+				}
+			}
+		}
+		_borders[side] = BorderConstraint.createRelative(coord, scaleMin, scaleMax);
 		return this;
 	}
 	

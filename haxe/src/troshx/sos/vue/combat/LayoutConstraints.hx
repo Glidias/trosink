@@ -1,5 +1,6 @@
 package troshx.sos.vue.combat;
 import troshx.util.layout.AspectConstraint;
+import troshx.util.layout.BorderConstraint;
 import troshx.util.layout.LayoutItem;
 import troshx.util.layout.PointScaleConstraint;
 
@@ -36,21 +37,35 @@ class LayoutConstraints
 					item.pin(PointScaleConstraint.createRelative(0.5, 0.5).scaleMaxRelative(1.75, 0))
 					.pivot(PointScaleConstraint.createRelative(name != "btnParry" ? 1 : 0, 1).scaleMinRelative(0.5,0.5) )
 					.aspect(AspectConstraint.createRelative(1, 1));
-				case "cpMeter":
-					item.pivot(PointScaleConstraint.createRelative(0, 1).scaleMaxRelative(1.25, 1.2));
-				case "cpText":
-					item.pivot(PointScaleConstraint.createRelative(0, 1).scaleMinRelative(0.5, 0.5).scaleMaxRelative(1, 1.2))
-					.pin(PointScaleConstraint.createRelative(0,1).scaleMaxRelative(2.2,1));
+				case "opponentSwiper":
+					item.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0, 0.5));
+				case "roundCount":
+					item.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0, 0.5));
 				case "vitals":
-					item.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0.82, 0.82).scaleMaxRelative(3, 3));
+					item.pin(PointScaleConstraint.createRelative(0,0).scaleMinRelative(0, 0.5))
+					.pivot(PointScaleConstraint.createRelative(0, 0).scaleMinRelative(0.5, 0.5).scaleMaxRelative(3, 3));
+				case "cpMeter":
+					item.pin(PointScaleConstraint.createRelative(0,0).scaleMinRelative(0.5, 0.5).scaleMaxRelative(3, 3))
+					.pivot(PointScaleConstraint.createRelative(0, 0).scaleMaxRelative(2.25, 0));
+				case "cpText":
+					item.pin(PointScaleConstraint.createRelative(0,0).scaleMinRelative(0.5, 0.5).scaleMaxRelative(2.25, 3))
+					.pivot(PointScaleConstraint.createRelative(0, 1).scaleMinRelative(0.5, 0.5).scaleMaxRelative(1, 1.1));
 				case "handLeftAlt", "handRightAlt": 
 					item.pin(PointScaleConstraint.createRelative(0.5+footMiddleOffset*(name=='handLeftAlt' ? -1 : 1), 1).scaleMaxRelative(1,1))
-					.pivot(PointScaleConstraint.createRelative( (name == "handLeftAlt" ? 1 : 0), 1).scaleMaxRelative(1.2, 1))
-					.aspect(AspectConstraint.createRelative(1.2, 1));
+					.pivot(PointScaleConstraint.createRelative( (name == "handLeftAlt" ? 1 : 0), 1).scaleMaxRelative(1.0, 1.1))
+					.aspect(AspectConstraint.createRelative(1.0, 0));
 				case "handLeftText", "handRightText": 
 					item.pin(PointScaleConstraint.createRelative(0.5+footMiddleOffset*(name=='handLeftText' ? -1 : 1), 1).scaleMaxRelative(1,1))
-					.pivot(PointScaleConstraint.createRelative( (name == "handLeftText" ? 1 : 0), 1).scaleMaxRelative(999, 1.6))
+					.pivot(PointScaleConstraint.createRelative( (name == "handLeftText" ? 1 : 0), 1).scaleMaxRelative(0, 1.2))
 					;
+					if (name == "handLeftText") {
+						item.border(BorderConstraint.SIDE_LEFT, 0, 1);
+						item.border(BorderConstraint.SIDE_RIGHT, 0, 1.1, 0.5+footMiddleOffset*(-1));
+						
+					} else {
+						item.border(BorderConstraint.SIDE_RIGHT, 0, 1);
+						item.border(BorderConstraint.SIDE_LEFT, 0, 1.1, 0.5+footMiddleOffset*(1));
+					}
 					
 				
 			}
