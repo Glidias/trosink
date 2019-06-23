@@ -1,4 +1,6 @@
 package troshx.sos.vue.combat;
+import hammer.GestureInteractionData;
+import hammer.Hammer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
@@ -14,7 +16,7 @@ import troshx.util.layout.Vec2;
  * ...
  * @author Glidias
  */
-class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
+class ImageMapTester extends VComponent<ImageMapData, NoneT>
 {
 
 	public function new() 
@@ -23,7 +25,7 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		DollView;
 	}
 	
-	override function Data():ImageMapTesterData {
+	override function Data():ImageMapData {
 		return {
 			layoutItemList: null,
 			positionList: [],
@@ -41,6 +43,13 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		return {
 			zone: new LayoutItemView()
 		}
+	}
+	
+	
+	
+	function setupUIInteraction():Void {
+		new HammerJSCombat(cast _vRefs.container, _vData);
+		
 	}
 	
 	override public function Mounted():Void {
@@ -85,6 +94,8 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		
 		Browser.window.addEventListener("resize", onResize);
 		onResize();
+		
+		setupUIInteraction();
 	}
 	
 	private function onResize():Void 
@@ -96,6 +107,8 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		this.scaleY  = screenHeight / refHeight;
 		
 		refreshLayout();
+		
+		
 	}
 	
 	function refreshLayout():Void
@@ -109,17 +122,4 @@ class ImageMapTester extends VComponent<ImageMapTesterData, NoneT>
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
 	
-}
-
-typedef ImageMapTesterData = {
-	var layoutItemList:Array<LayoutItem>;
-	var positionList:Array<Vec2>;
-	var scaleList:Array<Vec2>;
-	var titleList:Array<String>;
-	var classList:Array<String>;
-	
-	var refWidth:Float;
-	var refHeight:Float;
-	var scaleX:Float;
-	var scaleY:Float;
 }

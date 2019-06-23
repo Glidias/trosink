@@ -25,6 +25,9 @@ class TestUI
 		Browser.document.body.style.overflow = "hidden";
 		Browser.document.body.style.width = "100%";
 		Browser.document.body.style.height = "100%";
+		
+		Browser.document.body.style.backgroundColor = "#e4e5e7";
+		
 		boot.startVueWithRootComponent( "#app", new ImageMapTester() );
 	}
 	

@@ -26,6 +26,9 @@ class LayoutItem
 	//static var PIN_FIXED:PointScaleConstraint = PointScaleConstraint.createRelative(0, 0).scaleMaxRelative(1,1).scaleMinRelative(1,1);
 
 	static var SCRATCH:Vec2 = new Vec2();
+	
+	public var hitDecomposition:Array<Array<Vec2>>;
+	public var hitPadding:Float = 0;
 
 	function new() 
 	{
