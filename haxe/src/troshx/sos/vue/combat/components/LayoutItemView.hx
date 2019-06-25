@@ -22,8 +22,13 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 		if (!this.gotSVG) {
 			obj.width = width + "px";
 			obj.height = height + "px";
-			obj.backgroundColor = 'rgba(0,255,0,0.4)';
 			obj.outline = 'green solid 1px';
+			obj.backgroundColor = 'rgba(0,255,0,0.4)';
+			if (item.shape == LayoutItem.SHAPE_CIRCLE) {
+				obj.borderRadius = '50%';
+				obj.backgroundColor = 'rgba(255,255,0,0.4)';
+				obj.outline = "none";
+			} 
 		}
 		return obj;
 	}
@@ -74,8 +79,9 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 			<svg v-if="gotSVG" xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" :width="width" :height="height">
 				<g style="transform-origin:0 0;" :style="gStyle">
 					<polygon :style="pStyle" style="stroke:#00F; fill:rgba(0,255,0,0.4)" :points="polyPoints"></polygon>
-				</g>	
+				</g>
 			</svg>
+			<slot />
 		</div>';
 	}
 	
@@ -91,6 +97,5 @@ typedef LayoutItemViewProps = {
 	var y:Float;
 	var width:Float;
 	var height:Float;
-	
 	var title:String;
 }

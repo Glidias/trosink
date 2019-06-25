@@ -34,20 +34,37 @@ class HammerJSCombat
 	
 	var imageMapData:ImageMapData;
 	var interactionList:Array<UInteract>;
+	public function setNewInteractionList(arr:Array<UInteract>):Void {
+		interactionList = arr;
+	}
 	
-	public function new(element:CanvasElement, imageMapData:ImageMapData) 
+	public var currentGesture(default, null):GestureInteractionData;
+	
+	var callback:Int->Int->Void;
+	
+	public var defaultAct:UInteract = new UInteract(-1, UIInteraction.HOVER); // app specific set
+	
+	public function new(element:CanvasElement, imageMapData:ImageMapData, callback:Int->Int->Void=null) 
 	{
+		this.callback = callback != null ? callback : dummyCallback;
 		this.imageMapData = imageMapData;
+
 		hammer = new Hammer(element);
+		
+		// app specific set
 		interactionList = UIInteraction.getDollViewInteracts(imageMapData.layoutItemList, imageMapData.titleList, imageMapData.classList);
 		
 		hammer.on("hammer.input move panup pandown tap press swipeleft swiperight swipeup", handleUIGesture);
 	}
 	
-	var _hoverAct:UInteract = new UInteract( -1, UIInteraction.MOVE);
+	private function dummyCallback(index:Int, event:Int):Void {
+		trace("Receiving event from:" + index + " EVENT INDEX:" + event);
+	}
+	
+	
 	
 	function handleUIGesture(e:GestureInteractionData):Void {
-		
+		currentGesture = e;
 		var pt:Dynamic = e.changedPointers[0];
 		var id:Int;
 		var touch:Touch = null;
@@ -61,14 +78,14 @@ class HammerJSCombat
 		if (Std.is(pt, Touch)) {
 			touch = pt;
 			id = touch.identifier;
-			u = touch.screenX / canvasWidth;
-			v = touch.screenY / canvasHeight;
+			u = touch.pageX / canvasWidth;
+			v = touch.pageY / canvasHeight;
 			
 		} else {  // if (Std.is(pt, PointerEvent))
 			pointer = pt;
 			id = pointer.pointerId;
-			u = pointer.screenX / canvasWidth;
-			v = pointer.screenY / canvasHeight;
+			u = pointer.pageX / canvasWidth;
+			v = pointer.pageY / canvasHeight;
 		} 
 		//else {
 		//	return;
@@ -81,15 +98,21 @@ class HammerJSCombat
 			// resolve down case if needed
 			act = UIInteraction.findHit(u, v, imageMapData, interactionList);
 			if (act != null ) {
+				// resolve if needed
+				
+				if ( (act.mask & UIInteraction.DOWN)!=0 ) callback(act.index, UIInteraction.DOWN);
+				
 				if (UIInteraction.requiresTracking(act.mask)) {
 					activeTouches.set(id, act);
 					trace("Added id:" + id);
 				}
-				// resolve if needed
+				
 			} else {
 				// hover body part hit area check if not focused yet
-				activeTouches.set(id, _hoverAct);
-				//trace("Added hover checking id:" + id);
+				if (defaultAct != null) {
+					activeTouches.set(id, defaultAct);
+					//trace("Added hover checking id:" + id);
+				}
 			}
 		} else {
 			if ( !activeTouches.exists(id) ) return;
@@ -99,15 +122,19 @@ class HammerJSCombat
 	
 				// check for Hammer.INPUT..  move, end or cancel
 				if (e.eventType == Hammer.INPUT_MOVE) {
-					if ( (act.mask & UIInteraction.MOVE)!=0 ) {
+					if ( (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) )!=0 ) {
 						//trace("Hover detected");
-						var act2 = UIInteraction.findHit(u, v, imageMapData, interactionList);
-						if (act2 != null  ) {
-							if (UIInteraction.requiresTracking(act2.mask)) {
-								activeTouches.set(id, act2);
-								trace("Added act2 id:" + id);
+						// NOTE: need to check displacement 
+						if ((act.mask & UIInteraction.MOVE) != 0) callback(act.index, UIInteraction.MOVE);
+						if ((act.mask & (UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
+							var act2 = UIInteraction.findHit(u, v, imageMapData, interactionList);
+							if (act2 != null) {
+								if ( (act2.mask & UIInteraction.MOVE_OVER) != 0 && act2.index == act.index) {
+									callback(act.index, UIInteraction.MOVE_OVER);
+								} else if ( (act2.mask & UIInteraction.HOVER) != 0 && act2.index != act.index) {
+									callback(act.index, UIInteraction.HOVER);
+								}
 							}
-							// resolve if needed
 						}
 					}	
 				} else if (e.eventType == Hammer.INPUT_END || e.eventType == Hammer.INPUT_CANCEL) {
@@ -125,11 +152,14 @@ class HammerJSCombat
 			var interactType:Int = hammerEventMap.get(e.type);
 			if ( (act.mask & interactType) != 0) {
 				if ( (interactType & UIInteraction.REQUIRE_CONFIRMATION) == 0) {
-					// resolve now
+					callback(act.index, interactType);
 				} else { // check confirm first
-					
+					if (UIInteraction.checkHit(u, v, imageMapData, act)>=0) {
+						
+					}
 				}
 			}
+			activeTouches.remove(id);
 		}
 	}
 }

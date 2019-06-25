@@ -1,6 +1,7 @@
 package troshx.sos.vue.tests;
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
+import troshx.sos.vue.combat.DollView;
 import troshx.sos.vue.combat.ImageMapTester;
 
 import troshx.util.layout.PointScaleConstraint;

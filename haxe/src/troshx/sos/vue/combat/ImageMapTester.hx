@@ -22,21 +22,10 @@ class ImageMapTester extends VComponent<ImageMapData, NoneT>
 	public function new() 
 	{
 		super();
-		DollView;
 	}
 	
 	override function Data():ImageMapData {
-		return {
-			layoutItemList: null,
-			positionList: [],
-			scaleList: [],
-			titleList: [],
-			classList: [],
-			refWidth:0,
-			refHeight:0,
-			scaleX:1,
-			scaleY:1
-		}
+		return DollView.getBlankImageMapData();
 	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {

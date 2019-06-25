@@ -1,5 +1,6 @@
 package troshx.sos.vue.combat;
 
+import haxe.ds.StringMap;
 import troshx.util.layout.LayoutItem;
 import troshx.util.layout.Vec2;
 
@@ -8,6 +9,8 @@ import troshx.util.layout.Vec2;
  */
 typedef ImageMapData = {
 	var layoutItemList:Array<LayoutItem>;
+	
+	
 	var positionList:Array<Vec2>;
 	var scaleList:Array<Vec2>;
 	var titleList:Array<String>;
@@ -17,4 +20,6 @@ typedef ImageMapData = {
 	var refHeight:Float;
 	var scaleX:Float;
 	var scaleY:Float;
+	
+	@:optional var idIndices:StringMap<Int>;
 }
