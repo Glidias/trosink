@@ -42,10 +42,10 @@ class FightState
 	// riddle stuff here
 	public var initiative:Int = 0;  // initaitive  flag, use as either a boolean or bitmask depending on game needs
 	public var cp:Int = 0;	// the CP remaining
-	public var shock:Int = 0;	// unresolved shock that is accumulated and needs to be resolved by the end of the exchange
+	//public var shock:Int = 0;	// unresolved shock that is accumulated and needs to be resolved by the end of the exchange
 	
-	public var reachFlags:Int = 0;  // the reach in relation to opponents
-	public var opponents:Int = 0;	// the opponents he is currently facing up against as a mask for the exchange
+	//public var reachFlags:Int = 0;  // the reach in relation to opponents
+	//public var opponents:Int = 0;	// the opponents he is currently facing up against as a mask for the exchange
 	public var lastAttacking:Bool = false; // flag to indicate if was attacking on last declared move
 	
 	// own character reference of declared manuevers for easy manipulation on the fly

@@ -1,22 +1,22 @@
-package troshx.sos;
+package troshx.sos.combat;
 import troshx.components.Bout;
 import troshx.components.FightState;
 import troshx.core.BoutMessage;
 import troshx.sos.sheets.CharSheet;
 import troshx.core.IBoutModel;
 import troshx.core.ManueverStack;
-import troshx.sos.BoutModel;
 import troshx.util.LibUtil;
 
 /**
- * ...
+ * Initial start of Bout game model. Includes logging of messages support as well.
+ * 
  * @author Glidias
  */
 class BoutModel implements IBoutModel<CharSheet>
 {
 	
 	// bout model
-	public var bout:Bout<CharSheet> = new Bout<CharSheet>();
+	public var bout:Bout<CharSheet> = null;
 	public function setBout(val:Bout<CharSheet>):Void {
 		bout = val;
 	}
@@ -33,9 +33,9 @@ class BoutModel implements IBoutModel<CharSheet>
 		LibUtil.clearArray(_messages);
 	}
 	
-	// manuevers within bout
+	// listed manuevers within bout
 	private var manueverStack:ManueverStack= new ManueverStack();
-	private var defManueverStack:ManueverStack = new ManueverStack();
+	//private var defManueverStack:ManueverStack = new ManueverStack();
 	
 	public function new() 
 	{

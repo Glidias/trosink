@@ -36,6 +36,8 @@ class HammerJSCombat
 	var imageMapData:ImageMapData;
 	var interactionList:Array<UInteract>;
 	
+	var viewModel:CombatViewModel;
+	
 	public function setNewInteractionList(arr:Array<UInteract>):Void {
 		interactionList = arr;
 	}
@@ -48,21 +50,33 @@ class HammerJSCombat
 	
 	public function new(element:CanvasElement, imageMapData:ImageMapData, callback:Int->Int->Void=null) 
 	{
-		this.callback = callback != null ? callback : dummyCallback;
+		this.callback = callback != null ? callback : defaultCallback;
 		this.imageMapData = imageMapData;
 
 		hammer = new Hammer(element);
 		
 		// app specific set
 		interactionList = UIInteraction.setupDollViewInteracts(imageMapData.layoutItemList, imageMapData.titleList, imageMapData.classList);
-		
 		hammer.on("hammer.input move panup pandown tap press swipeleft swiperight swipeup", handleUIGesture);
 	}
 	
-	private function dummyCallback(index:Int, event:Int):Void {
-		trace("Receiving event from:" + index + " ::"+event + " >"+currentGesture.type + " :"+currentGesture.eventType);
+	// app specific set
+	private function defaultCallback(index:Int, event:Int):Void {
+		if (viewModel == null) {
+			trace("Receiving event from:" + index + " ::" + event + " >" + currentGesture.type + " :" + currentGesture.eventType);
+			return;
+		}
+		
+		var tag = imageMapData.classList[index];
+		if (tag == "swing" || tag == "part") {
+			if (event == UIInteraction.HOVER || index != viewModel.focusedIndex) {
+				viewModel.focusedIndex = index;
+			} else {
+				
+			}
+			return;
+		}
 	}
-	
 	
 	
 	function handleUIGesture(e:GestureInteractionData):Void {

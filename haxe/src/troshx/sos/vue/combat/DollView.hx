@@ -8,6 +8,8 @@ import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
+import troshx.sos.combat.BoutController;
+import troshx.sos.combat.BoutModel;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
@@ -25,7 +27,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	override function Data():DollViewData {
 		return {
-			mapData: getBlankImageMapData()
+			mapData: getBlankImageMapData(),
+			viewModel: new CombatViewModel()
 		}
 	}
 	
@@ -62,6 +65,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return {
 			zone: new LayoutItemView()
 		}
+	}
+	
+	function setupNewGame():Void {
+		
 	}
 	
 	
@@ -124,6 +131,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 		onResize();
 		
 		setupUIInteraction();
+		
+		
+		setupNewGame();
 	}
 	
 	private function onResize():Void 
@@ -156,4 +166,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 
 typedef DollViewData = {
 	var mapData: ImageMapData;
+	var viewModel:CombatViewModel;
+	@:optional var boutController:BoutController;
 }
