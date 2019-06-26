@@ -1,9 +1,9 @@
 package troshx.sos.vue.tests.layout;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import hxGeomAlgo.HxPoint;
 import js.Browser;
 import troshx.util.layout.AspectConstraint;
-import troshx.util.layout.Vec2;
 
 /**
  * ...
@@ -50,7 +50,7 @@ class AspectConstraintTest extends VComponent<AspectConstraintTestData, NoneT>
 			aspectConstraint: null,
 			refWidth:150, 
 			refHeight:200,
-			testScale: new Vec2(1, 1),
+			testScale: new HxPoint(1, 1),
 			debugField: ""
 		};
 	}
@@ -94,6 +94,6 @@ typedef AspectConstraintTestData = {
 	var refWidth:Float;
 	var refHeight:Float;
 	var aspectConstraint:AspectConstraint;
-	var testScale:Vec2;
+	var testScale:HxPoint;
 	var debugField:String;
 }

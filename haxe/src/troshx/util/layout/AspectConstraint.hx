@@ -1,5 +1,5 @@
 package troshx.util.layout;
-import troshx.util.layout.Vec2;
+import hxGeomAlgo.HxPoint;
 
 /**
  * This provides a constraint for min/max relative aspect ratio (of width/height)
@@ -20,7 +20,7 @@ class AspectConstraint
 		return this;
 	}
 	
-	public function findScales(result:Vec2, scaleX:Float, scaleY:Float):Void {
+	public function findScales(result:HxPoint, scaleX:Float, scaleY:Float):Void {
 		result.x = Math.min(scaleX, max * scaleY);
 		result.y = min > 0 ? Math.min(scaleY, scaleX / min) : scaleY;
 		//result.x = scaleX;

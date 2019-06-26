@@ -1,8 +1,8 @@
 package troshx.sos.vue.combat;
 
 import haxe.ds.StringMap;
+import hxGeomAlgo.HxPoint;
 import troshx.util.layout.LayoutItem;
-import troshx.util.layout.Vec2;
 
 /**
  * @author Glidias
@@ -11,8 +11,8 @@ typedef ImageMapData = {
 	var layoutItemList:Array<LayoutItem>;
 	
 	
-	var positionList:Array<Vec2>;
-	var scaleList:Array<Vec2>;
+	var positionList:Array<HxPoint>;
+	var scaleList:Array<HxPoint>;
 	var titleList:Array<String>;
 	var classList:Array<String>;
 	

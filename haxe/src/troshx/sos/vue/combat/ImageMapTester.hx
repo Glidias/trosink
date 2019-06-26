@@ -1,16 +1,14 @@
 package troshx.sos.vue.combat;
-import hammer.GestureInteractionData;
-import hammer.Hammer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
+import hxGeomAlgo.HxPoint;
 import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
-import troshx.util.layout.Vec2;
 
 /**
  * ...
@@ -69,8 +67,8 @@ class ImageMapTester extends VComponent<ImageMapData, NoneT>
 				//c.attributes.shape;
 				//c.attributes.coord;
 				var elem:HtmlElement = cast c;
-				this.positionList.push( new Vec2());
-				this.scaleList.push( new Vec2());
+				this.positionList.push( new HxPoint());
+				this.scaleList.push( new HxPoint());
 				this.classList.push(elem.getAttribute("alt"));
 				this.titleList.push(elem.getAttribute("title"));
 				arr.push(LayoutItem.fromHTMLImageMapArea(img.width, img.height, elem.getAttribute("shape"), elem.getAttribute("coords")));

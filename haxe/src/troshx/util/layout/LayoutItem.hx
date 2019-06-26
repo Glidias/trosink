@@ -1,4 +1,6 @@
 package troshx.util.layout;
+import hxGeomAlgo.HxPoint;
+import hxGeomAlgo.PolyTools.Poly;
 /**
  * A basic layout item in screen space
  * @author Glidias
@@ -11,7 +13,10 @@ class LayoutItem
 	public var uDim(default, null):Float;
 	public var vDim(default, null):Float;
 	
-	public var uvs(default, null):Array<Vec2>;	// local coordinate polygon uvs over base dimensions
+	public var uvs(default, null):Poly;	// local coordinate polygon uvs over base dimensions
+	public inline function setUVs(uvs:Poly):Void {
+		this.uvs = uvs;
+	}
 	
 	public var shape(default, null):Int = 0;
 	public static inline var SHAPE_RECT:Int = 0;
@@ -25,9 +30,9 @@ class LayoutItem
 	
 	//static var PIN_FIXED:PointScaleConstraint = PointScaleConstraint.createRelative(0, 0).scaleMaxRelative(1,1).scaleMinRelative(1,1);
 
-	static var SCRATCH:Vec2 = new Vec2();
+	static var SCRATCH:HxPoint = new HxPoint();
 	
-	public var hitDecomposition:Array<Array<Vec2>>;
+	public var hitDecomposition:Array<Poly>;
 	public var hitPadding:Float = 0;
 
 	function new() 
@@ -35,7 +40,7 @@ class LayoutItem
 		
 	}
 	
-	public function solve(resultPosition:Vec2, resultScale:Vec2, scaleX:Float, scaleY:Float):Void {
+	public function solve(resultPosition:HxPoint, resultScale:HxPoint, scaleX:Float, scaleY:Float):Void {
 		var pivotU:Float;
 		var pivotV:Float;
 		var scratch = SCRATCH;
@@ -141,7 +146,7 @@ class LayoutItem
 		
 	}
 	
-	public function resolvePolygon(resultUVs:Array<Float>, position:Vec2, scale:Vec2):Void {
+	public function resolvePolygon(resultUVs:Array<Float>, position:HxPoint, scale:HxPoint):Void {
 		var c:Int = 0;
 		for (i in 0...uvs.length) {
 			resultUVs[c++] = position.x + uvs[i].x * scale.x;
@@ -176,9 +181,9 @@ class LayoutItem
 		var i:Int = 0;
 		var len:Int = coords.length;
 		me.uvs = [];
-		var v:Vec2;
+		var v:HxPoint;
 		while ( i < len) {
-			v = new Vec2(coords[i], coords[i + 1]);
+			v = new HxPoint(coords[i], coords[i + 1]);
 			me.uvs.push(v);
 			if (v.x < minX) minX = v.x;
 			if (v.y < minY) minY = v.y;

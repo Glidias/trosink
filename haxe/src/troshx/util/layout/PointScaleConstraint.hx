@@ -1,4 +1,5 @@
 package troshx.util.layout;
+import hxGeomAlgo.HxPoint;
 
 /**
  * Used as pivot scale constraint to define a local
@@ -8,16 +9,16 @@ package troshx.util.layout;
  */
 class PointScaleConstraint 
 {
-	public var scaleMin(default, null):Vec2;
-	public var scaleMax(default, null):Vec2;
-	public var pt(default, null):Vec2 = new Vec2();
+	public var scaleMin(default, null):HxPoint;
+	public var scaleMax(default, null):HxPoint;
+	public var pt(default, null):HxPoint = new HxPoint();
 
 	function new() 
 	{
 		
 	}
 	
-	public function findScaleRatios(result:Vec2, scaleX:Float, scaleY:Float):Void {
+	public function findScaleRatios(result:HxPoint, scaleX:Float, scaleY:Float):Void {
 		result.x = 1;
 		result.y = 1;
 	
@@ -31,7 +32,7 @@ class PointScaleConstraint
 		}
 	}
 	
-	public function findScales(result:Vec2, scaleX:Float, scaleY:Float):Void {
+	public function findScales(result:HxPoint, scaleX:Float, scaleY:Float):Void {
 		findScaleRatios(result, scaleY, scaleX);
 		result.x *= scaleX;
 		result.y *= scaleY;
@@ -39,7 +40,7 @@ class PointScaleConstraint
 	
 	public function scaleMinRelative(x:Float=0, y:Float=0):PointScaleConstraint {
 		if (scaleMin == null) {
-			scaleMin = new Vec2();
+			scaleMin = new HxPoint();
 		}
 		scaleMin.x = x;
 		scaleMin.y = y;
@@ -48,7 +49,7 @@ class PointScaleConstraint
 	
 	public function scaleMaxRelative(x:Float=0, y:Float=0):PointScaleConstraint {
 		if (scaleMax == null) {
-			scaleMax = new Vec2();
+			scaleMax = new HxPoint();
 		}
 		scaleMax.x = x;
 		scaleMax.y = y;

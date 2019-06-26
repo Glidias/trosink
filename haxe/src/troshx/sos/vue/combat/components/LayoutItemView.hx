@@ -1,6 +1,7 @@
 package troshx.sos.vue.combat.components;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import hxGeomAlgo.PolyTools.Poly;
 import troshx.util.layout.LayoutItem;
 
 /**
@@ -59,19 +60,25 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 	@:computed var polyPoints(get, never):String;
 	function get_polyPoints():String 
 	{
-		var uvs = item.uvs;
+		return getPolyString(item.uvs);
+	}
+	
+	function getPolyString(poly:Poly):String {
 		var xScale:Float = width;
 		var yScale:Float = height;
 		var pts:Array<Float> = [];
-		for (i in 0...uvs.length) {
-			pts.push(uvs[i].x*xScale);
-			pts.push(uvs[i].y*yScale);
+		for (i in 0...poly.length) {
+			pts.push(poly[i].x*xScale);
+			pts.push(poly[i].y*yScale);
 		}
 		return pts.join(" ");
-		
 	}
 	
-
+	@:computed var polyDecompPoints(get, never):Array<String>;
+	function get_polyDecompPoints():Array<String> 
+	{
+		return item.hitDecomposition != null ? item.hitDecomposition.map(getPolyString) : null;
+	}
 	
 	override function Template():String {
 		//pointer-events:none;
@@ -80,6 +87,11 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 				<g style="transform-origin:0 0;" :style="gStyle">
 					<polygon :style="pStyle" style="stroke:#00F; fill:rgba(0,255,0,0.4)" :points="polyPoints"></polygon>
 				</g>
+				
+				<g style="transform-origin:0 0;" :style="gStyle" v-for="(p, i) in polyDecompPoints">
+					<polygon :style="pStyle" style="stroke:#ff0000; fill:transparent" :points="p" :key="i"></polygon>
+				</g>
+				
 			</svg>
 			<slot />
 		</div>';

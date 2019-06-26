@@ -52,7 +52,7 @@ class HammerJSCombat
 		hammer = new Hammer(element);
 		
 		// app specific set
-		interactionList = UIInteraction.getDollViewInteracts(imageMapData.layoutItemList, imageMapData.titleList, imageMapData.classList);
+		interactionList = UIInteraction.setupDollViewInteracts(imageMapData.layoutItemList, imageMapData.titleList, imageMapData.classList);
 		
 		hammer.on("hammer.input move panup pandown tap press swipeleft swiperight swipeup", handleUIGesture);
 	}
@@ -111,19 +111,19 @@ class HammerJSCombat
 				// hover body part hit area check if not focused yet
 				if (defaultAct != null) {
 					activeTouches.set(id, defaultAct);
-					//trace("Added hover checking id:" + id);
+					trace("Added hover checking id:" + id);
 				}
 			}
 		} else {
 			if ( !activeTouches.exists(id) ) return;
 			act = activeTouches.get(id);
-			
+	
 			if (e.type == "hammer.input") { // Respond to further raw hammer input
 	
 				// check for Hammer.INPUT..  move, end or cancel
 				if (e.eventType == Hammer.INPUT_MOVE) {
-					if ( (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) )!=0 ) {
-						//trace("Hover detected");
+					if ( (e.deltaX!= 0 || e.deltaY!=0) && (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) )!=0 ) {
+						//trace("Move/MoveOver/Hover detected");
 						// NOTE: need to check displacement 
 						if ((act.mask & UIInteraction.MOVE) != 0) callback(act.index, UIInteraction.MOVE);
 						if ((act.mask & (UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
@@ -139,7 +139,7 @@ class HammerJSCombat
 					}	
 				} else if (e.eventType == Hammer.INPUT_END || e.eventType == Hammer.INPUT_CANCEL) {
 					activeTouches.remove(id);
-					//trace("Removed id:" + id);
+					trace("Removed id:" + id);
 					
 				} else {
 					throw "Could not resolve event type:" + e.eventType;
@@ -151,15 +151,16 @@ class HammerJSCombat
 			// Respond to hammerJS event gesture
 			var interactType:Int = hammerEventMap.get(e.type);
 			if ( (act.mask & interactType) != 0) {
-				if ( (interactType & UIInteraction.REQUIRE_CONFIRMATION) == 0) {
+				if ( (interactType & UIInteraction.REQUIRE_CONFIRM_HIT) == 0 || UIInteraction.checkHit(u, v, imageMapData, act)>=0 ) {
 					callback(act.index, interactType);
-				} else { // check confirm first
-					if (UIInteraction.checkHit(u, v, imageMapData, act)>=0) {
-						
-					}
+				} 
+				if (!UIInteraction.requiresContinousHandling(interactType)) {
+					activeTouches.remove(id);
+					trace("Removedx id:" + id + " for :"+e.type);
 				}
 			}
-			activeTouches.remove(id);
+			
+			
 		}
 	}
 }

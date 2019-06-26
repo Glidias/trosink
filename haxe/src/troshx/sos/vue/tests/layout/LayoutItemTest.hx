@@ -1,11 +1,11 @@
 package troshx.sos.vue.tests.layout;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
+import hxGeomAlgo.HxPoint;
 import js.Browser;
 import troshx.util.layout.AspectConstraint;
 import troshx.util.layout.LayoutItem;
 import troshx.util.layout.PointScaleConstraint;
-import troshx.util.layout.Vec2;
 
 /**
  * ...
@@ -19,8 +19,8 @@ class LayoutItemTest extends VComponent<LayoutItemTestData, NoneT>
 		super();
 	}
 	
-	static var TEST_POS:Vec2 = new Vec2();
-	static var TEST_SCALE:Vec2 = new Vec2();
+	static var TEST_POS:HxPoint = new HxPoint();
+	static var TEST_SCALE:HxPoint = new HxPoint();
 	
 
 	

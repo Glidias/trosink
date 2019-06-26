@@ -3,13 +3,13 @@ import haxe.ds.StringMap;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
+import hxGeomAlgo.HxPoint;
 import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
-import troshx.util.layout.Vec2;
 
 /**
  * Main doll view component
@@ -102,8 +102,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 				//c.attributes.shape;
 				//c.attributes.coord;
 				var elem:HtmlElement = cast c;
-				d.positionList.push( new Vec2());
-				d.scaleList.push( new Vec2());
+				d.positionList.push( new HxPoint());
+				d.scaleList.push( new HxPoint());
 				d.classList.push(elem.getAttribute("alt"));
 				var title = elem.getAttribute("title");
 				d.titleList.push(title);
