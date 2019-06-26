@@ -31,7 +31,10 @@ class UIInteraction
 	@:act public static inline var HOVER:Int = (1 << 12);
 	@:act public static inline var MOVE_OVER:Int = (1 << 13);
 	
-	public static inline var REQUIRE_CONFIRM_HIT:Int = TAP;
+	public static inline function requiresConfirmHit(mask:Int):Bool {
+		return (mask & TAP)!=0;
+	}
+	
 	public static inline function requiresTracking(mask:Int):Bool {
 		return mask >= 2;
 	}
@@ -89,7 +92,7 @@ class UIInteraction
 			}
 			
 			if (tag == "part" || tag == "swing") {	// assumption against refWidth/refHeight
-				item.hitPadding = 8;
+				item.hitPadding = 5;
 			}
 			
 			if (tag == "part" || tag == "swing" || name == "enemyHandLeft" || name == "enemyHandRight") {
@@ -99,25 +102,26 @@ class UIInteraction
 			
 			switch(name) {
 				case "initRange": 
-					arr.push(new UInteract(i, DOWN | HOVER) );
+					arr.push(new UInteract(i, DOWN) );
 				case "advManuever1", "advManuever2", "advManuever3", "advManuever4": 
-					
+					arr.push(new UInteract(i, DOWN) );
 				case "btnBlock", "btnVoid", "btnParry": 
-					arr.push(new UInteract(i, DOWN | HOVER) );
+					item.hitPadding = 5;
+					arr.push(new UInteract(i, DOWN) );
+				case "incomingManuevers":
+					arr.push(new UInteract(i, PAN_UP|PAN_DOWN));	
 				case "opponentSwiper":
-					
+					arr.push(new UInteract(i, SWIPE_LEFT|SWIPE_RIGHT));	
 				case "roundCount":
-					
+					//arr.push(new UInteract(i, HOLD);	
 				case "vitals":
-					item.hitPadding = 8;
-					arr.push(new UInteract(i, DOWN));
-					
+					arr.push(new UInteract(i, PAN_UP|PAN_DOWN));	
 				case "cpMeter":
 					
 				case "cpText":
 					
 				case "handLeftAlt", "handRightAlt": 
-					
+						arr.push(new UInteract(i, TAP|HOLD|SWIPE_LEFT|SWIPE_RIGHT));	
 				case "handLeftText", "handRightText": 
 					
 				

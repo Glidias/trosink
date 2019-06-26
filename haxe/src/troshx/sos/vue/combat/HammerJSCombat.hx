@@ -30,10 +30,12 @@ class HammerJSCombat
 		"swipeup" => UIInteraction.SWIPE_UP
 	];
 	
+	var _inputActCache:UInteract;
 	var activeTouches:IntMap<UInteract> = new IntMap<UInteract>();
 	
 	var imageMapData:ImageMapData;
 	var interactionList:Array<UInteract>;
+	
 	public function setNewInteractionList(arr:Array<UInteract>):Void {
 		interactionList = arr;
 	}
@@ -58,7 +60,7 @@ class HammerJSCombat
 	}
 	
 	private function dummyCallback(index:Int, event:Int):Void {
-		trace("Receiving event from:" + index + " EVENT INDEX:" + event);
+		trace("Receiving event from:" + index + " ::"+event + " >"+currentGesture.type + " :"+currentGesture.eventType);
 	}
 	
 	
@@ -104,19 +106,25 @@ class HammerJSCombat
 				
 				if (UIInteraction.requiresTracking(act.mask)) {
 					activeTouches.set(id, act);
-					trace("Added id:" + id);
+					//trace("Added id:" + id);
 				}
 				
 			} else {
 				// hover body part hit area check if not focused yet
 				if (defaultAct != null) {
 					activeTouches.set(id, defaultAct);
-					trace("Added hover checking id:" + id);
+					//trace("Added hover checking id:" + id);
 				}
 			}
 		} else {
 			if ( !activeTouches.exists(id) ) return;
 			act = activeTouches.get(id);
+			if (act == null) {	// lazy defered removal
+				act = _inputActCache;
+				activeTouches.remove(id);
+				_inputActCache = null;
+				if (act == null) return;
+			}
 	
 			if (e.type == "hammer.input") { // Respond to further raw hammer input
 	
@@ -124,7 +132,6 @@ class HammerJSCombat
 				if (e.eventType == Hammer.INPUT_MOVE) {
 					if ( (e.deltaX!= 0 || e.deltaY!=0) && (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) )!=0 ) {
 						//trace("Move/MoveOver/Hover detected");
-						// NOTE: need to check displacement 
 						if ((act.mask & UIInteraction.MOVE) != 0) callback(act.index, UIInteraction.MOVE);
 						if ((act.mask & (UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
 							var act2 = UIInteraction.findHit(u, v, imageMapData, interactionList);
@@ -132,14 +139,16 @@ class HammerJSCombat
 								if ( (act2.mask & UIInteraction.MOVE_OVER) != 0 && act2.index == act.index) {
 									callback(act.index, UIInteraction.MOVE_OVER);
 								} else if ( (act2.mask & UIInteraction.HOVER) != 0 && act2.index != act.index) {
-									callback(act.index, UIInteraction.HOVER);
+									activeTouches.set(id, act2);
+									callback(act2.index, UIInteraction.HOVER);
 								}
 							}
 						}
 					}	
 				} else if (e.eventType == Hammer.INPUT_END || e.eventType == Hammer.INPUT_CANCEL) {
-					activeTouches.remove(id);
-					trace("Removed id:" + id);
+					_inputActCache = act;
+					activeTouches.set(id, null);
+					//trace("Removed-l id:" + id);
 					
 				} else {
 					throw "Could not resolve event type:" + e.eventType;
@@ -151,12 +160,12 @@ class HammerJSCombat
 			// Respond to hammerJS event gesture
 			var interactType:Int = hammerEventMap.get(e.type);
 			if ( (act.mask & interactType) != 0) {
-				if ( (interactType & UIInteraction.REQUIRE_CONFIRM_HIT) == 0 || UIInteraction.checkHit(u, v, imageMapData, act)>=0 ) {
+				if ( !UIInteraction.requiresConfirmHit(interactType) || UIInteraction.checkHit(u, v, imageMapData, act)>=0 ) {
 					callback(act.index, interactType);
 				} 
 				if (!UIInteraction.requiresContinousHandling(interactType)) {
 					activeTouches.remove(id);
-					trace("Removedx id:" + id + " for :"+e.type);
+					//trace("Removedx id:" + id + " for :"+e.type);
 				}
 			}
 			

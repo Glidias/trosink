@@ -322,6 +322,937 @@ haxevx_vuex_native_ActionContext.prototype = {
 };
 var haxevx_vuex_util_VHTMacros = function() { };
 haxevx_vuex_util_VHTMacros.__name__ = ["haxevx","vuex","util","VHTMacros"];
+var hxGeomAlgo_Bayazit = function() { };
+hxGeomAlgo_Bayazit.__name__ = ["hxGeomAlgo","Bayazit"];
+hxGeomAlgo_Bayazit.decomposePoly = function(simplePoly) {
+	var res = [];
+	if(simplePoly.length < 3) {
+		return res;
+	}
+	hxGeomAlgo_Bayazit.poly = [];
+	var _g = 0;
+	while(_g < simplePoly.length) {
+		var p = simplePoly[_g];
+		++_g;
+		hxGeomAlgo_Bayazit.poly.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(p.x,p.y));
+	}
+	hxGeomAlgo_Bayazit.reversed = hxGeomAlgo_PolyTools.makeCW(hxGeomAlgo_Bayazit.poly);
+	hxGeomAlgo_Bayazit.reflexVertices.length = 0;
+	hxGeomAlgo_Bayazit.steinerPoints.length = 0;
+	hxGeomAlgo_Bayazit._decomposePoly(hxGeomAlgo_Bayazit.poly,res);
+	return res;
+};
+hxGeomAlgo_Bayazit._decomposePoly = function(poly,polys) {
+	var upperInt = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+	var lowerInt = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+	var p = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+	var closestVert = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+	var upperDist = 0;
+	var lowerDist = 0;
+	var d = 0;
+	var closestDist = 0;
+	var upperIdx = 0;
+	var lowerIdx = 0;
+	var closestIdx = 0;
+	var upperPoly = [];
+	var lowerPoly = [];
+	var _g1 = 0;
+	var _g = poly.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(hxGeomAlgo_PolyTools.isReflex(poly,i)) {
+			hxGeomAlgo_Bayazit.reflexVertices.push(poly[i]);
+			lowerDist = Infinity;
+			upperDist = lowerDist;
+			var _g3 = 0;
+			var _g2 = poly.length;
+			while(_g3 < _g2) {
+				var j = _g3++;
+				var tmp;
+				var idx = i - 1;
+				var len = poly.length;
+				while(idx < 0) idx += len;
+				var p1 = poly[idx % len];
+				var idx1 = i;
+				var len1 = poly.length;
+				while(idx1 < 0) idx1 += len1;
+				var a = poly[idx1 % len1];
+				var idx2 = j;
+				var len2 = poly.length;
+				while(idx2 < 0) idx2 += len2;
+				var b = poly[idx2 % len2];
+				if((a.x - p1.x) * (b.y - p1.y) - (b.x - p1.x) * (a.y - p1.y) > 0) {
+					var idx3 = i - 1;
+					var len3 = poly.length;
+					while(idx3 < 0) idx3 += len3;
+					var p2 = poly[idx3 % len3];
+					var idx4 = i;
+					var len4 = poly.length;
+					while(idx4 < 0) idx4 += len4;
+					var a1 = poly[idx4 % len4];
+					var idx5 = j - 1;
+					var len5 = poly.length;
+					while(idx5 < 0) idx5 += len5;
+					var b1 = poly[idx5 % len5];
+					tmp = (a1.x - p2.x) * (b1.y - p2.y) - (b1.x - p2.x) * (a1.y - p2.y) <= 0;
+				} else {
+					tmp = false;
+				}
+				if(tmp) {
+					var idx6 = i - 1;
+					var len6 = poly.length;
+					while(idx6 < 0) idx6 += len6;
+					var p3 = poly[idx6 % len6];
+					var idx7 = i;
+					var len7 = poly.length;
+					while(idx7 < 0) idx7 += len7;
+					var p4 = poly[idx7 % len7];
+					var idx8 = j;
+					var len8 = poly.length;
+					while(idx8 < 0) idx8 += len8;
+					var p5 = poly[idx8 % len8];
+					var idx9 = j - 1;
+					var len9 = poly.length;
+					while(idx9 < 0) idx9 += len9;
+					p = hxGeomAlgo_PolyTools.intersection(p3,p4,p5,poly[idx9 % len9]);
+					var idx10 = i + 1;
+					var len10 = poly.length;
+					while(idx10 < 0) idx10 += len10;
+					var p6 = poly[idx10 % len10];
+					var idx11 = i;
+					var len11 = poly.length;
+					while(idx11 < 0) idx11 += len11;
+					var a2 = poly[idx11 % len11];
+					if((a2.x - p6.x) * (p.y - p6.y) - (p.x - p6.x) * (a2.y - p6.y) < 0) {
+						var v = poly[i];
+						var x = v.x - p.x;
+						var x1 = v.y - p.y;
+						d = x * x + x1 * x1;
+						if(d < lowerDist) {
+							lowerDist = d;
+							lowerInt = p;
+							lowerIdx = j;
+						}
+					}
+				}
+				var tmp1;
+				var idx12 = i + 1;
+				var len12 = poly.length;
+				while(idx12 < 0) idx12 += len12;
+				var p7 = poly[idx12 % len12];
+				var idx13 = i;
+				var len13 = poly.length;
+				while(idx13 < 0) idx13 += len13;
+				var a3 = poly[idx13 % len13];
+				var idx14 = j + 1;
+				var len14 = poly.length;
+				while(idx14 < 0) idx14 += len14;
+				var b2 = poly[idx14 % len14];
+				if((a3.x - p7.x) * (b2.y - p7.y) - (b2.x - p7.x) * (a3.y - p7.y) > 0) {
+					var idx15 = i + 1;
+					var len15 = poly.length;
+					while(idx15 < 0) idx15 += len15;
+					var p8 = poly[idx15 % len15];
+					var idx16 = i;
+					var len16 = poly.length;
+					while(idx16 < 0) idx16 += len16;
+					var a4 = poly[idx16 % len16];
+					var idx17 = j;
+					var len17 = poly.length;
+					while(idx17 < 0) idx17 += len17;
+					var b3 = poly[idx17 % len17];
+					tmp1 = (a4.x - p8.x) * (b3.y - p8.y) - (b3.x - p8.x) * (a4.y - p8.y) <= 0;
+				} else {
+					tmp1 = false;
+				}
+				if(tmp1) {
+					var idx18 = i + 1;
+					var len18 = poly.length;
+					while(idx18 < 0) idx18 += len18;
+					var p9 = poly[idx18 % len18];
+					var idx19 = i;
+					var len19 = poly.length;
+					while(idx19 < 0) idx19 += len19;
+					var p10 = poly[idx19 % len19];
+					var idx20 = j;
+					var len20 = poly.length;
+					while(idx20 < 0) idx20 += len20;
+					var p11 = poly[idx20 % len20];
+					var idx21 = j + 1;
+					var len21 = poly.length;
+					while(idx21 < 0) idx21 += len21;
+					p = hxGeomAlgo_PolyTools.intersection(p9,p10,p11,poly[idx21 % len21]);
+					var idx22 = i - 1;
+					var len22 = poly.length;
+					while(idx22 < 0) idx22 += len22;
+					var p12 = poly[idx22 % len22];
+					var idx23 = i;
+					var len23 = poly.length;
+					while(idx23 < 0) idx23 += len23;
+					var a5 = poly[idx23 % len23];
+					if((a5.x - p12.x) * (p.y - p12.y) - (p.x - p12.x) * (a5.y - p12.y) > 0) {
+						var v1 = poly[i];
+						var x2 = v1.x - p.x;
+						var x3 = v1.y - p.y;
+						d = x2 * x2 + x3 * x3;
+						if(d < upperDist) {
+							upperDist = d;
+							upperInt = p;
+							upperIdx = j;
+						}
+					}
+				}
+			}
+			if(lowerIdx == (upperIdx + 1) % poly.length) {
+				p.x = (lowerInt.x + upperInt.x) / 2;
+				p.y = (lowerInt.y + upperInt.y) / 2;
+				hxGeomAlgo_Bayazit.steinerPoints.push(p);
+				if(i < upperIdx) {
+					var _g31 = i;
+					var _g21 = upperIdx + 1;
+					while(_g31 < _g21) {
+						var k = _g31++;
+						lowerPoly.push(poly[k]);
+					}
+					lowerPoly.push(p);
+					upperPoly.push(p);
+					if(lowerIdx != 0) {
+						var _g32 = lowerIdx;
+						var _g22 = poly.length;
+						while(_g32 < _g22) {
+							var k1 = _g32++;
+							upperPoly.push(poly[k1]);
+						}
+					}
+					var _g33 = 0;
+					var _g23 = i + 1;
+					while(_g33 < _g23) {
+						var k2 = _g33++;
+						upperPoly.push(poly[k2]);
+					}
+				} else {
+					if(i != 0) {
+						var _g34 = i;
+						var _g24 = poly.length;
+						while(_g34 < _g24) {
+							var k3 = _g34++;
+							lowerPoly.push(poly[k3]);
+						}
+					}
+					var _g35 = 0;
+					var _g25 = upperIdx + 1;
+					while(_g35 < _g25) {
+						var k4 = _g35++;
+						lowerPoly.push(poly[k4]);
+					}
+					lowerPoly.push(p);
+					upperPoly.push(p);
+					var _g36 = lowerIdx;
+					var _g26 = i + 1;
+					while(_g36 < _g26) {
+						var k5 = _g36++;
+						upperPoly.push(poly[k5]);
+					}
+				}
+			} else {
+				if(lowerIdx > upperIdx) {
+					upperIdx += poly.length;
+				}
+				closestDist = Infinity;
+				var _g37 = lowerIdx;
+				var _g27 = upperIdx + 1;
+				while(_g37 < _g27) {
+					var j1 = _g37++;
+					var tmp2;
+					var idx24 = i - 1;
+					var len24 = poly.length;
+					while(idx24 < 0) idx24 += len24;
+					var p13 = poly[idx24 % len24];
+					var idx25 = i;
+					var len25 = poly.length;
+					while(idx25 < 0) idx25 += len25;
+					var a6 = poly[idx25 % len25];
+					var idx26 = j1;
+					var len26 = poly.length;
+					while(idx26 < 0) idx26 += len26;
+					var b4 = poly[idx26 % len26];
+					if((a6.x - p13.x) * (b4.y - p13.y) - (b4.x - p13.x) * (a6.y - p13.y) >= 0) {
+						var idx27 = i + 1;
+						var len27 = poly.length;
+						while(idx27 < 0) idx27 += len27;
+						var p14 = poly[idx27 % len27];
+						var idx28 = i;
+						var len28 = poly.length;
+						while(idx28 < 0) idx28 += len28;
+						var a7 = poly[idx28 % len28];
+						var idx29 = j1;
+						var len29 = poly.length;
+						while(idx29 < 0) idx29 += len29;
+						var b5 = poly[idx29 % len29];
+						tmp2 = (a7.x - p14.x) * (b5.y - p14.y) - (b5.x - p14.x) * (a7.y - p14.y) <= 0;
+					} else {
+						tmp2 = false;
+					}
+					if(tmp2) {
+						var idx30 = i;
+						var len30 = poly.length;
+						while(idx30 < 0) idx30 += len30;
+						var v2 = poly[idx30 % len30];
+						var idx31 = j1;
+						var len31 = poly.length;
+						while(idx31 < 0) idx31 += len31;
+						var w = poly[idx31 % len31];
+						var x4 = v2.x - w.x;
+						var x5 = v2.y - w.y;
+						d = x4 * x4 + x5 * x5;
+						if(d < closestDist) {
+							closestDist = d;
+							var idx32 = j1;
+							var len32 = poly.length;
+							while(idx32 < 0) idx32 += len32;
+							closestVert = poly[idx32 % len32];
+							closestIdx = j1 % poly.length;
+						}
+					}
+				}
+				if(i < closestIdx) {
+					var _g38 = i;
+					var _g28 = closestIdx + 1;
+					while(_g38 < _g28) {
+						var k6 = _g38++;
+						lowerPoly.push(poly[k6]);
+					}
+					if(closestIdx != 0) {
+						var _g39 = closestIdx;
+						var _g29 = poly.length;
+						while(_g39 < _g29) {
+							var k7 = _g39++;
+							upperPoly.push(poly[k7]);
+						}
+					}
+					var _g310 = 0;
+					var _g210 = i + 1;
+					while(_g310 < _g210) {
+						var k8 = _g310++;
+						upperPoly.push(poly[k8]);
+					}
+				} else {
+					if(i != 0) {
+						var _g311 = i;
+						var _g211 = poly.length;
+						while(_g311 < _g211) {
+							var k9 = _g311++;
+							lowerPoly.push(poly[k9]);
+						}
+					}
+					var _g312 = 0;
+					var _g212 = closestIdx + 1;
+					while(_g312 < _g212) {
+						var k10 = _g312++;
+						lowerPoly.push(poly[k10]);
+					}
+					var _g313 = closestIdx;
+					var _g213 = i + 1;
+					while(_g313 < _g213) {
+						var k11 = _g313++;
+						upperPoly.push(poly[k11]);
+					}
+				}
+			}
+			if(lowerPoly.length < upperPoly.length) {
+				hxGeomAlgo_Bayazit._decomposePoly(lowerPoly,polys);
+				hxGeomAlgo_Bayazit._decomposePoly(upperPoly,polys);
+			} else {
+				hxGeomAlgo_Bayazit._decomposePoly(upperPoly,polys);
+				hxGeomAlgo_Bayazit._decomposePoly(lowerPoly,polys);
+			}
+			return;
+		}
+	}
+	polys.push(poly);
+};
+var hxGeomAlgo_HomogCoord = function(x,y,w) {
+	if(w == null) {
+		w = 1;
+	}
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this.x = x;
+	this.y = y;
+	this.w = w;
+};
+hxGeomAlgo_HomogCoord.__name__ = ["hxGeomAlgo","HomogCoord"];
+hxGeomAlgo_HomogCoord.det = function(p,q,r) {
+	return p.w * q.perpdot(r) - q.w * p.perpdot(r) + r.w * p.perpdot(q);
+};
+hxGeomAlgo_HomogCoord.ccw = function(p,q,r) {
+	return hxGeomAlgo_HomogCoord.det(p,q,r) > 0;
+};
+hxGeomAlgo_HomogCoord.cw = function(p,q,r) {
+	return hxGeomAlgo_HomogCoord.det(p,q,r) < 0;
+};
+hxGeomAlgo_HomogCoord.prototype = {
+	add: function(p) {
+		this.x += p.x;
+		this.y += p.y;
+		return this;
+	}
+	,sub: function(p) {
+		this.x -= p.x;
+		this.y -= p.y;
+		return this;
+	}
+	,neg: function() {
+		this.w = -this.w;
+		this.x = -this.x;
+		this.y = -this.y;
+		return this;
+	}
+	,mul: function(m) {
+		this.w *= m;
+		this.x *= m;
+		this.y *= m;
+		return this;
+	}
+	,div: function(m) {
+		this.w /= m;
+		this.x /= m;
+		this.y /= m;
+		return this;
+	}
+	,normalize: function() {
+		return this.div(this.length());
+	}
+	,lengthSquared: function() {
+		return this.x * this.x + this.y * this.y;
+	}
+	,length: function() {
+		return Math.sqrt(this.lengthSquared());
+	}
+	,perp: function() {
+		var tmp = -this.y;
+		this.y = this.x;
+		this.x = tmp;
+		return this;
+	}
+	,dotPoint: function(p) {
+		return this.w + this.x * p.x + this.y * p.y;
+	}
+	,dot: function(p) {
+		return this.w * p.w + this.x * p.x + this.y * p.y;
+	}
+	,perpdot: function(p) {
+		return this.x * p.y - this.y * p.x;
+	}
+	,dotperp: function(p) {
+		return -this.x * p.y + this.y * p.x;
+	}
+	,equals: function(p) {
+		if(p.w * this.x == this.w * p.x) {
+			return p.w * this.y == this.w * p.y;
+		} else {
+			return false;
+		}
+	}
+	,left: function(p) {
+		return this.dotPoint(p) > 0;
+	}
+	,right: function(p) {
+		return this.dotPoint(p) < 0;
+	}
+	,toScreen: function() {
+		return hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(this.x / this.w,-this.y / this.w);
+	}
+	,toPoint: function() {
+		return hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(this.x / this.w,this.y / this.w);
+	}
+	,meet: function(p) {
+		return new hxGeomAlgo_HomogCoord(p.w * this.y - this.w * p.y,this.w * p.x - p.w * this.x,this.x * p.y - this.y * p.x);
+	}
+	,meetPoint: function(p) {
+		return new hxGeomAlgo_HomogCoord(this.y - this.w * p.y,this.w * p.x - this.x,this.x * p.y - this.y * p.x);
+	}
+	,toString: function() {
+		return " (w:" + this.w + "; x:" + this.x + ", y:" + this.y + ")  ";
+	}
+	,__class__: hxGeomAlgo_HomogCoord
+};
+var hxGeomAlgo__$HxPoint_HxPoint_$Impl_$ = {};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.__name__ = ["hxGeomAlgo","_HxPoint","HxPoint_Impl_"];
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.get_x = function(this1) {
+	return this1.x;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.set_x = function(this1,value) {
+	return this1.x = value;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.get_y = function(this1) {
+	return this1.y;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.set_y = function(this1,value) {
+	return this1.y = value;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new = function(x,y) {
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var this1 = new hxGeomAlgo_HxPointData(x,y);
+	return this1;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.setTo = function(this1,newX,newY) {
+	this1.x = newX;
+	this1.y = newY;
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.equals = function(this1,p) {
+	if(this1 != null && p != null && p.x == this1.x) {
+		return p.y == this1.y;
+	} else {
+		return false;
+	}
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.notEequals = function(this1,p) {
+	return !(this1 != null && p != null && p.x == this1.x && p.y == this1.y);
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.clone = function(this1) {
+	return hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(this1.x,this1.y);
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.toString = function(this1) {
+	return "(" + this1.x + ", " + this1.y + ")";
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.fromPointStruct = function(p) {
+	return hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(p.x,p.y);
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.toPointStruct = function(this1) {
+	return { x : this1.x, y : this1.y};
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.areEqual = function(p,q) {
+	if(p != null && q != null && q.x == p.x) {
+		return q.y == p.y;
+	} else {
+		return false;
+	}
+};
+hxGeomAlgo__$HxPoint_HxPoint_$Impl_$.areNotEqual = function(p,q) {
+	return !(p != null && q != null && q.x == p.x && q.y == p.y);
+};
+var hxGeomAlgo_HxPointData = function(x,y) {
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this.x = x;
+	this.y = y;
+};
+hxGeomAlgo_HxPointData.__name__ = ["hxGeomAlgo","HxPointData"];
+hxGeomAlgo_HxPointData.prototype = {
+	__class__: hxGeomAlgo_HxPointData
+};
+var hxGeomAlgo_PolyTools = function() { };
+hxGeomAlgo_PolyTools.__name__ = ["hxGeomAlgo","PolyTools"];
+hxGeomAlgo_PolyTools.isCCW = function(poly) {
+	if(poly.length <= 2) {
+		return true;
+	}
+	var signedArea = 0.;
+	var _g1 = 0;
+	var _g = poly.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var idx = i - 1;
+		var len = poly.length;
+		while(idx < 0) idx += len;
+		var signedArea1 = poly[idx % len].x * poly[i].y;
+		var poly1 = poly[i].x;
+		var idx1 = i - 1;
+		var len1 = poly.length;
+		while(idx1 < 0) idx1 += len1;
+		signedArea += signedArea1 - poly1 * poly[idx1 % len1].y;
+	}
+	return signedArea < 0;
+};
+hxGeomAlgo_PolyTools.makeCCW = function(poly) {
+	var reversed = false;
+	if(!hxGeomAlgo_PolyTools.isCCW(poly)) {
+		poly.reverse();
+		reversed = true;
+	}
+	return reversed;
+};
+hxGeomAlgo_PolyTools.makeCW = function(poly) {
+	var reversed = false;
+	if(hxGeomAlgo_PolyTools.isCCW(poly)) {
+		poly.reverse();
+		reversed = true;
+	}
+	return reversed;
+};
+hxGeomAlgo_PolyTools.isConvex = function(poly) {
+	var isPositive = null;
+	var _g1 = 0;
+	var _g = poly.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var lower = i == 0 ? poly.length - 1 : i - 1;
+		var middle = i;
+		var upper = i == poly.length - 1 ? 0 : i + 1;
+		var dx0 = poly[middle].x - poly[lower].x;
+		var dy0 = poly[middle].y - poly[lower].y;
+		var dx1 = poly[upper].x - poly[middle].x;
+		var dy1 = poly[upper].y - poly[middle].y;
+		var cross = dx0 * dy1 - dx1 * dy0;
+		var newIsPositive = cross > 0;
+		if(cross == 0) {
+			continue;
+		}
+		if(isPositive == null) {
+			isPositive = newIsPositive;
+		} else if(isPositive != newIsPositive) {
+			return false;
+		}
+	}
+	return true;
+};
+hxGeomAlgo_PolyTools.isSimple = function(poly) {
+	var len = poly.length;
+	if(len <= 3) {
+		return true;
+	}
+	var _g1 = 0;
+	var _g = len;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var p0 = i;
+		var p1 = i == len - 1 ? 0 : i + 1;
+		var _g3 = i + 1;
+		var _g2 = len;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var q0 = j;
+			var q1 = j == len - 1 ? 0 : j + 1;
+			var intersection = hxGeomAlgo_PolyTools.segmentIntersect(poly[p0],poly[p1],poly[q0],poly[q1]);
+			var tmp;
+			var tmp1;
+			if(intersection != null) {
+				var tmp2;
+				var p = poly[p0];
+				if(!(intersection != null && p != null && p.x == intersection.x && p.y == intersection.y)) {
+					var p2 = poly[p1];
+					if(intersection != null && p2 != null && p2.x == intersection.x) {
+						tmp2 = p2.y == intersection.y;
+					} else {
+						tmp2 = false;
+					}
+				} else {
+					tmp2 = true;
+				}
+				tmp1 = !tmp2;
+			} else {
+				tmp1 = false;
+			}
+			if(tmp1) {
+				var tmp3;
+				var p3 = poly[q0];
+				if(!(intersection != null && p3 != null && p3.x == intersection.x && p3.y == intersection.y)) {
+					var p4 = poly[q1];
+					if(intersection != null && p4 != null && p4.x == intersection.x) {
+						tmp3 = p4.y == intersection.y;
+					} else {
+						tmp3 = false;
+					}
+				} else {
+					tmp3 = true;
+				}
+				tmp = !tmp3;
+			} else {
+				tmp = false;
+			}
+			if(tmp) {
+				return false;
+			}
+		}
+	}
+	return true;
+};
+hxGeomAlgo_PolyTools.segmentIntersect = function(p0,p1,q0,q1) {
+	var intersectionPoint;
+	var a1;
+	var a2;
+	var b1;
+	var b2;
+	var c1;
+	var c2;
+	a1 = p1.y - p0.y;
+	b1 = p0.x - p1.x;
+	c1 = p1.x * p0.y - p0.x * p1.y;
+	a2 = q1.y - q0.y;
+	b2 = q0.x - q1.x;
+	c2 = q1.x * q0.y - q0.x * q1.y;
+	var denom = a1 * b2 - a2 * b1;
+	if(denom == 0) {
+		return null;
+	}
+	intersectionPoint = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+	intersectionPoint.x = (b1 * c2 - b2 * c1) / denom;
+	intersectionPoint.y = (a2 * c1 - a1 * c2) / denom;
+	var x = intersectionPoint.x - p1.x;
+	var x1 = intersectionPoint.y - p1.y;
+	var x2 = p0.x - p1.x;
+	var x3 = p0.y - p1.y;
+	if(x * x + x1 * x1 > x2 * x2 + x3 * x3) {
+		return null;
+	}
+	var x4 = intersectionPoint.x - p0.x;
+	var x5 = intersectionPoint.y - p0.y;
+	var x6 = p0.x - p1.x;
+	var x7 = p0.y - p1.y;
+	if(x4 * x4 + x5 * x5 > x6 * x6 + x7 * x7) {
+		return null;
+	}
+	var x8 = intersectionPoint.x - q1.x;
+	var x9 = intersectionPoint.y - q1.y;
+	var x10 = q0.x - q1.x;
+	var x11 = q0.y - q1.y;
+	if(x8 * x8 + x9 * x9 > x10 * x10 + x11 * x11) {
+		return null;
+	}
+	var x12 = intersectionPoint.x - q0.x;
+	var x13 = intersectionPoint.y - q0.y;
+	var x14 = q0.x - q1.x;
+	var x15 = q0.y - q1.y;
+	if(x12 * x12 + x13 * x13 > x14 * x14 + x15 * x15) {
+		return null;
+	}
+	return intersectionPoint;
+};
+hxGeomAlgo_PolyTools.findDuplicatePoints = function(poly,consecutiveOnly,wrapAround) {
+	if(wrapAround == null) {
+		wrapAround = true;
+	}
+	if(consecutiveOnly == null) {
+		consecutiveOnly = true;
+	}
+	var len = poly.length;
+	if(len <= 1) {
+		return [];
+	}
+	var dupIndices = [];
+	var _g1 = 0;
+	var _g = len - 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var j = i + 1;
+		while(j < len) {
+			var this1 = poly[i];
+			var p = poly[j];
+			var foundDup = this1 != null && p != null && p.x == this1.x && p.y == this1.y;
+			if(foundDup) {
+				dupIndices.push(i);
+			}
+			if(consecutiveOnly || foundDup && !consecutiveOnly) {
+				break;
+			}
+			++j;
+		}
+	}
+	var tmp;
+	if(wrapAround && consecutiveOnly) {
+		var this2 = poly[0];
+		var p1 = poly[len - 1];
+		if(this2 != null && p1 != null && p1.x == this2.x) {
+			tmp = p1.y == this2.y;
+		} else {
+			tmp = false;
+		}
+	} else {
+		tmp = false;
+	}
+	if(tmp) {
+		dupIndices.push(len - 1);
+	}
+	return dupIndices;
+};
+hxGeomAlgo_PolyTools.intersection = function(p1,p2,q1,q2) {
+	var res = null;
+	var a1 = p2.y - p1.y;
+	var b1 = p1.x - p2.x;
+	var c1 = a1 * p1.x + b1 * p1.y;
+	var a2 = q2.y - q1.y;
+	var b2 = q1.x - q2.x;
+	var c2 = a2 * q1.x + b2 * q1.y;
+	var det = a1 * b2 - a2 * b1;
+	if(!(Math.abs(det) <= hxGeomAlgo_PolyTools.EPSILON)) {
+		res = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+		res.x = (b2 * c1 - b1 * c2) / det;
+		res.y = (a1 * c2 - a2 * c1) / det;
+	}
+	return res;
+};
+hxGeomAlgo_PolyTools.isReflex = function(poly,idx) {
+	var idx1 = idx - 1;
+	var len = poly.length;
+	while(idx1 < 0) idx1 += len;
+	var p = poly[idx1 % len];
+	var idx2 = idx;
+	var len1 = poly.length;
+	while(idx2 < 0) idx2 += len1;
+	var a = poly[idx2 % len1];
+	var idx3 = idx + 1;
+	var len2 = poly.length;
+	while(idx3 < 0) idx3 += len2;
+	var b = poly[idx3 % len2];
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) < 0;
+};
+hxGeomAlgo_PolyTools.at = function(poly,idx) {
+	var len = poly.length;
+	while(idx < 0) idx += len;
+	return poly[idx % len];
+};
+hxGeomAlgo_PolyTools.side = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y);
+};
+hxGeomAlgo_PolyTools.isLeft = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) > 0;
+};
+hxGeomAlgo_PolyTools.isLeftOrOn = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) >= 0;
+};
+hxGeomAlgo_PolyTools.isRight = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) < 0;
+};
+hxGeomAlgo_PolyTools.isRightOrOn = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) <= 0;
+};
+hxGeomAlgo_PolyTools.isCollinear = function(p,a,b) {
+	return (a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y) == 0;
+};
+hxGeomAlgo_PolyTools.distance = function(v,w) {
+	var x = v.x - w.x;
+	var x1 = v.y - w.y;
+	return Math.sqrt(x * x + x1 * x1);
+};
+hxGeomAlgo_PolyTools.distanceToSegment = function(p,v,w) {
+	return Math.sqrt(hxGeomAlgo_PolyTools.distanceToSegmentSquared(p,v,w));
+};
+hxGeomAlgo_PolyTools.distanceSquared = function(v,w) {
+	var x = v.x - w.x;
+	var x1 = v.y - w.y;
+	return x * x + x1 * x1;
+};
+hxGeomAlgo_PolyTools.distanceToSegmentSquared = function(p,v,w) {
+	var x = v.x - w.x;
+	var x1 = v.y - w.y;
+	var l2 = x * x + x1 * x1;
+	if(l2 == 0) {
+		var x2 = p.x - v.x;
+		var x3 = p.y - v.y;
+		return x2 * x2 + x3 * x3;
+	}
+	var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+	if(t < 0) {
+		var x4 = p.x - v.x;
+		var x5 = p.y - v.y;
+		return x4 * x4 + x5 * x5;
+	}
+	if(t > 1) {
+		var x6 = p.x - w.x;
+		var x7 = p.y - w.y;
+		return x6 * x6 + x7 * x7;
+	}
+	var this1 = hxGeomAlgo_PolyTools.point;
+	this1.x = v.x + t * (w.x - v.x);
+	this1.y = v.y + t * (w.y - v.y);
+	var w1 = hxGeomAlgo_PolyTools.point;
+	var x8 = p.x - w1.x;
+	var x9 = p.y - w1.y;
+	return x8 * x8 + x9 * x9;
+};
+hxGeomAlgo_PolyTools.meet = function(p,q) {
+	return new hxGeomAlgo_HomogCoord(p.y - q.y,q.x - p.x,p.x * q.y - p.y * q.x);
+};
+hxGeomAlgo_PolyTools.dot = function(p,q) {
+	return p.x * q.x + p.y * q.y;
+};
+hxGeomAlgo_PolyTools.sqr = function(x) {
+	return x * x;
+};
+hxGeomAlgo_PolyTools.eq = function(a,b) {
+	return Math.abs(a - b) <= hxGeomAlgo_PolyTools.EPSILON;
+};
+hxGeomAlgo_PolyTools.clear = function(array) {
+	array.length = 0;
+};
+hxGeomAlgo_PolyTools.toFloatArray = function(poly,out) {
+	if(out != null) {
+		out = out;
+	} else {
+		out = [];
+	}
+	var _g = 0;
+	while(_g < poly.length) {
+		var p = poly[_g];
+		++_g;
+		out.push(p.x);
+		out.push(p.y);
+	}
+	return out;
+};
+hxGeomAlgo_PolyTools.reverseFloatArray = function(poly,inPlace) {
+	if(inPlace == null) {
+		inPlace = false;
+	}
+	var res = inPlace ? poly : [];
+	var nPoints = poly.length >> 1;
+	var _g1 = 0;
+	var _g = nPoints;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var xPos = (nPoints - i - 1) * 2;
+		res[i * 2] = poly[xPos];
+		res[i * 2 + 1] = poly[xPos + 1];
+	}
+	return res;
+};
+hxGeomAlgo_PolyTools.flatten = function(array,out) {
+	var res = out != null ? out : [];
+	var _g = 0;
+	while(_g < array.length) {
+		var arr = array[_g];
+		++_g;
+		var _g1 = 0;
+		while(_g1 < arr.length) {
+			var item = arr[_g1];
+			++_g1;
+			res.push(item);
+		}
+	}
+	return res;
+};
+hxGeomAlgo_PolyTools.toPointArray = function(poly,out) {
+	if(out != null) {
+		out = out;
+	} else {
+		out = [];
+	}
+	var size = poly.length;
+	if(poly.length % 2 == 1) {
+		--size;
+	}
+	var _g1 = 0;
+	var _g = size >> 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		out.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(poly[i * 2],poly[i * 2 + 1]));
+	}
+	return out;
+};
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -534,16 +1465,105 @@ var troshx_sos_vue_combat_DollView = function() {
 	haxevx_vuex_core_VComponent.call(this);
 };
 troshx_sos_vue_combat_DollView.__name__ = ["troshx","sos","vue","combat","DollView"];
+troshx_sos_vue_combat_DollView.getBlankImageMapData = function() {
+	return { layoutItemList : null, positionList : [], scaleList : [], titleList : [], classList : [], refWidth : 0, refHeight : 0, scaleX : 1, scaleY : 1};
+};
 troshx_sos_vue_combat_DollView.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_combat_DollView.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
-	_Init: function() {
+	Data: function() {
+		return { mapData : troshx_sos_vue_combat_DollView.getBlankImageMapData()};
+	}
+	,layoutViewPropsOf: function(name) {
+		var d = this.mapData;
+		var _this = d.idIndices;
+		var i = __map_reserved[name] != null ? _this.getReserved(name) : _this.h[name];
+		return { title : d.titleList[i], x : d.positionList[i].x * d.refWidth * d.scaleX, y : d.positionList[i].y * d.refHeight * d.scaleY, width : d.scaleList[i].x * d.refWidth * d.scaleX, height : d.scaleList[i].y * d.refHeight * d.scaleY, item : d.layoutItemList[i]};
+	}
+	,Components: function() {
+		return { zone : new troshx_sos_vue_combat_components_LayoutItemView()};
+	}
+	,setupUIInteraction: function() {
+		new troshx_sos_vue_combat_HammerJSCombat(this.$refs.container,this.mapData);
+	}
+	,Mounted: function() {
+		var _gthis = this;
+		var img = this.$refs.image;
+		if(img.width > 0) {
+			this.handleImageMap(img);
+		} else {
+			img.onload = function() {
+				_gthis.handleImageMap(img);
+			};
+		}
+	}
+	,handleImageMap: function(img) {
+		var map = this.$refs.map;
+		var c = map.firstChild;
+		var d = this.mapData;
+		d.refWidth = img.width;
+		d.refHeight = img.height;
+		var idIndices = new haxe_ds_StringMap();
+		var count = 0;
+		var arr = [];
+		while(c != null) {
+			if(c.nodeName.toLowerCase() == "area") {
+				var elem = c;
+				d.positionList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
+				d.scaleList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
+				d.classList.push(elem.getAttribute("alt"));
+				var title = elem.getAttribute("title");
+				d.titleList.push(title);
+				var value = count++;
+				if(__map_reserved[title] != null) {
+					idIndices.setReserved(title,value);
+				} else {
+					idIndices.h[title] = value;
+				}
+				arr.push(troshx_util_layout_LayoutItem.fromHTMLImageMapArea(img.width,img.height,elem.getAttribute("shape"),elem.getAttribute("coords")));
+			}
+			c = c.nextSibling;
+		}
+		d.layoutItemList = arr;
+		d.idIndices = idIndices;
+		troshx_sos_vue_combat_LayoutConstraints.applyDollView(arr,d.titleList,d.classList,d.refWidth,d.refHeight);
+		window.addEventListener("resize",$bind(this,this.onResize));
+		this.onResize();
+		this.setupUIInteraction();
+	}
+	,onResize: function() {
+		var container = this.$refs.container;
+		var screenWidth = parseFloat(container.clientWidth);
+		var screenHeight = parseFloat(container.clientHeight);
+		var d = this.mapData;
+		d.scaleX = screenWidth / d.refWidth;
+		d.scaleY = screenHeight / d.refHeight;
+		this.refreshLayout();
+	}
+	,refreshLayout: function() {
+		var d = this.mapData;
+		var _g1 = 0;
+		var _g = d.layoutItemList.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			d.layoutItemList[i].solve(d.positionList[i],d.scaleList[i],d.scaleX,d.scaleY);
+		}
+	}
+	,Template: function() {
+		return "<div style=\"position:fixed;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div v-if=\"mapData.positionList.length\" style=\"width:100%;height:100%;top:0;left;0;position:absolute;background-repeat:no-repeat;background-image:url(images/dollscreen.png); background-position:50% 50%; background-size:contain\">\r\n\t\t<zone v-bind=\"layoutViewPropsOf('vitals')\">\r\n\t\t\tVitals\r\n\t\t</zone>\r\n\t\t\r\n\t\t<div>\r\n\t\t\t\r\n\t\t</div>\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"98, 321, 106, 322, 111, 333, 97, 367, 94, 338, 79, 330, 98, 321\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"393, 328, 399, 346, 395, 359, 384, 357, 370, 329, 386, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
+	}
+	,_Init: function() {
 		var cls = troshx_sos_vue_combat_DollView;
 		var clsP = cls.prototype;
+		this.data = clsP.Data;
+		this.components = this.Components();
+		this.mounted = clsP.Mounted;
+		this.template = this.Template();
+		this.methods = { layoutViewPropsOf : clsP.layoutViewPropsOf, setupUIInteraction : clsP.setupUIInteraction, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
 	}
 	,__class__: troshx_sos_vue_combat_DollView
 });
-var troshx_sos_vue_combat_HammerJSCombat = function(element,imageMapData) {
-	this._hoverAct = new troshx_sos_vue_combat_UInteract(-1,2);
+var troshx_sos_vue_combat_HammerJSCombat = function(element,imageMapData,callback) {
+	this.defaultAct = new troshx_sos_vue_combat_UInteract(-1,4096);
 	this.activeTouches = new haxe_ds_IntMap();
 	var _g = new haxe_ds_StringMap();
 	if(__map_reserved["panup"] != null) {
@@ -582,14 +1602,22 @@ var troshx_sos_vue_combat_HammerJSCombat = function(element,imageMapData) {
 		_g.h["swipeup"] = 16;
 	}
 	this.hammerEventMap = _g;
+	this.callback = callback != null ? callback : $bind(this,this.dummyCallback);
 	this.imageMapData = imageMapData;
 	this.hammer = new Hammer(element);
-	this.interactionList = troshx_sos_vue_combat_UIInteraction.getDollViewInteracts(imageMapData.layoutItemList,imageMapData.titleList,imageMapData.classList);
+	this.interactionList = troshx_sos_vue_combat_UIInteraction.setupDollViewInteracts(imageMapData.layoutItemList,imageMapData.titleList,imageMapData.classList);
 	this.hammer.on("hammer.input move panup pandown tap press swipeleft swiperight swipeup",$bind(this,this.handleUIGesture));
 };
 troshx_sos_vue_combat_HammerJSCombat.__name__ = ["troshx","sos","vue","combat","HammerJSCombat"];
 troshx_sos_vue_combat_HammerJSCombat.prototype = {
-	handleUIGesture: function(e) {
+	setNewInteractionList: function(arr) {
+		this.interactionList = arr;
+	}
+	,dummyCallback: function(index,event) {
+		console.log("Receiving event from:" + index + " ::" + event + " >" + this.currentGesture.type + " :" + this.currentGesture.eventType);
+	}
+	,handleUIGesture: function(e) {
+		this.currentGesture = e;
 		var pt = e.changedPointers[0];
 		var id;
 		var touch = null;
@@ -601,43 +1629,61 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 		if(js_Boot.__instanceof(pt,Touch)) {
 			touch = pt;
 			id = touch.identifier;
-			u = touch.screenX / canvasWidth;
-			v = touch.screenY / canvasHeight;
+			u = touch.pageX / canvasWidth;
+			v = touch.pageY / canvasHeight;
 		} else {
 			pointer = pt;
 			id = pointer.pointerId;
-			u = pointer.screenX / canvasWidth;
-			v = pointer.screenY / canvasHeight;
+			u = pointer.pageX / canvasWidth;
+			v = pointer.pageY / canvasHeight;
 		}
 		var act;
 		if(e.isFirst && e.type == "hammer.input") {
 			act = troshx_sos_vue_combat_UIInteraction.findHit(u,v,this.imageMapData,this.interactionList);
 			if(act != null) {
+				if((act.mask & 1) != 0) {
+					this.callback(act.index,1);
+				}
 				if(act.mask >= 2) {
 					this.activeTouches.h[id] = act;
-					console.log("Added id:" + id);
 				}
-			} else {
-				this.activeTouches.h[id] = this._hoverAct;
+			} else if(this.defaultAct != null) {
+				this.activeTouches.h[id] = this.defaultAct;
 			}
 		} else {
 			if(!this.activeTouches.h.hasOwnProperty(id)) {
 				return;
 			}
 			act = this.activeTouches.h[id];
+			if(act == null) {
+				act = this._inputActCache;
+				this.activeTouches.remove(id);
+				this._inputActCache = null;
+				if(act == null) {
+					return;
+				}
+			}
 			if(e.type == "hammer.input") {
 				if(e.eventType == Hammer.INPUT_MOVE) {
-					if((act.mask & 2) != 0) {
-						var act2 = troshx_sos_vue_combat_UIInteraction.findHit(u,v,this.imageMapData,this.interactionList);
-						if(act2 != null) {
-							if(act2.mask >= 2) {
-								this.activeTouches.h[id] = act2;
-								console.log("Added act2 id:" + id);
+					if((e.deltaX != 0 || e.deltaY != 0) && (act.mask & 12290) != 0) {
+						if((act.mask & 2) != 0) {
+							this.callback(act.index,2);
+						}
+						if((act.mask & 12288) != 0) {
+							var act2 = troshx_sos_vue_combat_UIInteraction.findHit(u,v,this.imageMapData,this.interactionList);
+							if(act2 != null) {
+								if((act2.mask & 8192) != 0 && act2.index == act.index) {
+									this.callback(act.index,8192);
+								} else if((act2.mask & 4096) != 0 && act2.index != act.index) {
+									this.activeTouches.h[id] = act2;
+									this.callback(act2.index,4096);
+								}
 							}
 						}
 					}
 				} else if(e.eventType == Hammer.INPUT_END || e.eventType == Hammer.INPUT_CANCEL) {
-					this.activeTouches.remove(id);
+					this._inputActCache = act;
+					this.activeTouches.h[id] = null;
 				} else {
 					throw new js__$Boot_HaxeError("Could not resolve event type:" + e.eventType);
 				}
@@ -647,7 +1693,12 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 			var key = e.type;
 			var interactType = __map_reserved[key] != null ? _this.getReserved(key) : _this.h[key];
 			if((act.mask & interactType) != 0) {
-				var tmp = (interactType & 4) == 0;
+				if((interactType & 4) == 0 || troshx_sos_vue_combat_UIInteraction.checkHit(u,v,this.imageMapData,act) >= 0) {
+					this.callback(act.index,interactType);
+				}
+				if((interactType & 12034) == 0) {
+					this.activeTouches.remove(id);
+				}
 			}
 		}
 	}
@@ -660,7 +1711,7 @@ troshx_sos_vue_combat_ImageMapTester.__name__ = ["troshx","sos","vue","combat","
 troshx_sos_vue_combat_ImageMapTester.__super__ = haxevx_vuex_core_VComponent;
 troshx_sos_vue_combat_ImageMapTester.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
 	Data: function() {
-		return { layoutItemList : null, positionList : [], scaleList : [], titleList : [], classList : [], refWidth : 0, refHeight : 0, scaleX : 1, scaleY : 1};
+		return troshx_sos_vue_combat_DollView.getBlankImageMapData();
 	}
 	,Components: function() {
 		return { zone : new troshx_sos_vue_combat_components_LayoutItemView()};
@@ -688,8 +1739,8 @@ troshx_sos_vue_combat_ImageMapTester.prototype = $extend(haxevx_vuex_core_VCompo
 		while(c != null) {
 			if(c.nodeName.toLowerCase() == "area") {
 				var elem = c;
-				this.positionList.push(new troshx_util_layout_Vec2());
-				this.scaleList.push(new troshx_util_layout_Vec2());
+				this.positionList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
+				this.scaleList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
 				this.classList.push(elem.getAttribute("alt"));
 				this.titleList.push(elem.getAttribute("title"));
 				arr.push(troshx_util_layout_LayoutItem.fromHTMLImageMapArea(img.width,img.height,elem.getAttribute("shape"),elem.getAttribute("coords")));
@@ -719,7 +1770,7 @@ troshx_sos_vue_combat_ImageMapTester.prototype = $extend(haxevx_vuex_core_VCompo
 		}
 	}
 	,Template: function() {
-		return "<div style=\"position:fixed;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"98, 321, 106, 322, 111, 333, 97, 367, 94, 338, 79, 330, 98, 321\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"393, 328, 399, 346, 395, 359, 384, 357, 370, 329, 386, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260, 338, 253\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n\t<div style=\"width:100%;height:100%;top:0;left;0;position:absolute;background-repeat:no-repeat;background-image:url(images/dollscreen.png); background-position:50% 50%; background-size:contain\">\r\n\t\t<zone v-for=\"(li, i) in layoutItemList\" :title=\"titleList[i]\" :class=\"classList[i]\" :key=\"i\" :x=\"positionList[i].x*refWidth*scaleX\" :y=\"positionList[i].y*refHeight*scaleY\" :width=\"scaleList[i].x*refWidth*scaleX\" :height=\"scaleList[i].y*refHeight*scaleY\" :item=\"li\" />\r\n\t</div>\r\n</div>";
+		return "<div style=\"position:fixed;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div style=\"width:100%;height:100%;top:0;left;0;position:absolute;background-repeat:no-repeat;background-image:url(images/dollscreen.png); background-position:50% 50%; background-size:contain\">\r\n\t\t<zone v-for=\"(li, i) in layoutItemList\" :title=\"titleList[i]\" :class=\"classList[i]\" :key=\"i\" :x=\"positionList[i].x*refWidth*scaleX\" :y=\"positionList[i].y*refHeight*scaleY\" :width=\"scaleList[i].x*refWidth*scaleX\" :height=\"scaleList[i].y*refHeight*scaleY\" :item=\"li\" />\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<!--<area shape=\"circle\" coords=\"155, 155, 32\" title=\"circle_test\" />-->\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_UPWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"98, 321, 106, 322, 111, 333, 97, 367, 94, 338, 79, 330, 98, 321\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"393, 328, 399, 346, 395, 359, 384, 357, 370, 329, 386, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_combat_ImageMapTester;
@@ -789,10 +1840,38 @@ troshx_sos_vue_combat_LayoutConstraints.applyDollView = function(layoutItems,nam
 };
 var troshx_sos_vue_combat_UIInteraction = function() { };
 troshx_sos_vue_combat_UIInteraction.__name__ = ["troshx","sos","vue","combat","UIInteraction"];
+troshx_sos_vue_combat_UIInteraction.requiresConfirmHit = function(mask) {
+	return (mask & 4) != 0;
+};
 troshx_sos_vue_combat_UIInteraction.requiresTracking = function(mask) {
 	return mask >= 2;
 };
-troshx_sos_vue_combat_UIInteraction.getDollViewInteracts = function(layoutItems,names,tags) {
+troshx_sos_vue_combat_UIInteraction.requiresContinousHandling = function(mask) {
+	return (mask & 12034) != 0;
+};
+troshx_sos_vue_combat_UIInteraction.isValidPoly = function(poly) {
+	return poly.length >= 3;
+};
+troshx_sos_vue_combat_UIInteraction.weldPoly = function(poly,dupPoints) {
+	var map_h = { };
+	var _g1 = 0;
+	var _g = dupPoints.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		map_h[dupPoints[i]] = true;
+	}
+	var newPoly = [];
+	var _g11 = 0;
+	var _g2 = poly.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		if(!map_h.hasOwnProperty(i1)) {
+			newPoly.push(poly[i1]);
+		}
+	}
+	return newPoly;
+};
+troshx_sos_vue_combat_UIInteraction.setupDollViewInteracts = function(layoutItems,names,tags) {
 	var arr = [];
 	var _g1 = 0;
 	var _g = layoutItems.length;
@@ -801,18 +1880,36 @@ troshx_sos_vue_combat_UIInteraction.getDollViewInteracts = function(layoutItems,
 		var item = layoutItems[i];
 		var name = names[i];
 		var tag = tags[i];
+		if(item.shape == 2) {
+			var dupPoints = hxGeomAlgo_PolyTools.findDuplicatePoints(item.uvs,true,true);
+			if(dupPoints.length != 0) {
+				item.uvs = troshx_sos_vue_combat_UIInteraction.weldPoly(item.uvs,dupPoints);
+			}
+			hxGeomAlgo_PolyTools.makeCW(item.uvs);
+			if(!hxGeomAlgo_PolyTools.isConvex(item.uvs)) {
+				item.hitDecomposition = hxGeomAlgo_Bayazit.decomposePoly(item.uvs);
+				var lastLen = item.hitDecomposition.length;
+				item.hitDecomposition = item.hitDecomposition.filter(troshx_sos_vue_combat_UIInteraction.isValidPoly);
+				if(item.hitDecomposition.length == 0 || item.hitDecomposition.length != lastLen) {
+					console.log("WARNING!! invalid decomposition occured: " + name + " : " + item.hitDecomposition.length + " / " + lastLen);
+					item.hitDecomposition = null;
+				}
+			}
+		}
 		if(tag == "part" || tag == "swing") {
-			item.hitPadding = 8;
+			item.hitPadding = 5;
 		}
 		if(tag == "part" || tag == "swing" || name == "enemyHandLeft" || name == "enemyHandRight") {
-			arr.push(new troshx_sos_vue_combat_UInteract(i,3));
+			arr.push(new troshx_sos_vue_combat_UInteract(i,4097));
 			continue;
 		}
 		switch(name) {
 		case "advManuever1":case "advManuever2":case "advManuever3":case "advManuever4":
+			arr.push(new troshx_sos_vue_combat_UInteract(i,1));
 			break;
 		case "btnBlock":case "btnParry":case "btnVoid":
-			arr.push(new troshx_sos_vue_combat_UInteract(i,3));
+			item.hitPadding = 5;
+			arr.push(new troshx_sos_vue_combat_UInteract(i,1));
 			break;
 		case "cpMeter":
 			break;
@@ -821,38 +1918,248 @@ troshx_sos_vue_combat_UIInteraction.getDollViewInteracts = function(layoutItems,
 		case "handLeftText":case "handRightText":
 			break;
 		case "handLeftAlt":case "handRightAlt":
+			arr.push(new troshx_sos_vue_combat_UInteract(i,172));
+			break;
+		case "incomingManuevers":
+			arr.push(new troshx_sos_vue_combat_UInteract(i,1280));
 			break;
 		case "initRange":
-			arr.push(new troshx_sos_vue_combat_UInteract(i,3));
+			arr.push(new troshx_sos_vue_combat_UInteract(i,1));
 			break;
 		case "opponentSwiper":
+			arr.push(new troshx_sos_vue_combat_UInteract(i,160));
 			break;
 		case "roundCount":
 			break;
 		case "vitals":
+			arr.push(new troshx_sos_vue_combat_UInteract(i,1280));
 			break;
 		}
 	}
 	return arr;
 };
 troshx_sos_vue_combat_UIInteraction.findHit = function(u,v,mapData,interacts) {
-	var layoutList = mapData.layoutItemList;
-	var positionList = mapData.positionList;
-	var scaleList = mapData.scaleList;
-	var closestHit;
-	var closestHitDist;
+	var closestHit = null;
+	var closestHitDist = 999999999999;
 	var _g1 = 0;
 	var _g = interacts.length;
 	while(_g1 < _g) {
 		var i = _g1++;
 		var act = interacts[i];
-		var layout = layoutList[act.index];
-		var padding = layout.hitPadding;
+		var hitResult = troshx_sos_vue_combat_UIInteraction.checkHit(u,v,mapData,act);
+		if(hitResult >= 0) {
+			if(hitResult == 0) {
+				return act;
+			} else if(hitResult < closestHitDist) {
+				closestHit = act;
+				closestHitDist = hitResult;
+			}
+		}
 	}
-	return null;
+	return closestHit;
 };
-troshx_sos_vue_combat_UIInteraction.confirmHit = function(u,v,mapData,act) {
-	return false;
+troshx_sos_vue_combat_UIInteraction.checkHit = function(u,v,mapData,act) {
+	var layout = mapData.layoutItemList[act.index];
+	var pos = mapData.positionList[act.index];
+	var scale = mapData.scaleList[act.index];
+	var sw = mapData.scaleX * mapData.refWidth;
+	var sh = mapData.scaleY * mapData.refHeight;
+	var cx;
+	var cy;
+	var dx;
+	var dy;
+	var d;
+	var d2;
+	var x = u * sw;
+	var y = v * sh;
+	var minX = pos.x * sw;
+	var minY = pos.y * sh;
+	var r;
+	var maxX = minX + scale.x * sw;
+	var maxY = minY + scale.y * sh;
+	var paddX = layout.hitPadding * mapData.scaleX * (scale.x / layout.uDim);
+	var paddY = layout.hitPadding * mapData.scaleY * (scale.y / layout.vDim);
+	if(x >= minX && x <= maxX && y >= minY && y <= maxY) {
+		if(layout.shape == 0) {
+			return 0;
+		}
+	} else if(layout.shape == 0) {
+		if(layout.hitPadding <= 0) {
+			return -1;
+		}
+		if(x > maxX) {
+			dx = x - maxX;
+		} else if(x < minX) {
+			dx = x - minX;
+		} else {
+			dx = 0;
+		}
+		if(y > maxY) {
+			dy = y - maxY;
+		} else if(y < minY) {
+			dy = y - minY;
+		} else {
+			dy = 0;
+		}
+		d2 = dx * dx + dy * dy;
+		if(paddX < paddY) {
+			r = paddY;
+		} else {
+			r = paddX;
+		}
+		dx *= r / paddX;
+		dy *= r / paddY;
+		d = dx * dx + dy * dy;
+		if(d <= r * r) {
+			return d2;
+		}
+		return -1;
+	}
+	if(layout.shape == 1) {
+		dx = (maxX - minX) * 0.5;
+		dy = (maxY - minY) * 0.5;
+		cx = minX + dx;
+		cy = minY + dy;
+		if(dx < dy) {
+			r = dy;
+		} else {
+			r = dx;
+		}
+		var sx = 1;
+		var sy = 1;
+		if(layout.hitPadding > 0) {
+			sx = r / dx;
+			sy = r / dy;
+		}
+		dx = x - cx;
+		dy = y - cy;
+		dx *= sx;
+		dy *= sy;
+		d = dx * dx + dy * dy;
+		if(d <= r * r) {
+			return 0;
+		}
+		d2 = d;
+		dx += (dx < 0 ? 1 : -1) * paddX * sx;
+		dy += (dy < 0 ? 1 : -1) * paddY * sy;
+		d = dx * dx + dy * dy;
+		if(d <= r * r) {
+			d = Math.sqrt(d2) - r;
+			return d * d;
+		}
+	} else {
+		var pt = troshx_sos_vue_combat_UIInteraction.SAMPLE_PT;
+		pt.x = x;
+		pt.y = y;
+		if(layout.hitDecomposition == null) {
+			r = troshx_sos_vue_combat_UIInteraction.checkHitPolygon(pt,layout.uvs,paddX,paddY,pos,scale,sw,sh);
+			return r;
+		} else {
+			r = 99999999999;
+			var gotPaddHit = false;
+			var _g1 = 0;
+			var _g = layout.hitDecomposition.length;
+			while(_g1 < _g) {
+				var p = _g1++;
+				dx = troshx_sos_vue_combat_UIInteraction.checkHitPolygon(pt,layout.hitDecomposition[p],paddX,paddY,pos,scale,sw,sh);
+				if(dx == 0) {
+					return 0;
+				}
+				if(dx > 0 && dx < r) {
+					gotPaddHit = true;
+					r = dx;
+				}
+			}
+			if(gotPaddHit) {
+				return r;
+			} else {
+				return -1;
+			}
+		}
+	}
+	return -1;
+};
+troshx_sos_vue_combat_UIInteraction.checkHitPolygon = function(pt,poly,paddX,paddY,pos,scale,sw,sh) {
+	var len = poly.length;
+	var p;
+	var p2;
+	var side;
+	var shortestDist = 99999999999;
+	var gotPaddHit = false;
+	var x = pos.x * sw;
+	var y = pos.y * sh;
+	var width = scale.x * sw;
+	var height = scale.y * sh;
+	var a = troshx_sos_vue_combat_UIInteraction.SAMPLE_PT_A;
+	var b = troshx_sos_vue_combat_UIInteraction.SAMPLE_PT_B;
+	var noPadding = paddX == 0 && paddY == 0;
+	var r = paddX < paddY ? paddY : paddX;
+	var sx = noPadding ? 1 : r / paddX;
+	var sy = noPadding ? 1 : r / paddY;
+	r *= r;
+	var i = 0;
+	while(i < len) {
+		p = poly[i];
+		if(i < len - 1) {
+			p2 = poly[i + 1];
+		} else {
+			p2 = poly[0];
+		}
+		a.x = x + p.x * width;
+		b.x = x + p2.x * width;
+		a.y = y + p.y * height;
+		b.y = y + p2.y * height;
+		side = (a.x - pt.x) * (b.y - pt.y) - (b.x - pt.x) * (a.y - pt.y) > 0;
+		if(!side) {
+			if(noPadding) {
+				return -1;
+			}
+			if(troshx_sos_vue_combat_UIInteraction.distanceToSegmentSquaredPaddScaled(pt,a,b,sx,sy) <= r) {
+				var d = hxGeomAlgo_PolyTools.distanceToSegmentSquared(pt,a,b);
+				return d;
+			}
+			return -1;
+		}
+		++i;
+	}
+	if(!gotPaddHit) {
+		return 0;
+	} else {
+		return shortestDist;
+	}
+};
+troshx_sos_vue_combat_UIInteraction.distanceSquaredPaddScaled = function(v,w,sx,sy) {
+	var x = (v.x - w.x) * sx;
+	var x1 = (v.y - w.y) * sy;
+	return x * x + x1 * x1;
+};
+troshx_sos_vue_combat_UIInteraction.distanceToSegmentSquaredPaddScaled = function(p,v,w,sx,sy) {
+	var x = v.x - w.x;
+	var x1 = v.y - w.y;
+	var l2 = x * x + x1 * x1;
+	if(l2 == 0) {
+		var x2 = (p.x - v.x) * sx;
+		var x3 = (p.y - v.y) * sy;
+		return x2 * x2 + x3 * x3;
+	}
+	var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+	if(t < 0) {
+		var x4 = (p.x - v.x) * sx;
+		var x5 = (p.y - v.y) * sy;
+		return x4 * x4 + x5 * x5;
+	}
+	if(t > 1) {
+		var x6 = (p.x - w.x) * sx;
+		var x7 = (p.y - w.y) * sy;
+		return x6 * x6 + x7 * x7;
+	}
+	var this1 = troshx_sos_vue_combat_UIInteraction.SAMPLE_PT2;
+	this1.x = v.x + t * (w.x - v.x);
+	this1.y = v.y + t * (w.y - v.y);
+	var w1 = troshx_sos_vue_combat_UIInteraction.SAMPLE_PT2;
+	var x8 = (p.x - w1.x) * sx;
+	var x9 = (p.y - w1.y) * sy;
+	return x8 * x8 + x9 * x9;
 };
 var troshx_sos_vue_combat_UInteract = function(index,mask) {
 	this.index = index;
@@ -873,8 +2180,13 @@ troshx_sos_vue_combat_components_LayoutItemView.prototype = $extend(haxevx_vuex_
 		if(!this.gotSVG) {
 			obj.width = this.width + "px";
 			obj.height = this.height + "px";
-			obj.backgroundColor = "rgba(0,255,0,0.4)";
 			obj.outline = "green solid 1px";
+			obj.backgroundColor = "rgba(0,255,0,0.4)";
+			if(this.item.shape == 1) {
+				obj.borderRadius = "50%";
+				obj.backgroundColor = "rgba(255,255,0,0.4)";
+				obj.outline = "none";
+			}
 		}
 		return obj;
 	}
@@ -888,28 +2200,37 @@ troshx_sos_vue_combat_components_LayoutItemView.prototype = $extend(haxevx_vuex_
 		return { strokeWidth : 0.5 + "px"};
 	}
 	,get_polyPoints: function() {
-		var uvs = this.item.uvs;
+		return this.getPolyString(this.item.uvs);
+	}
+	,getPolyString: function(poly) {
 		var xScale = this.width;
 		var yScale = this.height;
 		var pts = [];
 		var _g1 = 0;
-		var _g = uvs.length;
+		var _g = poly.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			pts.push(uvs[i].x * xScale);
-			pts.push(uvs[i].y * yScale);
+			pts.push(poly[i].x * xScale);
+			pts.push(poly[i].y * yScale);
 		}
 		return pts.join(" ");
 	}
+	,get_polyDecompPoints: function() {
+		if(this.item.hitDecomposition != null) {
+			return this.item.hitDecomposition.map($bind(this,this.getPolyString));
+		} else {
+			return null;
+		}
+	}
 	,Template: function() {
-		return "<div class=\"layout-item\" :data-title=\"title\" style=\"position:absolute;z-index:1;\" :style=\"computedStyle\">\r\n\t\t\t<svg v-if=\"gotSVG\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.2\" baseProfile=\"tiny\" :width=\"width\" :height=\"height\">\r\n\t\t\t\t<g style=\"transform-origin:0 0;\" :style=\"gStyle\">\r\n\t\t\t\t\t<polygon :style=\"pStyle\" style=\"stroke:#00F; fill:rgba(0,255,0,0.4)\" :points=\"polyPoints\"></polygon>\r\n\t\t\t\t</g>\t\r\n\t\t\t</svg>\r\n\t\t</div>";
+		return "<div class=\"layout-item\" :data-title=\"title\" style=\"position:absolute;z-index:1;\" :style=\"computedStyle\">\r\n\t\t\t<svg v-if=\"gotSVG\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.2\" baseProfile=\"tiny\" :width=\"width\" :height=\"height\">\r\n\t\t\t\t<g style=\"transform-origin:0 0;\" :style=\"gStyle\">\r\n\t\t\t\t\t<polygon :style=\"pStyle\" style=\"stroke:#00F; fill:rgba(0,255,0,0.4)\" :points=\"polyPoints\"></polygon>\r\n\t\t\t\t</g>\r\n\t\t\t\t\r\n\t\t\t\t<g style=\"transform-origin:0 0;\" :style=\"gStyle\" v-for=\"(p, i) in polyDecompPoints\">\r\n\t\t\t\t\t<polygon :style=\"pStyle\" style=\"stroke:#ff0000; fill:transparent\" :points=\"p\" :key=\"i\"></polygon>\r\n\t\t\t\t</g>\r\n\t\t\t\t\r\n\t\t\t</svg>\r\n\t\t\t<slot />\r\n\t\t</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_combat_components_LayoutItemView;
 		var clsP = cls.prototype;
 		this.template = this.Template();
-		this.computed = { computedStyle : clsP.get_computedStyle, gotSVG : clsP.get_gotSVG, gStyle : clsP.get_gStyle, pStyle : clsP.get_pStyle, polyPoints : clsP.get_polyPoints};
-		this.methods = { get_computedStyle : clsP.get_computedStyle, get_gotSVG : clsP.get_gotSVG, get_gStyle : clsP.get_gStyle, get_pStyle : clsP.get_pStyle, get_polyPoints : clsP.get_polyPoints};
+		this.computed = { computedStyle : clsP.get_computedStyle, gotSVG : clsP.get_gotSVG, gStyle : clsP.get_gStyle, pStyle : clsP.get_pStyle, polyPoints : clsP.get_polyPoints, polyDecompPoints : clsP.get_polyDecompPoints};
+		this.methods = { get_computedStyle : clsP.get_computedStyle, get_gotSVG : clsP.get_gotSVG, get_gStyle : clsP.get_gStyle, get_pStyle : clsP.get_pStyle, get_polyPoints : clsP.get_polyPoints, getPolyString : clsP.getPolyString, get_polyDecompPoints : clsP.get_polyDecompPoints};
 		this.props = { item : { type : Object}, title : { type : String}, y : { type : Number}, height : { type : Number}, width : { type : Number}, x : { type : Number}};
 	}
 	,__class__: troshx_sos_vue_combat_components_LayoutItemView
@@ -956,7 +2277,7 @@ troshx_sos_vue_tests_layout_AspectConstraintTest.prototype = $extend(haxevx_vuex
 		console.log(this.debugField);
 	}
 	,Data: function() {
-		return { screenWidth : 0, screenHeight : 0, aspectConstraint : null, refWidth : 150, refHeight : 200, testScale : new troshx_util_layout_Vec2(1,1), debugField : ""};
+		return { screenWidth : 0, screenHeight : 0, aspectConstraint : null, refWidth : 150, refHeight : 200, testScale : hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(1,1), debugField : ""};
 	}
 	,get_aspect: function() {
 		return this.refWidth / this.refHeight;
@@ -983,20 +2304,6 @@ troshx_sos_vue_tests_layout_AspectConstraintTest.prototype = $extend(haxevx_vuex
 	}
 	,__class__: troshx_sos_vue_tests_layout_AspectConstraintTest
 });
-var troshx_util_layout_Vec2 = function(x,y) {
-	if(y == null) {
-		y = 0;
-	}
-	if(x == null) {
-		x = 0;
-	}
-	this.x = x;
-	this.y = y;
-};
-troshx_util_layout_Vec2.__name__ = ["troshx","util","layout","Vec2"];
-troshx_util_layout_Vec2.prototype = {
-	__class__: troshx_util_layout_Vec2
-};
 var troshx_sos_vue_tests_layout_LayoutItemTest = function() {
 	haxevx_vuex_core_VComponent.call(this);
 };
@@ -1164,7 +2471,7 @@ troshx_util_layout_LayoutItem.createPolygon = function(scrnWidth,scrnHeight,coor
 	me.uvs = [];
 	var v;
 	while(i < len) {
-		v = new troshx_util_layout_Vec2(coords[i],coords[i + 1]);
+		v = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(coords[i],coords[i + 1]);
 		me.uvs.push(v);
 		if(v.x < minX) {
 			minX = v.x;
@@ -1209,7 +2516,10 @@ troshx_util_layout_LayoutItem.fromHTMLImageMapArea = function(mapWidth,mapHeight
 	}
 };
 troshx_util_layout_LayoutItem.prototype = {
-	solve: function(resultPosition,resultScale,scaleX,scaleY) {
+	setUVs: function(uvs) {
+		this.uvs = uvs;
+	}
+	,solve: function(resultPosition,resultScale,scaleX,scaleY) {
 		var pivotU;
 		var pivotV;
 		var scratch = troshx_util_layout_LayoutItem.SCRATCH;
@@ -1348,7 +2658,7 @@ troshx_util_layout_LayoutItem.prototype = {
 	,__class__: troshx_util_layout_LayoutItem
 };
 var troshx_util_layout_PointScaleConstraint = function() {
-	this.pt = new troshx_util_layout_Vec2();
+	this.pt = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 };
 troshx_util_layout_PointScaleConstraint.__name__ = ["troshx","util","layout","PointScaleConstraint"];
 troshx_util_layout_PointScaleConstraint.createRelative = function(x,y) {
@@ -1391,7 +2701,7 @@ troshx_util_layout_PointScaleConstraint.prototype = {
 			x = 0;
 		}
 		if(this.scaleMin == null) {
-			this.scaleMin = new troshx_util_layout_Vec2();
+			this.scaleMin = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 		}
 		this.scaleMin.x = x;
 		this.scaleMin.y = y;
@@ -1405,7 +2715,7 @@ troshx_util_layout_PointScaleConstraint.prototype = {
 			x = 0;
 		}
 		if(this.scaleMax == null) {
-			this.scaleMax = new troshx_util_layout_Vec2();
+			this.scaleMax = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 		}
 		this.scaleMax.x = x;
 		this.scaleMax.y = y;
@@ -1430,6 +2740,12 @@ var __map_reserved = {};
 haxevx_vuex_core_Singletons.NAMES = new haxe_ds_StringMap();
 haxevx_vuex_core_Singletons.SINGLETON_CACHE = new haxe_ds_StringMap();
 haxevx_vuex_core_ModuleStack.stack = [];
+hxGeomAlgo_Bayazit.reflexVertices = [];
+hxGeomAlgo_Bayazit.steinerPoints = [];
+hxGeomAlgo_HomogCoord.INFINITY = new hxGeomAlgo_HomogCoord();
+hxGeomAlgo_PolyTools.point = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+hxGeomAlgo_PolyTools.zero = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new(0,0);
+hxGeomAlgo_PolyTools.EPSILON = .00000001;
 js_Boot.__toStr = ({ }).toString;
 troshx_sos_vue_combat_UIInteraction.COMPLETED = 0;
 troshx_sos_vue_combat_UIInteraction.DOWN = 1;
@@ -1446,9 +2762,14 @@ troshx_sos_vue_combat_UIInteraction.PAN_RIGHT = 512;
 troshx_sos_vue_combat_UIInteraction.PAN_DOWN = 1024;
 troshx_sos_vue_combat_UIInteraction.PAN_LEFT = 2048;
 troshx_sos_vue_combat_UIInteraction.PAN = 3840;
-troshx_sos_vue_combat_UIInteraction.REQUIRE_CONFIRMATION = 4;
-troshx_sos_vue_tests_layout_LayoutItemTest.TEST_POS = new troshx_util_layout_Vec2();
-troshx_sos_vue_tests_layout_LayoutItemTest.TEST_SCALE = new troshx_util_layout_Vec2();
+troshx_sos_vue_combat_UIInteraction.HOVER = 4096;
+troshx_sos_vue_combat_UIInteraction.MOVE_OVER = 8192;
+troshx_sos_vue_combat_UIInteraction.SAMPLE_PT = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+troshx_sos_vue_combat_UIInteraction.SAMPLE_PT2 = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+troshx_sos_vue_combat_UIInteraction.SAMPLE_PT_A = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+troshx_sos_vue_combat_UIInteraction.SAMPLE_PT_B = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+troshx_sos_vue_tests_layout_LayoutItemTest.TEST_POS = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
+troshx_sos_vue_tests_layout_LayoutItemTest.TEST_SCALE = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 troshx_util_layout_BorderConstraint.SIDE_TOP = 0;
 troshx_util_layout_BorderConstraint.SIDE_RIGHT = 1;
 troshx_util_layout_BorderConstraint.SIDE_BOTTOM = 2;
@@ -1456,6 +2777,6 @@ troshx_util_layout_BorderConstraint.SIDE_LEFT = 3;
 troshx_util_layout_LayoutItem.SHAPE_RECT = 0;
 troshx_util_layout_LayoutItem.SHAPE_CIRCLE = 1;
 troshx_util_layout_LayoutItem.SHAPE_POLYGON = 2;
-troshx_util_layout_LayoutItem.SCRATCH = new troshx_util_layout_Vec2();
+troshx_util_layout_LayoutItem.SCRATCH = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 troshx_sos_vue_tests_TestUI.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
