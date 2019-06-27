@@ -9,6 +9,9 @@
 	<link rel="stylesheet" type="text/css" href="scss/pages/dollview.css">
 		
 	<script language="javascript">
+	if (!window.Touch) {
+		alert("A");
+	}
 	document.ontouchstart = function(e){ 
 		var n = ""+e.target.nodeName;
 		n = n.toLowerCase();
