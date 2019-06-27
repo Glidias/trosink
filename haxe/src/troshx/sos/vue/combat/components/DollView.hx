@@ -89,7 +89,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var opponents = this.opponents;
 		var focusIndex = viewModel.focusOpponentIndex;
 		if (opponents == null || opponents.length == 0) return 0;
-		return viewModel.focusOpponentIndex < opponents.length ? viewModel.focusOpponentIndex : opponents.length -1;
+		return focusIndex < opponents.length ? focusIndex : opponents.length -1;
 	}
 	
 	@:computed inline function get_currentOpponent():FightNode<CharSheet> 
