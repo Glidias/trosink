@@ -35,6 +35,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
+		p.fillColor = "rgba(0,200,255,0.3)";
+		p.strokeColor = "rgba(0,200,255,0.3)";
+		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
 		p.showShape = i == viewModel.focusedIndex;
 		return p;
 	}
@@ -43,6 +46,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
+		p.fillColor = "rgba(0,255,255,0.3)";
+		p.strokeColor = "rgba(0,255,255,0.3)";
+		p.strokeWidth = 8*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
 		p.showShape = i == viewModel.focusedIndex;
 		return p;
 	}
