@@ -2,3 +2,22 @@
 	box-sizing:border-box;
 }
 
+.dollview {
+	.textarea-region {
+		border:1px solid rgba(190,190,190,1);
+		overflow:hidden;
+	}
+	.hover-tag {
+		position:absolute;
+		bottom:0;
+		background-color:beige;
+	}
+	.cpMeter {
+		overflow:hidden;
+		display:flex;
+		flex-direction:column-reverse;
+		align-items:center;
+		text-align:center;
+	}
+}
+

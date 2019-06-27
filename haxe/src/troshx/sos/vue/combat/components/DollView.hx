@@ -8,7 +8,9 @@ import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
+import troshx.components.Bout.FightNode;
 import troshx.sos.combat.BoutController;
+import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
@@ -65,8 +67,36 @@ class DollView extends VComponent<DollViewData, NoneT>
 			height: d.scaleList[i].y * d.refHeight * d.scaleY,
 			item: d.layoutItemList[i]
 		}
-		// //:title="titleList[i]" :class="classList[i]" :key="i" :x="positionList[i].x*refWidth*scaleX" :y="positionList[i].y*refHeight*scaleY" :width="scaleList[i].x*refWidth*scaleX" :height="scaleList[i].y*refHeight*scaleY" :item="li"
 	}
+	
+	@:computed inline function get_focusedTextLbl():String 
+	{
+		return viewModel.focusedIndex + "::";
+	}
+	
+	@:computed inline function get_player():FightNode<CharSheet>
+	{
+		return viewModel.getCurrentPlayer();
+	}
+	
+	@:computed inline function get_opponents():Array<FightNode<CharSheet>> 
+	{
+		return viewModel.getCurrentOpponents();
+	}
+	
+	@:computed function get_clampedOpponentIndex():Int
+	{
+		var opponents = this.opponents;
+		var focusIndex = viewModel.focusOpponentIndex;
+		if (opponents == null || opponents.length == 0) return 0;
+		return viewModel.focusOpponentIndex < opponents.length ? viewModel.focusOpponentIndex : opponents.length -1;
+	}
+	
+	@:computed inline function get_currentOpponent():FightNode<CharSheet> 
+	{
+		return this.opponents[this.clampedOpponentIndex];
+	}
+	
 	
 	public static function getBlankImageMapData():ImageMapData {
 		return {
@@ -179,6 +209,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 			d.layoutItemList[i].solve(d.positionList[i], d.scaleList[i], d.scaleX, d.scaleY);
 		}
 	}
+	
+	
 	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");

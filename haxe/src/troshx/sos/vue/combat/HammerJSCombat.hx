@@ -88,6 +88,9 @@ class HammerJSCombat
 				viewModel.setDraggedCP(0);
 				trace("Drag move canceled");
 			}
+			else {
+				return;
+			}
 			
 			return;
 		}
@@ -105,6 +108,13 @@ class HammerJSCombat
 				}
 			}
 			return;
+		}
+		
+		var name = imageMapData.titleList[index];
+		if (name == "incomingManuevers") {
+			viewModel.showFocusedTag = false;
+		} else if (name == "vitals") {
+			
 		}
 	}
 	
