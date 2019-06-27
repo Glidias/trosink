@@ -12,7 +12,7 @@ import troshx.util.layout.LayoutItem;
 class UIInteraction 
 {
 	
-	public static inline var COMPLETED:Int = 0;
+
 	@:act public static inline var DOWN:Int = (1 << 0);
 	@:act public static inline var MOVE:Int = (1 << 1);
 	@:act public static inline var TAP:Int = (1 << 2);
@@ -31,8 +31,12 @@ class UIInteraction
 	@:act public static inline var HOVER:Int = (1 << 12);
 	@:act public static inline var MOVE_OVER:Int = (1 << 13);
 	
+	@:act public static inline var CANCELED:Int = (1 << 14);
+	@:act public static inline var RELEASE:Int = (1 << 15);
+	@:act public static inline var RELEASE_OVER:Int = (1 << 16);
+	
 	public static inline function requiresConfirmHit(mask:Int):Bool {
-		return (mask & TAP)!=0;
+		return (mask & (TAP|RELEASE_OVER))!=0;
 	}
 	
 	public static inline function requiresTracking(mask:Int):Bool {
@@ -96,7 +100,7 @@ class UIInteraction
 			}
 			
 			if (tag == "part" || tag == "swing" || name == "enemyHandLeft" || name == "enemyHandRight") {
-				arr.push(new UInteract(i, DOWN | HOVER) );
+				arr.push(new UInteract(i, DOWN | HOVER | RELEASE | CANCELED) );
 				continue;
 			}
 			
@@ -107,7 +111,7 @@ class UIInteraction
 					arr.push(new UInteract(i, DOWN) );
 				case "btnBlock", "btnVoid", "btnParry": 
 					item.hitPadding = 5;
-					arr.push(new UInteract(i, DOWN) );
+					arr.push(new UInteract(i, DOWN | RELEASE | CANCELED) );
 				case "incomingManuevers":
 					arr.push(new UInteract(i, PAN_UP|PAN_DOWN));	
 				case "opponentSwiper":
@@ -138,6 +142,7 @@ class UIInteraction
 		
 		for (i in 0...interacts.length) {
 			var act:UInteract = interacts[i];
+			if (act.disabled) continue;
 			var hitResult:Float = checkHit(u, v, mapData, act);
 			if (hitResult >=0) {
 				if (hitResult == 0) {
@@ -354,10 +359,12 @@ class UIInteraction
 class UInteract {
 	public var index:Int;
 	public var mask:Int;
+	public var disabled:Bool;
+	
 	public function new(index:Int, mask:Int) {
 		
 		this.index = index;
 		this.mask = mask;
-		
+		this.disabled = false;
 	}
 }

@@ -1,11 +1,15 @@
-<div style="position:fixed;top:0;left:0;width:100%;height:100%"  ref="container">
+<div class="dollview" style="position:fixed;top:0;left:0;width:100%;height:100%"  ref="container">
 	<div v-if="mapData.positionList.length" style="width:100%;height:100%;top:0;left;0;position:absolute;background-repeat:no-repeat;background-image:url(images/dollscreen.png); background-position:50% 50%; background-size:contain">
 		<zone v-bind="layoutViewPropsOf('vitals')">
 			Vitals
 		</zone>
 		
-		<div>
-			
+		<div class="parts">
+			<zone v-bind="getPartPropsOf(li)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li"></zone>
+		</div>
+		
+		<div class="swings">
+			<zone v-bind="getSwingPropsOf(li)" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li"></zone>
 		</div>
 	</div>
 	<div class="image-map-holder" style="position:relative; display:none">

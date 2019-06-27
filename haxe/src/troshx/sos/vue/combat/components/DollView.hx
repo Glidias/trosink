@@ -1,4 +1,4 @@
-package troshx.sos.vue.combat;
+package troshx.sos.vue.combat.components;
 import haxe.ds.StringMap;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
@@ -9,7 +9,6 @@ import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
 import troshx.sos.combat.BoutController;
-import troshx.sos.combat.BoutModel;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
@@ -30,6 +29,22 @@ class DollView extends VComponent<DollViewData, NoneT>
 			mapData: getBlankImageMapData(),
 			viewModel: new CombatViewModel()
 		}
+	}
+	
+	function getPartPropsOf(name:String):LayoutItemViewProps {
+		var p = layoutViewPropsOf(name);
+		var d = mapData;
+		var i:Int = d.idIndices.get(name);
+		p.showShape = i == viewModel.focusedIndex;
+		return p;
+	}
+	
+	function getSwingPropsOf(name:String):LayoutItemViewProps {
+		var p = layoutViewPropsOf(name);
+		var d = mapData;
+		var i:Int = d.idIndices.get(name);
+		p.showShape = i == viewModel.focusedIndex;
+		return p;
 	}
 	
 	
@@ -73,8 +88,11 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	
 	function setupUIInteraction():Void {
-		new HammerJSCombat(cast _vRefs.container, this.mapData);
+		hammerUI = new HammerJSCombat(cast _vRefs.container, this.mapData);
+		hammerUI.viewModel = this.viewModel;
 		
+		
+		this.viewModel.setupDollInteraction(hammerUI.interactionList, this.mapData);
 	}
 	
 	override public function Mounted():Void {
@@ -167,5 +185,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 typedef DollViewData = {
 	var mapData: ImageMapData;
 	var viewModel:CombatViewModel;
+	
+	// post initialize  below to prevent reactivity
+	@:optional var hammerUI:HammerJSCombat;
 	@:optional var boutController:BoutController;
+	
 }

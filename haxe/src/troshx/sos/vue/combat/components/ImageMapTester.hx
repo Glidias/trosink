@@ -1,4 +1,4 @@
-package troshx.sos.vue.combat;
+package troshx.sos.vue.combat.components;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
@@ -7,6 +7,7 @@ import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
+import troshx.sos.vue.combat.components.DollView;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 

@@ -23,13 +23,16 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 		if (!this.gotSVG) {
 			obj.width = width + "px";
 			obj.height = height + "px";
-			obj.outline = 'green solid 1px';
-			obj.backgroundColor = 'rgba(0,255,0,0.4)';
-			if (item.shape == LayoutItem.SHAPE_CIRCLE) {
-				obj.borderRadius = '50%';
-				obj.backgroundColor = 'rgba(255,255,0,0.4)';
-				obj.outline = "none";
-			} 
+			
+			if (this.showShape || this.debug) {
+				obj.outline = strokeColor+' solid '+strokeWidth+'px';
+				obj.backgroundColor = fillColor;
+				if (item.shape == LayoutItem.SHAPE_CIRCLE) {
+					obj.borderRadius = '50%';
+					obj.backgroundColor = fillColor;
+					if (!this.debug) obj.outline = "none";
+				} 
+			}
 		}
 		return obj;
 	}
@@ -53,7 +56,8 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 	inline function get_pStyle():Dynamic 
 	{
 		return {
-			strokeWidth: (0.5)+'px',
+			strokeWidth: strokeWidth + 'px',
+			stroke:strokeColor, fill:fillColor
 		}
 	}
 	
@@ -82,24 +86,20 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 	
 	override function Template():String {
 		//pointer-events:none;
-		return '<div class="layout-item" :data-title="title" style="position:absolute;z-index:1;" :style="computedStyle">
-			<svg v-if="gotSVG" xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" :width="width" :height="height">
+		return '<div class="layout-item" :class="debug" :data-title="title" style="position:absolute;z-index:1;" :style="computedStyle">
+			<svg v-if="gotSVG && (debug || showShape)" xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" :width="width" :height="height">
 				<g style="transform-origin:0 0;" :style="gStyle">
-					<polygon :style="pStyle" style="stroke:#00F; fill:rgba(0,255,0,0.4)" :points="polyPoints"></polygon>
+					<polygon :style="pStyle" :points="polyPoints"></polygon>
 				</g>
-				
-				<g style="transform-origin:0 0;" :style="gStyle" v-for="(p, i) in polyDecompPoints">
-					<polygon :style="pStyle" style="stroke:#ff0000; fill:transparent" :points="p" :key="i"></polygon>
+				<g v-if="debug" style="transform-origin:0 0;" :style="gStyle" v-for="(p, i) in polyDecompPoints">
+					<polygon style="stroke-width:0.5, stroke:#ff0000; fill:transparent" :points="p" :key="i"></polygon>
 				</g>
-				
 			</svg>
-			<slot />
+			<div class="slot">
+				<slot />
+			</div>
 		</div>';
 	}
-	
-	
-	
-	
 	
 }
 
@@ -110,4 +110,11 @@ typedef LayoutItemViewProps = {
 	var width:Float;
 	var height:Float;
 	var title:String;
+	
+	@:optional @:prop({"default":1}) var strokeWidth:Float;
+	@:optional @:prop({"default":"#00F"}) var strokeColor:String;
+	@:optional @:prop({"default":"rgba(0,255,0,0.4)"}) var fillColor:String;
+	
+	@:optional @:prop({"default":false}) var debug:Bool;
+	@:optional @:prop({"default":false}) var showShape:Bool;
 }

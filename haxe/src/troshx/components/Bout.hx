@@ -12,7 +12,7 @@ class Bout<C>
 	public var c:Int = 0;
 	public var s:Int = 0;
 	//
-	public var combatants:List<FightNode<C>> = new List<FightNode<C>>();
+	public var combatants:Array<FightNode<C>> = [];
 	
 	// The standard tros convention of rounds and half tempos
 	public var secondTempo:Bool = false;
