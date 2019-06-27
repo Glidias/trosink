@@ -2,7 +2,7 @@ package troshx.sos.vue.tests;
 import haxevx.vuex.core.VxBoot;
 import js.Browser;
 import troshx.sos.vue.combat.components.DollView;
-import troshx.sos.vue.combat.components.ImageMapTester;
+//import troshx.sos.vue.combat.components.ImageMapTester;
 
 import troshx.util.layout.PointScaleConstraint;
 import troshx.util.layout.BorderConstraint;

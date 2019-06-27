@@ -19,5 +19,14 @@
 		align-items:center;
 		text-align:center;
 	}
+	.thrust-point {
+		
+		
+		background-color:black;
+		border-radius:50%;
+		
+		position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);
+		
+	}
 }
 

@@ -86,6 +86,26 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return viewModel.getCurrentOpponents();
 	}
 	
+	@:computed inline function get_dollScale():Float
+	{
+		var x = mapData.scaleX;
+		var y = mapData.scaleY;
+		return y < x ? y : x;
+	}
+	
+	@:computed inline function get_thrustPointStyle():Dynamic
+	{
+		var scale = this.dollScale;
+		var d = (scale * 9);
+		return {
+			//backgroundColor:
+			width:  d + "px",
+			height: d + "px"
+		};
+	}
+	
+	
+	
 	@:computed function get_clampedOpponentIndex():Int
 	{
 		var opponents = this.opponents;

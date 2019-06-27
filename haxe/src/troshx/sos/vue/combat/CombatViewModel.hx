@@ -67,13 +67,16 @@ class CombatViewModel
 		if (index < 0) return null;
 		return _body.getDescLabelTargetZone(index);
 	}
-	public function getDollPartHitLocationAt(index:Int):HitLocation {
+	public inline function getDollPartHitLocationAt(index:Int):HitLocation {
 		return _body.hitLocations[DOLL_PART_HitIndices[index]];
 	}
 	public function getDollPartThrustZoneAt(index:Int):TargetZone {
 		index = DOLL_PART_Indices[index];
 		if (index < 0) return null;
 		return _body.targetZones[index];
+	}
+	public inline function isDollPartThrustable(index:Int):Bool {
+		return  DOLL_PART_Indices[index] >= 0;
 	}
 	
 	public function getDollPartArmorValues(result:Array<Int> = null):Array<Int> {
