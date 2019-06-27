@@ -300,7 +300,7 @@ class Humanoid implements IBodyHitZones {
 	
 	@:hitMask("Full Leg") public static inline var FULL_LEG:Int = (1 << THIGH) | (1 << KNEE) | (1 << SHIN) | (1 << FOOT);
 	@:hitMask("Full Arm") public static inline var FULL_ARM:Int = (1 << SHOULDER) |  (1 << UPPER_ARM) | (1 << ELBOW) | (1 << FOREARM) | (1 << HAND);
-	
+	@:hitMask("Front Only") public static inline var FRONT_ONLY:Int = (1 << FACE);
 }
 
 typedef FallingDamageDef = {

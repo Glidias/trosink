@@ -71,7 +71,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	@:computed inline function get_focusedTextLbl():String 
 	{
-		return viewModel.focusedIndex + "::";
+		var lbl = viewModel.getFocusedLabel();
+		if (lbl == null) lbl = viewModel.getBodyPartLabel(viewModel.focusedIndex);
+		return lbl;
 	}
 	
 	@:computed inline function get_player():FightNode<CharSheet>

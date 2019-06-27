@@ -3,6 +3,7 @@ import haxe.ds.IntMap;
 import hxGeomAlgo.Bayazit;
 import hxGeomAlgo.HxPoint;
 import hxGeomAlgo.PolyTools;
+import troshx.sos.vue.combat.UIInteraction.UInteract;
 import troshx.util.layout.LayoutItem;
 
 /**
@@ -368,5 +369,13 @@ class UInteract {
 		this.index = index;
 		this.mask = mask;
 		this.disabled = false;
+	}
+	
+	public static function getIndexMapOfArray(arr:Array<UInteract>):IntMap<UInteract> {
+		var map:IntMap<UInteract> = new IntMap<UInteract>();
+		for (i in 0...arr.length) {
+			map.set(arr[i].index, arr[i]);
+		}
+		return map;
 	}
 }

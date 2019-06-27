@@ -8,7 +8,8 @@ import troshx.core.ManueverStack;
 import troshx.util.LibUtil;
 
 /**
- * Initial start of Bout game model. Includes logging of messages support as well.
+ * Bout game model. Includes logging of messages support as well.
+ * Suitable for server-side use.
  * 
  * @author Glidias
  */
