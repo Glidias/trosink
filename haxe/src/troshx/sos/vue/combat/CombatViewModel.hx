@@ -12,8 +12,8 @@ import troshx.sos.vue.combat.UIInteraction.UInteract;
  */
 class CombatViewModel 
 {
-	// initialize
-	
+	// initialize view flags
+	public var observeOpponent:Bool = false;
 	public var showFocusedTag:Bool = false;
 	public var focusedIndex(default, null):Int = -1;
 	public function setFocusedIndex(val:Int):Void {

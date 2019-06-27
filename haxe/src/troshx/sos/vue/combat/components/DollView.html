@@ -4,6 +4,7 @@
 			Vitals
 		</zone>
 		<zone v-bind="layoutViewPropsOf('incomingManuevers')" style="padding:5px" class="textarea-region">
+			<div v-show="viewModel.observeOpponent">observing..</div>
 			<div class="hover-tag" v-show="viewModel.showFocusedTag">{{focusedTextLbl}}</div>
 		</zone>
 		<zone v-bind="layoutViewPropsOf('cpMeter')">

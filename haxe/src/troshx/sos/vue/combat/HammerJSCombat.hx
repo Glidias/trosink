@@ -1,6 +1,11 @@
 package troshx.sos.vue.combat;
 import hammer.GestureInteractionData;
 import hammer.Hammer;
+import hammer.Manager;
+import hammer.recognizers.Pan;
+import hammer.recognizers.Press;
+import hammer.recognizers.Swipe;
+import hammer.recognizers.Tap;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 import js.html.CanvasElement;
@@ -14,8 +19,8 @@ import troshx.sos.vue.combat.UIInteraction.UInteract;
  */
 class HammerJSCombat 
 {
-	var hammer:Hammer;
-	//var manager:Manager;
+	//var hammer:Hammer;
+	var hammer:Manager;
 	
 	var hammerEventMap:StringMap<Int> = [	// note: should contain everything for reusability
 		"panup" => UIInteraction.PAN_UP,
@@ -52,9 +57,15 @@ class HammerJSCombat
 	{
 		this.callback = callback != null ? callback : defaultCallback;
 		this.imageMapData = imageMapData;
-
-		hammer = new Hammer(element);
 		
+		hammer = new Manager(cast element);
+		hammer.add(new Press());
+		hammer.add(new Swipe());
+		hammer.add(new Pan());
+		hammer.add(new Tap({
+			taps: 1
+		}));
+
 		defaultAct = DEFAULT_ACT_HOVER;
 		
 		// app specific set
@@ -102,6 +113,7 @@ class HammerJSCombat
 			} else {
 				if (event == UIInteraction.DOWN && index == viewModel.focusedIndex) {
 					viewModel.setDraggedCP(0);
+					viewModel.showFocusedTag = true;
 					viewModel.setActingState(CombatViewModel.ACTING_DOLL_DRAG_CP);
 					requiredActs = UIInteraction.MOVE | UIInteraction.CANCELED | UIInteraction.RELEASE;
 					defaultAct = null;
@@ -112,9 +124,16 @@ class HammerJSCombat
 		
 		var name = imageMapData.titleList[index];
 		if (name == "incomingManuevers") {
-			viewModel.showFocusedTag = false;
+			if ( (event & UIInteraction.PAN) != 0) viewModel.showFocusedTag = false;
+			else if ( (event & UIInteraction.MASK_CANCELED_OR_RELEASE) != 0 ) {
+				viewModel.observeOpponent = false;
+			} else if ( event & (UIInteraction.HOLD | UIInteraction.DOWN) != 0 ) {
+				viewModel.observeOpponent = true;
+			}
 		} else if (name == "vitals") {
 			
+		} else {
+			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}
 	}
 	
@@ -171,14 +190,20 @@ class HammerJSCombat
 				}
 			}
 		} else {
-			if ( !activeTouches.exists(id) ) return;
+			if ( !activeTouches.exists(id) ) {
+				trace("OUT");
+				return;
+			}
 			act = activeTouches.get(id);
 			if (act == null) {	// lazy defered removal
 				act = _inputActCache;
 				mask |= act.mask;
 				activeTouches.remove(id);
 				_inputActCache = null;
-				if (act == null) return;
+				if (act == null) {
+					
+					return;
+				}
 			} else {
 				mask |= act.mask;
 			}
@@ -208,6 +233,7 @@ class HammerJSCombat
 							callback(act.index, UIInteraction.RELEASE_OVER);
 						}
 						if ((mask & UIInteraction.RELEASE) != 0) {
+						
 							callback(act.index, UIInteraction.RELEASE);
 						}
 					} else if ((mask & UIInteraction.CANCELED)!=0) { //Hammer.INPUT_CANCEL
@@ -215,7 +241,7 @@ class HammerJSCombat
 					}
 					
 					activeTouches.set(id, null);
-					//trace("Removed-l id:" + id);
+					trace("Removed-l id:" + id);
 					
 				} else {
 					throw "Could not resolve event type:" + e.eventType;
@@ -230,10 +256,10 @@ class HammerJSCombat
 				if ( !UIInteraction.requiresConfirmHit(interactType) || UIInteraction.checkHit(u, v, imageMapData, act)>=0 ) {
 					if (!act.disabled) callback(act.index, interactType);
 				} 
-				if (!UIInteraction.requiresContinousHandling(interactType)) {
-					activeTouches.remove(id);
+				//if (!UIInteraction.requiresContinousHandling(interactType)) {
+					//activeTouches.remove(id);
 					//trace("Removedx id:" + id + " for :"+e.type);
-				}
+				//}
 			}
 			
 			
