@@ -28,7 +28,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	override function Data():DollViewData {
 		return {
-			mapData: getBlankImageMapData(),
+			mapData: getRenderTrackedImageData(),
 			viewModel: new CombatViewModel()
 		}
 	}
@@ -59,6 +59,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	function layoutViewPropsOf(name:String):LayoutItemViewProps {
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
+		var R = mapData.renderCount;
 		return {
 			title: d.titleList[i],
 			x: d.positionList[i].x*d.refWidth*d.scaleX,
@@ -90,6 +91,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	{
 		var x = mapData.scaleX;
 		var y = mapData.scaleY;
+		var R = mapData.renderCount;
 		return y < x ? y : x;
 	}
 	
@@ -119,6 +121,12 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.opponents[this.clampedOpponentIndex];
 	}
 	
+	
+	public static function getRenderTrackedImageData():ImageMapData {
+		return {
+			renderCount:0,
+		};
+	}
 	
 	public static function getBlankImageMapData():ImageMapData {
 		return {
@@ -176,6 +184,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 		d.refWidth = img.width;
 		d.refHeight = img.height;
 		
+		d.layoutItemList = [];
+		d.positionList = [];
+		d.scaleList = [];
+		d.titleList = [];
+		d.classList = [];
+		
+		
 		var idIndices = new StringMap<Int>();
 		
 		var count:Int = 0;
@@ -230,6 +245,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		for (i in 0...d.layoutItemList.length) {
 			d.layoutItemList[i].solve(d.positionList[i], d.scaleList[i], d.scaleX, d.scaleY);
 		}
+		d.renderCount++;
 	}
 	
 	

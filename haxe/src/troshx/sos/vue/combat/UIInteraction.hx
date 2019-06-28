@@ -142,10 +142,10 @@ class UIInteraction
 	public static function findHit(u:Float, v:Float, mapData:ImageMapData, interacts:Array<UInteract>):UInteract {
 		var closestHit:UInteract = null;
 		var closestHitDist:Float = 999999999999;
-		
 		for (i in 0...interacts.length) {
 			var act:UInteract = interacts[i];
 			if (act.disabled) continue;
+			
 			var hitResult:Float = checkHit(u, v, mapData, act);
 			if (hitResult >=0) {
 				if (hitResult == 0) {

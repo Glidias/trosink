@@ -8,18 +8,20 @@ import troshx.util.layout.LayoutItem;
  * @author Glidias
  */
 typedef ImageMapData = {
-	var layoutItemList:Array<LayoutItem>;
+	@:optional var layoutItemList:Array<LayoutItem>;
 	
 	
-	var positionList:Array<HxPoint>;
-	var scaleList:Array<HxPoint>;
-	var titleList:Array<String>;
-	var classList:Array<String>;
+	@:optional var positionList:Array<HxPoint>;
+	@:optional var scaleList:Array<HxPoint>;
+	@:optional var titleList:Array<String>;
+	@:optional var classList:Array<String>;
 	
-	var refWidth:Float;
-	var refHeight:Float;
-	var scaleX:Float;
-	var scaleY:Float;
+	@:optional var refWidth:Float;
+	@:optional var refHeight:Float;
+	@:optional var scaleX:Float;
+	@:optional var scaleY:Float;
+	
+	@:optional var renderCount:Int;
 	
 	@:optional var idIndices:StringMap<Int>;
 }
