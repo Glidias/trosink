@@ -43,9 +43,9 @@ class Bout<C>
 	
 }
 
-// if using Ash framework, will extend from Ash's Node class
 class FightNode<C> { 
 	public var fight:FightState;
 	public var charSheet:C;
 	public var sideIndex:Int;
+	public var label:String;
 }

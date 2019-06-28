@@ -209,17 +209,15 @@ class CombatViewModel
 		var mapTempThrusts:StringMap<Int> = new StringMap<Int>();
 		var key:String;
 		for (i in 0...body.thrustStartIndex) {
-			//if (targetZones[i].description == "")  {
-				key = toUnderscoreCapital.replace(targetZones[i].name, "_$1").toUpperCase();
-				mapTempSwings.set("SWING_"+key, i);
-				//trace(key);
-			//} 
+			key = toUnderscoreCapital.replace(targetZones[i].name, "_$1").toUpperCase();
+			mapTempSwings.set("SWING_"+key, i);
+			//trace(key);
 		}
 		//trace(" to thrusts...");
 		for (i in body.thrustStartIndex...targetZones.length) {
 			key = toUnderscoreCapital.replace(targetZones[i].name, "_$1").toUpperCase();
 			mapTempThrusts.set(key, i);
-			if (key == "LOWER_ARM") {	// exception consdieration for Target zone to PART
+			if (key == "LOWER_ARM") {	// exception consdieration for Target zone to PART harcodes
 				mapTempThrusts.set("FOREARM", i);
 			} else if (key == "UPPER_LEG") {
 				mapTempThrusts.set("THIGH", i);
@@ -255,7 +253,6 @@ class CombatViewModel
 			key = toSlugifyCapital.map(key.toLowerCase(), function(e):String { return e.matched(1).toUpperCase(); } );
 			key = key.charAt(0).toLowerCase() + key.substr(1);
 			if (Reflect.hasField(body.hitLocationHash, key)) {
-				var hitLoc:HitLocation;
 				DOLL_PART_HitIndices[i] = LibUtil.field(body.hitLocationHash, key);
 			} else {
 				throw ("FAILED TO FIND hit location index by key:"+key);
@@ -271,7 +268,7 @@ class CombatViewModel
 			DOLL_SWING_IsRights |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "r" ? (i << 1) : 0;
 			
 			key = keySplit[0];
-			if (key == "SWING_UPWARD_HEAD") {	// WARNINg hardcode case from Humanoid
+			if (key == "SWING_UPWARD_HEAD") {	// hardcodes exception case , ah well
 				DOLL_SWING_Indices[i] = 1;
 			} else if (key == "SWING_DOWNWARD_HEAD") {
 				DOLL_SWING_Indices[i] = 0;
