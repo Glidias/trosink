@@ -21,10 +21,7 @@ class LayoutItemTest extends VComponent<LayoutItemTestData, NoneT>
 	
 	static var TEST_POS:HxPoint = new HxPoint();
 	static var TEST_SCALE:HxPoint = new HxPoint();
-	
 
-	
-	
 	
 	private function onResize():Void {
 		var container = _vRefs.container;
