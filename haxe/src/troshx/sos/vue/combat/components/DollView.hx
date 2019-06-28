@@ -59,7 +59,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 	function layoutViewPropsOf(name:String):LayoutItemViewProps {
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
-		var R = mapData.renderCount;
 		return {
 			title: d.titleList[i],
 			x: d.positionList[i].x*d.refWidth*d.scaleX,
