@@ -49,8 +49,8 @@ class FightState
 	public var lastAttacking:Bool = false; // flag to indicate if was attacking on last declared move
 	
 	// own character reference of declared manuevers for easy manipulation on the fly
-	public var attackManuevers:Array<ManueverDeclare>;
-	public var defensiveManevers:Array<ManueverDeclare>;
+	public var attackManuevers:Array<ManueverDeclare> = [];
+	public var defensiveManevers:Array<ManueverDeclare> = [];
 	
 	public function new() 
 	{

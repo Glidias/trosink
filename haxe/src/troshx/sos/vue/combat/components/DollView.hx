@@ -10,9 +10,12 @@ import js.html.HtmlElement;
 import js.html.Image;
 import troshx.components.Bout.FightNode;
 import troshx.sos.combat.BoutController;
+import troshx.sos.pregens.FightCharacters;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
+
+import troshx.sos.vue.pregen.PregenSelectView;
 
 /**
  * Main doll view component
@@ -26,10 +29,21 @@ class DollView extends VComponent<DollViewData, NoneT>
 		super();
 	}
 	
+	static inline var PREGEN_SELECT_OPPONENT:Int = 4;
+	static inline var PREGEN_SELECT_SELF:Int = 1;
+	@:computed function get_pregenHeader():String 
+	{
+		return showPregens == PREGEN_SELECT_SELF ? "Select your character" : "Select your opponent"; 
+	}
+	
+	
 	override function Data():DollViewData {
 		return {
 			mapData: getRenderTrackedImageData(),
-			viewModel: new CombatViewModel()
+			viewModel: new CombatViewModel(),
+			
+			fightChars: new FightCharacters(),
+			showPregens: PREGEN_SELECT_SELF
 		}
 	}
 	
@@ -94,6 +108,11 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return y < x ? y : x;
 	}
 	
+	@:computed inline function get_gotPregens():Bool
+	{
+		return fightChars != null && showPregens !=0;
+	}
+	
 	@:computed inline function get_thrustPointStyle():Dynamic
 	{
 		var scale = this.dollScale;
@@ -143,7 +162,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
 		return {
-			zone: new LayoutItemView()
+			zone: new LayoutItemView(),
+			pregens: new PregenSelectView()
 		}
 	}
 	
@@ -249,6 +269,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	
 	
+	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
@@ -264,5 +285,9 @@ typedef DollViewData = {
 	// post initialize  below to prevent reactivity
 	@:optional var hammerUI:HammerJSCombat;
 	@:optional var boutController:BoutController;
+	
+	// pregens
+	@:optional var fightChars:FightCharacters;
+	@:optional var showPregens:Int;
 	
 }

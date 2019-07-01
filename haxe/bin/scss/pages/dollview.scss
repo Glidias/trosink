@@ -20,13 +20,54 @@
 		text-align:center;
 	}
 	.thrust-point {
-		
-		
 		background-color:black;
 		border-radius:50%;
 		
 		position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);
 		
 	}
+	
+
 }
 
+.pregen-select-view {
+	background-color:#333333;
+	z-index:2;
+	-webkit-overflow-scrolling: touch; 
+	
+	label {
+		color:white;
+	}
+	h1 {
+		text-align:center;
+		color:white;
+		font-size:20px;
+	}
+	a {
+		cursor:pointer;
+		color:white;
+		font-size:16px;
+	}
+	ul {
+		list-style-type:none;
+		text-align:center;
+		padding-left:0;
+	}
+	li {
+		margin-bottom:15px;
+		text-indent:0;
+	}
+	.close-btn-zone {
+		text-align:center;
+	}
+	button {
+		padding:8px 15px;
+	}
+	.close-btn-zone {
+		margin-top:45px;
+	}
+	.close-btn {
+		padding:10px 5px;
+		border:1px solid white;
+	}
+}

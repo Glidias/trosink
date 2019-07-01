@@ -21,7 +21,10 @@
 			<zone v-bind="getSwingPropsOf(li)" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li"></zone>
 		</div>
 		
-		
+		<div v-if="gotPregens">
+			<pregens :header="pregenHeader" :characters="fightChars.pool"></pregens>
+		</div>
+			
 	</div>
 	<div class="image-map-holder" style="position:relative; display:none">
 		<img src="images/dollscreen.png" style="transform-origin:0 0; pointer-events:none; opacity:0.12" usemap="#map" ref="image" />

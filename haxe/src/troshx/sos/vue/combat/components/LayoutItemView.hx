@@ -158,7 +158,7 @@ class LayoutItemView extends VComponent<NoneT, LayoutItemViewProps>
 		//pointer-events:none;
 		return '<div class="layout-item" :class="[{debug}, titleClasses]" :data-vis="showShape" :data-title="title" style="position:absolute;z-index:1;" :style="computedStyle">
 			<svg v-if="gotSVG" v-show="debug || showShape" xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" :width="width" :height="height" style="position:absolute">
-				<g style="transform-origin:0 0;" :style="gStyle">
+				<g style="transform-origin:0 0;">
 					<polygon :style="pStyle" :points="polyPoints"></polygon>
 				</g>
 				<g v-if="debug" style="transform-origin:0 0;position:absolute" v-for="(p, i) in polyDecompPoints">

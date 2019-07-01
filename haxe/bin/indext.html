@@ -16,7 +16,7 @@
 	document.ontouchstart = function(e){ 
 		var n = ""+e.target.nodeName;
 		n = n.toLowerCase();
-		if (n != "input" && n != "textarea" && n !="button" && n!="select")  {
+		if (n !== "a" && n !== "input" && n !== "textarea" && n !=="button" && n!=="select")  {
 			e.preventDefault(); 
 		}
 	}
@@ -28,7 +28,6 @@
 </head>
 <body>
 	<div id="app"></div>
-	<canvas id="canvasGL" width="320" height="320"></canvas>
 	<script src="TrosHAXE.js"></script>
 </body>
 </html>
