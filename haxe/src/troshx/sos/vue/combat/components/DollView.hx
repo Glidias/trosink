@@ -13,6 +13,12 @@ import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
 import troshx.core.CharSave;
 import troshx.sos.chargen.CharGenData;
+import troshx.sos.core.Armor;
+import troshx.sos.core.Armor.AV3;
+import troshx.sos.core.BodyChar;
+import troshx.sos.core.HitLocation;
+import troshx.sos.core.Inventory.ArmorAssign;
+import troshx.util.LibUtil;
 
 import troshx.sos.combat.BoutController;
 import troshx.sos.combat.BoutModel;
@@ -250,7 +256,64 @@ class DollView extends VComponent<DollViewData, NoneT>
 		
 	}
 	
-	// UI Interaction
+	
+	// Armor display calculation
+	
+	@:computed function get_coverageHitLocations():Array<HitLocation> {
+		return this.currentOpponent.charSheet.body.hitLocations; // getNewHitLocationsFrontSlice();
+	}
+	
+	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {
+		var ch = coverageHitLocations;
+		var dyn:Dynamic<AV3> = {};
+		//trace("Hit dummy set up...");
+		for (i in 0...ch.length) {
+			var h = ch[i];
+			LibUtil.setField(dyn, h.id, { avp:0, avc:0, avb:0 }); 
+		}
+		return dyn;
+	}
+	
+	/*
+	 * @:computed inline function get_targetingZoneMask():Int {
+		var i:Int = this.calcMeleeTargetingZoneIndex;
+		return shouldCalcMeleeAiming ? (1<<i) : 0;
+	}
+	*/
+	
+	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
+		var inventory = this.currentOpponent.charSheet.inventory;
+		var armors:Array<ArmorAssign> = inventory.wornArmor;
+		var values:Dynamic<AV3>  = this.hitLocationZeroAVValues;
+		var ch = coverageHitLocations;
+		var body:BodyChar =  this.currentOpponent.charSheet.body;
+
+		var targMask:Int = 0;// targetingZoneMask;
+	
+		var nonFirearmMissile:Bool = false; // this.calcArmorMissile && !this.calcArmorFirearm;
+		
+		for (i in 0...ch.length) {
+			var ider = ch[i].id;
+			var cur = LibUtil.field(values, ider);
+			cur.avc = 0;
+			cur.avp = 0;
+			cur.avb = 0;
+		}
+		
+		for (i in 0...armors.length) {
+			var a:Armor = armors[i].armor;
+			var layerMask:Int = 0;
+
+			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
+				layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
+			}
+			a.writeAVVAluesTo(values, body, layerMask, nonFirearmMissile, targMask);
+		}
+		
+		return values;
+	}
+	
+	// UI Interaction and states
 	
 	// -- the setup
 	function setupUIInteraction():Void {
