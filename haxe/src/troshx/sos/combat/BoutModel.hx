@@ -1,6 +1,5 @@
 package troshx.sos.combat;
 import troshx.components.Bout;
-import troshx.components.FightState;
 import troshx.core.BoutMessage;
 import troshx.sos.sheets.CharSheet;
 import troshx.core.IBoutModel;
@@ -9,7 +8,7 @@ import troshx.util.LibUtil;
 
 /**
  * Bout game model. Includes logging of messages support as well.
- * Suitable for server-side use.
+ * Suitable for both client and server-side use.
  * 
  * @author Glidias
  */

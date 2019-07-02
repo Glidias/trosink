@@ -40,7 +40,7 @@ class HammerJSCombat
 	
 	public var viewModel:CombatViewModel;
 	
-	public function setNewInteractionList(arr:Array<UInteract>):Void {
+	public inline function setNewInteractionList(arr:Array<UInteract>):Void {
 		interactionList = arr;
 	}
 	

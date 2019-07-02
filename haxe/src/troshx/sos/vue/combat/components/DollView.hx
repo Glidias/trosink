@@ -1,4 +1,5 @@
 package troshx.sos.vue.combat.components;
+import haxe.Unserializer;
 import haxe.ds.StringMap;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
@@ -8,10 +9,16 @@ import js.Browser;
 import js.html.Element;
 import js.html.HtmlElement;
 import js.html.Image;
+import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
+import troshx.core.CharSave;
+import troshx.sos.chargen.CharGenData;
+
 import troshx.sos.combat.BoutController;
+import troshx.sos.combat.BoutModel;
 import troshx.sos.pregens.FightCharacters;
 import troshx.sos.sheets.CharSheet;
+import troshx.sos.vue.combat.CombatViewModel;
 import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
@@ -29,13 +36,91 @@ class DollView extends VComponent<DollViewData, NoneT>
 		super();
 	}
 	
+	// PREGENS
+	
 	static inline var PREGEN_SELECT_OPPONENT:Int = 4;
 	static inline var PREGEN_SELECT_SELF:Int = 1;
 	@:computed function get_pregenHeader():String 
 	{
 		return showPregens == PREGEN_SELECT_SELF ? "Select your character" : "Select your opponent"; 
 	}
+	function closePregens():Void {
+		this.showPregens = 0;
+	}
 	
+	function confirmPregens(val:Dynamic):Void {
+		var boutModel = this.boutModel;
+		if (boutModel.bout == null) {
+			boutModel.bout = new Bout();
+		}
+		var viewModel:CombatViewModel = this.viewModel;
+		var showPregens = this.showPregens;
+		if (showPregens == PREGEN_SELECT_SELF) {
+			var valData:CharSave = val;
+			var node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
+			var theIndex = boutModel.bout.combatants.length;
+			boutModel.bout.combatants.push(node);
+			viewModel.currentPlayerIndex = theIndex;
+			node.fight.cp = node.charSheet.CP;
+			
+		} else if (showPregens == PREGEN_SELECT_OPPONENT) {
+			var valData:CharSave = val;
+			var node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
+			boutModel.bout.combatants.push(node);
+			
+		}
+		this.showPregens = 0;
+	}
+	
+	function deserializeSheet(dataStr:String):CharSheet {
+		 var unserializer = new Unserializer(dataStr);
+		var data:CharSheet = unserializer.unserialize();
+		//trace(data);
+		return data;
+	}
+	
+	function showSelfPregens():Void {
+		this.showPregens = PREGEN_SELECT_SELF;
+	}
+	
+	function showOpponentPregens():Void {
+		this.showPregens = PREGEN_SELECT_OPPONENT;
+	}
+	
+	// BOUT
+	
+	@:computed inline function get_boutModel():BoutModel 
+	{
+		return this.viewModel.boutModel;
+	}
+	
+	//@:watch
+	
+	// SELF
+	
+	@:computed function get_remainingDisplayCP():Int {
+		return this.viewModel.getRemainingDisplayCP();
+	}
+	
+	@:computed function get_fatique():Int {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.fatique;
+	}
+	@:computed function get_CP():Int {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.CP;
+	}
+	@:computed function get_remCP():Int {
+		return viewModel.getRemainingDisplayCP();
+	}
+	@:computed function get_BL():Int {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.totalBloodLost;
+	}
+	@:computed function get_pain():Int {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.totalBloodLost;
+	}
 	
 	override function Data():DollViewData {
 		return {
@@ -43,7 +128,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 			viewModel: new CombatViewModel(),
 			
 			fightChars: new FightCharacters(),
-			showPregens: PREGEN_SELECT_SELF
+			showPregens: 0
 		}
 	}
 	
@@ -68,7 +153,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 		p.showShape = i == viewModel.focusedIndex;
 		return p;
 	}
-	
 	
 	function layoutViewPropsOf(name:String):LayoutItemViewProps {
 		var d = mapData;
@@ -124,8 +208,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 		};
 	}
 	
-	
-	
 	@:computed function get_clampedOpponentIndex():Int
 	{
 		var opponents = this.opponents;
@@ -139,6 +221,69 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.opponents[this.clampedOpponentIndex];
 	}
 	
+	@:computed inline function get_gotOpponents():Bool
+	{
+		return this.opponents != null && this.opponents.length >= 1;
+	}
+	
+	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
+		return {
+			zone: new LayoutItemView(),
+			pregens: new PregenSelectView()
+		}
+	}
+	
+		
+	override public function Mounted():Void {
+		var img:Image = _vRefs.image;
+		if (img.width > 0) {
+			handleImageMap(img);
+			
+		} else {
+			img.onload= function() {
+				handleImageMap(img);
+			};
+		}
+	}
+	
+	function startGame():Void {
+		
+	}
+	
+	// UI Interaction
+	
+	// -- the setup
+	function setupUIInteraction():Void {
+		hammerUI = new HammerJSCombat(cast _vRefs.container, this.mapData);
+		hammerUI.viewModel = this.viewModel;
+		
+		this.viewModel.setupDollInteraction(hammerUI.interactionList, this.mapData);
+		
+		//hammerUI.setNewInteractionList([]);
+		this.viewModel.setActingState(CombatViewModel.ACTING_NONE);
+	}
+	
+	@:computed function get_actingState():Int {
+		return this.viewModel.actingState;
+	}
+
+	@:watch("actingState") function onActingStateChanged(newValue:Int, oldValue:Int):Void {
+		var arr = this.viewModel.getInteractionListByState(newValue);
+		this.hammerUI.setNewInteractionList(arr!=null ? arr : this.viewModel.getInteractionListByState(CombatViewModel.ACTING_NONE));
+	}
+	
+	// -- temp pregen initialization handler atm
+	
+	@:watch("gotOpponents") function onOpponentsStateChange(newValue:Bool, oldValue:Bool):Void {
+		
+		if (newValue) this.viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
+		else {
+			this.viewModel.setActingState(CombatViewModel.ACTING_NONE);
+		}
+		//this.hammerUI.setNewInteractionList(arr!=null ? arr : this.viewModel.getInteractionListByState(CombatViewModel.ACTING_DOLL_DECLARE));
+	}
+	
+	// Image map layout setup
 	
 	public static function getRenderTrackedImageData():ImageMapData {
 		return {
@@ -159,40 +304,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 			scaleY:1
 		};
 	}
-	
-	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
-		return {
-			zone: new LayoutItemView(),
-			pregens: new PregenSelectView()
-		}
-	}
-	
-	function setupNewGame():Void {
-		
-	}
-	
-	
-	function setupUIInteraction():Void {
-		hammerUI = new HammerJSCombat(cast _vRefs.container, this.mapData);
-		hammerUI.viewModel = this.viewModel;
-		
-		
-		this.viewModel.setupDollInteraction(hammerUI.interactionList, this.mapData);
-	}
-	
-	override public function Mounted():Void {
-		var img:Image = _vRefs.image;
-		if (img.width > 0) {
-			handleImageMap(img);
-			
-		} else {
-			img.onload= function() {
-				handleImageMap(img);
-			};
-		}
-	}
-	
-	//function resolve
 	
 	function handleImageMap(img:Image) 
 	{
@@ -241,9 +352,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		onResize();
 		
 		setupUIInteraction();
-		
-		
-		setupNewGame();
+
 	}
 	
 	private function onResize():Void 
@@ -269,12 +378,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	
 	
-	
 	override public function Template():String {
 		return VHTMacros.getHTMLStringFromFile("", "html");
 	}
-	
-	
 	
 }
 

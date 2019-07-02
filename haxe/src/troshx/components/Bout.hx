@@ -48,10 +48,10 @@ class FightNode<C> {
 	public var charSheet:C;
 	public var sideIndex:Int;
 	public var label:String;
-	public function new(label:String, charSheet:C) {
+	public function new(label:String, charSheet:C, side:Int=0) {
 		this.label = label;
 		this.charSheet = charSheet;
 		fight = new FightState();
-		sideIndex = -1;
+		sideIndex = side;
 	}
 }

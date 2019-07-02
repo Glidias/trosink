@@ -58,6 +58,14 @@ class CombatViewModel
 		draggedCP = val;
 	}
 	
+	public function getRemainingDisplayCP():Int {
+		var dcp = draggedCP;
+		var pl = this.getCurrentPlayer();
+		//if (pl == null) return 0;
+		var cp = pl.fight.cp - dcp;
+		return cp >= 0 ? cp : 0;
+	}
+	
 	public var DOLL_PART_Slugs:Array<String> = [];
 	public var DOLL_PART_Indices:Array<Int> = [];
 	public var DOLL_PART_HitIndices:Array<Int> = [];
@@ -103,29 +111,42 @@ class CombatViewModel
 	}
 	
 	public var boutModel(default, null):BoutModel; // server side synced data
+	public inline function getDefaultPlayerSideIndex():Int {
+		return 0;
+	}
+	
+	public inline function getDefaultEnemySideIndex():Int {
+		return 1;
+	}
 	
 	public static inline var ACTING_DOLL_DECLARE:Int = 0;
 	public static inline var ACTING_DOLL_DRAG_CP:Int = 1;
+	public static inline var ACTING_NONE:Int = 2;
 	public var actingState(default, null):Int = -1;
 	public function setActingState(val:Int):Void {
 		actingState = val;
 	}
 
-	var currentPlayerIndex:Int = -1;
+	public var currentPlayerIndex:Int = -1;
 	public var focusOpponentIndex:Int = 0;
 	
 	public inline function getCurrentPlayer():FightNode<CharSheet> {
 		return currentPlayerIndex >= 0 ? boutModel.bout.combatants[currentPlayerIndex] : null;
 	}
 	public inline function getCurrentOpponents():Array<FightNode<CharSheet>> {
-		var player = getCurrentPlayer();
-		if (player == null) return null;
-		return null;
+		var playerSideIndex = getDefaultPlayerSideIndex();
+		if (boutModel.bout == null) return null;
+		//trace(bout
+		return boutModel.bout.combatants.filter(function(obj) {
+			return obj.sideIndex != playerSideIndex;
+		});
 	}
 	public inline function getCurrentAllies():Array<FightNode<CharSheet>> {
-		var player = getCurrentPlayer();
-		if (player == null) return null;
-		return null;
+		var playerSideIndex = getDefaultPlayerSideIndex();
+		if (boutModel.bout == null) return null;
+		return boutModel.bout.combatants.filter(function(obj) {
+			return obj.sideIndex != playerSideIndex;
+		});
 	}
 	
 	var defaultSwingAvailMask(default, null):Int = 0;
@@ -162,6 +183,10 @@ class CombatViewModel
 	
 	// Post initialize
 	var _interactionStates:Array<Array<UInteract>>;
+	public function getInteractionListByState(state:Int):Array<UInteract> {
+		return _interactionStates[state];
+	}
+	
 	var _interactionMaps:Array<IntMap<UInteract>>;
 	var _dollImageMapData:ImageMapData;
 	var _body:BodyChar;
@@ -173,9 +198,9 @@ class CombatViewModel
 		_interactionStates = [];
 		_interactionStates[ACTING_DOLL_DECLARE] = fullInteractList;
 		_interactionMaps[ACTING_DOLL_DECLARE] = UInteract.getIndexMapOfArray(fullInteractList);
-		
 		_interactionStates[ACTING_DOLL_DRAG_CP] = [];
 		_dollImageMapData = imageMapData;
+		_interactionStates[ACTING_NONE] = [];
 		
 		
 		var body = BodyChar.getInstance();

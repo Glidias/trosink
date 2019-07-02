@@ -1,0 +1,17 @@
+<div style="position:fixed;top:0;left:0;width:100%;height:100%;overflow:auto" class="pregen-select-view">
+	<h1 v-if="header">{{header}}</h1>
+	<ul v-if="characters">
+		<li v-for="(li, i) in characters" :key="i">
+			<div class="checkbox-holder">
+				<input v-if="multiSelect" type="checkbox" v-model.number="selectedChars" :value="i" :id="'popup_cb_'+i"></input>
+				<input v-else type="radio" :checked="selectedChar==i" :value="i" @click="selectedChar=i" :id="'popup_cb_'+i"></input>
+				<label :for="'popup_cb_'+i">{{li.label}}</label>
+				<div class="desc">{{li.description}}</div>
+			</div>
+		</li>
+	</ul>
+	<div class="btn-zone">
+		<a class="btn ok" v-show="(multiSelect && selectedChars.length) || (!multiSelect && selectedChar>=0)" v-on:click="onConfirm"><span>[✓]</span> Okay</a>
+		<a class="btn close" v-on:click="onClose"><span>[x]</span> Cancel</a>
+	</div>
+</div>
