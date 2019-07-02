@@ -1,8 +1,10 @@
 package troshx.sos.vue.tests;
 import haxevx.vuex.core.VxBoot;
+import haxevx.vuex.native.Vue;
 import js.Browser;
 import js.html.CanvasElement;
 import troshx.sos.vue.combat.components.DollView;
+import troshx.sos.vue.externs.VueScroll;
 import troshx.sos.vue.externs.WebGL2D;
 //import troshx.sos.vue.combat.components.ImageMapTester;
 
@@ -31,6 +33,7 @@ class TestUI
 		
 		Browser.document.body.style.backgroundColor = "#e4e5e7";
 		
+		Vue.use(VueScroll);
 		
 		var cvsGL:CanvasElement = cast Browser.document.getElementById("canvasGL");
 		if (cvsGL != null) {

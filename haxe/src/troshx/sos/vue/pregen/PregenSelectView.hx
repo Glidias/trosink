@@ -32,6 +32,28 @@ class PregenSelectView extends VComponent<PregenSelectData, PregenSelectProps>
 		}
 	}
 	
+	@:computed function get_scrollOptions():Dynamic {
+		return {
+		scrollPanel: {
+			scrollingX:false
+		},
+		 bar: {
+			//keepShow: true,
+			size:'33px',
+			
+			opacity:1,
+			color:'#ffffff'
+		 },
+		 rail: {
+			background: '#01a99a',
+			size: '32px',
+			
+			keepShow: false,
+			opacity:1
+		  }
+	 };
+	}
+	
 	function singleCharSelected():Void {
 		var i = this.selectedChar;
 		var char = characters[i];

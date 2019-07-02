@@ -1,4 +1,5 @@
 <div style="position:fixed;top:0;left:0;width:100%;height:100%;overflow:auto" class="pregen-select-view">
+	 <vue-scroll :ops="scrollOptions">
 	<h1 v-if="header">{{header}}</h1>
 	<ul v-if="characters">
 		<li v-for="(li, i) in characters" :key="i">
@@ -14,4 +15,5 @@
 		<a class="btn ok" v-show="(multiSelect && selectedChars.length) || (!multiSelect && selectedChar>=0)" v-on:click="onConfirm"><span>[✓]</span> Okay</a>
 		<a class="btn close" v-on:click="onClose"><span>[x]</span> Cancel</a>
 	</div>
+	</vue-scroll>
 </div>
