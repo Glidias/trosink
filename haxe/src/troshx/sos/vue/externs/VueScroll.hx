@@ -4,7 +4,7 @@ package troshx.sos.vue.externs;
  * ...
  * @author Glidias
  */
-@:native("vuescroll") 
+@:native("VueDragScroll") 
 extern class VueScroll {
 	
 }
