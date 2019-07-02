@@ -259,6 +259,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	// Armor display calculation
 	
+	@:computed function get_armorColorScale():Array<String> {
+		return ["#ff0000", "#c00000", "#e26b0a", "#f79646",
+		"#ffff00", "#9bbb59", "#92d050", "#00b050",
+		"#0070c0", "#00b0f0"
+		];
+	}
+	
 	@:computed function get_coverageHitLocations():Array<HitLocation> {
 		return this.currentOpponent.charSheet.body.hitLocations; // getNewHitLocationsFrontSlice();
 	}

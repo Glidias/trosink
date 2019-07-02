@@ -57,6 +57,8 @@
 		<div v-if="gotPregens">
 			<pregens :header="pregenHeader" :characters="fightChars.pool" @close="closePregens" @singleCharSelected="confirmPregens" @multiCharSelected="confirmPregens"></pregens>
 		</div>
+		
+		<!--<div v-for="(li, i) in armorColorScale" :key="i" :style="{color:li}">Preview</div>-->
 			
 	</div>
 	<div class="image-map-holder" style="position:relative; display:none">
