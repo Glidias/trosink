@@ -46,6 +46,10 @@
 					<li v-for="(li, i) in opponents" :key="i">{{li.label}}</li>
 				</ul>
 			</zone>
+					
+			<div class="parts-armor">	
+				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li"></zone>
+			</div>		
 		</div>	
 		<div v-else>
 			<div class="select-opponent">

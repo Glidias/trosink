@@ -149,6 +149,31 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return p;
 	}
 	
+	function getArmorPartPropsOf(name:String, index:Int):LayoutItemViewProps {
+		var hitLocArmorValues = this.hitLocationArmorValues;
+		var hitLocIndex:Int = this.viewModel.DOLL_PART_HitIndices[index];
+		var locations = this.coverageHitLocations;
+		var avs = hitLocationArmorValues;
+		var av:AV3 = LibUtil.field(avs, locations[hitLocIndex].id);
+		var aggre:Float = av.avc + av.avb + av.avc;
+		var gotAV:Bool = aggre > 0;
+		aggre /= 3;
+		var aggI:Int = Math.floor(aggre);
+		var colors = this.armorColorScale;
+		if (aggI >= colors.length) {
+			aggI = colors.length - 1;
+		}
+		
+		var p = layoutViewPropsOf(name);
+		var d = mapData;
+		var i:Int = d.idIndices.get(name);
+		p.fillColor = "transparent";
+		p.strokeColor = colors[aggI];
+		p.strokeWidth = 3*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
+		p.showShape = gotAV && aggI >= 1;
+		return p;
+	}
+	
 	function getSwingPropsOf(name:String):LayoutItemViewProps {
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
@@ -266,7 +291,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		];
 	}
 	
-	@:computed function get_coverageHitLocations():Array<HitLocation> {
+	@:computed inline function get_coverageHitLocations():Array<HitLocation> {
 		return this.currentOpponent.charSheet.body.hitLocations; // getNewHitLocationsFrontSlice();
 	}
 	
