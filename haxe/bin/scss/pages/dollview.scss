@@ -9,13 +9,15 @@
 	box-sizing:border-box;
 	pointer-events:none;
 	touch-action:none;
-	&.enable-input {
-		pointer-events:auto;
-		touch-action:auto;
-	}
+	
 }
 
 .dollview {
+	
+	.enableinput {
+		pointer-events:auto;
+		touch-action:auto;
+	}
 	
 	.bg {
 		pointer-events:none;

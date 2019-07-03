@@ -2,7 +2,7 @@
 	<div v-if="mapData.renderCount!=0" style="width:100%;height:100%;top:0;left;0;position:absolute;">
 		<div class="bg" v-show="gotOpponents" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear.png); background-position:50% 50%; background-size:contain"></div>
 		
-		<zone v-bind="layoutViewPropsOf('vitals')" style="padding:5px" class="textarea-region" :class="{'enable-input':!player}">
+		<zone v-bind="layoutViewPropsOf('vitals')" style="padding:5px" class="textarea-region" :class="{'enableinput':!player}">
 			<div v-if="player">
 				<div>F: <span>{{fatique}}</span></div>
 				<div>Pain: <span>{{pain}}</span></div>
