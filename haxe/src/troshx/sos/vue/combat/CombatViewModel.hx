@@ -69,7 +69,10 @@ class CombatViewModel
 	public var DOLL_PART_Slugs:Array<String> = [];
 	public var DOLL_PART_Indices:Array<Int> = [];
 	public var DOLL_PART_HitIndices:Array<Int> = [];
-	public var DOLL_PART_IsRights:Int = 0;
+	public var DOLL_PART_IsLefts:Int = 0;
+	public inline function isLeftPartAtDollIndex(i:Int):Bool {
+		return (DOLL_PART_IsLefts & (1 << i)) != 0;
+	}
 	public function getDollPartThrustDescAt(index:Int):String {
 		index = DOLL_PART_Indices[index];
 		if (index < 0) return null;
@@ -102,7 +105,7 @@ class CombatViewModel
 	
 	public var DOLL_SWING_Slugs:Array<String> = [];
 	public var DOLL_SWING_Indices:Array<Int> = [];
-	public var DOLL_SWING_IsRights:Int = 0;
+	public var DOLL_SWING_IsLefts:Int = 0;
 	public function getDollSwingDescAt(index:Int):String {
 		return _body.getDescLabelTargetZone(DOLL_SWING_Indices[index]);
 	}
@@ -264,8 +267,7 @@ class CombatViewModel
 			keySplit = DOLL_PART_Slugs[i].split("-");
 			key = keySplit[0];
 			
-			DOLL_PART_IsRights |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "r" ? (1<<i) : 0;
-			
+			DOLL_PART_IsLefts |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "l" ? (1 << i) : 0;
 			if (mapTempThrusts.exists(key)) {
 				DOLL_PART_Indices[i] = mapTempThrusts.get(key);
 				//trace("Part thrust detected:" + key);
@@ -290,7 +292,7 @@ class CombatViewModel
 			//DOLL_PART_Slugs[i].replace(
 			keySplit = DOLL_SWING_Slugs[i].split("-");
 			
-			DOLL_SWING_IsRights |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "r" ? (i << 1) : 0;
+			DOLL_SWING_IsLefts |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "l" ? (1 << i) : 0;
 			
 			key = keySplit[0];
 			if (key == "SWING_UPWARD_HEAD") {	// hardcodes exception case , ah well

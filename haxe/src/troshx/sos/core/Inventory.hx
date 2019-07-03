@@ -54,6 +54,10 @@ class Inventory
 	public static inline var PREFER_UNHELD_DROPPED:Int = 2;
 	public static inline var PREFER_UNHELD_EQUIPPED:Int = 4;
 	
+	public static inline var WEAR_RIGHT:Int = 1;
+	public static inline var WEAR_LEFT:Int = 2;
+	public static inline var WEAR_WHOLE:Int = 4;
+	
 	public static var UID_COUNT:Int = 0;
 	
 	// todo: imperative weapon state equip caches
@@ -83,10 +87,6 @@ class Inventory
 	function dispatchSignal(signal:InventorySignal):Void {
 		getSignaler().dispatch(signal);
 	}
-	
-		
-	
-	
 	
 	/*
 	public function getReach():Int {
@@ -160,32 +160,67 @@ class Inventory
 		return LibUtil.maxI(w != null ? w.reach : 1, w2 != null ? w2.reach : 1);
 	}
 	
-	
-	
-	public function findHeldShield():Shield 
+	public function findHeldShieldAssign():ShieldAssign 
 	{
 		for (i in 0...shields.length) {
 			if ( shields[i].held == HELD_OFF ) {
-				return shields[i].shield;
+				return shields[i];
 			}
 		}
 		for (i in 0...shields.length) {
 			if (shields[i].held != 0) {
-				return shields[i].shield;
+				return shields[i];
 			}
 		}
 		return null;
 	}
 	
+	
+	public function findHeldShield():Shield 
+	{
+		var assign = findHeldShieldAssign();
+		return assign != null ? assign.shield : null;
+	}
+	
 	public var shieldPosition:Int = Shield.POSITION_LOW;
+	
+	public function getSortedWeapons(ranged:Bool, ?profs:Int, reverse:Bool=false):Array<SortedWeapon> {
+		var weaps = getWeildableWeaponsTypeFiltered(ranged, profs);
+		var arr:Array<SortedWeapon> = [];
+		var w:WeaponAssign;
+		for (i in 0...weaps.length) {
+			w = weaps[i];
+			arr[i] = {
+				assign:w,
+				sortVal: ranged ? w.weapon.atnM : (10 - w.weapon.reach) + ((w.weapon.atnS/10 + w.weapon.atnT/10 + w.weapon.dtn/10) / 3)
+			};
+		}
+		arr.sort(reverse ? sortBetweenSortedReversed : sortBetweenSorted);
+		return arr;
+	}
+	
+	public function getSortedShields(reverse:Bool=false):Array<SortedShield> {
+		var arr:Array<SortedShield> = [];
+		var s:ShieldAssign;
+		for (i in 0...shields.length) {
+			s = shields[i];
+			arr[i] = {
+				assign:s,
+				sortVal: (10- s.shield.size) + s.shield.blockTN/10
+			};
+		}
+		arr.sort(reverse ? sortBetweenSortedReversed : sortBetweenSorted);
+		return arr;
+	}
 	
 	public function getWeildableWeaponsTypeFiltered(ranged:Bool, ?profs:Int):Array<WeaponAssign> {
 		var arr = [];
 		for (i in 0...weapons.length) {
 			var wp = weapons[i];
 			var w = wp.weapon;
+		
 			var c =  w.matchesTypes(ranged, profs);
-			if ( !w.isAmmunition() && c) {
+			if ( !w.isAmmunition() && c && !w.isAttachment()) {
 				arr.push(wp);	
 			}
 		}
@@ -447,12 +482,30 @@ class Inventory
 		return moneyRef.changeToHighest();
 	}
 	
-	function sortBetweenAttachmentItems(ao:Item, bo:Item):Int
+	public static function sortBetweenAttachmentItems(ao:Item, bo:Item):Int
 	{
 		var a = ao.label.toLowerCase();
 		var b = bo.label.toLowerCase();
 		if (a < b) return -1;
 		if (a > b) return 1;
+		return 0;
+	}
+	
+	public static function sortBetweenSorted(ao:Sorted, bo:Sorted):Int
+	{
+		var a = ao.sortVal;
+		var b = bo.sortVal;
+		if (a < b) return -1;
+		if (a > b) return 1;
+		return 0;
+	}
+	
+	public static function sortBetweenSortedReversed(ao:Sorted, bo:Sorted):Int
+	{
+		var a = ao.sortVal;
+		var b = bo.sortVal;
+		if (a < b) return 1;
+		if (a > b) return -1;
 		return 0;
 	}
 	
@@ -465,6 +518,81 @@ class Inventory
 		}
 		newArr.sort(sortBetweenAttachmentItems);
 		return newArr;
+	}
+	
+	// re-runs through list of ArmorAssign name labels and refresh half markers
+	public static inline var LEFT_HALF_SUFFIX:String = "_";
+	
+	public function refreshHalfArmorLabels():Void {
+		for (i in 0...wornArmor.length) {
+			var assign = wornArmor[i];
+			var name = assign.armor.name;
+			if (name.charAt(0) != "(") {
+				assign.half = WEAR_WHOLE;
+				continue;
+			}
+			var ni = name.indexOf(" ");
+			var actualArmorName:String = name.substr(ni);
+			name = name.substr(0, ni);
+			var leftSideSuffix:Bool = name.charAt(name.length - 1) == LEFT_HALF_SUFFIX;
+			if (leftSideSuffix) {
+				name = name.substr(0, name.length - 1);
+			}
+			if (name == "(Half)" || name == "(single)") {  // 2 conventions
+				if (name == "(Half)"){  // old version label convert to "(single)" label
+					name = "(single)";
+					assign.armor.name = name + (leftSideSuffix ? LEFT_HALF_SUFFIX : "") + " " + actualArmorName;
+				}
+				assign.half = leftSideSuffix ? WEAR_LEFT : WEAR_RIGHT;
+			} else {
+				assign.half = WEAR_WHOLE;
+			}
+		}
+	}
+	
+	// if not already carrying a weapon/shield, draws them from equipment list
+	public function weildMeleeEquip(?profs:Int):Void {
+		var masterItem:Item = findMasterHandItem();
+		var secItem:Item = findOffHandItem();
+		if (masterItem != null) {
+			if (!isWeaponary(masterItem)) {
+				masterItem = null;
+			}
+		}
+		if (secItem != null) {
+			if (!isWeaponary(secItem)) {
+				secItem = null;
+			}
+		}
+		
+		var weaponPicks:Array<SortedWeapon> = null;
+		var w:SortedWeapon;
+		var shieldPicks:Array<SortedShield>;
+		if (masterItem == null) {
+			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true); 
+			if (weaponPicks.length > 0) {
+				w = weaponPicks.pop();
+				holdEquiped(w.assign, w.assign.weapon.twoHanded ? HELD_BOTH : HELD_MASTER);
+				if (w.assign.weapon.twoHanded) return;
+			}
+		}
+		
+		if (secItem == null) {
+			shieldPicks = getSortedShields(true);
+			if (shieldPicks.length > 0) {
+				holdEquiped(shieldPicks.pop().assign, HELD_OFF);
+				return;
+			}
+			
+			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true);
+			while (weaponPicks.length > 0) {
+				w = weaponPicks.pop();
+				if (!w.assign.weapon.twoHanded) {
+					holdEquiped(w.assign, HELD_OFF);
+					return;
+				}
+			}
+		}
 	}
 	
 	public function dropEquipedShield(alreadyEquiped:ShieldAssign, doDestroy:Bool = false):ItemQty {  // Not applicable for shield
@@ -608,6 +736,10 @@ class Inventory
 			}
 		}
 
+	}
+	
+	public static inline function isWeaponary(item:Item):Bool {
+		return Std.is(item, Weapon) || Std.is(item, Shield);
 	}
 	
 	
@@ -858,6 +990,7 @@ typedef WeaponAssign = {
 typedef ArmorAssign = {
 	> ReadyAssign,
 	armor:Armor,
+	?half:Int
 }
 
 typedef ShieldAssign = {
@@ -865,5 +998,18 @@ typedef ShieldAssign = {
 	shield:Shield
 }
 
+typedef Sorted = {
+	sortVal:Float
+}
+
+typedef SortedWeapon = {
+	> Sorted,
+	assign:WeaponAssign
+}
+
+typedef SortedShield = {
+	> Sorted,
+	assign:ShieldAssign
+}
 
 

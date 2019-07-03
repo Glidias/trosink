@@ -29,8 +29,10 @@ import troshx.sos.sheets.CharSheet;
 
 
 /**
- * View model for Character generation 
+ * Model for Character generation 
  * All formulas based off gist: https://gist.github.com/Glidias/9cbd8bd8114649207b79c252873fd207
+ * 
+ * This class is also required for serialization/loading of characters
  * 
  * @author Glidias
  */

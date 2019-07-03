@@ -1059,8 +1059,12 @@ class InventoryVue extends VComponent<InventoryVueData, InventoryVueProps>
 		return this.armorEntry.focusedFlags != 0 || hasPopup;
 	}
 	
-	@:computed function get_carriedShield():Shield {
+	@:computed function get_carriedShieldAssign():ShieldAssign {
 		return this.inventory.findHeldShield();
+	}
+	@:computed function get_carriedShield():Shield {
+		var a = this.carriedShieldAssign;
+		return a != null ? a.shield : null;
 	}
 	
 	@:computed function get_shieldSizeLabels():Array<String> {

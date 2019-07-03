@@ -12,7 +12,9 @@ import js.html.Image;
 import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
 import troshx.core.CharSave;
-import troshx.sos.chargen.CharGenData;
+import troshx.sos.core.Inventory;
+import troshx.sos.core.Shield;
+
 import troshx.sos.core.Armor;
 import troshx.sos.core.Armor.AV3;
 import troshx.sos.core.BodyChar;
@@ -29,6 +31,9 @@ import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
 import troshx.sos.vue.pregen.PregenSelectView;
+
+// NOTE: This import is required for serialization, DO NOT delete!
+import troshx.sos.chargen.CharGenData;
 
 /**
  * Main doll view component
@@ -61,9 +66,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 		var viewModel:CombatViewModel = this.viewModel;
 		var showPregens = this.showPregens;
+		var node:FightNode<CharSheet> = null;
 		if (showPregens == PREGEN_SELECT_SELF) {
 			var valData:CharSave = val;
-			var node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
+			node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
 			var theIndex = boutModel.bout.combatants.length;
 			boutModel.bout.combatants.push(node);
 			viewModel.currentPlayerIndex = theIndex;
@@ -71,10 +77,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 			
 		} else if (showPregens == PREGEN_SELECT_OPPONENT) {
 			var valData:CharSave = val;
-			var node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
+			node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
 			boutModel.bout.combatants.push(node);
-			
 		}
+		if (node != null) {
+			node.charSheet.inventory.refreshHalfArmorLabels();
+			node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+		}
+		
 		this.showPregens = 0;
 	}
 	
@@ -100,9 +110,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.viewModel.boutModel;
 	}
 	
-	//@:watch
-	
-	// SELF
+	// SELF VITALS
 	
 	@:computed function get_remainingDisplayCP():Int {
 		return this.viewModel.getRemainingDisplayCP();
@@ -128,6 +136,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return pl.charSheet.totalBloodLost;
 	}
 	
+	// ----
+	
 	override function Data():DollViewData {
 		return {
 			mapData: getRenderTrackedImageData(),
@@ -150,27 +160,16 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	
 	function getArmorPartPropsOf(name:String, index:Int):LayoutItemViewProps {
-		var hitLocArmorValues = this.hitLocationArmorValues;
-		var hitLocIndex:Int = this.viewModel.DOLL_PART_HitIndices[index];
-		var locations = this.coverageHitLocations;
-		var avs = hitLocationArmorValues;
-		var av:AV3 = LibUtil.field(avs, locations[hitLocIndex].id);
-		var aggre:Float = av.avc + av.avb + av.avc;
-		var gotAV:Bool = aggre > 0;
-		aggre /= 3;
-		var aggI:Int = Math.floor(aggre);
-		var colors = this.armorColorScale;
-		if (aggI >= colors.length) {
-			aggI = colors.length - 1;
-		}
+		var aColors = armorDollColors;
+		var defColors = armorColorScale;
+		var gotColor = aColors[index] != null;
 		
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
-		var i:Int = d.idIndices.get(name);
 		p.fillColor = "transparent";
-		p.strokeColor = colors[aggI];
+		p.strokeColor = gotColor ? aColors[index] : defColors[0];
 		p.strokeWidth = 3*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
-		p.showShape = gotAV && aggI >= 1;
+		p.showShape = gotColor;
 		return p;
 	}
 	
@@ -210,7 +209,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return viewModel.getCurrentPlayer();
 	}
 	
-	@:computed inline function get_opponents():Array<FightNode<CharSheet>> 
+	@:computed function get_opponents():Array<FightNode<CharSheet>> 
 	{
 		return viewModel.getCurrentOpponents();
 	}
@@ -282,7 +281,11 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	
 	
-	// Armor display calculation
+	// Doll Armor display calculation
+	
+	@:computed inline function get_currentDollSheet():CharSheet {
+		return this.currentOpponent.charSheet;
+	}
 	
 	@:computed function get_armorColorScale():Array<String> {
 		return ["#ff0000", "#c00000", "#e26b0a", "#f79646",
@@ -291,19 +294,49 @@ class DollView extends VComponent<DollViewData, NoneT>
 		];
 	}
 	
-	@:computed inline function get_coverageHitLocations():Array<HitLocation> {
-		return this.currentOpponent.charSheet.body.hitLocations; // getNewHitLocationsFrontSlice();
+	@:computed function get_carriedDollShieldAssign():ShieldAssign {
+		return this.currentDollSheet.inventory.findHeldShieldAssign();
 	}
 	
+	@:computed inline function get_carriedDollShield():Shield {
+		var assign = this.carriedDollShieldAssign;
+		return assign != null ? assign.shield : null;
+	}
+	
+	@:computed function get_shieldLowProfiles():Array<Dynamic<Bool>> {
+		return Shield.getLowCoverage();
+	}
+	
+	@:computed function get_shieldHighProfiles():Array<Dynamic<Bool>> {
+		return Shield.getHighCoverage();
+	}
+	
+	@:computed function get_dollShieldCoverage():Dynamic<Bool> {
+		var shield = this.carriedDollShield;
+		var index:Int = shield != null ? shield.size : 0; 
+		return this.currentDollSheet.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
+	}
+	
+	function shieldCoveredAtDollHitLocation(i:Int):Bool {
+		var viewModel = this.viewModel;
+		var hitLocation = viewModel.getDollPartHitLocationAt(i);
+		
+		// note todo: might not be left part isLeftPartAtDollIndex, depends on where the shield is actually carried..
+		return this.carriedDollShield != null && LibUtil.field(this.dollShieldCoverage, hitLocation.id) != null && (!hitLocation.twoSided || viewModel.isLeftPartAtDollIndex(i));
+	}
+	
+	@:computed inline function get_coverageHitLocations():Array<HitLocation> {
+		return this.currentDollSheet.body.hitLocations; // getNewHitLocationsFrontSlice();
+	}
+	
+	// for standard dominant (enemy's right) side (ie. left side of doll)
 	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {
-		var ch = coverageHitLocations;
-		var dyn:Dynamic<AV3> = {};
-		//trace("Hit dummy set up...");
-		for (i in 0...ch.length) {
-			var h = ch[i];
-			LibUtil.setField(dyn, h.id, { avp:0, avc:0, avb:0 }); 
-		}
-		return dyn;
+		return this.currentDollSheet.body.getNewEmptyAvs();
+	}
+	
+	// for standard non-dominant (enemy's left) side  (ie. right side of doll)
+	@:computed function get_hitLocationZeroAVValues2():Dynamic<AV3> {
+		return this.currentDollSheet.body.getNewEmptyAvs();
 	}
 	
 	/*
@@ -313,12 +346,37 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	*/
 	
-	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
-		var inventory = this.currentOpponent.charSheet.inventory;
+	@:computed function get_armorDollColors():Array<String> {
+		var arr:Array<String> = [];
+		var hitIndices =  this.viewModel.DOLL_PART_HitIndices;
+		var locations = this.coverageHitLocations;
+		var avs = this.hitLocationArmorValues;
+		var avsLeft = this.hitLocationArmorValues2;
+		var isLefts = this.viewModel.DOLL_PART_IsLefts;
+		for (i in 0...hitIndices.length) {
+			var hitLocIndex:Int = hitIndices[i];
+			var hitLoc = locations[hitLocIndex];
+			var chosenAVs = hitLoc.twoSided && (isLefts & (1<<i)) != 0 ? avsLeft : avs;
+			var av:AV3 = LibUtil.field(chosenAVs, hitLoc.id);
+			var aggre:Float = av.avc + av.avb + av.avc;
+			var gotAV:Bool = aggre > 0;
+			aggre /= 3;
+			
+			var aggI:Int = Math.floor(aggre);
+			var colors = this.armorColorScale;
+			if (aggI >= colors.length) {
+				aggI = colors.length - 1;
+			}
+			arr[i] = gotAV ? colors[aggI] : null;
+		}
+		return arr;
+	}
+	
+	function getHitLocationArmorValues(values:Dynamic<AV3>, sideMask:Int = 7):Dynamic<AV3> {
+		var inventory = this.currentDollSheet.inventory;
 		var armors:Array<ArmorAssign> = inventory.wornArmor;
-		var values:Dynamic<AV3>  = this.hitLocationZeroAVValues;
 		var ch = coverageHitLocations;
-		var body:BodyChar =  this.currentOpponent.charSheet.body;
+		var body:BodyChar =  this.currentDollSheet.body;
 
 		var targMask:Int = 0;// targetingZoneMask;
 	
@@ -333,9 +391,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 		
 		for (i in 0...armors.length) {
-			var a:Armor = armors[i].armor;
+			var assign:ArmorAssign = armors[i];
+			if (assign.half != null && (assign.half & sideMask)==0) {
+				continue;
+			}
+			if (sideMask == 2 && assign.half == 3) continue; // skip unnecessary both sides
+			
+			var a:Armor = assign.armor;
 			var layerMask:Int = 0;
-
 			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
 				layerMask = inventory.layeredWearingMaskWith(a, a.special.wornWith.name, body);	
 			}
@@ -343,6 +406,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 		
 		return values;
+	}
+	
+	@:computed function get_hitLocationArmorValues():Dynamic<AV3> {
+		return getHitLocationArmorValues(this.hitLocationZeroAVValues, Inventory.WEAR_WHOLE|Inventory.WEAR_RIGHT );
+	}
+	@:computed function get_hitLocationArmorValues2():Dynamic<AV3> {
+		return getHitLocationArmorValues(this.hitLocationZeroAVValues2, Inventory.WEAR_LEFT);
 	}
 	
 	// UI Interaction and states

@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.sos.core.Armor.AV3;
 import troshx.util.LibUtil;
 
 /**
@@ -56,6 +57,17 @@ class BodyChar
 	
 	function new() 	{
 		
+	}
+	
+	public function getNewEmptyAvs():Dynamic<AV3> {
+		var ch = hitLocations;
+		var dyn:Dynamic<AV3> = {};
+		//trace("Hit dummy set up...");
+		for (i in 0...ch.length) {
+			var h = ch[i];
+			LibUtil.setField(dyn, h.id, { avp:0, avc:0, avb:0 }); 
+		}
+		return dyn;
 	}
 	
 	public inline function isThrusting(targetZone:Int):Bool {

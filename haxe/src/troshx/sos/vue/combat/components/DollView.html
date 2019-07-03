@@ -48,7 +48,9 @@
 			</zone>
 					
 			<div class="parts-armor">	
-				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li"></zone>
+				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
+					<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)"></div>
+				</zone>
 			</div>		
 		</div>	
 		<div v-else>
