@@ -133,6 +133,23 @@ class Inventory
 		return null;
 	}
 	
+	public function getOffhandWeaponAssign():WeaponAssign {
+		for (i in 0...weapons.length) {
+			if (weapons[i].held == HELD_OFF) {
+				return weapons[i];
+			}
+		}
+		return null;
+	}
+	public function getMasterWeaponAssign():WeaponAssign {
+		for (i in 0...weapons.length) {
+			if (( weapons[i].held & HELD_MASTER) != 0) {
+				return weapons[i];
+			}
+		}
+		return null;
+	}
+	
 	public function getOffhandWeapon():Weapon {
 		for (i in 0...weapons.length) {
 			if (weapons[i].held == HELD_OFF) {

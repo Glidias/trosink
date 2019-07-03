@@ -11,6 +11,10 @@
 
 .dollview {
 	
+	button {
+		border-radius:0;
+	}
+	
 	ul {
 		list-style-type:none;
 		padding:0;margin:0;
@@ -64,6 +68,65 @@
 		ul {
 			text-align:center;
 		}
+	}
+	
+	.handLeftText, .handLeftAlt, .handRightText, .handRightAlt {
+		display:flex;
+		align-items:center;
+		.lbl {
+			position:relative;
+			width:100%;
+			
+		}
+	}
+	
+	.handLeftText {
+		.lbl {
+			text-align:right;
+		}
+	}
+	.handLeftAlt {
+		overflow:hidden;
+		padding:5px;
+		.lbl {
+			text-align:left;
+		}
+		&:after {
+			border-radius:2px;
+			border:1px solid #888888;
+			box-sizing:border-box;
+
+			width:50%;
+			height:1em;
+			content:'';
+			display:inline-block;
+		}
+		
+	}
+	
+	.handRightText {
+		
+		.lbl {
+			text-align:left;
+		}
+	}
+	.handRightAlt {
+		overflow:hidden;
+		padding:5px;
+		.lbl {
+			text-align:right;
+		}
+		&:before {
+			border-radius:2px;
+			border:1px solid #888888;
+			box-sizing:border-box;
+
+			width:50%;
+			height:1em;
+			content:'';
+			display:inline-block;
+		}
+		
 	}
 	
 	

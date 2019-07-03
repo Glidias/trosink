@@ -28,6 +28,20 @@
 				<div v-show="viewModel.draggedCP">-{{viewModel.draggedCP}}</div>
 				<div v-show="viewModel.draggedCP"> {{remCP}}</div>
 			</zone>
+				
+			<zone v-bind="layoutViewPropsOf('handLeftAlt')"  class="textarea-region" v-if="leftItem">
+				<div class="lbl">{{leftTypeTag}}</div>
+			</zone>
+			<zone v-bind="layoutViewPropsOf('handLeftText')" v-if="leftItem">
+				<div class="lbl">{{leftItem.name}}</div>
+			</zone>
+				
+			<zone v-bind="layoutViewPropsOf('handRightAlt')"  class="textarea-region" v-if="rightItem">
+				<div class="lbl">{{rightTypeTag}}</div>
+			</zone>
+			<zone v-bind="layoutViewPropsOf('handRightText')" v-if="rightItem">
+				<div class="lbl">{{rightItem.name}}</div>
+			</zone>
 		</div>
 				
 		<div v-if="gotOpponents">

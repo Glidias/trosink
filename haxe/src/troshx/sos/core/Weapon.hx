@@ -174,6 +174,11 @@ class Weapon extends Item
 		return isAmmo && ranged;
 	}
 	
+	public function profLabelStdFirst():String {
+		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);
+		return arr[0];
+	}
+	
 	public function profLabels():String {
 		var arr = Profeciency.getLabelsOfArrayProfs(ranged ? Profeciency.getCoreRanged() : Profeciency.getCoreMelee(), profs);
 		if (profsCustom != null) {

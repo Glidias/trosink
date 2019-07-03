@@ -13,7 +13,9 @@ import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
 import troshx.core.CharSave;
 import troshx.sos.core.Inventory;
+import troshx.sos.core.Item;
 import troshx.sos.core.Shield;
+import troshx.sos.core.Weapon;
 
 import troshx.sos.core.Armor;
 import troshx.sos.core.Armor.AV3;
@@ -110,12 +112,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.viewModel.boutModel;
 	}
 	
-	// SELF VITALS
+	// SELF 
 	
+	// cp
 	@:computed function get_remainingDisplayCP():Int {
 		return this.viewModel.getRemainingDisplayCP();
 	}
 	
+	// vitals
 	@:computed function get_fatique():Int {
 		var pl = viewModel.getCurrentPlayer();
 		return pl.charSheet.fatique;
@@ -135,6 +139,31 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var pl = viewModel.getCurrentPlayer();
 		return pl.charSheet.totalBloodLost;
 	}
+	
+	// todo : might be different depending on handedness
+	@:computed function get_rightItem():Item {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.inventory.findMasterHandItem();
+	}
+	@:computed function get_leftItem():Item {
+		var pl = viewModel.getCurrentPlayer();
+		return pl.charSheet.inventory.findOffHandItem();
+	}
+	
+	function getTypeTagForItem(item:Item):String {
+		var weapon:Weapon = LibUtil.as(item, Weapon);
+		var shield:Shield = LibUtil.as(item, Shield);
+		return shield != null ? "S" : weapon != null ? weapon.profLabelStdFirst().split(" ").join("").substr(0,3) : "";
+	}
+	
+	@:computed function get_leftTypeTag():String {
+		return getTypeTagForItem(this.leftItem);
+	}
+	
+	@:computed function get_rightTypeTag():String {
+		return getTypeTagForItem(this.rightItem);
+	}
+	
 	
 	// ----
 	
@@ -322,7 +351,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var hitLocation = viewModel.getDollPartHitLocationAt(i);
 		
 		// note todo: might not be left part isLeftPartAtDollIndex, depends on where the shield is actually carried..
-		return this.carriedDollShield != null && LibUtil.field(this.dollShieldCoverage, hitLocation.id) != null && (!hitLocation.twoSided || viewModel.isLeftPartAtDollIndex(i));
+		return this.carriedDollShield != null && LibUtil.field(this.dollShieldCoverage, hitLocation.id) != null && (LibUtil.field(this.dollShieldCoverage, hitLocation.id) || viewModel.isLeftPartAtDollIndex(i) );
 	}
 	
 	@:computed inline function get_coverageHitLocations():Array<HitLocation> {
