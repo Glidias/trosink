@@ -352,6 +352,19 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return assign != null ? assign.shield : null;
 	}
 	
+	@:computed function get_shieldIconStyle():Dynamic {
+		var shield = carriedDollShield;
+		var avI:Int = -1;
+		var armorColorScale = this.armorColorScale;
+		if (shield != null) {
+			avI = shield.AV - 1;
+			if (avI >= armorColorScale.length) {
+				avI = armorColorScale.length - 1;
+			}
+		}
+		return shield != null && avI >= 0 ? {color:armorColorScale[avI]} : {};
+	}
+	
 	@:computed function get_shieldLowProfiles():Array<Dynamic<Bool>> {
 		return Shield.getLowCoverage();
 	}
@@ -412,12 +425,12 @@ class DollView extends VComponent<DollViewData, NoneT>
 			var gotAV:Bool = aggre > 0;
 			aggre /= 3;
 			
-			var aggI:Int = Math.floor(aggre);
+			var aggI:Int = Math.floor(aggre) - 1;
 			var colors = this.armorColorScale;
 			if (aggI >= colors.length) {
 				aggI = colors.length - 1;
 			}
-			arr[i] = gotAV ? colors[aggI] : null;
+			arr[i] = gotAV && aggI>0 ? colors[aggI] : null;
 		}
 		return arr;
 	}

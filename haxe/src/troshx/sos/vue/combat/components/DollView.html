@@ -1,6 +1,6 @@
 <div class="dollview" style="position:absolute;top:0;left:0;width:100%;height:100%"  ref="container">
 	<div v-if="mapData.renderCount!=0" style="width:100%;height:100%;top:0;left;0;position:absolute;">
-		<div class="bg" v-show="gotOpponents" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear.png); background-position:50% 50%; background-size:contain"></div>
+		<div class="bg" v-show="gotOpponents" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain"></div>
 		
 		<zone v-bind="layoutViewPropsOf('vitals')" style="padding:5px" class="textarea-region" :class="{'enableinput':!player}">
 			<div v-if="player">
@@ -63,14 +63,14 @@
 					
 			<div class="parts-armor">	
 				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
-					<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)"></div>
+					<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)" :style="shieldIconStyle"></div>
 				</zone>
 			</div>
 					
-			<zone v-bind="layoutViewPropsOf('enemyHandLeft')" class="enemy-handbox">
+			<zone v-bind="layoutViewPropsOf('enemyHandLeft')" class="enemy-handbox" v-if="enemyLeftItem">
 				<div class="lbl">{{enemyLeftTypeTag}}</div>
 			</zone>
-			<zone v-bind="layoutViewPropsOf('enemyHandRight')" class="enemy-handbox">
+			<zone v-bind="layoutViewPropsOf('enemyHandRight')" class="enemy-handbox" v-if="enemyRightItem">
 				<div class="lbl">{{enemyRightTypeTag}}</div>
 			</zone>
 			
@@ -113,8 +113,8 @@
 			<area shape="poly" coords="153, 85, 219, 144, 200, 159, 120, 157" alt="swing" title="SWING_NECK-r" />
 			<area shape="poly" coords="224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124" alt="part" title="LOWER_HEAD" />
 			<area shape="poly" coords="322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192" alt="part" title="UPPER_ARM-l" />
-			<area shape="poly" coords="98, 321, 106, 322, 111, 333, 97, 367, 94, 338, 79, 330, 98, 321" alt="part" title="HAND-r" />
-			<area shape="poly" coords="393, 328, 399, 346, 395, 359, 384, 357, 370, 329, 386, 320" alt="part" title="HAND-l" />
+			<area shape="poly" coords="99, 318, 105, 318, 115, 332, 98, 371, 94, 376, 95, 358, 85, 377, 80, 377, 86, 360, 83, 358, 68, 378, 70, 366, 62, 366, 77, 343, 71, 343, 70, 338, 81, 326, 99, 318" alt="part" title="HAND-r" />
+			<area shape="poly" coords="381, 320, 405, 327, 417, 340, 411, 346, 424, 366, 424, 370, 417, 371, 417, 378, 402, 359, 404, 379, 392, 360, 392, 375, 388, 371, 372, 334, 372, 327, 381, 320" alt="part" title="HAND-l" />
 			<area shape="poly" coords="356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270" alt="part" title="FOREARM-l" />
 			<area shape="poly" coords="334, 253, 345, 263, 325, 273, 318, 260" alt="part" title="ELBOW-l" />
 			<area shape="poly" coords="138, 267, 155, 281, 116, 327, 105, 317" alt="part" title="FOREARM-r" />
