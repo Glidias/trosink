@@ -201,8 +201,8 @@ class Inventory
 	
 	public var shieldPosition:Int = Shield.POSITION_LOW;
 	
-	public function getSortedWeapons(ranged:Bool, ?profs:Int, reverse:Bool=false):Array<SortedWeapon> {
-		var weaps = getWeildableWeaponsTypeFiltered(ranged, profs);
+	public function getSortedWeapons(ranged:Bool, ?profs:Int, reverse:Bool=false, unheld:Bool=false):Array<SortedWeapon> {
+		var weaps = getWeildableWeaponsTypeFiltered(ranged, profs, unheld);
 		var arr:Array<SortedWeapon> = [];
 		var w:WeaponAssign;
 		for (i in 0...weaps.length) {
@@ -216,26 +216,27 @@ class Inventory
 		return arr;
 	}
 	
-	public function getSortedShields(reverse:Bool=false):Array<SortedShield> {
+	public function getSortedShields(reverse:Bool = false, unheld:Bool = false):Array<SortedShield> {
 		var arr:Array<SortedShield> = [];
 		var s:ShieldAssign;
 		for (i in 0...shields.length) {
 			s = shields[i];
-			arr[i] = {
+			if (unheld && s.unheld!=0) continue;
+			arr.push({
 				assign:s,
 				sortVal: (10- s.shield.size) + s.shield.blockTN/10
-			};
+			});
 		}
 		arr.sort(reverse ? sortBetweenSortedReversed : sortBetweenSorted);
 		return arr;
 	}
 	
-	public function getWeildableWeaponsTypeFiltered(ranged:Bool, ?profs:Int):Array<WeaponAssign> {
+	public function getWeildableWeaponsTypeFiltered(ranged:Bool, ?profs:Int, unheld:Bool=false):Array<WeaponAssign> {
 		var arr = [];
 		for (i in 0...weapons.length) {
 			var wp = weapons[i];
+			if (unheld && wp.held != 0) continue;
 			var w = wp.weapon;
-		
 			var c =  w.matchesTypes(ranged, profs);
 			if ( !w.isAmmunition() && c && !w.isAttachment()) {
 				arr.push(wp);	
@@ -586,7 +587,7 @@ class Inventory
 		var w:SortedWeapon;
 		var shieldPicks:Array<SortedShield>;
 		if (masterItem == null) {
-			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true); 
+			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true, true); 
 			if (weaponPicks.length > 0) {
 				w = weaponPicks.pop();
 				holdEquiped(w.assign, w.assign.weapon.twoHanded ? HELD_BOTH : HELD_MASTER);
@@ -595,13 +596,13 @@ class Inventory
 		}
 		
 		if (secItem == null) {
-			shieldPicks = getSortedShields(true);
+			shieldPicks = getSortedShields(true, true);
 			if (shieldPicks.length > 0) {
 				holdEquiped(shieldPicks.pop().assign, HELD_OFF);
 				return;
 			}
 			
-			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true);
+			if (weaponPicks == null) weaponPicks = getSortedWeapons(false, profs, true, true);
 			while (weaponPicks.length > 0) {
 				w = weaponPicks.pop();
 				if (!w.assign.weapon.twoHanded) {
