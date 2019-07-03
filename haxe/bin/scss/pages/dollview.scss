@@ -7,10 +7,20 @@
 
 .layout-item {
 	box-sizing:border-box;
+	pointer-events:none;
+	touch-action:none;
+	&.enable-input {
+		pointer-events:auto;
+		touch-action:auto;
+	}
 }
 
 .dollview {
 	
+	.bg {
+		pointer-events:none;
+		touch-action:none;
+	}
 	button {
 		border-radius:0;
 	}
