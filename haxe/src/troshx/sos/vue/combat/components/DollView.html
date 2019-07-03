@@ -65,7 +65,15 @@
 				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
 					<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)"></div>
 				</zone>
-			</div>		
+			</div>
+					
+			<zone v-bind="layoutViewPropsOf('enemyHandLeft')" class="enemy-handbox">
+				<div class="lbl">{{enemyLeftTypeTag}}</div>
+			</zone>
+			<zone v-bind="layoutViewPropsOf('enemyHandRight')" class="enemy-handbox">
+				<div class="lbl">{{enemyRightTypeTag}}</div>
+			</zone>
+			
 		</div>	
 		<div v-else>
 			<div class="select-opponent">
@@ -78,7 +86,7 @@
 			<pregens :header="pregenHeader" :characters="fightChars.pool" @close="closePregens" @singleCharSelected="confirmPregens" @multiCharSelected="confirmPregens"></pregens>
 		</div>
 		
-		<!--<div v-for="(li, i) in armorColorScale" :key="i" :style="{color:li}">Preview</div>-->
+		<!--<div v-for="(li, i) in armorColorScale" :key="i" :style="{color:li}">-</div>-->
 			
 	</div>
 	<div class="image-map-holder" style="position:relative; display:none">

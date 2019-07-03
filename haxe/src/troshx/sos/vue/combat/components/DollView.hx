@@ -164,6 +164,26 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return getTypeTagForItem(this.rightItem);
 	}
 	
+	// ENEMY
+	
+	@:computed function get_enemyRightItem():Item {
+		var pl = this.currentOpponent;
+		return pl.charSheet.inventory.findMasterHandItem();
+	}
+	@:computed function get_enemyLeftItem():Item {
+		var pl = this.currentOpponent;
+		return pl.charSheet.inventory.findOffHandItem();
+	}
+	
+	@:computed function get_enemyLeftTypeTag():String {
+		return getTypeTagForItem(this.enemyLeftItem);
+	}
+	
+	@:computed function get_enemyRightTypeTag():String {
+		return getTypeTagForItem(this.enemyRightItem);
+	}
+	
+	
 	
 	// ----
 	
@@ -318,7 +338,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	@:computed function get_armorColorScale():Array<String> {
 		return ["#ff0000", "#c00000", "#e26b0a", "#f79646",
-		"#ffff00", "#9bbb59", "#92d050", "#00b050",
+		"#f1e70d", "#9bbb59", "#92d050", "#00b050",	//f1e70d   //ffff00
 		"#0070c0", "#00b0f0"
 		];
 	}
@@ -385,9 +405,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 		for (i in 0...hitIndices.length) {
 			var hitLocIndex:Int = hitIndices[i];
 			var hitLoc = locations[hitLocIndex];
-			var chosenAVs = hitLoc.twoSided && (isLefts & (1<<i)) != 0 ? avsLeft : avs;
+			var chosenAVs = hitLoc.twoSided && (isLefts & (1 << i)) != 0 ? avsLeft : avs;
+			//trace( (hitLoc.twoSided && (isLefts & (1 << i)) != 0) + " : " + this.viewModel.DOLL_PART_Slugs[i]);
 			var av:AV3 = LibUtil.field(chosenAVs, hitLoc.id);
-			var aggre:Float = av.avc + av.avb + av.avc;
+			var aggre:Float = av.avc + av.avp + av.avb;
 			var gotAV:Bool = aggre > 0;
 			aggre /= 3;
 			
@@ -424,8 +445,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 			if (assign.half != null && (assign.half & sideMask)==0) {
 				continue;
 			}
-			if (sideMask == 2 && assign.half == 3) continue; // skip unnecessary both sides
-			
 			var a:Armor = assign.armor;
 			var layerMask:Int = 0;
 			if (a.special != null && a.special.wornWith != null && a.special.wornWith.name != "" ) {
@@ -441,7 +460,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return getHitLocationArmorValues(this.hitLocationZeroAVValues, Inventory.WEAR_WHOLE|Inventory.WEAR_RIGHT );
 	}
 	@:computed function get_hitLocationArmorValues2():Dynamic<AV3> {
-		return getHitLocationArmorValues(this.hitLocationZeroAVValues2, Inventory.WEAR_LEFT);
+		return getHitLocationArmorValues(this.hitLocationZeroAVValues2, Inventory.WEAR_WHOLE|Inventory.WEAR_LEFT);
 	}
 	
 	// UI Interaction and states

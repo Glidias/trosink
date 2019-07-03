@@ -14,6 +14,17 @@
 
 .dollview {
 	
+	.enemy-handbox {
+		font-size:11px;
+		text-align:center;
+		.lbl {
+			width:100%;
+			position:absolute;
+			top:50%;
+			transform:translateY(-50%);
+		}
+	}
+	
 	.enableinput {
 		pointer-events:auto;
 		touch-action:auto;
