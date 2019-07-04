@@ -49,6 +49,8 @@ class HammerJSCombat
 	
 	var callback:Int->Int->Void;
 	
+	public var pointerOffsetX:Float = 0;
+	public var pointerOffsetY:Float = 0;
 	
 	
 	public var DEFAULT_ACT_HOVER:UInteract = new UInteract(-1, UIInteraction.HOVER); // app specific set
@@ -61,7 +63,7 @@ class HammerJSCombat
 			cursorDomRef.style.transform = 'translate3d(${x}px, ${y}px, 0)';
 		}
 	}
-	
+
 	public function new(element:CanvasElement, imageMapData:ImageMapData, callback:Int->Int->Void=null, cursorDomRef:DOMElement=null) 
 	{
 		this.cursorDomRef = cursorDomRef;
@@ -86,6 +88,8 @@ class HammerJSCombat
 	}
 	
 	// app specific set
+	public static inline var HIT_OFFSET_OBSERVE_Y:Int = -40;
+	
 	private function defaultCallback(index:Int, event:Int):Void {
 		if (viewModel == null) {
 			trace("Receiving event from:" + index + " ::" + event + " >" + currentGesture.type + " :" + currentGesture.eventType);
@@ -176,6 +180,7 @@ class HammerJSCombat
 			viewModel.showFocusedTag = true;
 		}
 		if (gesture != null) {
+			pointerOffsetY = val && gesture.pointerType == "touch" ? HIT_OFFSET_OBSERVE_Y : 0;
 			setCursorPos(gesture.center.x, gesture.center.y);
 		}
 		
@@ -198,14 +203,14 @@ class HammerJSCombat
 		if (Std.is(pt, Touch)) {
 			touch = pt;
 			id = touch.identifier;
-			u = touch.pageX / canvasWidth;
-			v = touch.pageY / canvasHeight;
+			u = (touch.pageX+pointerOffsetX) / canvasWidth;
+			v = (touch.pageY+pointerOffsetY) / canvasHeight;
 			
 		} else {  // if (Std.is(pt, PointerEvent))
 			pointer = pt;
 			id = pointer.pointerId;
-			u = pointer.pageX / canvasWidth;
-			v = pointer.pageY / canvasHeight;
+			u = (pointer.pageX+pointerOffsetX) / canvasWidth;
+			v = (pointer.pageY+pointerOffsetY) / canvasHeight;
 		} 
 		//else {
 		//	return;
