@@ -541,6 +541,12 @@ class Inventory
 	// re-runs through list of ArmorAssign name labels and refresh half markers
 	public static inline var LEFT_HALF_SUFFIX:String = "_";
 	
+	public function cleanupShieldLabels():Void {
+		for (i in 0...shields.length) {
+			shields[i].shield.tempFixSpecsFromName();
+		}
+	}
+	
 	public function refreshHalfArmorLabels():Void {
 		for (i in 0...wornArmor.length) {
 			var assign = wornArmor[i];

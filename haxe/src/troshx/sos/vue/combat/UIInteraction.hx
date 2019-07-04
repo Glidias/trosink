@@ -36,6 +36,8 @@ class UIInteraction
 	@:act public static inline var RELEASE:Int = (1 << 15);
 	@:act public static inline var RELEASE_OVER:Int = (1 << 16);
 	
+	@:act public static inline var ROLL_OUT:Int = (1 << 17);
+	
 	public static inline var MASK_CANCELED_OR_RELEASE:Int = CANCELED | RELEASE;
 	
 	public static inline function requiresConfirmHit(mask:Int):Bool {
@@ -116,7 +118,7 @@ class UIInteraction
 					item.hitPadding = 5;
 					arr.push(new UInteract(i, DOWN | RELEASE | CANCELED) );
 				case "incomingManuevers":
-					arr.push(new UInteract(i, HOVER|MASK_CANCELED_OR_RELEASE|DOWN)); //| PAN_UP|PAN_DOWN
+					arr.push(new UInteract(i, MOVE|ROLL_OUT|HOVER|MASK_CANCELED_OR_RELEASE|DOWN)); //| PAN_UP|PAN_DOWN
 				case "opponentSwiper":
 					arr.push(new UInteract(i, SWIPE_LEFT|SWIPE_RIGHT));	
 				case "roundCount":

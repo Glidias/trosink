@@ -9,6 +9,7 @@ import hammer.recognizers.Tap;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 import js.html.CanvasElement;
+import js.html.DOMElement;
 import js.html.PointerEvent;
 import js.html.Touch;
 import troshx.sos.vue.combat.UIInteraction.UInteract;
@@ -49,12 +50,21 @@ class HammerJSCombat
 	var callback:Int->Int->Void;
 	
 	
+	
 	public var DEFAULT_ACT_HOVER:UInteract = new UInteract(-1, UIInteraction.HOVER); // app specific set
 	public var defaultAct:UInteract;
 	public var requiredActs:Int = 0;	// enforce compulsory required events mask for callbacks
 	
-	public function new(element:CanvasElement, imageMapData:ImageMapData, callback:Int->Int->Void=null) 
+	var cursorDomRef:DOMElement;
+	inline function setCursorPos(x:Float, y:Float):Void {
+		if (cursorDomRef != null) {
+			cursorDomRef.style.transform = 'translate3d(${x}px, ${y}px, 0)';
+		}
+	}
+	
+	public function new(element:CanvasElement, imageMapData:ImageMapData, callback:Int->Int->Void=null, cursorDomRef:DOMElement=null) 
 	{
+		this.cursorDomRef = cursorDomRef;
 		this.callback = callback != null ? callback : defaultCallback;
 		this.imageMapData = imageMapData;
 		
@@ -65,6 +75,8 @@ class HammerJSCombat
 		hammer.add(new Tap({
 			taps: 1
 		}));
+		
+		this.cursorDomRef = cursorDomRef;
 
 		defaultAct = DEFAULT_ACT_HOVER;
 		
@@ -90,14 +102,14 @@ class HammerJSCombat
 				defaultAct = DEFAULT_ACT_HOVER;
 				requiredActs = 0;
 				
-				trace("Drag move release");
+				//trace("Drag move release");
 			} else if (event == UIInteraction.CANCELED) {
 				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
 				defaultAct = DEFAULT_ACT_HOVER;
 				requiredActs = 0;
 				
 				viewModel.setDraggedCP(0);
-				trace("Drag move canceled");
+				//trace("Drag move canceled");
 			}
 			else {
 				return;
@@ -107,7 +119,8 @@ class HammerJSCombat
 		}
 		
 		var tag = imageMapData.classList[index];
-		if (tag == "swing" || tag == "part") {
+		var name = imageMapData.titleList[index];
+		if (tag == "swing" || tag == "part" || name == "enemyHandLeft" || name == "enemyHandRight") {
 			if (event == UIInteraction.HOVER || index != viewModel.focusedIndex) {
 				if (!viewModel.observeOpponent) viewModel.setFocusedIndex(index);
 				else viewModel.setObserveIndex(index);
@@ -123,26 +136,33 @@ class HammerJSCombat
 			return;
 		}
 		
-		var name = imageMapData.titleList[index];
+		
 		if (name == "incomingManuevers") {
 			if ( (event & UIInteraction.PAN) != 0) viewModel.showFocusedTag = false;
+			else if ( (event & UIInteraction.MOVE) != 0) {
+				setCursorPos(currentGesture.center.x, currentGesture.center.y);
+			}
 			else if ( (event & UIInteraction.MASK_CANCELED_OR_RELEASE) != 0 ) {
 				if (viewModel.setObserveOpponent(false)) {
-					onViewModelObservationChange();
+					onViewModelObservationChange(currentGesture);
 				}
+				viewModel.setIncomingHeldDown(false);
 			} else if ( event & (UIInteraction.HOLD | UIInteraction.DOWN) != 0 ) {
+				viewModel.setIncomingHeldDown(true);
+			} else if ( (event & UIInteraction.ROLL_OUT) != 0 ){
 				if (viewModel.setObserveOpponent(true)) {
-					onViewModelObservationChange();
+					onViewModelObservationChange(currentGesture);
 				}
 			}
-		} else if (name == "vitals") {
+		} 
+		else if (name == "vitals") {
 			
 		} else {
 			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}
 	}
 	
-	public function onViewModelObservationChange():Void {
+	public function onViewModelObservationChange(gesture:GestureInteractionData=null):Void {
 		var viewModel = this.viewModel;
 		var val = viewModel.observeOpponent;
 		if (val) {
@@ -154,6 +174,9 @@ class HammerJSCombat
 			viewModel.handleDisabledMask(viewModel.swingAvailabilityMask, viewModel.DOLL_SWING_Slugs);
 			viewModel.setObserveIndex( -1);
 			viewModel.showFocusedTag = true;
+		}
+		if (gesture != null) {
+			setCursorPos(gesture.center.x, gesture.center.y);
 		}
 		
 		
@@ -235,14 +258,21 @@ class HammerJSCombat
 				if (e.eventType == Hammer.INPUT_MOVE) {
 					if ( (e.deltaX != 0 || e.deltaY != 0) && (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) ) != 0 ) {
 						if ((mask & UIInteraction.MOVE) != 0) callback(act.index, UIInteraction.MOVE);
-						if ((act.mask & (UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
+						if ((act.mask & (UIInteraction.ROLL_OUT | UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
 							var act2 = UIInteraction.findHit(u, v, imageMapData, interactionList);
 							if (act2 != null) {
 								if ( (act2.mask & UIInteraction.MOVE_OVER) != 0 && act2.index == act.index) {
 									callback(act.index, UIInteraction.MOVE_OVER);
 								} else if ( (act2.mask & UIInteraction.HOVER) != 0 && act2.index != act.index) {
+									if ((act.mask & UIInteraction.ROLL_OUT) != 0) {
+										callback(act.index, UIInteraction.ROLL_OUT);
+									}
 									//activeTouches.set(id, act2);
 									callback(act2.index, UIInteraction.HOVER);
+								}
+							} else {
+								if ((act.mask & UIInteraction.ROLL_OUT) != 0) {
+									callback(act.index, UIInteraction.ROLL_OUT);
 								}
 							}
 						}
@@ -263,7 +293,7 @@ class HammerJSCombat
 					}
 					
 					activeTouches.set(id, null);
-					trace("Removed-l id:" + id);
+					//trace("Removed-l id:" + id);
 					
 				} else {
 					throw "Could not resolve event type:" + e.eventType;

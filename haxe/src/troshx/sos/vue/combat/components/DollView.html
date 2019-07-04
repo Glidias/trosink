@@ -1,7 +1,7 @@
 <div class="dollview" style="position:absolute;top:0;left:0;width:100%;height:100%"  ref="container">
+	<div class="mouse-cursor" ref="cursor" :class="{observe:viewModel.observeOpponent}" />
 	<div v-if="mapData.renderCount!=0" style="width:100%;height:100%;top:0;left;0;position:absolute;">
 		<div class="bg" v-show="gotOpponents" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain"></div>
-		
 		<zone v-bind="layoutViewPropsOf('vitals')" style="padding:5px" class="textarea-region" :class="{'enableinput':!player}">
 			<div v-if="player">
 				<div>F: <span>{{fatique}}</span></div>
@@ -14,8 +14,9 @@
 		</zone>
 		
 		<zone v-bind="layoutViewPropsOf('incomingManuevers')" style="padding:5px" class="textarea-region">
-			<div class="observe-indicator" v-show="viewModel.observeOpponent">observing..</div>
-			<div class="hover-tag" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
+			<div v-show="isDraggingCP">todo: Drag CP tray</div>
+			<div class="observe-indicator" v-show="viewModel.incomingHeldDown" v-html="observePrompt"></div>
+			<div class="hover-tag" v-if="gotOpponents && currentOpponent" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
 		</zone>
 			
 		<div v-if="player">
@@ -30,14 +31,14 @@
 			</zone>
 				
 			<zone v-bind="layoutViewPropsOf('handLeftAlt')"  class="textarea-region" v-if="leftItem">
-				<div class="lbl">{{leftTypeTag}}</div>
+				<div class="lbl" v-html="leftTypeTag"></div>
 			</zone>
 			<zone v-bind="layoutViewPropsOf('handLeftText')" v-if="leftItem">
 				<div class="lbl">{{leftItem.name}}</div>
 			</zone>
 				
 			<zone v-bind="layoutViewPropsOf('handRightAlt')"  class="textarea-region" v-if="rightItem">
-				<div class="lbl">{{rightTypeTag}}</div>
+				<div class="lbl" v-html="rightTypeTag"></div>
 			</zone>
 			<zone v-bind="layoutViewPropsOf('handRightText')" v-if="rightItem">
 				<div class="lbl">{{rightItem.name}}</div>
@@ -65,11 +66,11 @@
 			<zone v-bind="getObservePartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li"></zone>
 			
 					
-			<zone v-bind="layoutViewPropsOf('enemyHandLeft')" class="enemy-handbox" v-if="enemyLeftItem">
-				<div class="lbl">{{enemyLeftTypeTag}}</div>
+			<zone v-bind="getPartPropsOf('enemyHandLeft')" class="enemy-handbox" v-if="enemyLeftItem">
+				<div class="lbl" v-html="enemyLeftTypeTag"></div>
 			</zone>
-			<zone v-bind="layoutViewPropsOf('enemyHandRight')" class="enemy-handbox" v-if="enemyRightItem">
-				<div class="lbl">{{enemyRightTypeTag}}</div>
+			<zone v-bind="getPartPropsOf('enemyHandRight')" class="enemy-handbox" v-if="enemyRightItem">
+				<div class="lbl" v-html="enemyRightTypeTag"></div>
 			</zone>
 			
 		</div>	
@@ -90,6 +91,8 @@
 	<div class="image-map-holder" style="position:relative; display:none">
 		<img src="images/dollscreen.png" style="transform-origin:0 0; pointer-events:none; opacity:0.12" usemap="#map" ref="image" />
 		<map name="map" ref="map">
+			<area shape="rect" coords="401, 334, 435, 391" title="enemyHandLeft" />
+			<area shape="rect" coords="59, 336, 92, 393" title="enemyHandRight" />
 			<area shape="poly" coords="316, 519, 314, 580, 305, 622, 317, 659, 374, 585" alt="swing" title="SWING_LOWER_LEG-l" />
 			<area shape="poly" coords="124, 567, 170, 525, 172, 576, 179, 619, 160, 663" alt="swing" title="SWING_LOWER_LEG-r" />
 			<area shape="rect" coords="224, 478, 261, 585" title="enemyStatus" />
@@ -142,8 +145,6 @@
 			<area shape="rect" coords="71, 3, 320, 34" title="opponentSwiper" />
 			<area shape="rect" coords="8, 3, 65, 31" title="roundCount" />
 			<area shape="rect" coords="7, 37, 74, 163" title="vitals" />
-			<area shape="rect" coords="401, 334, 435, 391" title="enemyHandLeft" />
-			<area shape="rect" coords="59, 336, 92, 393" title="enemyHandRight" />
 			<area shape="rect" coords="21, 175, 72, 229" title="cpText" />
 			<area shape="rect" coords="421, 143, 487, 203" title="advManuever1" />
 			<area shape="rect" coords="423, 239, 486, 298" title="advManuever2" />

@@ -5,6 +5,8 @@ import troshx.components.Bout.FightNode;
 import troshx.sos.combat.BoutModel;
 import troshx.sos.core.BodyChar;
 import troshx.sos.core.HitLocation;
+import troshx.sos.core.Inventory;
+import troshx.sos.core.Item;
 import troshx.sos.core.TargetZone;
 import troshx.sos.core.Wound;
 import troshx.sos.sheets.CharSheet;
@@ -12,13 +14,20 @@ import troshx.sos.vue.combat.UIInteraction.UInteract;
 import troshx.util.LibUtil;
 
 /**
- * Client-side Combat view model 
+ * Client-side Combat view model that works alongside other views
  * 
  * @author Glidias
  */
 class CombatViewModel 
 {
-	// initialize view flags
+	//public var focusInvalidateCount(default, null):Int = 0;
+	
+	public var incomingHeldDown(default, null):Bool = false;
+	public function setIncomingHeldDown(val:Bool):Void
+	{
+		incomingHeldDown = val;
+	}
+	
 	public var observeOpponent(default, null):Bool = false;
 	public function setObserveOpponent(val:Bool):Bool {
 		var gotChange:Bool = observeOpponent != val;
@@ -29,15 +38,16 @@ class CombatViewModel
 	public var observeIndex(default, null):Int = -1;
 	public var focusedIndex(default, null):Int = -1;
 	public inline function setFocusedIndex(val:Int):Void { // layout index
+		//focusInvalidateCount++;
 		focusedIndex = val;
 		showFocusedTag = val >=0;
 	}
 	
 	public inline function setObserveIndex(val:Int):Void { // layout index
 		observeIndex = val;
-
 	}
-	public function getFocusedLabel():String {
+	
+	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item):String {
 		var i = focusedIndex;
 		if (i < 0) return "";
 		
@@ -45,10 +55,22 @@ class CombatViewModel
 			return getDollSwingDescAt(_swingMap.get(i));
 		} else if (_partMap.exists(i)) {
 			return getDollPartThrustDescAt(_partMap.get(i));
+		} else if (i == _enemyHandLeftIdx || i == _enemyHandRightIdx) {
+			if (i != _enemyHandRightIdx) {
+				return enemyLeftItem != null ? enemyLeftItem.name : "enemy's left-hand item";
+			} else {
+				return enemyRightItem != null ? enemyRightItem.name : "enemy's right-hand item"; 
+			}
 		} else {
 			return "todo/missing";
 		}
 	}
+	
+	public inline function focusIndexEnemyHandSide(i:Int):Int {
+		return (i == _enemyHandLeftIdx ? Inventory.WEAR_LEFT : i == _enemyHandRightIdx ? Inventory.WEAR_RIGHT : 0);
+	}
+	
+	
 
 	public function getHitLocationAtFocusIndex(i:Int):HitLocation {
 		return getDollPartHitLocationAt(_partMap.get(i));
@@ -67,7 +89,6 @@ class CombatViewModel
 		} else {
 			return null;
 		}
-		
 	}
 	
 	public var draggedCP(default, null):Int = 0;
@@ -213,6 +234,8 @@ class CombatViewModel
 	var _body:BodyChar;
 	var _swingMap:IntMap<Int>;
 	var _partMap:IntMap<Int>;
+	var _enemyHandLeftIdx:Int;
+	var _enemyHandRightIdx:Int;
 	
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
 		_interactionMaps = [];
@@ -233,7 +256,7 @@ class CombatViewModel
 	
 		for (i in 0...imageMapData.layoutItemList.length) {
 			var tag = imageMapData.classList[i];
-
+			var name = imageMapData.titleList[i];
 			if (tag == "part") {
 				_partMap.set(i, DOLL_PART_Slugs.length);
 				DOLL_PART_Slugs.push(imageMapData.titleList[i]);
@@ -242,6 +265,10 @@ class CombatViewModel
 				_swingMap.set(i, DOLL_SWING_Slugs.length);
 				DOLL_SWING_Slugs.push(imageMapData.titleList[i]);
 				
+			} else if (name == "enemyHandLeft") {
+				_enemyHandLeftIdx = i;
+			} else if (name == "enemyHandRight") {
+				_enemyHandRightIdx = i;
 			}
 
 		}
@@ -346,6 +373,8 @@ class CombatViewModel
 	{
 		this.boutModel = boutModel!=null ? boutModel : new BoutModel();
 	}
+	
+	
 	
 	
 	

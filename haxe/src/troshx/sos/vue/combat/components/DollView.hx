@@ -84,7 +84,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 		if (node != null) {
 			node.charSheet.inventory.refreshHalfArmorLabels();
+			node.charSheet.inventory.cleanupShieldLabels();
 			node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+			
 		}
 		
 		this.showPregens = 0;
@@ -153,7 +155,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	function getTypeTagForItem(item:Item):String {
 		var weapon:Weapon = LibUtil.as(item, Weapon);
 		var shield:Shield = LibUtil.as(item, Shield);
-		return shield != null ? "S" : weapon != null ? weapon.profLabelStdFirst().split(" ").join("").substr(0,3) : "";
+		return shield != null ? '<span class="fa">${ICON_SHIELD}</span>' : weapon != null ? weapon.profLabelStdFirst().split(" ").join("").substr(0,3) : "";
 	}
 	
 	@:computed function get_leftTypeTag():String {
@@ -201,8 +203,8 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
-		p.fillColor = "rgba(245,245,220,0.7)";
-		p.strokeColor = "rgba(225,225,200,0.1)";
+		p.fillColor = "transparent";// "rgba(245,245,220,0)";
+		p.strokeColor = "rgba(0,0,0,1)";
 		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
 		p.showShape = i == viewModel.observeIndex;
 		return p;
@@ -213,7 +215,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var d = mapData;
 		var i:Int = d.idIndices.get(name);
 		p.fillColor = "rgba(0,200,255,0.3)";
-		p.strokeColor = "rgba(0,200,255,0.3)";
+		p.strokeColor = "rgba(0,200,255,0.3)"; // "transparent";//
 		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
 		p.showShape = i == viewModel.focusedIndex;
 		return p;
@@ -260,10 +262,21 @@ class DollView extends VComponent<DollViewData, NoneT>
 	@:computed function get_focusedTextLbl():String 
 	{
 		var viewModel = this.viewModel;
-		var lbl = !viewModel.observeOpponent ? viewModel.getFocusedLabel() : this.partObserveLbl;
+		//var d1 = this.viewModel.focusInvalidateCount; // this.cachedEnemyLeft
+		var lbl = !viewModel.observeOpponent ? viewModel.getFocusedLabel(this.enemyLeftItem, this.enemyRightItem) : this.partObserveLbl;
 		//if (lbl == null) lbl = viewModel.getBodyPartLabel(viewModel.focusedIndex);
 		return lbl;
 	}
+	
+	@:computed function get_observePrompt():String {
+		return !this.viewModel.observeOpponent ? '<span class="fa">${ICON_ARROW_LEFT}${ICON_FINGER_UP}</span> to observe <span class="fa">${ICON_EYE}</span>' : "observing...";
+	}
+	
+	static inline var ICON_EYE:String = "&#xf06e;";
+	static inline var ICON_CHEV_LEFT:String = "&#xf053;";
+	static inline var ICON_ARROW_LEFT:String = "&#xf060;";
+	static inline var ICON_FINGER_UP:String = "&#xf0a6;";
+	static inline var ICON_SHIELD:String = "&#xf132;";
 	
 	@:computed function get_partObserveLbl():String 
 	{
@@ -271,7 +284,19 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var di = viewModel.getDollIndexAtFocusIndex(oi);
 		if (di >= 0) {
 			var armor:Armor = getVisibleArmorAtDollPartIndex(di);
-			return viewModel.getBodyPartLabel(oi) + (armor!=null ? ": <b>"+armor.name+"</b>" : "");	
+			var shield:Shield = this.carriedDollShield;
+			if (shield != null && !shieldCoveredAtDollHitLocation(di) ) {
+				shield = null;
+			}
+			return viewModel.getBodyPartLabel(oi) + (shield!= null || armor!=null ? ": "+(shield!=null? '<span class="fa">${ICON_SHIELD}</span> ' : "")+(armor != null ? "<b>"+armor.name+"</b>" : "") : "");	
+		} else  {
+			var hi = viewModel.focusIndexEnemyHandSide(oi);
+			if (hi != 0) {
+				var item:Item = hi != Inventory.WEAR_LEFT ? this.enemyRightItem : this.enemyLeftItem;
+				if (item != null) {
+					return item.name;
+				}
+			}
 		}
 		return "";
 	}
@@ -512,7 +537,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	// -- the setup
 	function setupUIInteraction():Void {
-		hammerUI = new HammerJSCombat(cast _vRefs.container, this.mapData);
+		hammerUI = new HammerJSCombat(cast _vRefs.container, this.mapData, null, _vRefs.cursor);
 		hammerUI.viewModel = this.viewModel;
 		
 		this.viewModel.setupDollInteraction(hammerUI.interactionList, this.mapData);
@@ -525,6 +550,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.viewModel.actingState;
 	}
 
+	@:computed function get_isDraggingCP():Bool {
+		return this.viewModel.actingState == CombatViewModel.ACTING_DOLL_DRAG_CP;
+	}
+	
 	@:watch("actingState") function onActingStateChanged(newValue:Int, oldValue:Int):Void {
 		var arr = this.viewModel.getInteractionListByState(newValue);
 		this.hammerUI.setNewInteractionList(arr!=null ? arr : this.viewModel.getInteractionListByState(CombatViewModel.ACTING_NONE));
