@@ -125,7 +125,7 @@ class HammerJSCombat
 		var tag = imageMapData.classList[index];
 		var name = imageMapData.titleList[index];
 		if (tag == "swing" || tag == "part" || name == "enemyHandLeft" || name == "enemyHandRight") {
-			if (event == UIInteraction.HOVER || index != viewModel.focusedIndex) {
+			if ( (event & UIInteraction.MASK_HOVER)!=0 || index != viewModel.focusedIndex) {
 				if (!viewModel.observeOpponent) viewModel.setFocusedIndex(index);
 				else viewModel.setObserveIndex(index);
 			} else {
@@ -264,19 +264,23 @@ class HammerJSCombat
 			if (e.type == "hammer.input") { // Respond to further raw hammer input
 				// check for Hammer.INPUT..  move, end or cancel
 				if (e.eventType == Hammer.INPUT_MOVE) {
-					if ( (e.deltaX != 0 || e.deltaY != 0) && (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.HOVER) ) != 0 ) {
+					if ( (e.deltaX != 0 || e.deltaY != 0) && (act.mask & (UIInteraction.MOVE | UIInteraction.MOVE_OVER | UIInteraction.MASK_HOVER) ) != 0 ) {
 						if ((mask & UIInteraction.MOVE) != 0) callback(act.index, UIInteraction.MOVE);
-						if ((act.mask & (UIInteraction.ROLL_OUT | UIInteraction.MOVE_OVER | UIInteraction.HOVER) != 0)) {
+						if ((act.mask & (UIInteraction.ROLL_OUT | UIInteraction.MOVE_OVER | UIInteraction.MASK_HOVER) != 0)) {
 							var act2 = UIInteraction.findHit(u, v, imageMapData, interactionList);
 							if (act2 != null) {
 								if ( (act2.mask & UIInteraction.MOVE_OVER) != 0 && act2.index == act.index) {
 									callback(act.index, UIInteraction.MOVE_OVER);
-								} else if ( (act2.mask & UIInteraction.HOVER) != 0 && act2.index != act.index) {
+								} else if ( (act2.mask & UIInteraction.MASK_HOVER) != 0 && act2.index != act.index) {
 									if ((act.mask & UIInteraction.ROLL_OUT) != 0) {
 										callback(act.index, UIInteraction.ROLL_OUT);
 									}
-									//activeTouches.set(id, act2);
-									callback(act2.index, UIInteraction.HOVER);
+									
+									if ((act.mask & UIInteraction.HOVER)!=0) callback(act2.index, UIInteraction.HOVER);
+									if ((act.mask & UIInteraction.HOVER_SWITCH) != 0) {
+										activeTouches.set(id, act2);
+										callback(act2.index, UIInteraction.HOVER_SWITCH);
+									}
 								}
 							} else {
 								if ((act.mask & UIInteraction.ROLL_OUT) != 0) {

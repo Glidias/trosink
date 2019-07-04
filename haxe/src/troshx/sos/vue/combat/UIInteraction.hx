@@ -38,6 +38,10 @@ class UIInteraction
 	
 	@:act public static inline var ROLL_OUT:Int = (1 << 17);
 	
+	@:act public static inline var HOVER_SWITCH:Int = (1 << 18);
+	
+	
+	public static inline var MASK_HOVER:Int = HOVER_SWITCH | HOVER;
 	public static inline var MASK_CANCELED_OR_RELEASE:Int = CANCELED | RELEASE;
 	
 	public static inline function requiresConfirmHit(mask:Int):Bool {
@@ -105,7 +109,7 @@ class UIInteraction
 			}
 			
 			if (tag == "part" || tag == "swing" || name == "enemyHandLeft" || name == "enemyHandRight") {
-				arr.push(new UInteract(i, DOWN | HOVER | RELEASE | CANCELED) );
+				arr.push(new UInteract(i, DOWN | HOVER_SWITCH | RELEASE | CANCELED) );
 				continue;
 			}
 			
