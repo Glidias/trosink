@@ -14,6 +14,28 @@
 
 .dollview {
 	
+	.observe-indicator {
+		position:absolute;
+		top:4px;
+		left:0;
+		transform:translateZ(0);
+		&:before {
+			content:'\f06e';
+			font-family:'FontAwesome';
+			position:relative;
+			width:auto;
+			display:inline-block;
+			transform:translateX(-100%);
+		}
+	}
+	
+	.incomingManuevers {
+		overflow:visible !important;
+		.scroll-container {
+			overflow:hidden;
+		}
+	}
+	
 	.enemy-handbox {
 
 		background-color:rgb(228, 229, 231);

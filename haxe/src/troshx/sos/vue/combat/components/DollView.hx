@@ -197,6 +197,17 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
+	function getObservePartPropsOf(name:String):LayoutItemViewProps {
+		var p = layoutViewPropsOf(name);
+		var d = mapData;
+		var i:Int = d.idIndices.get(name);
+		p.fillColor = "rgba(245,245,220,0.7)";
+		p.strokeColor = "rgba(225,225,200,0.1)";
+		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
+		p.showShape = i == viewModel.observeIndex;
+		return p;
+	}
+	
 	function getPartPropsOf(name:String):LayoutItemViewProps {
 		var p = layoutViewPropsOf(name);
 		var d = mapData;
@@ -246,11 +257,23 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
-	@:computed inline function get_focusedTextLbl():String 
+	@:computed function get_focusedTextLbl():String 
 	{
-		var lbl = viewModel.getFocusedLabel();
-		if (lbl == null) lbl = viewModel.getBodyPartLabel(viewModel.focusedIndex);
+		var viewModel = this.viewModel;
+		var lbl = !viewModel.observeOpponent ? viewModel.getFocusedLabel() : this.partObserveLbl;
+		//if (lbl == null) lbl = viewModel.getBodyPartLabel(viewModel.focusedIndex);
 		return lbl;
+	}
+	
+	@:computed function get_partObserveLbl():String 
+	{
+		var oi = viewModel.observeIndex;
+		var di = viewModel.getDollIndexAtFocusIndex(oi);
+		if (di >= 0) {
+			var armor:Armor = getVisibleArmorAtDollPartIndex(di);
+			return viewModel.getBodyPartLabel(oi) + (armor!=null ? ": <b>"+armor.name+"</b>" : "");	
+		}
+		return "";
 	}
 	
 	@:computed inline function get_player():FightNode<CharSheet>
@@ -393,12 +416,12 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	// for standard dominant (enemy's right) side (ie. left side of doll)
 	@:computed function get_hitLocationZeroAVValues():Dynamic<AV3> {
-		return this.currentDollSheet.body.getNewEmptyAvs();
+		return this.currentDollSheet.body.getNewEmptyAvsWithVis();
 	}
 	
 	// for standard non-dominant (enemy's left) side  (ie. right side of doll)
 	@:computed function get_hitLocationZeroAVValues2():Dynamic<AV3> {
-		return this.currentDollSheet.body.getNewEmptyAvs();
+		return this.currentDollSheet.body.getNewEmptyAvsWithVis();
 	}
 	
 	/*
@@ -421,7 +444,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 			var chosenAVs = hitLoc.twoSided && (isLefts & (1 << i)) != 0 ? avsLeft : avs;
 			//trace( (hitLoc.twoSided && (isLefts & (1 << i)) != 0) + " : " + this.viewModel.DOLL_PART_Slugs[i]);
 			var av:AV3 = LibUtil.field(chosenAVs, hitLoc.id);
-			var aggre:Float = av.avc + av.avp + av.avb;
+			var aggre:Float = av.avc*Armor.VISIBLE_WEIGHT_AVC + av.avp*Armor.VISIBLE_WEIGHT_AVP + av.avb*Armor.VISIBLE_WEIGHT_AVB;
 			var gotAV:Bool = aggre > 0;
 			aggre /= 3;
 			
@@ -429,10 +452,19 @@ class DollView extends VComponent<DollViewData, NoneT>
 			var colors = this.armorColorScale;
 			if (aggI >= colors.length) {
 				aggI = colors.length - 1;
+				if (aggI < 0) aggI = 0;
 			}
-			arr[i] = gotAV && aggI>0 ? colors[aggI] : null;
+			arr[i] = gotAV ? colors[aggI] : null;
 		}
 		return arr;
+	}
+	
+	function getVisibleArmorAtDollPartIndex(i:Int):Armor {
+		var avs:Dynamic<AV3> = this.viewModel.isLeftPartAtDollIndex(i) ? this.hitLocationArmorValues2 : this.hitLocationArmorValues;
+		var hitLocIndex:Int = this.viewModel.DOLL_PART_HitIndices[i];
+		var hitLoc = this.coverageHitLocations[hitLocIndex];
+		var av:AV3 = LibUtil.field(avs, hitLoc.id);
+		return av.visArmor;
 	}
 	
 	function getHitLocationArmorValues(values:Dynamic<AV3>, sideMask:Int = 7):Dynamic<AV3> {

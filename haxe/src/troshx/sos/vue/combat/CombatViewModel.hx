@@ -19,12 +19,23 @@ import troshx.util.LibUtil;
 class CombatViewModel 
 {
 	// initialize view flags
-	public var observeOpponent:Bool = false;
+	public var observeOpponent(default, null):Bool = false;
+	public function setObserveOpponent(val:Bool):Bool {
+		var gotChange:Bool = observeOpponent != val;
+		observeOpponent = val;
+		return gotChange;
+	}
 	public var showFocusedTag:Bool = false;
+	public var observeIndex(default, null):Int = -1;
 	public var focusedIndex(default, null):Int = -1;
-	public function setFocusedIndex(val:Int):Void { // layout index
+	public inline function setFocusedIndex(val:Int):Void { // layout index
 		focusedIndex = val;
 		showFocusedTag = val >=0;
+	}
+	
+	public inline function setObserveIndex(val:Int):Void { // layout index
+		observeIndex = val;
+
 	}
 	public function getFocusedLabel():String {
 		var i = focusedIndex;
@@ -39,6 +50,12 @@ class CombatViewModel
 		}
 	}
 
+	public function getHitLocationAtFocusIndex(i:Int):HitLocation {
+		return getDollPartHitLocationAt(_partMap.get(i));
+	}
+	public function getDollIndexAtFocusIndex(i:Int):Int {
+		return _partMap.get(i);
+	}
 	
 	public function getBodyPartLabel(i:Int=-1):String {
 		if (i < 0) i = focusedIndex;
@@ -125,6 +142,7 @@ class CombatViewModel
 	public static inline var ACTING_DOLL_DECLARE:Int = 0;
 	public static inline var ACTING_DOLL_DRAG_CP:Int = 1;
 	public static inline var ACTING_NONE:Int = 2;
+	
 	public var actingState(default, null):Int = -1;
 	public function setActingState(val:Int):Void {
 		actingState = val;
@@ -156,23 +174,23 @@ class CombatViewModel
 	var defaultThrustAvailMask(default, null):Int = 0;
 	public var swingAvailabilityMask(default, null):Int = 0;
 	public var thrustAvailabilityMask(default, null):Int = 0;
-	function handleDisabledMask(val:Int, slugs:Array<String>):Void {
+	public function handleDisabledMask(val:Int, slugs:Array<String>):Void {
 		var map = _interactionMaps[ACTING_DOLL_DECLARE];
 		for (i in 0...slugs.length) {
 			//trace(val + " : "+_dollImageMapData.titleList[map.get(_dollImageMapData.idIndices.get(slugs[i])).index] + " : "+((val & (1<<i)) == 0));
 			map.get(_dollImageMapData.idIndices.get(slugs[i])).disabled = ((val & (1<<i)) == 0);
 		}
 	}
-	function setDisabledAll(slugs:Array<String>, disabled:Bool=true):Void {
+	public function setDisabledAll(slugs:Array<String>, disabled:Bool=true):Void {
 		var map = _interactionMaps[ACTING_DOLL_DECLARE];
 		for (i in 0...slugs.length) {
 			map.get(_dollImageMapData.idIndices.get(slugs[i])).disabled = disabled;
 		}
 	}
-	function onThrustAvailabilityChange():Void {
+	public function onThrustAvailabilityChange():Void {
 		handleDisabledMask(thrustAvailabilityMask, DOLL_PART_Slugs);
 	}
-	function onSwingAvailabilityChange():Void {
+	public function onSwingAvailabilityChange():Void {
 		handleDisabledMask(swingAvailabilityMask, DOLL_SWING_Slugs);
 	}
 	
@@ -204,7 +222,6 @@ class CombatViewModel
 		_interactionStates[ACTING_DOLL_DRAG_CP] = [];
 		_dollImageMapData = imageMapData;
 		_interactionStates[ACTING_NONE] = [];
-		
 		
 		var body = BodyChar.getInstance();
 		_body = body;

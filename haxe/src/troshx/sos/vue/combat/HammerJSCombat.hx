@@ -82,7 +82,7 @@ class HammerJSCombat
 		
 		if (viewModel.actingState == CombatViewModel.ACTING_DOLL_DRAG_CP) {
 			if (event == UIInteraction.MOVE) {
-				trace("Drag move detect");
+				//trace("Drag move detect");
 			}
 			else if (event == UIInteraction.RELEASE) {
 				// check if outside screen, ignore?
@@ -109,7 +109,8 @@ class HammerJSCombat
 		var tag = imageMapData.classList[index];
 		if (tag == "swing" || tag == "part") {
 			if (event == UIInteraction.HOVER || index != viewModel.focusedIndex) {
-				viewModel.setFocusedIndex(index);
+				if (!viewModel.observeOpponent) viewModel.setFocusedIndex(index);
+				else viewModel.setObserveIndex(index);
 			} else {
 				if (event == UIInteraction.DOWN && index == viewModel.focusedIndex) {
 					viewModel.setDraggedCP(0);
@@ -126,15 +127,36 @@ class HammerJSCombat
 		if (name == "incomingManuevers") {
 			if ( (event & UIInteraction.PAN) != 0) viewModel.showFocusedTag = false;
 			else if ( (event & UIInteraction.MASK_CANCELED_OR_RELEASE) != 0 ) {
-				viewModel.observeOpponent = false;
+				if (viewModel.setObserveOpponent(false)) {
+					onViewModelObservationChange();
+				}
 			} else if ( event & (UIInteraction.HOLD | UIInteraction.DOWN) != 0 ) {
-				viewModel.observeOpponent = true;
+				if (viewModel.setObserveOpponent(true)) {
+					onViewModelObservationChange();
+				}
 			}
 		} else if (name == "vitals") {
 			
 		} else {
 			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}
+	}
+	
+	public function onViewModelObservationChange():Void {
+		var viewModel = this.viewModel;
+		var val = viewModel.observeOpponent;
+		if (val) {
+			viewModel.setDisabledAll(viewModel.DOLL_PART_Slugs, false);
+			viewModel.setDisabledAll(viewModel.DOLL_SWING_Slugs, true);
+			viewModel.showFocusedTag = true;
+		} else {
+			viewModel.handleDisabledMask(viewModel.thrustAvailabilityMask, viewModel.DOLL_PART_Slugs);
+			viewModel.handleDisabledMask(viewModel.swingAvailabilityMask, viewModel.DOLL_SWING_Slugs);
+			viewModel.setObserveIndex( -1);
+			viewModel.showFocusedTag = true;
+		}
+		
+		
 	}
 	
 	
@@ -219,7 +241,7 @@ class HammerJSCombat
 								if ( (act2.mask & UIInteraction.MOVE_OVER) != 0 && act2.index == act.index) {
 									callback(act.index, UIInteraction.MOVE_OVER);
 								} else if ( (act2.mask & UIInteraction.HOVER) != 0 && act2.index != act.index) {
-									activeTouches.set(id, act2);
+									//activeTouches.set(id, act2);
 									callback(act2.index, UIInteraction.HOVER);
 								}
 							}

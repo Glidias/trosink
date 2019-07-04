@@ -116,7 +116,7 @@ class UIInteraction
 					item.hitPadding = 5;
 					arr.push(new UInteract(i, DOWN | RELEASE | CANCELED) );
 				case "incomingManuevers":
-					arr.push(new UInteract(i, MASK_CANCELED_OR_RELEASE|DOWN| PAN_UP|PAN_DOWN));	
+					arr.push(new UInteract(i, HOVER|MASK_CANCELED_OR_RELEASE|DOWN)); //| PAN_UP|PAN_DOWN
 				case "opponentSwiper":
 					arr.push(new UInteract(i, SWIPE_LEFT|SWIPE_RIGHT));	
 				case "roundCount":

@@ -16,6 +16,11 @@ class Armor extends Item
 	public var AVP:Int = 0;
 	public var AVB:Int = 0;
 	
+	// default heuristic rough weight distribution of AVs that predicts prominent visiblity of armour
+	public static inline var VISIBLE_WEIGHT_AVC:Float = 1.0;
+	public static inline var VISIBLE_WEIGHT_AVP:Float = 1.4;
+	public static inline var VISIBLE_WEIGHT_AVB:Float = 0.6;
+	
 	// generic armor coverage hash by string id.
 	public var coverage:Dynamic<Int>;	// Using plain dynamic object to favor javascript object
 	var _coverageValues:Array<Int>;
@@ -117,6 +122,14 @@ class Armor extends Item
 			}
 			if (tempAvs.avb > cur.avb) {
 				cur.avb = tempAvs.avb;
+			}
+			
+			if (cur.vis != null ) {
+				var visResult:Float = tempAvs.avc * VISIBLE_WEIGHT_AVC + tempAvs.avp * VISIBLE_WEIGHT_AVP * tempAvs.avb * VISIBLE_WEIGHT_AVB;
+				if (visResult > cur.vis) {
+					cur.visArmor = this;
+					cur.vis = visResult;
+				}
 			}
 		}
 	}
@@ -307,6 +320,8 @@ typedef AV3 = {
 	var avc:Int;
 	var avp:Int;
 	var avb:Int;
+	@:optional var visArmor:Armor;
+	@:optional var vis:Float;
 }
 
 

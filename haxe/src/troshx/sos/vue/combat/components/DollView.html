@@ -14,8 +14,8 @@
 		</zone>
 		
 		<zone v-bind="layoutViewPropsOf('incomingManuevers')" style="padding:5px" class="textarea-region">
-			<div v-show="viewModel.observeOpponent">observing..</div>
-			<div class="hover-tag" v-show="viewModel.showFocusedTag">{{focusedTextLbl}}</div>
+			<div class="observe-indicator" v-show="viewModel.observeOpponent">observing..</div>
+			<div class="hover-tag" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
 		</zone>
 			
 		<div v-if="player">
@@ -45,27 +45,25 @@
 		</div>
 				
 		<div v-if="gotOpponents">
-			<div class="parts">	
-				<zone v-bind="getPartPropsOf(li)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
-					<div class="thrust-point" v-if="viewModel.isDollPartThrustable(i)" :style="thrustPointStyle"></div>
-				</zone>
-			</div>
 			
-			<div class="swings">
-				<zone v-bind="getSwingPropsOf(li)" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li"></zone>
-			</div>
-			
+			<zone v-bind="getPartPropsOf(li)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
+				<div class="thrust-point" v-if="viewModel.isDollPartThrustable(i)" :style="thrustPointStyle"></div>
+			</zone>
+			<zone v-bind="getSwingPropsOf(li)" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li"></zone>
+		
+	
 			<zone v-bind="layoutViewPropsOf('opponentSwiper')" class="textarea-region">
 				<ul>
 					<li v-for="(li, i) in opponents" :key="i">{{li.label}}</li>
 				</ul>
 			</zone>
 					
-			<div class="parts-armor">	
-				<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
-					<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)" :style="shieldIconStyle"></div>
-				</zone>
-			</div>
+			<zone v-bind="getArmorPartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
+				<div class="shieldmark" v-show="shieldCoveredAtDollHitLocation(i)" :style="shieldIconStyle"></div>
+			</zone>
+					
+			<zone v-bind="getObservePartPropsOf(li, i)" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li"></zone>
+			
 					
 			<zone v-bind="layoutViewPropsOf('enemyHandLeft')" class="enemy-handbox" v-if="enemyLeftItem">
 				<div class="lbl">{{enemyLeftTypeTag}}</div>

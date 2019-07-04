@@ -69,6 +69,16 @@ class BodyChar
 		}
 		return dyn;
 	}
+	public function getNewEmptyAvsWithVis():Dynamic<AV3> {
+		var ch = hitLocations;
+		var dyn:Dynamic<AV3> = {};
+		//trace("Hit dummy set up...");
+		for (i in 0...ch.length) {
+			var h = ch[i];
+			LibUtil.setField(dyn, h.id, { avp:0, avc:0, avb:0, vis:0, visArmor:null }); 
+		}
+		return dyn;
+	}
 	
 	public inline function isThrusting(targetZone:Int):Bool {
 		return targetZone >= thrustStartIndex;
