@@ -23,5 +23,5 @@ typedef ImageMapData = {
 	
 	@:optional var renderCount:Int;
 	
-	@:optional var idIndices:StringMap<Int>;
+	@:optional var idIndices:Dynamic<Int>;
 }

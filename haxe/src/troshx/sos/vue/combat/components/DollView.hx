@@ -16,6 +16,8 @@ import troshx.sos.core.Inventory;
 import troshx.sos.core.Item;
 import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
+import troshx.sos.vue.combat.components.ZoneItemView.ShapeStyleProps;
+import troshx.sos.vue.combat.components.ZoneItemView.ZoneItemViewProps;
 
 import troshx.sos.core.Armor;
 import troshx.sos.core.Armor.AV3;
@@ -29,7 +31,6 @@ import troshx.sos.combat.BoutModel;
 import troshx.sos.pregens.FightCharacters;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.CombatViewModel;
-import troshx.sos.vue.combat.components.LayoutItemView;
 import troshx.util.layout.LayoutItem;
 
 import troshx.sos.vue.pregen.PregenSelectView;
@@ -199,35 +200,35 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
-	function getObservePartPropsOf(name:String):LayoutItemViewProps {
-		var p = layoutViewPropsOf(name);
+	@:computed function get_styleObservePartProps():ShapeStyleProps {
 		var d = mapData;
-		var i:Int = d.idIndices.get(name);
-		p.fillColor = "transparent";// "rgba(245,245,220,0)";
-		p.strokeColor = "rgba(0,0,0,1)";
-		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
-		p.showShape = i == viewModel.observeIndex;
-		return p;
+		return {
+			fillColor: "transparent",
+			strokeColor: "rgba(0,0,0,1)",
+			strokeWidth: 4*(d.scaleX < d.scaleY ? d.scaleX : d.scaleY)
+		}
 	}
 	
-	function getPartPropsOf(name:String):LayoutItemViewProps {
-		var p = layoutViewPropsOf(name);
+	@:computed function get_stylePartProps():ShapeStyleProps {
 		var d = mapData;
-		var i:Int = d.idIndices.get(name);
-		p.fillColor = "rgba(0,200,255,0.3)";
-		p.strokeColor = "rgba(0,200,255,0.3)"; // "transparent";//
-		p.strokeWidth = 4*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
-		p.showShape = i == viewModel.focusedIndex;
-		return p;
+		return {
+			fillColor: "rgba(0,200,255,0.3)",
+			strokeColor: "rgba(0,200,255,0.3)",
+			strokeWidth: 4*(d.scaleX < d.scaleY ? d.scaleX : d.scaleY),
+		}
 	}
 	
-	function getArmorPartPropsOf(name:String, index:Int):LayoutItemViewProps {
+	function getArmorPartPropsOf(name:String, index:Int):ZoneItemViewProps {
 		var aColors = armorDollColors;
 		var defColors = armorColorScale;
 		var gotColor = aColors[index] != null;
 		
-		var p = layoutViewPropsOf(name);
 		var d = mapData;
+		var p:ZoneItemViewProps = {
+			index:LibUtil.field(d.idIndices, name),
+			mapData:d
+		}
+		
 		p.fillColor = "transparent";
 		p.strokeColor = gotColor ? aColors[index] : defColors[0];
 		p.strokeWidth = 3*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
@@ -235,27 +236,23 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return p;
 	}
 	
-	function getSwingPropsOf(name:String):LayoutItemViewProps {
-		var p = layoutViewPropsOf(name);
-		var d = mapData;
-		var i:Int = d.idIndices.get(name);
-		p.fillColor = "rgba(0,255,255,0.3)";
-		p.strokeColor = "rgba(0,255,255,0.3)";
-		p.strokeWidth = 8*(mapData.scaleX < mapData.scaleY ? mapData.scaleX : mapData.scaleY);
-		p.showShape = i == viewModel.focusedIndex;
-		return p;
+	@:computed function get_armorPartProps():Array<ZoneItemViewProps> {
+		var arr:Array<ZoneItemViewProps> = [];
+		var slugs = viewModel.DOLL_PART_Slugs;
+		for (i in 0...slugs.length) {
+			arr[i] = getArmorPartPropsOf(slugs[i], i);
+		}
+		return arr;
 	}
 	
-	function layoutViewPropsOf(name:String):LayoutItemViewProps {
+
+	
+	@:computed function get_styleSwingProps():ShapeStyleProps {
 		var d = mapData;
-		var i:Int = d.idIndices.get(name);
 		return {
-			title: d.titleList[i],
-			x: d.positionList[i].x*d.refWidth*d.scaleX,
-			y: d.positionList[i].y*d.refHeight*d.scaleY,
-			width: d.scaleList[i].x*d.refWidth*d.scaleX,
-			height: d.scaleList[i].y * d.refHeight * d.scaleY,
-			item: d.layoutItemList[i]
+			fillColor: "rgba(0,255,255,0.3)",
+			strokeColor: "rgba(0,255,255,0.3)",
+			strokeWidth: 8*(d.scaleX < d.scaleY ? d.scaleX : d.scaleY)
 		}
 	}
 	
@@ -355,7 +352,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
 		return {
-			zone: new LayoutItemView(),
+			zone: new ZoneItemView(),
 			pregens: new PregenSelectView()
 		}
 	}
@@ -425,6 +422,15 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var shield = this.carriedDollShield;
 		var index:Int = shield != null ? shield.size : 0; 
 		return this.currentDollSheet.inventory.shieldPosition == Shield.POSITION_HIGH ? this.shieldHighProfiles[index] : this.shieldLowProfiles[index];
+	}
+	
+	@:computed function get_dollShieldCoverageBools():Array<Bool> {
+		var slugs =  viewModel.DOLL_PART_Slugs;
+		var arr:Array<Bool> = [];
+		for (i in 0...slugs.length) {
+			arr[i] = shieldCoveredAtDollHitLocation(i);
+		}
+		return arr;
 	}
 	
 	function shieldCoveredAtDollHitLocation(i:Int):Bool {
@@ -608,7 +614,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		d.classList = [];
 		
 		
-		var idIndices = new StringMap<Int>();
+		var idIndices:Dynamic<Int> = {};
 		
 		var count:Int = 0;
 		var arr:Array<LayoutItem> = [];
@@ -622,7 +628,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 				d.classList.push(elem.getAttribute("alt"));
 				var title = elem.getAttribute("title");
 				d.titleList.push(title);
-				idIndices.set(title, count++);
+				LibUtil.setField(idIndices, title, count++);
 				
 				arr.push(LayoutItem.fromHTMLImageMapArea(img.width, img.height, elem.getAttribute("shape"), elem.getAttribute("coords")));
 			}
