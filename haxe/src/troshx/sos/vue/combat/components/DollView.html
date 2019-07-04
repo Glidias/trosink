@@ -62,6 +62,8 @@
 			<zone :index="mapData.idIndices[li]" :mapData="mapData" v-bind="styleObservePartProps" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li" :showShape="viewModel.observeIndex==mapData.idIndices[li]"></zone>
 					
 	
+		
+			
 			<zone :index="mapData.idIndices['enemyHandLeft']" :mapData="mapData" v-bind="stylePartProps" class="enemy-handbox" v-if="enemyLeftItem" :showShape="viewModel.focusedIndex==mapData.idIndices['enemyHandLeft']">
 				<div class="lbl" v-html="enemyLeftTypeTag"></div>
 			</zone>
@@ -69,8 +71,8 @@
 				<div class="lbl" v-html="enemyRightTypeTag"></div>
 			</zone>		
 					
-			<zone :index="mapData.idIndices['enemyHandLeft']" :mapData="mapData" v-bind="stylePartProps" class="enemy-handbox" v-if="enemyLeftItem" :showShape="viewModel.observeIndex==mapData.idIndices['enemyHandLeft']"></zone>		
-			<zone :index="mapData.idIndices['enemyHandRight']" :mapData="mapData" v-bind="stylePartProps" class="enemy-handbox" v-if="enemyRightItem" :showShape="viewModel.observeIndex==mapData.idIndices['enemyHandRight']"></zone>			
+			<zone :index="mapData.idIndices['enemyHandLeft']" :mapData="mapData" v-bind="stylePartProps" class="enemy-handbox dummy" v-if="enemyLeftItem" :showShape="viewModel.observeIndex==mapData.idIndices['enemyHandLeft']"></zone>		
+			<zone :index="mapData.idIndices['enemyHandRight']" :mapData="mapData" v-bind="stylePartProps" class="enemy-handbox dummy" v-if="enemyRightItem" :showShape="viewModel.observeIndex==mapData.idIndices['enemyHandRight']"></zone>	
 			
 	
 			<zone :index="mapData.idIndices['opponentSwiper']" :mapData="mapData" class="textarea-region">

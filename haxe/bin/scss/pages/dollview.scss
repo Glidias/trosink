@@ -79,6 +79,11 @@
 			top:50%;
 			transform:translateY(-50%);
 		}
+		
+		&.dummy {
+			border:0;
+			background-color:transparent;
+		}
 	}
 	
 	.enableinput {
