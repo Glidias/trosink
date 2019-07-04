@@ -180,8 +180,11 @@ class HammerJSCombat
 			viewModel.showFocusedTag = true;
 		}
 		if (gesture != null) {
-			pointerOffsetY = val && gesture.pointerType == "touch" ? HIT_OFFSET_OBSERVE_Y : 0;
+			var isTouchMode =  val && gesture.pointerType == "touch";
+			pointerOffsetY = isTouchMode ? HIT_OFFSET_OBSERVE_Y : 0;
 			setCursorPos(gesture.center.x, gesture.center.y);
+			this.viewModel.isTouchDragMode = isTouchMode;
+			
 		}
 		
 		

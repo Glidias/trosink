@@ -22,6 +22,7 @@ class CombatViewModel
 {
 	//public var focusInvalidateCount(default, null):Int = 0;
 	
+	public var isTouchDragMode:Bool = false;
 	public var incomingHeldDown(default, null):Bool = false;
 	public function setIncomingHeldDown(val:Bool):Void
 	{
