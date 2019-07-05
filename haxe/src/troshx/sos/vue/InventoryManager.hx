@@ -2,12 +2,9 @@ package troshx.sos.vue;
 import haxe.Unserializer;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
-import haxevx.vuex.native.Vue;
 import haxevx.vuex.util.VHTMacros;
 import js.Browser;
-import js.html.ButtonElement;
 import troshx.sos.core.Inventory;
-import troshx.sos.vue.treeview.TreeView;
 import troshx.sos.vue.widgets.GingkoTreeBrowser;
 import troshx.util.LibUtil;
 

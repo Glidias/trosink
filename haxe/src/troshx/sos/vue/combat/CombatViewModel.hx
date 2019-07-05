@@ -200,13 +200,13 @@ class CombatViewModel
 		var map = _interactionMaps[ACTING_DOLL_DECLARE];
 		for (i in 0...slugs.length) {
 			//trace(val + " : "+_dollImageMapData.titleList[map.get(_dollImageMapData.idIndices.get(slugs[i])).index] + " : "+((val & (1<<i)) == 0));
-			map.get(LibUtil.field(_dollImageMapData.idIndices, slugs[i])).disabled = ((val & (1<<i)) == 0);
+			map.get(_dollImageMapData.idIndices.get(slugs[i])).disabled = ((val & (1<<i)) == 0);
 		}
 	}
 	public function setDisabledAll(slugs:Array<String>, disabled:Bool=true):Void {
 		var map = _interactionMaps[ACTING_DOLL_DECLARE];
 		for (i in 0...slugs.length) {
-			map.get(LibUtil.field(_dollImageMapData.idIndices, slugs[i])).disabled = disabled;
+			map.get(_dollImageMapData.idIndices.get(slugs[i])).disabled = disabled;
 		}
 	}
 	public function onThrustAvailabilityChange():Void {
@@ -221,7 +221,7 @@ class CombatViewModel
 	}
 
 	public function swingArcAvailableBetween(slugs:Array<String>):Bool {
-		return swingAvailabilityMask & (LibUtil.field(_dollImageMapData.idIndices,slugs[0]) | LibUtil.field(_dollImageMapData.idIndices,slugs[1]) ) != 0;
+		return swingAvailabilityMask & (_dollImageMapData.idIndices.get(slugs[0]) | _dollImageMapData.idIndices.get(slugs[1]) ) != 0;
 	}
 	
 	// Post initialize

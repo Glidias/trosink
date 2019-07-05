@@ -1,7 +1,7 @@
 package troshx.sos.vue.combat;
 
-import haxe.ds.StringMap;
 import hxGeomAlgo.HxPoint;
+import troshx.util.AbsStringMap;
 import troshx.util.layout.LayoutItem;
 
 /**
@@ -23,5 +23,5 @@ typedef ImageMapData = {
 	
 	@:optional var renderCount:Int;
 	
-	@:optional var idIndices:Dynamic<Int>;
+	@:optional var idIndices:AbsStringMap<Int>;
 }

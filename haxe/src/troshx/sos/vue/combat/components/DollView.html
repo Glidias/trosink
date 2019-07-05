@@ -95,7 +95,7 @@
 		<!--<div v-for="(li, i) in armorColorScale" :key="i" :style="{color:li}">-</div>-->
 			
 	</div>
-	<div class="image-map-holder" style="position:relative; display:none">
+	<div class="image-map-holder" style="position:relative; display:none" v-if="mapData.renderCount==0">
 		<img src="images/dollscreen.png" style="transform-origin:0 0; pointer-events:none; opacity:0.12" usemap="#map" ref="image" />
 		<map name="map" ref="map">
 			<area shape="rect" coords="401, 334, 435, 391" title="enemyHandLeft" />

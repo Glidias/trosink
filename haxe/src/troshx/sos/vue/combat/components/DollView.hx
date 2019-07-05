@@ -18,12 +18,12 @@ import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.vue.combat.components.ZoneItemView.ShapeStyleProps;
 import troshx.sos.vue.combat.components.ZoneItemView.ZoneItemViewProps;
-
 import troshx.sos.core.Armor;
 import troshx.sos.core.Armor.AV3;
 import troshx.sos.core.BodyChar;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Inventory.ArmorAssign;
+import troshx.util.AbsStringMap;
 import troshx.util.LibUtil;
 
 import troshx.sos.combat.BoutController;
@@ -225,7 +225,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		
 		var d = mapData;
 		var p:ZoneItemViewProps = {
-			index:LibUtil.field(d.idIndices, name),
+			index:d.idIndices.get(name),
 			mapData:d
 		}
 		
@@ -614,7 +614,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		d.classList = [];
 		
 		
-		var idIndices:Dynamic<Int> = {};
+		var idIndices:AbsStringMap<Int> = new AbsStringMap<Int>();
 		
 		var count:Int = 0;
 		var arr:Array<LayoutItem> = [];
@@ -628,7 +628,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 				d.classList.push(elem.getAttribute("alt"));
 				var title = elem.getAttribute("title");
 				d.titleList.push(title);
-				LibUtil.setField(idIndices, title, count++);
+				idIndices.set(title, count++);
 				
 				arr.push(LayoutItem.fromHTMLImageMapArea(img.width, img.height, elem.getAttribute("shape"), elem.getAttribute("coords")));
 			}

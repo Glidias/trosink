@@ -6,6 +6,7 @@ import js.html.CanvasElement;
 import troshx.sos.vue.combat.components.DollView;
 import troshx.sos.vue.externs.VueScroll;
 import troshx.sos.vue.externs.WebGL2D;
+import troshx.util.AbsStringMap;
 //import troshx.sos.vue.combat.components.ImageMapTester;
 
 import troshx.util.layout.PointScaleConstraint;
@@ -34,6 +35,7 @@ class TestUI
 		Browser.document.body.style.backgroundColor = "#e4e5e7";
 		
 		Vue.use(VueScroll);
+		var abc = new AbsStringMap();
 		
 		var cvsGL:CanvasElement = cast Browser.document.getElementById("canvasGL");
 		if (cvsGL != null) {

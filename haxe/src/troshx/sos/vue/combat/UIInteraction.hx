@@ -3,7 +3,6 @@ import haxe.ds.IntMap;
 import hxGeomAlgo.Bayazit;
 import hxGeomAlgo.HxPoint;
 import hxGeomAlgo.PolyTools;
-import troshx.sos.vue.combat.UIInteraction.UInteract;
 import troshx.util.layout.LayoutItem;
 
 /**

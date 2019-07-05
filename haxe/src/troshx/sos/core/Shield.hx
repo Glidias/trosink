@@ -38,12 +38,16 @@ class Shield extends Item
 		damageType = DamageType.BLUDGEONING;
 		
 		if (specSpl.length > 1) {
+			specSpl[0] = StringTools.trim(specSpl[0]);
+			specSpl[1] = StringTools.trim(specSpl[1]);
 			var specs = specSpl.pop();
 			var duraSpl = specs.split(" ");
+			
 			if (duraSpl.length >= 2 ) {
 				durability = Std.parseInt(duraSpl[1]);
 			}
 			var mainStats:String = duraSpl[0];
+
 			var mainStatsSpl = mainStats.split("(");
 			bashTN = Std.parseInt(mainStatsSpl[0]);
 			if (mainStatsSpl.length >= 2 && mainStatsSpl[1].charAt(mainStatsSpl[1].length-1) == ")") {
