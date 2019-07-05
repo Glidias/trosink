@@ -15,8 +15,8 @@ class StealInitiative extends Manuever
 	{
 		super("stealInitiative", "Steal Initiative");
 		types = Manuever.TYPE_INITIATIVE;
-		instant = true;
-		
+		tags = Manuever.TAG_INSTANT;
+		costVaries = true;
 	}
 	
 	override public function resolve(sheet:CharSheet, state:FightState, declare:ManueverDeclare):Void {
@@ -25,7 +25,7 @@ class StealInitiative extends Manuever
 	
 	override public function getCost(sheet:CharSheet, fightState:FightState, inputs:Array<Int>):Int {
 		// return opponent perception
-		return cost;
+		return 0;
 	}
 	
 	

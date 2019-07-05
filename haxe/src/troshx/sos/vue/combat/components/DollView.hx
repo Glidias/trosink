@@ -13,6 +13,7 @@ import troshx.components.Bout.FightNode;
 import troshx.core.CharSave;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Item;
+import troshx.sos.core.Manuever;
 import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.vue.combat.components.ZoneItemView.ShapeStyleProps;
@@ -37,6 +38,8 @@ import troshx.sos.vue.pregen.PregenSelectView;
 // NOTE: This import is required for serialization, DO NOT delete!
 import troshx.sos.chargen.CharGenData;
 
+
+
 /**
  * Main doll view component
  * @author Glidias
@@ -47,6 +50,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 	public function new() 
 	{
 		super();
+		
+		// testing only
+		Manuever.getArray();
+		
 	}
 	
 	// PREGENS
