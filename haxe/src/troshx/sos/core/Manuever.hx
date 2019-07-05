@@ -1,5 +1,4 @@
 package troshx.sos.core;
-import haxe.ds.StringMap;
 import troshx.components.FightState;
 import troshx.components.FightState.ManueverDeclare;
 import troshx.core.IManuever;
@@ -7,6 +6,7 @@ import troshx.core.IUid;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.manuevers.StealInitiative;
 import troshx.sos.sheets.CharSheet;
+import troshx.util.AbsStringMap;
 import troshx.util.UidStringMapCreator;
 
 /**
@@ -156,11 +156,11 @@ class Manuever implements IManuever implements IUid
 	
 	// Singleton references
 	
-	static var MAP:StringMap<Manuever>;
-	public static function getMap():StringMap<Manuever> {
+	static var MAP:AbsStringMap<Manuever>;
+	public static function getMap():AbsStringMap<Manuever> {
 		return MAP != null ? MAP : (MAP = getNewMap());
 	}
-	public static function getNewMap():StringMap<Manuever> {
+	public static function getNewMap():AbsStringMap<Manuever> {
 		return  UidStringMapCreator.createStrMapFromArray(getNewArray());
 	}
 	

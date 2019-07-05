@@ -42,5 +42,13 @@ StringMap<T>
 		#end
 	}
 	
+	inline public function exists(p:String):Bool {
+		#if js
+		return LibUtil.field(this, p) != null;
+		#else
+		return this.exists(p);
+		#end
+	}
+	
 	
 }

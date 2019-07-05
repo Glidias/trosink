@@ -1,6 +1,5 @@
 package troshx.sos.vue.combat;
 import haxe.ds.IntMap;
-import haxe.ds.StringMap;
 import troshx.components.Bout.FightNode;
 import troshx.sos.combat.BoutModel;
 import troshx.sos.core.BodyChar;
@@ -11,6 +10,7 @@ import troshx.sos.core.TargetZone;
 import troshx.sos.core.Wound;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.UIInteraction.UInteract;
+import troshx.util.AbsStringMap;
 import troshx.util.LibUtil;
 
 /**
@@ -278,8 +278,8 @@ class CombatViewModel
 		var toUnderscoreCapital:EReg = new EReg(" ([A-Z])", "g");
 		var toSlugifyCapital:EReg = new EReg("_([a-z])", "g");
 		
-		var mapTempSwings:StringMap<Int> = new StringMap<Int>();
-		var mapTempThrusts:StringMap<Int> = new StringMap<Int>();
+		var mapTempSwings:AbsStringMap<Int> = new AbsStringMap<Int>();
+		var mapTempThrusts:AbsStringMap<Int> = new AbsStringMap<Int>();
 		var key:String;
 		for (i in 0...body.thrustStartIndex) {
 			key = toUnderscoreCapital.replace(targetZones[i].name, "_$1").toUpperCase();

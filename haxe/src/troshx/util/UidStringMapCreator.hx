@@ -1,5 +1,4 @@
 package troshx.util;
-import haxe.ds.StringMap;
 import troshx.core.IUid;
 
 /**
@@ -9,8 +8,8 @@ import troshx.core.IUid;
 class UidStringMapCreator 
 {
 
-	public static function createStrMapFromArray<T:IUid>(arr:Array<T>):StringMap<T> {
-		var map = new StringMap<T>();
+	public static function createStrMapFromArray<T:IUid>(arr:Array<T>):AbsStringMap<T> {
+		var map = new AbsStringMap<T>();
 		for (i in 0...arr.length) {
 			map.set(arr[i].uid, arr[i]);
 		}
