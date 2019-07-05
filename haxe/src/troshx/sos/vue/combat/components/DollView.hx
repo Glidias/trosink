@@ -1,6 +1,5 @@
 package troshx.sos.vue.combat.components;
 import haxe.Unserializer;
-import haxe.ds.StringMap;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
 import haxevx.vuex.util.VHTMacros;
