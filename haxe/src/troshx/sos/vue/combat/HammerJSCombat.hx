@@ -88,7 +88,7 @@ class HammerJSCombat
 	}
 	
 	// app specific set
-	public static inline var HIT_OFFSET_OBSERVE_Y:Int = -40;
+	public static inline var HIT_OFFSET_OBSERVE_Y:Int = -55; // note: hardcode to match with dollview.scss
 	
 	private function defaultCallback(index:Int, event:Int):Void {
 		if (viewModel == null) {
