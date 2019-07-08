@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.components.Bout;
 import troshx.components.FightState;
 import troshx.components.FightState.ManueverDeclare;
 import troshx.core.IManuever;
@@ -19,7 +20,6 @@ class Manuever implements IManuever implements IUid
 	public var name:String;
 	
 	public var isSuperior(default, null):Bool = false;
-	
 	
 	public var types:Int = 0;
 	public static inline var TYPE_DEFENSIVE:Int = 1;
@@ -57,7 +57,7 @@ class Manuever implements IManuever implements IUid
 		this.reqStuffs = reqStuffs;
 		return this;
 	}
-	public function getAdditionalRequire(charSheet:CharSheet, fightState:Int):Bool {
+	public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>):Bool {
 		return true;
 	}
 	
@@ -89,8 +89,6 @@ class Manuever implements IManuever implements IUid
 		func(manuever);
 		return this;
 	}
-	
-	
 	
 	public function clone():Manuever {
 		var manuever = Type.createEmptyInstance(Type.getClass(this));
@@ -181,12 +179,22 @@ class Manuever implements IManuever implements IUid
 		this.reach = 0;
 		return this;
 	}
+	public inline function hasOwnReach():Bool {
+		return this.reach > 0;
+	}
+	public inline function isRanged():Bool {
+		return this.reach < 0;
+	}
+	public function _ranged():Manuever {
+		this.reach = -1;
+		return this;
+	}
 	
 	public function handleEvent(sheet:CharSheet, fightState:FightState, declare:ManueverDeclare, event:SOSEvent):Bool {
 		return false;
 	}
 	
-	public function getCost(sheet:CharSheet, fightState:FightState, inputs:Array<Int>):Int {
+	public function getCost(bout:Bout<CharSheet>, node:FightNode<CharSheet>, inputs:Array<Int>):Int {
 		return cost;
 	}
 	
@@ -279,13 +287,16 @@ class Manuever implements IManuever implements IUid
 			/**/ new Manuever("halfSword", "Half-Sword")._types(TYPE_TRANSFORMATION)._requisite(REQ_WEAPON)._tags(TAG_INSTANT|TAG_ADVANCED)._costs(1),
 			/**/ new Manuever("murderStrike", "Murder Strike")._types(TYPE_TRANSFORMATION)._requisite(REQ_WEAPON)._tags(TAG_INSTANT | TAG_ADVANCED)._costs(2),	// Mordhau label
 			
-			
 			// Initiative
 			new StealInitiative(),
 			
 			// Puglism (trip / kick / knee   ,  Straight punch/ Hook punch/ One-two punch[2] ,  Head butt,  Elbow)
 			
 			// Ranged (melee shoot/ weapon throw / blind toss)
+			/**/ new Manuever("meleeShoot", "Melee Shoot")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
+			/**/ new Manuever("weaponThrow", "Weapon Throw")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
+			/**/ new Manuever("blindToss", "Blind Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF)._tn(5)._costs(0,0,true),
+			/**/ new Manuever("netToss", "Net Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF)._ranged(),
 			
 			// implied unlisted manuevers for reference
 			// Ally Defense[2], Quick Defense[2]...  Rapid Rise,Thread the Needle  , Quick draw,
@@ -315,9 +326,6 @@ class Manuever implements IManuever implements IUid
 			against separately.
 			Special: If a character has the Ambidextrous boon, this maneuver’s activation cost is reduced to [X+Y].
 			*/
-			
-			
-			
 			
 		];
 	}

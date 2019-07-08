@@ -9,8 +9,6 @@ import troshx.util.LibUtil;
 
 /**
  * A localized bout controller class using Song of Swords rules.
- * convention: IBoutCOntroller classes should be instantitated as new instances afresh for every new bout
- * to handle initialization of bout
  * See IBoutController interface for conventions
  * @author Glidias
  */
@@ -32,7 +30,7 @@ class BoutController implements IBoutController
 	public function new(model:BoutModel) 
 	{
 		this.model = model;
-		model.bout.s = STEP_ORIENTATION;
+		model.bout.setStep(STEP_ORIENTATION);
 	}
 	
 	

@@ -14,8 +14,13 @@
 	
 }
 
+
 .dollview {
-	
+	button, a {
+		pointer-events:auto;
+		touch-action:auto;
+	}
+
 	/*
 	.observe-indicator {
 		position:absolute;
@@ -33,8 +38,6 @@
 		}
 	}
 	*/
-	
-
 	
 	.mouse-cursor {
 		position:absolute;
@@ -62,6 +65,21 @@
 		overflow:visible !important;
 		.scroll-container {
 			overflow:hidden;
+		}
+	}
+	
+	.initRange {
+		.bger {
+			width:112%; height:112%; position:absolute;top:0;left:0; background-size:100% 100%; background-image:url(../../images/arrowpiece.png);
+		}
+		&:after {
+			content:'';
+			width:100%;
+			background-color:black;
+			position:absolute;
+			bottom:-1px;
+			height:2px;
+			left:2px;
 		}
 	}
 	

@@ -80,14 +80,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 			var valData:CharSave = val;
 			node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
 			var theIndex = boutModel.bout.combatants.length;
-			boutModel.bout.combatants.push(node);
+			boutModel.bout.pushNewFightNode(node);
 			viewModel.currentPlayerIndex = theIndex;
 			node.fight.cp = node.charSheet.CP;
 			
 		} else if (showPregens == PREGEN_SELECT_OPPONENT) {
 			var valData:CharSave = val;
 			node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
-			boutModel.bout.combatants.push(node);
+			boutModel.bout.pushNewFightNode(node);
 		}
 		if (node != null) {
 			node.charSheet.inventory.refreshHalfArmorLabels();
@@ -348,12 +348,20 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	@:computed inline function get_currentOpponent():FightNode<CharSheet> 
 	{
-		return this.opponents[this.clampedOpponentIndex];
+		var allOpponents = this.opponents; // fallback temp show from all opponents list if no currentPlayer yet
+		
+		var currentPlayer:FightNode<CharSheet> = this.player;
+		//if (currentPlayer != null) {
+			//var r = currentPlayer.targetLinkUpdateCount;
+			//trace(currentPlayer.targetLink); // target FightLink<CharSheet> linked-list item should be non-reactive
+		//}
+		return currentPlayer != null ? currentPlayer.getTargetOpponent() : 
+			allOpponents != null ? allOpponents[this.clampedOpponentIndex] : null;
 	}
 	
-	@:computed inline function get_gotOpponents():Bool
+	@:computed inline function get_gotCurrentOpponent():Bool
 	{
-		return this.opponents != null && this.opponents.length >= 1;
+		return this.currentOpponent != null;
 	}
 	
 	override function Components():Dynamic<VComponent<Dynamic,Dynamic>> {
@@ -573,7 +581,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	// -- temp pregen initialization handler atm
 	
-	@:watch("gotOpponents") function onOpponentsStateChange(newValue:Bool, oldValue:Bool):Void {
+	@:watch("gotCurrentOpponent") function onOpponentsStateChange(newValue:Bool, oldValue:Bool):Void {
 		
 		if (newValue) this.viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
 		else {

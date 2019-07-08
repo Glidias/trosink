@@ -176,6 +176,7 @@ class CombatViewModel
 	public inline function getCurrentPlayer():FightNode<CharSheet> {
 		return currentPlayerIndex >= 0 ? boutModel.bout.combatants[currentPlayerIndex] : null;
 	}
+	
 	public inline function getCurrentOpponents():Array<FightNode<CharSheet>> {
 		var playerSideIndex = getDefaultPlayerSideIndex();
 		if (boutModel.bout == null) return null;
@@ -184,6 +185,17 @@ class CombatViewModel
 			return obj.sideIndex != playerSideIndex;
 		});
 	}
+	
+	public inline function getCurrentActiveOpponents():Array<FightNode<CharSheet>> {
+		var pl = this.getCurrentPlayer();
+		if (boutModel.bout == null) return null;
+		if (pl != null) {
+			var r = this.boutModel.bout.linkUpdateCount;
+			return this.boutModel.bout.findLinkedOpponents(pl);
+		}
+		return null;
+	}
+	
 	public inline function getCurrentAllies():Array<FightNode<CharSheet>> {
 		var playerSideIndex = getDefaultPlayerSideIndex();
 		if (boutModel.bout == null) return null;

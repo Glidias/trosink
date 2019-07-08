@@ -1,6 +1,5 @@
 package troshx.core;
-import troshx.components.Bout;
-import troshx.core.BoutMessage;
+
 
 /**
  * @author Glidias
