@@ -252,16 +252,19 @@ class Manuever implements IManuever implements IUid
 			new Manuever("feint", "Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._costs(2)._superior(), // defered instant before resolution
 			
 			// Aim at weapon/shield
-			new Manuever("disarm", "break")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
+			new Manuever("disarm", "Disarm (Weapon)")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._costs(1)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
 			new Manuever("beat", "Beat")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
 			new Manuever("break", "Break")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
 			new Manuever("hew", "Hew")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_SHIELD)._superior(),
 			
+			//  and unarmed disarms
+			/**/ new Manuever("disarmUnarmedAtk", "Disarmed (Unarmed, Attack)")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._targetZoneMode(TARGET_ZONE_WEAPON)._costs(1)._reach(Weapon.REACH_H)._tn(7)._superiorInit(function(m){m._tn(6); }),
+
 			// Parries
 			new Manuever("parry", "Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY),
 				new Manuever("riposte", "Riposte")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY | TAG_ADVANCED)._costs(2)._superior(),
-				new Manuever("armParryUnarmed", "Armed Parry (Unarmed)")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._tags(TAG_PARRY),
-				new Manuever("disarmUnarmed", "Disarmed (Unarmed)")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._tags(TAG_PARRY)._costs(1)._reach(Weapon.REACH_HA)._tn(8)._superiorInit(function(m){m._tn(7); }),
+				/**/ new Manuever("armParry", "Arm Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._tags(TAG_PARRY),
+				/**/ new Manuever("disarmUnarmedDef", "Disarmed (Unarmed, Defend)")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._costs(1)._reach(Weapon.REACH_H)._tn(8)._superiorInit(function(m){m._tn(7); })._tags(TAG_PARRY),
 			
 			// Voids
 			new Manuever("void", "Void")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(8)._bs(2),
@@ -291,6 +294,7 @@ class Manuever implements IManuever implements IUid
 			new StealInitiative(),
 			
 			// Puglism (trip / kick / knee   ,  Straight punch/ Hook punch/ One-two punch[2] ,  Head butt,  Elbow)
+			// 
 			
 			// Ranged (melee shoot/ weapon throw / blind toss)
 			/**/ new Manuever("meleeShoot", "Melee Shoot")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
