@@ -17,7 +17,7 @@ class Beat extends Manuever
 	public function new() 
 	{
 		super("beat", "Beat");
-		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_SWING)._targetZoneMode(Manuever.TARGET_ZONE_WEAPON)._superior();
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_SWING)._targetZoneMode(Manuever.TARGET_ZONE_WEAPON | Manuever.TARGET_ZONE_SHIELD)._superior();
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
@@ -47,4 +47,30 @@ Superior: If you have initiative, you may now declare this
 maneuver in the first move of any bout. You still need to
 have declared aggressive to use Beat in the first move after
 orientation, but this does not apply in later bouts.
+*/
+
+class ShieldBeat extends Manuever
+{
+
+	public function new() 
+	{
+		super("shieldBeat", "Shield Beat");
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_SHIELD)._attackTypes(0)._targetZoneMode(Manuever.TARGET_ZONE_WEAPON | Manuever.TARGET_ZONE_SHIELD)._reach(Weapon.REACH_S)._costs(2);
+	}
+	
+}
+/*
+Shield Beat [X+2]
+Type and Tags: U ATTACK SHIELD BASH
+Requirements: Using a shield.
+Maneuver: Attack at S-reach, at Shield Bash TN, targeting
+opponent’s weapon or shield.
+Success (Weapon): Target weapon cannot be used as part
+of any maneuvers in the next move. You cannot perform
+maneuvers with your shield in the next move. This does
+not change the reach of combat.
+Success (Shield): Target shield does not grant AV for this or
+the next move, and cannot be used to Block for the next
+move. Your shield is knocked out of its shield position next
+move. This does not change the reach of combat.
 */
