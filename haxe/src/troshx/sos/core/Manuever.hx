@@ -4,6 +4,7 @@ import troshx.components.FightState;
 import troshx.components.FightState.ManueverDeclare;
 import troshx.core.IManuever;
 import troshx.core.IUid;
+import troshx.sos.core.BodyChar.Humanoid;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.manuevers.StealInitiative;
 import troshx.sos.sheets.CharSheet;
@@ -114,6 +115,9 @@ class Manuever implements IManuever implements IUid
 		
 		manuever.tn = tn;
 		manuever.bs = bs;
+		manuever.damage = damage;
+		manuever.damageType = damageType;
+		manuever.stun = stun;
 		//manuever.tnMod = tnMod;
 		
 		manuever.reach = reach;
@@ -133,6 +137,7 @@ class Manuever implements IManuever implements IUid
 	
 	public static inline var TAG_ADVANCED:Int = (1 << 9);
 	public static inline var TAG_INSTANT:Int = (1 << 10);
+	public static inline var TAG_MOVEMENT:Int = (1 << 11);
 	
 	
 	@:col public function _tags(val:Int):Manuever {
@@ -167,6 +172,8 @@ class Manuever implements IManuever implements IUid
 	public var cost:Int = 0;
 	public var costFuncInputs:Int = 0;
 	public var costVaries:Bool = false;
+	public static inline var NO_INVEST:Int = -1;
+	public static inline var DEFER_COST:Int = -2;
 	@:col public function _costs(cost:Int, costFuncInputs:Int=0, costVaries:Bool=false):Manuever {
 		this.cost = cost;
 		this.costFuncInputs = costFuncInputs;
@@ -188,6 +195,20 @@ class Manuever implements IManuever implements IUid
 	public function _ranged():Manuever {
 		this.reach = -1;
 		return this;
+	}
+	
+	
+	public var damage:Int = 0;
+	public var damageType:Int = -1;
+	public var stun:Int = 0;
+	@:col public function _damage(type:Int, val:Int, stun:Int=0):Manuever {
+		this.damageType = type;
+		this.damage = val;
+		this.stun = stun;
+		return this;
+	}
+	public inline function hasOwnDamage():Bool {
+		return this.damageType >= 0;
 	}
 	
 	public function handleEvent(sheet:CharSheet, fightState:FightState, declare:ManueverDeclare, event:SOSEvent):Bool {
@@ -239,23 +260,23 @@ class Manuever implements IManuever implements IUid
 		return [
 		
 			// Swings and thrusts
-			new Manuever("swing", "Swing")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING),
+			new Manuever("swing", "Swing")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING), // greater Swings +1 and +2
 				new Manuever("drawCut", "Draw Cut")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING),
-				new Manuever("cleavingBlow", "Cleaving Blow")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._tags(TAG_CROSS_FIGHTING),	// defered instant on resolve after
+				new Manuever("cleavingBlow", "Cleaving Blow")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._tags(TAG_CROSS_FIGHTING)._costs(2, DEFER_COST),	// defered instant on resolve after
 				
 			new Manuever("thrust", "Thrust")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST),
 				/**/ new Manuever("pushCut", "Push Cut")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._costs(1)._superior(),
-				new Manuever("jointThrust", "Joint Thrust")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._costs(0,0,true),
+				/**/ new Manuever("jointThrust", "Joint Thrust")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._costs(0,0,true),
 			
 			// Hooks and feints shared by both swing and thrusts
-			new Manuever("hook", "Hook")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._targetZoneMode(TARGET_ZONE_SHIELD|TARGET_ZONE_OPPONENT)._superior(),
-			new Manuever("feint", "Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._costs(2)._superior(), // defered instant before resolution
+			new Manuever("hook", "Hook")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._targetZoneMode(TARGET_ZONE_SHIELD|TARGET_ZONE_OPPONENT)._costs(1)._superior(),
+			new Manuever("feint", "Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._costs(2, DEFER_COST)._superior(), // defered instant before resolution
 			
 			// Aim at weapon/shield
 			new Manuever("disarm", "Disarm (Weapon)")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._costs(1)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
 			new Manuever("beat", "Beat")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
-			new Manuever("break", "Break")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
-			new Manuever("hew", "Hew")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_SHIELD)._superior(),
+			new Manuever("break", "Break")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._costs(2)._superior(),
+			new Manuever("hew", "Hew")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_SHIELD)._costs(1)._superior(),
 			
 			//  and unarmed disarms
 			/**/ new Manuever("disarmUnarmedAtk", "Disarmed (Unarmed, Attack)")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._targetZoneMode(TARGET_ZONE_WEAPON)._costs(1)._reach(Weapon.REACH_H)._tn(7)._superiorInit(function(m){m._tn(6); }),
@@ -275,7 +296,7 @@ class Manuever implements IManuever implements IUid
 			// Blocks
 			new Manuever("block", "Block")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK),
 				new Manuever("shieldBind", "Shield Bind")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK | TAG_ADVANCED)._superior(),
-				/**/ new Manuever("totalBlock", "Total Block")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK),  
+				/**/ new Manuever("totalBlock", "Total Block")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK)._costs(0, NO_INVEST),  
 			
 			// Shield/other alts
 			//Swipe Up Shield for sub menu  and tap on Shield Feint as an option. Will revert back to weapon being selected.
@@ -294,7 +315,15 @@ class Manuever implements IManuever implements IUid
 			new StealInitiative(),
 			
 			// Puglism (trip / kick / knee   ,  Straight punch/ Hook punch/ One-two punch[2] ,  Head butt,  Elbow)
-			// 
+			new Manuever("elbow", "Elbow")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(7)._attackTypes(ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 0)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2); }),
+			new Manuever("headbutt", "Headbutt")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(6)._attackTypes(ATTACK_TYPE_THRUST)._targetZoneMode(Manuever.specificTargetZoneModeMask((1<<Humanoid.THRUST_HEAD)|(1<<Humanoid.THRUST_CHEST)))._damage(DamageType.UNARMED, 1),
+			new Manuever("hookPunch", "Hook Punch")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(6)._attackTypes(ATTACK_TYPE_SWING)._damage(DamageType.UNARMED, 1)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2, 2); }),
+			new Manuever("kick", "Kick")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_S)._tn(7)._attackTypes(ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 0)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2); }),
+			new Manuever("knee", "Knee")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(7)._attackTypes(ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 1)._superiorInit(function(m){m._damage(DamageType.UNARMED, 3); }),
+			new Manuever("trip", "Trip")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(8)._targetZoneMode(Manuever.specificTargetZoneModeMask((1<<Humanoid.SWING_UPPER_LEG)|(1<<Humanoid.SWING_LOWER_LEG)))._superior(),
+			new Manuever("oneTwoPunch", "One-Two Punch")._types(0)._costs(2)._requisite(REQ_UNARMED),
+			new Manuever("straightPunch", "Straight Punch")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_H)._tn(6)._attackTypes(ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 2)._superiorInit(function(m){m._damage(DamageType.UNARMED, 3, 1); }),
+			
 			
 			// Ranged (melee shoot/ weapon throw / blind toss)
 			/**/ new Manuever("meleeShoot", "Melee Shoot")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
@@ -304,8 +333,17 @@ class Manuever implements IManuever implements IUid
 			
 			// implied unlisted manuevers for reference
 			// Ally Defense[2], Quick Defense[2]...  Rapid Rise,Thread the Needle  , Quick draw,
-			new Manuever("doNothing", "Do Nothing")._types(0)._superiorInit(function(m){m.name = "Focus"; }),
-			new Manuever("masterStrike", "Masterstrike")._types(0)._costs(2)._superior()
+			new Manuever("doNothing", "Do Nothing")._types(0)._costs(0, NO_INVEST)._superiorInit(function(m){m.name = "Focus"; }),
+			new Manuever("masterStrike", "Masterstrike")._types(0)._costs(2)._superior(),
+			new Manuever("doubleAttack", "Double Attack")._types(0)._costs(1), // amb == no costs
+			new Manuever("doubleShot", "Double Shot")._types(0)._costs(2),
+			
+			new Manuever("quickDefense", "Quick Defense")._types(0)._costs(2),
+			new Manuever("quickDraw", "Quick Draw")._types(0)._costs(1, NO_INVEST)._tags(TAG_INSTANT),
+			new Manuever("allyDefense", "Ally Defense")._types(0)._costs(2)._tags(TAG_CROSS_FIGHTING | TAG_INSTANT),
+			new Manuever("threadNeedle", "Thread the Needle")._types(0)._tags(TAG_INSTANT|TAG_MOVEMENT),
+			new Manuever("rapidRise", "Rapid Rise")._types(0)._tags(TAG_INSTANT|TAG_MOVEMENT)._costs(3, NO_INVEST),
+			new Manuever("guardedAttack", "Guarded Attack")._types(0),
 			
 			// Hilt push: + Lever down[2] / Retreat[2](FLEE?)
 			
@@ -330,6 +368,9 @@ class Manuever implements IManuever implements IUid
 			against separately.
 			Special: If a character has the Ambidextrous boon, this maneuver’s activation cost is reduced to [X+Y].
 			*/
+			
+			// Grappling
+			// Clinch
 			
 		];
 	}
