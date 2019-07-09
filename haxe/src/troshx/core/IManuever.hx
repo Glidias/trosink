@@ -1,5 +1,4 @@
 package troshx.core;
-import troshx.components.FightState.ManueverDeclare;
 
 /**
  * ...
