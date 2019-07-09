@@ -4,11 +4,15 @@ import troshx.components.FightState;
 import troshx.components.FightState.ManueverDeclare;
 import troshx.core.IManuever;
 import troshx.core.IUid;
+import troshx.core.ManueverSpec;
 import troshx.sos.core.BodyChar.Humanoid;
 import troshx.sos.events.SOSEvent;
-import troshx.sos.manuevers.StealInitiative;
+import troshx.sos.manuevers.*;
+import troshx.sos.manuevers.Disarm.DisarmUnarmedAtk;
+import troshx.sos.manuevers.Disarm.DisarmUnarmedDef;
 import troshx.sos.sheets.CharSheet;
 import troshx.util.AbsStringMap;
+import troshx.util.LibUtil;
 import troshx.util.UidStringMapCreator;
 
 /**
@@ -58,7 +62,7 @@ class Manuever implements IManuever implements IUid
 		this.reqStuffs = reqStuffs;
 		return this;
 	}
-	public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>):Bool {
+	public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
 		return true;
 	}
 	
@@ -219,7 +223,7 @@ class Manuever implements IManuever implements IUid
 		return cost;
 	}
 	
-	public function resolve(sheet:CharSheet, state:FightState, declare:ManueverDeclare):Void {
+	public function resolve(bout:Bout<CharSheet>, node:FightNode<CharSheet>, declare:ManueverDeclare):Void {
 		//var manuevers = getMap();
 	}
 
@@ -229,6 +233,100 @@ class Manuever implements IManuever implements IUid
 		this.name = name;
 	}
 	
+	
+	/*
+	Availability in terms of:
+	
+	getAvailability() for manuever itself
+	+
+	TN availability >=0 sanity check. Requisite + Attack Type (getTN(...)>=0) TN<=1 implies Auto execute/success. Negative TN implies impossible.
+	+
+	SoS rules: Current usage state (cannot mix unarmed/armed attacks)
+	If unarmed attack, only 1 attack manuever allowed. 
+	If armed attack, only up to 2 attack manuevers allowed using Double Attack rule
+	*/
+		
+	
+	/**
+	 * 
+	 * @param	bout
+	 * @param	node
+	 * @param	spec
+	 * @return	manuever getTN() value, if negative, denotes impossible manuever
+	 */
+	public function getTN(spec:ManueverSpec):Int {
+		return this.requisites != 0 ? getRequisiteTN(spec) : this.tn;
+	}
+	
+	/**
+	 * This function should typically be used if requisites isn't zero to get a relavant conventional manuever TN based on held equipment (if available)
+	 * @param	spec
+	 * @return	A default TN based on manuever requisites and manuever spec. If negative number -1, denotes impossible manuever due to lack of requisites.
+	 */
+	public function getRequisiteTN(spec:ManueverSpec):Int {
+		var activeItem:Item = spec.activeItem;
+		var req = this.requisites;
+		var types = this.types;
+		if (spec.typePreference != 0) {
+			types = (spec.typePreference & types);
+		}
+		var shield:Shield = LibUtil.as(activeItem, Shield);
+		var weapon:Weapon = LibUtil.as(activeItem, Weapon);
+		var reqMilitaryArms:Int = 0;
+		reqMilitaryArms |= shield != null ? REQ_SHIELD : 0;
+		reqMilitaryArms |= weapon != null ? REQ_WEAPON : 0;
+		
+		if ((req & REQ_STUFF) != 0) {
+			if (activeItem == null) {
+				return -1;
+			} else if (reqStuffs != null) { // specific named reqStuffs in array to check
+				if (reqStuffs.indexOf(activeItem.name) < 0) {
+					return -1;
+				}
+			} else if (req == REQ_STUFF && reqMilitaryArms != 0) { // (exclusively req==REQ_STUFF) requires a non shield/weapon item
+				return -1;
+			}
+		}
+		
+		// now consider remaining requirements like weapon/shield/unarmed
+		req &= (REQ_UNARMED|REQ_WEAPON|REQ_SHIELD);
+
+		if ((req & REQ_UNARMED) !=0) {
+			if (activeItem != null && !itemAsUnarmedAllowed(activeItem)) {
+				return -1;
+			}
+		}
+		
+		req &= (REQ_WEAPON|REQ_SHIELD);
+		
+		if ( (reqMilitaryArms & req) != req ) {
+			return -1;
+		}
+		
+		var rtn:Int;
+		if ((req & REQ_WEAPON) != 0) {
+			if ((types & TYPE_OFFENSIVE)!=0) {
+				rtn = isRanged() ? weapon.atnM : 
+				spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) ? weapon.atnT : weapon.atnS;
+			} else {
+				rtn = weapon.dtn;
+			}
+			if (rtn <= 0) return -1;
+			return this.tn > 0 ? this.tn : rtn;
+		} else if ((req & REQ_SHIELD) != 0) {
+			rtn = (types & TYPE_OFFENSIVE)!=0 ? shield.bashTN : shield.blockTN;
+			if (rtn <= 0) return -1;
+			return this.tn > 0 ? this.tn : rtn;
+		}
+
+		return this.tn;
+	}
+	
+	// override this to define exceptions for held item to be used with unarmed manuever
+	public function itemAsUnarmedAllowed(item:Item):Bool {
+		return false;
+	}
+
 	
 	/* INTERFACE troshx.core.IUid */
 	
@@ -260,32 +358,32 @@ class Manuever implements IManuever implements IUid
 		return [
 		
 			// Swings and thrusts
-			new Manuever("swing", "Swing")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING), // greater Swings +1 and +2
-				new Manuever("drawCut", "Draw Cut")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING),
-				new Manuever("cleavingBlow", "Cleaving Blow")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._tags(TAG_CROSS_FIGHTING)._costs(2, DEFER_COST),	// defered instant on resolve after
+			new Manuever("swing", "Swing")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING), // greater Swings +1 and +2?
+				new DrawCut(),
+				new CleavingBlow(),
 				
 			new Manuever("thrust", "Thrust")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST),
-				/**/ new Manuever("pushCut", "Push Cut")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._costs(1)._superior(),
-				/**/ new Manuever("jointThrust", "Joint Thrust")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._costs(0,0,true),
+				new PushCut(),
+				new JointThrust(),
 			
 			// Hooks and feints shared by both swing and thrusts
-			new Manuever("hook", "Hook")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._targetZoneMode(TARGET_ZONE_SHIELD|TARGET_ZONE_OPPONENT)._costs(1)._superior(),
-			new Manuever("feint", "Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_BOTH)._costs(2, DEFER_COST)._superior(), // defered instant before resolution
+			new Hook(),
+			new Feint(),
 			
 			// Aim at weapon/shield
-			new Manuever("disarm", "Disarm (Weapon)")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._costs(1)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
-			new Manuever("beat", "Beat")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._superior(),
-			new Manuever("break", "Break")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_WEAPON)._costs(2)._superior(),
+			new Disarm(),
+			new Beat(),
+			new Break(),
 			new Manuever("hew", "Hew")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_SHIELD)._costs(1)._superior(),
 			
 			//  and unarmed disarms
-			/**/ new Manuever("disarmUnarmedAtk", "Disarmed (Unarmed, Attack)")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._targetZoneMode(TARGET_ZONE_WEAPON)._costs(1)._reach(Weapon.REACH_H)._tn(7)._superiorInit(function(m){m._tn(6); }),
+			new DisarmUnarmedAtk(),
 
 			// Parries
 			new Manuever("parry", "Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY),
 				new Manuever("riposte", "Riposte")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY | TAG_ADVANCED)._costs(2)._superior(),
 				/**/ new Manuever("armParry", "Arm Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._tags(TAG_PARRY),
-				/**/ new Manuever("disarmUnarmedDef", "Disarmed (Unarmed, Defend)")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._costs(1)._reach(Weapon.REACH_H)._tn(8)._superiorInit(function(m){m._tn(7); })._tags(TAG_PARRY),
+				new DisarmUnarmedDef(),
 			
 			// Voids
 			new Manuever("void", "Void")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(8)._bs(2),
@@ -329,7 +427,7 @@ class Manuever implements IManuever implements IUid
 			/**/ new Manuever("meleeShoot", "Melee Shoot")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
 			/**/ new Manuever("weaponThrow", "Weapon Throw")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
 			/**/ new Manuever("blindToss", "Blind Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF)._tn(5)._costs(0,0,true),
-			/**/ new Manuever("netToss", "Net Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF)._ranged(),
+			/**/ new Manuever("netToss", "Net Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON|REQ_STUFF)._ranged(),
 			
 			// implied unlisted manuevers for reference
 			// Ally Defense[2], Quick Defense[2]...  Rapid Rise,Thread the Needle  , Quick draw,

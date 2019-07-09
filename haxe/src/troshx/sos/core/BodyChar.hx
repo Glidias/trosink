@@ -1,4 +1,5 @@
 package troshx.sos.core;
+import troshx.core.IBodyChar;
 import troshx.sos.core.Armor.AV3;
 import troshx.util.LibUtil;
 
@@ -6,7 +7,7 @@ import troshx.util.LibUtil;
  * Represents a specific character body type with all relavant damage tables under it
  * @author Glidias
  */
-class BodyChar
+class BodyChar implements IBodyChar
 {
 	public var name(default,null):String;
 	

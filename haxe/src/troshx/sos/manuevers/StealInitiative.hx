@@ -2,6 +2,7 @@ package troshx.sos.manuevers;
 import troshx.components.Bout;
 import troshx.components.FightState;
 import troshx.components.FightState.ManueverDeclare;
+import troshx.core.ManueverSpec;
 import troshx.sos.core.Manuever;
 import troshx.sos.sheets.CharSheet;
 
@@ -20,7 +21,11 @@ class StealInitiative extends Manuever
 		costVaries = true;
 	}
 	
-	override public function resolve(sheet:CharSheet, state:FightState, declare:ManueverDeclare):Void {
+	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
+		return node.fight.initiative == 0;
+	}
+	
+	override public function resolve(bout:Bout<CharSheet>, node:FightNode<CharSheet>, declare:ManueverDeclare):Void {
 		
 	}
 	

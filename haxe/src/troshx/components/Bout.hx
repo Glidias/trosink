@@ -136,6 +136,18 @@ class Bout<C>
 		return arr;
 	}
 	
+	public function countLinkedOpponents(a:FightNode<C>):Int {
+		var count:Int = 0;
+		var n = links;
+		while (n != null) {
+			if ( (n.a == a || n.b == a)  ) {
+				count++;
+			}
+			n = n.next;
+		}
+		return count;
+	}
+	
 	
 	public function removeLinksFromAgainst(from:FightNode<C>, against:Array<FightNode<C>>):Bool {
 		return clearLinksWithCondition(function(c) {

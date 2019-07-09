@@ -9,6 +9,7 @@ import troshx.core.BodyChar;
  */
  
 @:expose
+@:deprecated
 class Manuever
 {
 	
