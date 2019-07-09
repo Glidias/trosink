@@ -1,8 +1,8 @@
 package troshx.sos.vue.pregen;
 import haxevx.vuex.core.NoneT;
 import haxevx.vuex.core.VComponent;
-import haxevx.vuex.util.VHTMacros;
 import troshx.core.CharSave;
+import haxevx.vuex.util.VHTMacros;
 
 /**
  * 
@@ -18,8 +18,8 @@ class PregenSelectView extends VComponent<PregenSelectData, PregenSelectProps>
 	
 	override function Data():PregenSelectData {
 		return {
-			selectedChars: [],
-			selectedChar:-1
+			selectedChar: -1,
+			selectedChars: []
 		}
 	}
 	
