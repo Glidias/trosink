@@ -1,7 +1,6 @@
 package troshx.sos.pregens;
 import haxevx.vuex.util.VHTMacros;
 import troshx.core.CharSave;
-import troshx.core.CharSheet;
 
 /**
  * ...
