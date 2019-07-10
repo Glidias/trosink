@@ -27,7 +27,8 @@ class TotalBlock extends Manuever
 		var orientDef:Bool = node.fight.orientation == Manuever.ORIENTATION_DEFENSIVE;
 		var noAttacksNow:Bool = node.fight.attackManuevers.length == 0;
 		var noDefsNow:Bool = node.fight.defensiveManevers.length == 0;
-		return noAttacksNow && noDefsNow && firstMove && (!firstRound || orientDef);
+		var atLeast1CP:Bool = Math.floor(node.charSheet.CP * 0.5) >= 1;
+		return noAttacksNow && noDefsNow && firstMove && (!firstRound || orientDef) && atLeast1CP;
 	}
 	
 }
