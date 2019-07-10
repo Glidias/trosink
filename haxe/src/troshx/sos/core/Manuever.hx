@@ -5,15 +5,30 @@ import troshx.components.FightState.ManueverDeclare;
 import troshx.core.IManuever;
 import troshx.core.IUid;
 import troshx.core.ManueverSpec;
+import troshx.sos.bnb.Banes.OneEyed;
 import troshx.sos.core.BodyChar.Humanoid;
 import troshx.sos.events.SOSEvent;
 import troshx.sos.manuevers.*;
+import troshx.sos.manuevers.Beat.ShieldBeat;
 import troshx.sos.manuevers.Disarm.DisarmUnarmedAtk;
 import troshx.sos.manuevers.Disarm.DisarmUnarmedDef;
 import troshx.sos.sheets.CharSheet;
 import troshx.util.AbsStringMap;
 import troshx.util.LibUtil;
 import troshx.util.UidStringMapCreator;
+
+import troshx.sos.manuevers.Beat.ShieldBeat;
+
+import troshx.sos.manuevers.PugilisiticAttack.Elbow;
+import troshx.sos.manuevers.PugilisiticAttack.HeadButt;
+import troshx.sos.manuevers.PugilisiticAttack.Knee;
+import troshx.sos.manuevers.PugilisiticAttack.HookPunch;
+import troshx.sos.manuevers.PugilisiticAttack.Kick;
+import troshx.sos.manuevers.PugilisiticAttack.Trip;
+import troshx.sos.manuevers.PugilisiticAttack.OneTwoPunch;
+
+import troshx.sos.manuevers.NetManuevers.NetToss;
+import troshx.sos.manuevers.NetManuevers.NetFeint;
 
 /**
  * ...
@@ -38,6 +53,10 @@ class Manuever implements IManuever implements IUid
 		types = val;
 		return this;
 	}
+	
+	public static inline var ORIENTATION_DEFENSIVE:Int = 3;
+	public static inline var ORIENTATION_CAUTIOUS:Int = 2;
+	public static inline var ORIENTATION_AGGRESSIVE:Int = 1;
 	
 	public var attackTypes:Int = 0;
 	public static inline var ATTACK_TYPE_SWING:Int = 1;
@@ -70,7 +89,7 @@ class Manuever implements IManuever implements IUid
 	public static inline var TARGET_ZONE_AUTO:Int = 0;  // determined from attack type
 	public static inline var TARGET_ZONE_WEAPON:Int = 1;
 	public static inline var TARGET_ZONE_SHIELD:Int = 2;
-	public static inline var TARGET_ZONE_OPPONENT:Int = 3;
+	public static inline var TARGET_ZONE_OPPONENT:Int = -1;
 	
 	public static inline function specificTargetZoneModeMask(val:Int):Int {
 		return -val;
@@ -199,6 +218,14 @@ class Manuever implements IManuever implements IUid
 	public function _ranged():Manuever {
 		this.reach = -1;
 		return this;
+	}
+	
+	/**
+	 * override this to set max CP invest
+	 * @return	A positive value to indicate max allowed to invest. If value is zero, disables availability of manuever.
+	 */
+	public function getMaxInvest(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Int {
+		return -1;
 	}
 	
 	
@@ -370,37 +397,40 @@ class Manuever implements IManuever implements IUid
 			new Hook(),
 			new Feint(),
 			
-			// Aim at weapon/shield
+			// Aim at weapon/shield with weapon
 			new Disarm(),
 			new Beat(),
 			new Break(),
-			new Manuever("hew", "Hew")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING)._targetZoneMode(TARGET_ZONE_SHIELD)._costs(1)._superior(),
+			new Hew(),
+			
+			// Aim at weapon/shield with shield
+			new ShieldBeat(),
 			
 			//  and unarmed disarms
 			new DisarmUnarmedAtk(),
 
 			// Parries
 			new Manuever("parry", "Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY),
-				new Manuever("riposte", "Riposte")._types(TYPE_DEFENSIVE)._requisite(REQ_WEAPON)._tags(TAG_PARRY | TAG_ADVANCED)._costs(2)._superior(),
-				/**/ new Manuever("armParry", "Arm Parry")._types(TYPE_DEFENSIVE)._requisite(REQ_UNARMED)._tags(TAG_PARRY),
+				new Riposte(),
+				new ArmParry(),
 				new DisarmUnarmedDef(),
 			
 			// Voids
 			new Manuever("void", "Void")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(8)._bs(2),
-				new Manuever("hastyVoid", "Hasty Void")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(7)._bs(2),
-				new Manuever("mobileVoid", "Mobile Void")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(8)._bs(1),
-				/**/ new Manuever("flee", "Flee")._types(TYPE_DEFENSIVE)._tags(TAG_VOID)._tn(5),
+				new HastyVoid(),
+				new MobileVoid(),
+				new Flee(),
 				
 			// Blocks
 			new Manuever("block", "Block")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK),
-				new Manuever("shieldBind", "Shield Bind")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK | TAG_ADVANCED)._superior(),
-				/**/ new Manuever("totalBlock", "Total Block")._types(TYPE_DEFENSIVE)._requisite(REQ_SHIELD)._tags(TAG_BLOCK)._costs(0, NO_INVEST),  
+				new ShieldBind(),
+				new TotalBlock(),  
 			
 			// Shield/other alts
 			//Swipe Up Shield for sub menu  and tap on Shield Feint as an option. Will revert back to weapon being selected.
 			// alt-feints
-			new Manuever("shieldFeint", "Shield Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_SHIELD)._costs(1), // defered instant before resolution
-			new Manuever("netFeint", "Net Feint")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF, ["Net (Retiarius)"])._costs(1), // defered instant  before resolution
+			new ShieldFeint(),
+			new NetFeint(),
 			
 			// alt modes
 			/**/ new Manuever("buttStrike", "Butt Strike")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING), // unscrewed pommel cannot lowpriorit
@@ -413,21 +443,19 @@ class Manuever implements IManuever implements IUid
 			new StealInitiative(),
 			
 			// Puglism (trip / kick / knee   ,  Straight punch/ Hook punch/ One-two punch[2] ,  Head butt,  Elbow)
-			new Manuever("elbow", "Elbow")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(7)._attackTypes(ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 0)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2); }),
-			new Manuever("headbutt", "Headbutt")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(6)._attackTypes(ATTACK_TYPE_THRUST)._targetZoneMode(Manuever.specificTargetZoneModeMask((1<<Humanoid.THRUST_HEAD)|(1<<Humanoid.THRUST_CHEST)))._damage(DamageType.UNARMED, 1),
-			new Manuever("hookPunch", "Hook Punch")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(6)._attackTypes(ATTACK_TYPE_SWING)._damage(DamageType.UNARMED, 1)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2, 2); }),
-			new Manuever("kick", "Kick")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_S)._tn(7)._attackTypes(ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 0)._superiorInit(function(m){m._damage(DamageType.UNARMED, 2); }),
-			new Manuever("knee", "Knee")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(7)._attackTypes(ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 1)._superiorInit(function(m){m._damage(DamageType.UNARMED, 3); }),
-			new Manuever("trip", "Trip")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_HA)._tn(8)._targetZoneMode(Manuever.specificTargetZoneModeMask((1<<Humanoid.SWING_UPPER_LEG)|(1<<Humanoid.SWING_LOWER_LEG)))._superior(),
-			new Manuever("oneTwoPunch", "One-Two Punch")._types(0)._costs(2)._requisite(REQ_UNARMED),
-			new Manuever("straightPunch", "Straight Punch")._types(TYPE_OFFENSIVE)._requisite(REQ_UNARMED)._reach(Weapon.REACH_H)._tn(6)._attackTypes(ATTACK_TYPE_THRUST)._damage(DamageType.UNARMED, 2)._superiorInit(function(m){m._damage(DamageType.UNARMED, 3, 1); }),
-			
+			new Elbow(),
+			new HeadButt(),
+			new HookPunch(),
+			new Kick(),
+			new Knee(),
+			new Trip(),
+			new OneTwoPunch(),
 			
 			// Ranged (melee shoot/ weapon throw / blind toss)
-			/**/ new Manuever("meleeShoot", "Melee Shoot")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
-			/**/ new Manuever("weaponThrow", "Weapon Throw")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_THRUST)._ranged(),
-			/**/ new Manuever("blindToss", "Blind Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_STUFF)._tn(5)._costs(0,0,true),
-			/**/ new Manuever("netToss", "Net Toss")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON|REQ_STUFF)._ranged(),
+			new MeleeShoot(),
+			new WeaponThrow(),
+			new BlindToss(),
+			new NetToss(),
 			
 			// implied unlisted manuevers for reference
 			// Ally Defense[2], Quick Defense[2]...  Rapid Rise,Thread the Needle  , Quick draw,

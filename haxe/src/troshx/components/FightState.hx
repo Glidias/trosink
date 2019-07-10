@@ -34,6 +34,8 @@ typedef ManueverDeclare = {
 	@:optional var targetZone:Int;
 	@:optional var cost:Int;
 	@:optional var replies:ManueverDeclare;
+	
+	@:optional var targetZonePreferLeft:Bool;
 }
 
 
@@ -44,16 +46,21 @@ class FightState // represents individual fight state of single combatant
 	public var initiative:Int = 0;  // game-specific flag to track individual initaitives if needed, use as either a boolean or bitmask depending on game needs
 
 	public var dead:Bool = false; // dead marker to faciliate for Bout management/cleanup
-	public var flags:Int = 0; // game specific flags goes here for individual fight state
 	
 	// own character list of declared attack/defensive manuevers
 	public var attackManuevers:Array<ManueverDeclare> = [];
 	public var defensiveManevers:Array<ManueverDeclare> = [];
 	
+	// typical for TROSLikes
+	//public var flags:Int = 0; // game specific flags goes here for individual fight state
+	public var orientation:Int = 0;
+	public var lastAttacking:Bool = false;
+	public var KO:Bool = false;	// knocked out
+	public var kd:Bool = false;	// knocked down/prone
+	
 	// unresolved shock that is accumulated and needs to be resolved by the end of the exchange
 	//public var shock:Int = 0;
-	// flag to indicate if was attacking on last declared move (game-system specific. use "flags" instead)
-	//public var lastAttacking:Bool = false; 
+
 	
 	public function new() 
 	{
