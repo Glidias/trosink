@@ -10,9 +10,6 @@ typedef ManueverResult = {
 	// resolution results information
 	@:optional var marginSuccess:Int;
 	@:optional var successes:Int;
-	
-	// anything flag as canceled will be skipped by controller
-	@:optional var canceled:Bool;
 }
 
 typedef ManueverDeclare = {
@@ -35,7 +32,7 @@ typedef ManueverDeclare = {
 	@:optional var cost:Int;
 	@:optional var replies:ManueverDeclare;
 	
-	@:optional var targetZonePreferLeft:Bool;
+	@:optional var targetZonePreferLeft:Bool; // convention, in relation to target character's facing
 }
 
 
