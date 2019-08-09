@@ -22,7 +22,7 @@ class StealInitiative extends Manuever
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
-		return node.fight.initiative == 0;
+		return !Manuever.hasInitiative(node, node.targetLink);
 	}
 	
 	override public function resolve(bout:Bout<CharSheet>, node:FightNode<CharSheet>, declare:ManueverDeclare):Void {

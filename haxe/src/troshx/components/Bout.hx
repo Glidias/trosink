@@ -187,14 +187,15 @@ class FightNode<C> {
 	
 	public var charSheet:C;
 	
-	// focusing target link if needed
+	// focusing target link to determine available manuevers, 
+	// without which some manuevers (typically those requiring a target) would be disabled
 	public var targetLink:FightLink<C>;
-	//public var targetLinkUpdateCount:Int = 0;
 	
 	public inline function getTargetOpponent():FightNode<C> {
 		return targetLink != null ? targetLink.a != this ? targetLink.a : targetLink.b 
 				: null;
 	}
+	
 	
 	public function new(label:String, charSheet:C, side:Int=0) {
 		this.label = label;
@@ -207,8 +208,17 @@ class FightNode<C> {
 class FightLink<C> {
 	public var a(default, null):FightNode<C>;
 	public var b(default, null):FightNode<C>;
-	public var reach:Int = 0; // if needed by game system, set reach between specific opponents
+	public var reach:Int = 0; // if needed by game system, set reach between a given side
+	public var initiative:Int; // if needed by game system, set initiative to a given side or some given state
 	public var next:FightLink<C>;
+	
+	public static inline var SIDE_A:Int = -1;
+	public static inline var SIDE_B:Int = 1;
+	public static inline var SIDE_NONE:Int = 0;
+	
+	public inline function findNodeSide(node:FightNode<C>):Int {
+		return node == a ? SIDE_A : node == b ? SIDE_B : SIDE_NONE;
+	}
 	
 	public function new(a:FightNode<C>, b:FightNode<C>) {
 		this.a = a;

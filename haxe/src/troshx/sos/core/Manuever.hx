@@ -242,6 +242,10 @@ class Manuever implements IManuever implements IUid
 		return this.damageType >= 0;
 	}
 	
+	public static inline function hasInitiative(node:FightNode<CharSheet>, link:FightLink<CharSheet>):Bool {
+		return link.findNodeSide(node) == link.initiative;
+	}
+	
 	public function handleEvent(sheet:CharSheet, fightState:FightState, declare:ManueverDeclare, event:SOSEvent):Bool {
 		return false;
 	}

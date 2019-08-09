@@ -43,7 +43,6 @@ class FightState // represents individual fight state of single combatant
 {	
 	// riddle stuff here
 	public var cp:Int = 0;	// the CP remaining of individual
-	public var initiative:Int = 0;  // game-specific flag to track individual initaitives if needed, use as either a boolean or bitmask depending on game needs
 
 	public var dead:Bool = false; // dead marker to faciliate for Bout management/cleanup
 	
