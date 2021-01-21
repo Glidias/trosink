@@ -8,6 +8,7 @@ import hammer.recognizers.Swipe;
 import hammer.recognizers.Tap;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
+import js.Browser;
 import js.html.CanvasElement;
 import js.html.DOMElement;
 import js.html.PointerEvent;
@@ -58,6 +59,7 @@ class HammerJSCombat
 	public var requiredActs:Int = 0;	// enforce compulsory required events mask for callbacks
 	
 	var cursorDomRef:DOMElement;
+	var cpTrayDom:DOMElement;
 	inline function setCursorPos(x:Float, y:Float):Void {
 		if (cursorDomRef != null) {
 			cursorDomRef.style.transform = 'translate3d(${x}px, ${y}px, 0)';
@@ -99,13 +101,14 @@ class HammerJSCombat
 		if (viewModel.actingState == CombatViewModel.ACTING_DOLL_DRAG_CP) {
 			if (event == UIInteraction.MOVE) {
 				//trace("Drag move detect");
+				this.viewModel.setDraggedCP(this.viewModel.getDraggedCPAmountFromPos(currentGesture.center.x, currentGesture.center.y));
 			}
 			else if (event == UIInteraction.RELEASE) {
 				// check if outside screen, ignore?
 				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
 				defaultAct = DEFAULT_ACT_HOVER;
 				requiredActs = 0;
-				
+				viewModel.setDraggedCP(0);
 				//trace("Drag move release");
 			} else if (event == UIInteraction.CANCELED) {
 				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
@@ -132,7 +135,18 @@ class HammerJSCombat
 				if (event == UIInteraction.DOWN && index == viewModel.focusedIndex) {
 					viewModel.setDraggedCP(0);
 					viewModel.showFocusedTag = true;
+					viewModel.trayPosX = currentGesture.center.x;
+					viewModel.trayPosY = currentGesture.center.y;
+					calibrateDragCPTraySize();
+					//viewModel.trayGridSizeX = 32;
+					//viewModel.trayGridSizeY = 32;
+					//viewModel.trayPosFlip = viewModel.getHitLocationAtFocusIndex(
+					
+					
+					viewModel.trayPosFlip = viewModel.isFocusedEnemyLeftSide();
+					viewModel.trayPosFlipY = viewModel.isFocusedEnemyLower();
 					viewModel.setActingState(CombatViewModel.ACTING_DOLL_DRAG_CP);
+					
 					requiredActs = UIInteraction.MOVE | UIInteraction.CANCELED | UIInteraction.RELEASE;
 					defaultAct = null;
 				}
@@ -164,6 +178,24 @@ class HammerJSCombat
 		} else {
 			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}
+	}
+	
+	static inline var MAX_GRID_SIZE:Float = 60;
+	function calibrateDragCPTraySize() {
+		///viewModel.trayGridSizeX
+		var canvasWidth:Float = Browser.window.innerWidth; // imageMapData.scaleX * imageMapData.refWidth;
+		var canvasHeight:Float = Browser.window.innerHeight; // imageMapData.scaleY * imageMapData.refHeight;
+		var valY = Math.min(canvasWidth / 2 / 5, canvasHeight / 2 / 6);
+		if (valY > MAX_GRID_SIZE) valY = MAX_GRID_SIZE;
+		viewModel.trayGridSizeY = Math.floor(valY);
+		viewModel.trayGridShelfSize = Math.floor(0.65 * valY);
+		viewModel.trayGridSizeX = viewModel.trayGridSizeY;
+		if (this.cpTrayDom == null) this.cpTrayDom = Browser.document.getElementById('cpTray');
+		Browser.window.setTimeout(function() {
+			viewModel.trayGridSizeX = cpTrayDom.clientWidth / CombatViewModel.TRAY_TOTAL_COLS;
+			trace(viewModel.trayGridSizeX + ' , ' + viewModel.trayGridSizeX);
+		});
+		//viewModel.trayGridSizeX = Math.min(canvasWidth / 2 / 5, canvasHeight / 2 / 5);
 	}
 	
 	public function onViewModelObservationChange(gesture:GestureInteractionData=null):Void {

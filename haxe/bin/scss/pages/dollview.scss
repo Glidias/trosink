@@ -14,11 +14,16 @@
 	
 }
 
-
 .dollview {
 	button, a {
 		pointer-events:auto;
 		touch-action:auto;
+	}
+	
+	.cp-tray {
+		position:absolute; left:0; top:0; background-color:rgba(255,255,211,1); font-family:'Lucida Console', monospace; font-size:44px; line-height:1; letter-spacing:0.14em;
+		z-index:2;
+		transform-origin:0 0;
 	}
 
 	/*
@@ -33,7 +38,7 @@
 			position:relative;
 			width:auto;
 			display:inline-block;
-			z-index:10;
+			z-index:	10;
 			transform:translateX(-100%);
 		}
 	}
@@ -301,7 +306,7 @@
 		.desc {
 			font-size:11px;
 			color:#aaaaaa;
-			font-family:"Lucida Console", Monaco, monospace;
+			font-family:"Courier New", monospace;
 		}
 	}
 	.btn-zone {

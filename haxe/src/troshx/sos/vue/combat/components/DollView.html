@@ -14,14 +14,15 @@
 		</zone>
 		
 		<zone :index="mapData.idIndices['incomingManuevers']" :mapData="mapData" style="padding:5px" class="textarea-region">
-			<div v-show="isDraggingCP">todo: Drag CP tray</div>
 			<div class="observe-indicator" v-show="viewModel.incomingHeldDown" v-html="observePrompt"></div>
 			<div class="hover-tag" v-if="gotCurrentOpponent" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
 		</zone>
 			
 		<div v-if="player">
 			<zone :index="mapData.idIndices['cpMeter']" :mapData="mapData">
-				<div v-for="i in player.fight.cp">{{i}}</div>
+				<div v-for="i in cpMeterAmount">
+					<component :is="i <= player.fight.cp ? 'span' : 'del'">{{i}}</component>
+				</div>
 			</zone>
 				
 			<zone :index="mapData.idIndices['cpText']" :mapData="mapData">
@@ -43,6 +44,9 @@
 			<zone :index="mapData.idIndices['handRightText']" :mapData="mapData" v-if="rightItem">
 				<div class="lbl">{{rightItem.name}}</div>
 			</zone>
+			<div class="cp-tray" id="cpTray" v-show="isDraggingCP" v-html="dragCPHtml" :style="cpTrayStyle">
+				
+			</div>
 		</div>
 				
 		<div v-if="gotCurrentOpponent">

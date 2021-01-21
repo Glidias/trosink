@@ -7,7 +7,7 @@ import troshx.sos.vue.combat.components.DollView;
 import troshx.sos.vue.externs.VueScroll;
 import troshx.sos.vue.externs.WebGL2D;
 import troshx.util.AbsStringMap;
-//import troshx.sos.vue.combat.components.ImageMapTester;
+import troshx.sos.vue.combat.components.ImageMapTester;
 
 import troshx.util.layout.PointScaleConstraint;
 import troshx.util.layout.BorderConstraint;

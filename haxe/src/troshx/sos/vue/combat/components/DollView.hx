@@ -50,10 +50,6 @@ class DollView extends VComponent<DollViewData, NoneT>
 	public function new() 
 	{
 		super();
-		
-		// testing only
-		Manuever.getArray();
-		
 	}
 	
 	// PREGENS
@@ -135,7 +131,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	@:computed function get_CP():Int {
 		var pl = viewModel.getCurrentPlayer();
-		return pl.charSheet.CP;
+		return pl.charSheet.fullCP;
 	}
 	@:computed function get_remCP():Int {
 		return viewModel.getRemainingDisplayCP();
@@ -551,6 +547,80 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	@:computed function get_hitLocationArmorValues2():Dynamic<AV3> {
 		return getHitLocationArmorValues(this.hitLocationZeroAVValues2, Inventory.WEAR_WHOLE|Inventory.WEAR_LEFT);
+	}
+	
+	@:computed function get_cpTrayCSSTransform():String {
+		var scaleX = this.viewModel.trayPosFlip ? -1 : 1;
+		var scaleY = this.viewModel.trayPosFlipY ? -1 : 1;
+		return 'translate(${viewModel.trayPosX + viewModel.trayGridShelfX*scaleX}px, ${viewModel.trayPosY + viewModel.trayGridShelfSize*scaleY}px)' + ' scale(${scaleX},${scaleY})';
+	}
+	
+	@:computed function get_cpMeterAmount():Int {
+		return player.charSheet.CP;
+	}
+	
+	static inline var HTML_CHAR_DRAGGED = "◘";
+	static inline var HTML_CHAR_DICE = "◊";
+	
+	@:computed function get_dragCPHtml():String {
+		var player = this.player;
+		var draggedCP = viewModel.draggedCP;
+		
+		var totalShowCP = player.charSheet.fullCP;
+		
+		//var allotedCP = player.charSheet.CP; // alloted CP for fighting excluding pain
+		//var availableCP = player.fight.cp; // avilalbe usable CP for fighting across 2 exchanges
+		//meleeCP (-pain)
+		
+		// Show all indicators?
+		// pain x
+		// shock *
+		// used |
+		// fatique/prone/other .
+		
+		var totalRowsDn = Math.floor(totalShowCP / CombatViewModel.TRAY_TOTAL_COLS);
+		
+		// warning: assumed TRAY_TOTAL_COLS == 5
+		if (draggedCP > 0) {
+			var draggedRowsDn = Math.floor(draggedCP / CombatViewModel.TRAY_TOTAL_COLS);
+			return '<span>'+repeatTxt('${HTML_CHAR_DRAGGED}${HTML_CHAR_DRAGGED}${HTML_CHAR_DRAGGED}${HTML_CHAR_DRAGGED}${HTML_CHAR_DRAGGED}', draggedRowsDn, '<br>')+'</span>' + repeatTxt(HTML_CHAR_DRAGGED,  draggedCP - draggedRowsDn* CombatViewModel.TRAY_TOTAL_COLS) + getRemainingMid(draggedCP, HTML_CHAR_DICE, totalShowCP);
+		} else {
+			return repeatTxt('${HTML_CHAR_DICE}${HTML_CHAR_DICE}${HTML_CHAR_DICE}${HTML_CHAR_DICE}${HTML_CHAR_DICE}', totalRowsDn, '<br>') + repeatTxt(HTML_CHAR_DICE,  totalShowCP - totalRowsDn * CombatViewModel.TRAY_TOTAL_COLS);
+		}
+		/*
+		<span><del>&#9632;&#9632;&#9632;&#9632;&#9632;</del><br/>
+				&#9632;&#9632;&#9632;</span>&#9642;&#9642;<br/>
+				&#9642;&#9642;&#9642;&#9642;&#9642;<br/>
+				&#9642;&#9642;&#9642;&#9642;&#9642;<br/>
+		*/
+	}
+	
+	function getRemainingMid(fromAmount:Int, str:String, amount:Int):String {
+		var ab = amount - (Math.floor(amount / CombatViewModel.TRAY_TOTAL_COLS) * CombatViewModel.TRAY_TOTAL_COLS);
+		ab = amount - ab;
+		var residue = (ab - fromAmount) % CombatViewModel.TRAY_TOTAL_COLS;
+		if (residue < 0) residue = 0;
+		var s = repeatTxt(str, residue);
+		
+		
+		
+		var totalShowCP = amount - fromAmount - residue;
+		if (totalShowCP > 0 && residue > 0) s += "<br>";
+		var totalRowsDn= Math.floor(totalShowCP / CombatViewModel.TRAY_TOTAL_COLS);
+		return s + repeatTxt('${str}${str}${str}${str}${str}', totalRowsDn, '<br>') + repeatTxt(HTML_CHAR_DICE,  totalShowCP - totalRowsDn * CombatViewModel.TRAY_TOTAL_COLS);
+	}
+	
+	function repeatTxt(str:String, times:Int, lineBreak:String=''):String {
+		var s = '';
+		var lastIndex = times - 1;
+		for (i in 0...times) {
+			s += str +  lineBreak;  //(i != lastIndex ? lineBreak : lineBreak); trailing linebreak seems to be no issue
+		}
+		return s;
+	}
+	
+	@:computed function get_cpTrayStyle():Dynamic {
+		return {transform: this.cpTrayCSSTransform, 'font-size':'${viewModel.trayGridSizeY}px' };
 	}
 	
 	// UI Interaction and states

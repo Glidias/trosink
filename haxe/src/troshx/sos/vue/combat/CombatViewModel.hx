@@ -1,11 +1,13 @@
 package troshx.sos.vue.combat;
 import haxe.ds.IntMap;
+import haxe.ds.StringMap;
 import troshx.components.Bout.FightNode;
 import troshx.sos.combat.BoutModel;
 import troshx.sos.core.BodyChar;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Item;
+import troshx.sos.core.Manuever;
 import troshx.sos.core.TargetZone;
 import troshx.sos.core.Wound;
 import troshx.sos.sheets.CharSheet;
@@ -21,6 +23,46 @@ import troshx.util.LibUtil;
 class CombatViewModel 
 {
 	//public var focusInvalidateCount(default, null):Int = 0;
+	
+	public var trayPosX:Float = 0;
+	public var trayPosY:Float = 0;
+	public var trayGridSizeX:Float = 10;
+	public var trayGridSizeY:Float = 10;
+	public var trayGridShelfSize:Float = 10;
+	public var trayGridShelfX:Float = 8;
+	public static inline var TRAY_TOTAL_COLS:Int = 5;
+	
+	public var trayPosFlip:Bool = false;
+	public var trayPosFlipY:Bool = false;
+	public function getDraggedCPAmountFromPos(mx:Int, my:Int):Int {
+		var player = this.getCurrentPlayer();
+		var maxAvailableCP = player.fight.cp;
+		// any activation costs to be sbtracted
+		
+		var dx = trayPosFlip ? -1 : 1;
+		var dy = trayPosFlipY ? -1 : 1;
+		var x = trayPosX + trayGridShelfX * dx;
+		var y = trayPosY + trayGridShelfSize*dy;
+		var colIndex = Math.floor((mx - x) * dx / trayGridSizeX);
+		var rowIndex = Math.floor((my - y) * dy / trayGridSizeY);
+		if (rowIndex < 0 || colIndex < 0) {
+			return 0;
+		}
+		var amt =  (rowIndex) * CombatViewModel.TRAY_TOTAL_COLS + (colIndex+1);
+		if (amt > maxAvailableCP) amt = maxAvailableCP;
+		return amt;
+	}
+	
+	var manueverRepo:AbsStringMap<Manuever>;
+	
+	var MAP_LOWER_BODY_PARTS:StringMap<Bool> = [
+		'SWING_LOWER_LEG'=> true,
+		'SWING_UPPER_LEG'=> true,
+		'KNEE'=> true,
+		'LEG'=>	 true,
+		'SHIN'=> true,
+		'THIGH'=> true
+	];
 	
 	public var isTouchDragMode:Bool = false;
 	public var incomingHeldDown(default, null):Bool = false;
@@ -47,6 +89,32 @@ class CombatViewModel
 	public inline function setObserveIndex(val:Int):Void { // layout index
 		observeIndex = val;
 	}
+	
+	public function isFocusedEnemyLeftSide() {
+		var i = focusedIndex;
+		var str = null;
+		if (_swingMap.exists(i)) {
+			str = DOLL_SWING_Slugs[_swingMap.get(i)];
+		} else if (_partMap.exists(i)) {
+			str = DOLL_PART_Slugs[_partMap.get(i)];
+		}
+		return i == _enemyHandLeftIdx || (str != null && str.substr(str.length - 2) == "-l");
+	}
+	
+	public function isFocusedEnemyLower() {
+		var i = focusedIndex;
+		var str = null;
+		if (_swingMap.exists(i)) {
+			str = DOLL_SWING_Slugs[_swingMap.get(i)];
+		} else if (_partMap.exists(i)) {
+			str = DOLL_PART_Slugs[_partMap.get(i)];
+		}
+		if (str != null) {
+			str = str.split("-")[0];
+		}
+		return str != null && MAP_LOWER_BODY_PARTS.exists(str);
+	}
+
 	
 	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item):String {
 		var i = focusedIndex;
@@ -93,7 +161,7 @@ class CombatViewModel
 	}
 	
 	public var draggedCP(default, null):Int = 0;
-	public function setDraggedCP(val:Int):Void {
+	public inline function setDraggedCP(val:Int):Void {
 		draggedCP = val;
 	}
 	
@@ -384,10 +452,12 @@ class CombatViewModel
 	
 	public function new(boutModel:BoutModel=null) 
 	{
-		this.boutModel = boutModel!=null ? boutModel : new BoutModel();
+		this.boutModel = boutModel != null ? boutModel : new BoutModel();
+		this.manueverRepo = Manuever.getMap();
 	}
 	
 	
+		
 	
 	
 	
