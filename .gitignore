@@ -1,0 +1,4 @@
+haxe/bin/scss/**/*.css
+haxe/bin/scss/**/*.map
+haxe/bin/scss/pages/.sass-cache
+haxe/bin/scss/pages/.sass-cache/**/*
