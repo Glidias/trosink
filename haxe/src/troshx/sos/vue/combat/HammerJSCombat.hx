@@ -180,13 +180,15 @@ class HammerJSCombat
 		}
 	}
 	
-	static inline var MAX_GRID_SIZE:Float = 60;
+	static inline var MAX_GRID_SIZE:Float = 64;
+	static inline var MIN_GRID_SIZE:Float = 36;
 	function calibrateDragCPTraySize() {
 		///viewModel.trayGridSizeX
 		var canvasWidth:Float = Browser.window.innerWidth; // imageMapData.scaleX * imageMapData.refWidth;
 		var canvasHeight:Float = Browser.window.innerHeight; // imageMapData.scaleY * imageMapData.refHeight;
 		var valY = Math.min(canvasWidth / 2 / 5, canvasHeight / 2 / 6);
 		if (valY > MAX_GRID_SIZE) valY = MAX_GRID_SIZE;
+		if (valY < MIN_GRID_SIZE) valY  = MIN_GRID_SIZE;
 		viewModel.trayGridSizeY = Math.floor(valY);
 		viewModel.trayGridShelfSize = Math.floor(0.65 * valY);
 		viewModel.trayGridSizeX = viewModel.trayGridSizeY;
