@@ -219,7 +219,7 @@ Superior: Your Kicks now inflict an additional +2 damage.
 	public function new() 
 	{
 		super("trip", "Trip");
-		_reach(Weapon.REACH_HA)._tn(8)._targetZoneMode(Manuever.specificTargetZoneModeMask((1 << Humanoid.SWING_UPPER_LEG) | (1 << Humanoid.SWING_LOWER_LEG)))._superior();
+		_reach(Weapon.REACH_HA)._tn(8)._attackTypes(Manuever.ATTACK_TYPE_SWING | Manuever.ATTACK_TYPE_THRUST)._targetZoneMode(Manuever.specificTargetZoneModeMask((1 << Humanoid.SWING_UPPER_LEG) | (1 << Humanoid.SWING_LOWER_LEG)))._superior();
 	}
  }
  /* Trip [X]

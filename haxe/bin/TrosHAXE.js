@@ -9765,7 +9765,7 @@ troshx_sos_core_Manuever.getArray = function() {
 	}
 };
 troshx_sos_core_Manuever.getNewArray = function() {
-	return [new troshx_sos_core_Manuever("swing","Swing")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_manuevers_DrawCut(),new troshx_sos_manuevers_CleavingBlow(),new troshx_sos_core_Manuever("thrust","Thrust")._types(2)._requisite(1)._attackTypes(2),new troshx_sos_manuevers_PushCut(),new troshx_sos_manuevers_JointThrust(),new troshx_sos_manuevers_Hook(),new troshx_sos_manuevers_Feint(),new troshx_sos_manuevers_Disarm(),new troshx_sos_manuevers_Beat(),new troshx_sos_manuevers_Break(),new troshx_sos_manuevers_Hew(),new troshx_sos_manuevers_ShieldBeat(),new troshx_sos_manuevers_DisarmUnarmedAtk(),new troshx_sos_core_Manuever("parry","Parry")._types(1)._requisite(1)._tags(64),new troshx_sos_manuevers_Riposte(),new troshx_sos_manuevers_ArmParry(),new troshx_sos_manuevers_DisarmUnarmedDef(),new troshx_sos_core_Manuever("void","Void")._types(1)._tags(128)._tn(8)._bs(2),new troshx_sos_manuevers_HastyVoid(),new troshx_sos_manuevers_MobileVoid(),new troshx_sos_manuevers_Flee(),new troshx_sos_core_Manuever("block","Block")._types(1)._requisite(2)._tags(256),new troshx_sos_manuevers_ShieldBind(),new troshx_sos_manuevers_TotalBlock(),new troshx_sos_manuevers_ShieldFeint(),new troshx_sos_manuevers_NetFeint(),new troshx_sos_core_Manuever("buttStrike","Butt Strike")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_core_Manuever("pommelStrike","Pommel Strike")._types(2)._requisite(1)._attackTypes(2)._tn(6)._superior(),new troshx_sos_core_Manuever("halfSword","Half-Sword")._types(8)._requisite(1)._tags(1536)._costs(1),new troshx_sos_core_Manuever("murderStrike","Murder Strike")._types(8)._requisite(1)._tags(1536)._costs(2),new troshx_sos_manuevers_StealInitiative(),new troshx_sos_manuevers_Elbow(),new troshx_sos_manuevers_HeadButt(),new troshx_sos_manuevers_HookPunch(),new troshx_sos_manuevers_Kick(),new troshx_sos_manuevers_Knee(),new troshx_sos_manuevers_Trip(),new troshx_sos_manuevers_OneTwoPunch(),new troshx_sos_manuevers_MeleeShoot(),new troshx_sos_manuevers_WeaponThrow(),new troshx_sos_manuevers_BlindToss(),new troshx_sos_manuevers_NetToss(),new troshx_sos_core_Manuever("doNothing","Do Nothing")._types(0)._costs(0,-1)._superiorInit(function(m) {
+	return [new troshx_sos_core_Manuever("swing","Swing")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_manuevers_DrawCut(),new troshx_sos_manuevers_CleavingBlow(),new troshx_sos_core_Manuever("thrust","Thrust")._types(2)._requisite(1)._attackTypes(2),new troshx_sos_manuevers_PushCut(),new troshx_sos_manuevers_JointThrust(),new troshx_sos_manuevers_Hook(),new troshx_sos_manuevers_Feint(),new troshx_sos_manuevers_Disarm(),new troshx_sos_manuevers_Beat(),new troshx_sos_manuevers_Break(),new troshx_sos_manuevers_Hew(),new troshx_sos_manuevers_ShieldBeat(),new troshx_sos_manuevers_DisarmUnarmedAtk(),new troshx_sos_core_Manuever("parry","Parry")._types(1)._requisite(1)._tags(64),new troshx_sos_manuevers_Riposte(),new troshx_sos_manuevers_ArmParry(),new troshx_sos_manuevers_DisarmUnarmedDef(),new troshx_sos_core_Manuever("void","Void")._types(1)._tags(128)._tn(8)._bs(2),new troshx_sos_manuevers_HastyVoid(),new troshx_sos_manuevers_MobileVoid(),new troshx_sos_manuevers_Flee(),new troshx_sos_core_Manuever("block","Block")._types(1)._requisite(2)._tags(256),new troshx_sos_manuevers_ShieldBind(),new troshx_sos_manuevers_TotalBlock(),new troshx_sos_manuevers_ShieldFeint(),new troshx_sos_manuevers_NetFeint(),new troshx_sos_core_Manuever("buttStrike","Butt Strike")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_core_Manuever("pommelStrike","Pommel Strike")._types(2)._requisite(1)._attackTypes(2)._tn(6)._superior(),new troshx_sos_core_Manuever("halfSword","Half-Sword")._types(8)._requisite(1)._tags(1536)._costs(1),new troshx_sos_core_Manuever("murderStrike","Murder Strike")._types(8)._requisite(1)._tags(1536)._costs(2),new troshx_sos_manuevers_StealInitiative(),new troshx_sos_manuevers_StraightPunch(),new troshx_sos_manuevers_HookPunch(),new troshx_sos_manuevers_Elbow(),new troshx_sos_manuevers_HeadButt(),new troshx_sos_manuevers_Kick(),new troshx_sos_manuevers_Knee(),new troshx_sos_manuevers_Trip(),new troshx_sos_manuevers_OneTwoPunch(),new troshx_sos_manuevers_MeleeShoot(),new troshx_sos_manuevers_WeaponThrow(),new troshx_sos_manuevers_BlindToss(),new troshx_sos_manuevers_NetToss(),new troshx_sos_core_Manuever("doNothing","Do Nothing")._types(0)._costs(0,-1)._superiorInit(function(m) {
 		m.name = "Focus";
 	}),new troshx_sos_core_Manuever("masterStrike","Masterstrike")._types(0)._costs(2)._superior(),new troshx_sos_core_Manuever("doubleAttack","Double Attack")._types(0)._costs(1),new troshx_sos_core_Manuever("doubleShot","Double Shot")._types(0)._costs(2),new troshx_sos_core_Manuever("quickDefense","Quick Defense")._types(0)._costs(2),new troshx_sos_core_Manuever("quickDraw","Quick Draw")._types(0)._costs(1,-1)._tags(1024),new troshx_sos_core_Manuever("allyDefense","Ally Defense")._types(0)._costs(2)._tags(1025),new troshx_sos_core_Manuever("threadNeedle","Thread the Needle")._types(0)._tags(3072),new troshx_sos_core_Manuever("rapidRise","Rapid Rise")._types(0)._tags(3072)._costs(3,-1),new troshx_sos_core_Manuever("guardedAttack","Guarded Attack")._types(0)];
 };
@@ -11356,7 +11356,7 @@ troshx_sos_manuevers_Kick.prototype = $extend(troshx_sos_manuevers_PugilisiticAt
 });
 var troshx_sos_manuevers_Trip = function() {
 	troshx_sos_manuevers_PugilisiticAttack.call(this,"trip","Trip");
-	this._reach(1)._tn(8)._targetZoneMode(-192)._superior();
+	this._reach(1)._tn(8)._attackTypes(3)._targetZoneMode(-192)._superior();
 };
 $hxClasses["troshx.sos.manuevers.Trip"] = troshx_sos_manuevers_Trip;
 troshx_sos_manuevers_Trip.__name__ = ["troshx","sos","manuevers","Trip"];
@@ -12731,6 +12731,9 @@ troshx_sos_sheets_CharSheet.prototype = {
 		var row = this.get_encumbranceLvlRow();
 		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp);
 	}
+	,get_fullCP: function() {
+		return this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0))));
+	}
 	,get_meleeCP: function() {
 		var row = this.get_encumbranceLvlRow();
 		return row.cpMult * this.clampIntZero(this.getModifiedValue(13,(this.schoolLevel >= 1 ? this.schoolLevel : 0) + this.clampIntZero(this.getModifiedValue(8,(this.get_AGI() + this.get_WIT()) / 2 | 0))) * (this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[this.get_fatiqueLevel()].cp) - this.get_pain();
@@ -12876,12 +12879,136 @@ var troshx_sos_vue_combat_CombatViewModel = function(boutModel) {
 	this.observeOpponent = false;
 	this.incomingHeldDown = false;
 	this.isTouchDragMode = false;
+	var _g = new haxe_ds_StringMap();
+	if(__map_reserved["SWING_LOWER_LEG"] != null) {
+		_g.setReserved("SWING_LOWER_LEG",true);
+	} else {
+		_g.h["SWING_LOWER_LEG"] = true;
+	}
+	if(__map_reserved["SWING_UPPER_LEG"] != null) {
+		_g.setReserved("SWING_UPPER_LEG",true);
+	} else {
+		_g.h["SWING_UPPER_LEG"] = true;
+	}
+	if(__map_reserved["KNEE"] != null) {
+		_g.setReserved("KNEE",true);
+	} else {
+		_g.h["KNEE"] = true;
+	}
+	if(__map_reserved["LEG"] != null) {
+		_g.setReserved("LEG",true);
+	} else {
+		_g.h["LEG"] = true;
+	}
+	if(__map_reserved["SHIN"] != null) {
+		_g.setReserved("SHIN",true);
+	} else {
+		_g.h["SHIN"] = true;
+	}
+	if(__map_reserved["THIGH"] != null) {
+		_g.setReserved("THIGH",true);
+	} else {
+		_g.h["THIGH"] = true;
+	}
+	this.MAP_LOWER_BODY_PARTS = _g;
+	this.trayPosFlipY = false;
+	this.trayPosFlip = false;
+	this.trayGridShelfX = 8;
+	this.trayGridShelfSize = 10;
+	this.trayGridSizeY = 10;
+	this.trayGridSizeX = 10;
+	this.trayPosY = 0;
+	this.trayPosX = 0;
 	this.boutModel = boutModel != null ? boutModel : new troshx_sos_combat_BoutModel();
+	this.manueverRepo = troshx_sos_core_Manuever.getMap();
+	this.basicSwing = this.manueverRepo["swing"];
+	this.basicThrust = this.manueverRepo["thrust"];
+	var _e = this.manueverRepo;
+	this.advSwingArr = ["drawCut","cleavingBlow","hook","feint"].map(function(p) {
+		return _e[p];
+	});
+	var _e1 = this.manueverRepo;
+	this.advThrustArr = ["pushCut","jointThrust","hook","feint"].map(function(p1) {
+		return _e1[p1];
+	});
+	var _e2 = this.manueverRepo;
+	this.advAntiHandWithWeaponArr = ["disarm","beat","break","hew"].map(function(p2) {
+		return _e2[p2];
+	});
+	var _e3 = this.manueverRepo;
+	this.advAntiHandUnarmedArr = ["disarmUnarmedAtk"].map(function(p3) {
+		return _e3[p3];
+	});
+	var _e4 = this.manueverRepo;
+	this.advAntiHandWithShieldArr = ["shieldBeat"].map(function(p4) {
+		return _e4[p4];
+	});
+	this.basicHookPunch = this.manueverRepo["hookPunch"];
+	this.basicStraightPunch = this.manueverRepo["straightPunch"];
+	var _e5 = this.manueverRepo;
+	this.advPuglismSwingArr = ["","elbow","kick","trip"].map(function(p5) {
+		return _e5[p5];
+	});
+	var _e6 = this.manueverRepo;
+	this.advPuglismThrustArr = ["headbutt","knee","kick","trip"].map(function(p6) {
+		return _e6[p6];
+	});
+	this.mOneTwoPunch = this.manueverRepo["oneTwoPunch"];
+	this.basicMeleeShoot = this.manueverRepo["meleeShoot"];
+	this.basicNetToss = this.manueverRepo["netToss"];
+	var _e7 = this.manueverRepo;
+	this.advRangedArr = ["","","blindToss","weaponThrow"].map(function(p7) {
+		return _e7[p7];
+	});
+	this.basicVoid = this.manueverRepo["void"];
+	this.basicParry = this.manueverRepo["parry"];
+	this.basicBlock = this.manueverRepo["block"];
+	var _e8 = this.manueverRepo;
+	this.advVoidArr = ["hastyVoid","mobileVoid","","flee"].map(function(p8) {
+		return _e8[p8];
+	});
+	var _e9 = this.manueverRepo;
+	this.advParryArr = ["disarmUnarmedDef","armParry","riposte",""].map(function(p9) {
+		return _e9[p9];
+	});
+	var _e10 = this.manueverRepo;
+	this.advBlockArr = ["","shieldBind","","totalBlock"].map(function(p10) {
+		return _e10[p10];
+	});
+	this.mStealInitiative = this.manueverRepo["stealInitiative"];
+	this.mDoNothing = this.manueverRepo["doNothing"];
+	this.mMasterStrike = this.manueverRepo["masterStrike"];
+	this.mDoubleAttack = this.manueverRepo["doubleAttack"];
+	this.mDoubleShot = this.manueverRepo["mDoubleShot"];
+	this.mQuickDefense = this.manueverRepo["quickDefense"];
+	this.mQuickDraw = this.manueverRepo["quickDraw"];
+	this.mAllyDefense = this.manueverRepo["allyDefense"];
+	this.mThreadNeedle = this.manueverRepo["threadNeedle"];
+	this.mRapidRise = this.manueverRepo["rapidRise"];
+	this.mGuardedAttack = this.manueverRepo["guardedAttack"];
 };
 $hxClasses["troshx.sos.vue.combat.CombatViewModel"] = troshx_sos_vue_combat_CombatViewModel;
 troshx_sos_vue_combat_CombatViewModel.__name__ = ["troshx","sos","vue","combat","CombatViewModel"];
 troshx_sos_vue_combat_CombatViewModel.prototype = {
-	setIncomingHeldDown: function(val) {
+	getDraggedCPAmountFromPos: function(mx,my) {
+		var player = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
+		var maxAvailableCP = player.fight.cp;
+		var dx = this.trayPosFlip ? -1 : 1;
+		var dy = this.trayPosFlipY ? -1 : 1;
+		var x = this.trayPosX + this.trayGridShelfX * dx;
+		var y = this.trayPosY + this.trayGridShelfSize * dy;
+		var colIndex = Math.floor((mx - x) * dx / this.trayGridSizeX);
+		var rowIndex = Math.floor((my - y) * dy / this.trayGridSizeY);
+		if(rowIndex < 0 || colIndex < 0) {
+			return 0;
+		}
+		var amt = rowIndex * 5 + (colIndex + 1);
+		if(amt > maxAvailableCP) {
+			amt = maxAvailableCP;
+		}
+		return amt;
+	}
+	,setIncomingHeldDown: function(val) {
 		this.incomingHeldDown = val;
 	}
 	,setObserveOpponent: function(val) {
@@ -12902,6 +13029,46 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 		}
 		var curPlayer = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
 		var weaponAssign = offhand ? curPlayer.charSheet.inventory.getOffhandWeaponAssign() : curPlayer.charSheet.inventory.getMasterWeaponAssign();
+	}
+	,isFocusedEnemyLeftSide: function() {
+		var i = this.focusedIndex;
+		var str = null;
+		if(this._swingMap.h.hasOwnProperty(i)) {
+			str = this.DOLL_SWING_Slugs[this._swingMap.h[i]];
+		} else if(this._partMap.h.hasOwnProperty(i)) {
+			str = this.DOLL_PART_Slugs[this._partMap.h[i]];
+		}
+		if(i != this._enemyHandLeftIdx) {
+			if(str != null) {
+				return HxOverrides.substr(str,str.length - 2,null) == "-l";
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	,isFocusedEnemyLower: function() {
+		var i = this.focusedIndex;
+		var str = null;
+		if(this._swingMap.h.hasOwnProperty(i)) {
+			str = this.DOLL_SWING_Slugs[this._swingMap.h[i]];
+		} else if(this._partMap.h.hasOwnProperty(i)) {
+			str = this.DOLL_PART_Slugs[this._partMap.h[i]];
+		}
+		if(str != null) {
+			str = str.split("-")[0];
+		}
+		if(str != null) {
+			var _this = this.MAP_LOWER_BODY_PARTS;
+			if(__map_reserved[str] != null) {
+				return _this.existsReserved(str);
+			} else {
+				return _this.h.hasOwnProperty(str);
+			}
+		} else {
+			return false;
+		}
 	}
 	,getFocusedLabel: function(enemyLeftItem,enemyRightItem) {
 		var i = this.focusedIndex;
@@ -13291,19 +13458,20 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 			return;
 		}
 		if(this.viewModel.actingState == 1) {
-			if(event != 2) {
-				if(event == 32768) {
-					this.viewModel.setActingState(0);
-					this.defaultAct = this.DEFAULT_ACT_HOVER;
-					this.requiredActs = 0;
-				} else if(event == 16384) {
-					this.viewModel.setActingState(0);
-					this.defaultAct = this.DEFAULT_ACT_HOVER;
-					this.requiredActs = 0;
-					this.viewModel.setDraggedCP(0);
-				} else {
-					return;
-				}
+			if(event == 2) {
+				this.viewModel.draggedCP = this.viewModel.getDraggedCPAmountFromPos(this.currentGesture.center.x,this.currentGesture.center.y);
+			} else if(event == 32768) {
+				this.viewModel.setActingState(0);
+				this.defaultAct = this.DEFAULT_ACT_HOVER;
+				this.requiredActs = 0;
+				this.viewModel.draggedCP = 0;
+			} else if(event == 16384) {
+				this.viewModel.setActingState(0);
+				this.defaultAct = this.DEFAULT_ACT_HOVER;
+				this.requiredActs = 0;
+				this.viewModel.draggedCP = 0;
+			} else {
+				return;
 			}
 			return;
 		}
@@ -13319,8 +13487,13 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 					this.viewModel.observeIndex = index;
 				}
 			} else if(event == 1 && index == this.viewModel.focusedIndex) {
-				this.viewModel.setDraggedCP(0);
+				this.viewModel.draggedCP = 0;
 				this.viewModel.showFocusedTag = true;
+				this.viewModel.trayPosX = this.currentGesture.center.x;
+				this.viewModel.trayPosY = this.currentGesture.center.y;
+				this.calibrateDragCPTraySize();
+				this.viewModel.trayPosFlip = this.viewModel.isFocusedEnemyLeftSide();
+				this.viewModel.trayPosFlipY = this.viewModel.isFocusedEnemyLower();
 				this.viewModel.setActingState(1);
 				this.requiredActs = 49154;
 				this.defaultAct = null;
@@ -13349,6 +13522,28 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 		} else if(name != "vitals") {
 			console.log("unhadnled:" + name + " ::" + event + " : " + this.currentGesture.type);
 		}
+	}
+	,calibrateDragCPTraySize: function() {
+		var _gthis = this;
+		var canvasWidth = window.innerWidth;
+		var canvasHeight = window.innerHeight;
+		var valY = Math.min(canvasWidth / 2 / 5,canvasHeight / 2 / 6);
+		if(valY > 64) {
+			valY = 64;
+		}
+		if(valY < 36) {
+			valY = 36;
+		}
+		this.viewModel.trayGridSizeY = Math.floor(valY);
+		this.viewModel.trayGridShelfSize = Math.floor(0.65 * valY);
+		this.viewModel.trayGridSizeX = this.viewModel.trayGridSizeY;
+		if(this.cpTrayDom == null) {
+			this.cpTrayDom = window.document.getElementById("cpTray");
+		}
+		window.setTimeout(function() {
+			_gthis.viewModel.trayGridSizeX = _gthis.cpTrayDom.clientWidth / 5;
+			console.log(_gthis.viewModel.trayGridSizeX + " , " + _gthis.viewModel.trayGridSizeX);
+		});
 	}
 	,onViewModelObservationChange: function(gesture) {
 		var viewModel = this.viewModel;
@@ -13890,7 +14085,6 @@ troshx_sos_vue_combat_UInteract.prototype = {
 };
 var troshx_sos_vue_combat_components_DollView = function() {
 	haxevx_vuex_core_VComponent.call(this);
-	troshx_sos_core_Manuever.getArray();
 };
 $hxClasses["troshx.sos.vue.combat.components.DollView"] = troshx_sos_vue_combat_components_DollView;
 troshx_sos_vue_combat_components_DollView.__name__ = ["troshx","sos","vue","combat","components","DollView"];
@@ -14001,8 +14195,7 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		var _this = this.viewModel;
 		var pl = _this.currentPlayerIndex >= 0 ? _this.boutModel.bout.combatants[_this.currentPlayerIndex] : null;
 		var _this1 = pl.charSheet;
-		var row = _this1.get_encumbranceLvlRow();
-		return row.cpMult * _this1.clampIntZero(_this1.getModifiedValue(13,(_this1.schoolLevel >= 1 ? _this1.schoolLevel : 0) + _this1.clampIntZero(_this1.getModifiedValue(8,(_this1.get_AGI() + _this1.get_WIT()) / 2 | 0))) * (_this1.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this1.get_fatiqueLevel()].cp);
+		return _this1.clampIntZero(_this1.getModifiedValue(13,(_this1.schoolLevel >= 1 ? _this1.schoolLevel : 0) + _this1.clampIntZero(_this1.getModifiedValue(8,(_this1.get_AGI() + _this1.get_WIT()) / 2 | 0))));
 	}
 	,get_remCP: function() {
 		return this.viewModel.getRemainingDisplayCP();
@@ -14387,6 +14580,61 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 	,get_hitLocationArmorValues2: function() {
 		return this.getHitLocationArmorValues(this.hitLocationZeroAVValues2,6);
 	}
+	,get_cpTrayCSSTransform: function() {
+		var scaleX = this.viewModel.trayPosFlip ? -1 : 1;
+		var scaleY = this.viewModel.trayPosFlipY ? -1 : 1;
+		return "translate(" + (this.viewModel.trayPosX + this.viewModel.trayGridShelfX * scaleX) + "px, " + (this.viewModel.trayPosY + this.viewModel.trayGridShelfSize * scaleY) + "px)" + (" scale(" + scaleX + "," + scaleY + ")");
+	}
+	,get_cpMeterAmount: function() {
+		var _this = this.player.charSheet;
+		var row = _this.get_encumbranceLvlRow();
+		return row.cpMult * _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0))) * (_this.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this.get_fatiqueLevel()].cp);
+	}
+	,get_dragCPHtml: function() {
+		var player = this.player;
+		var draggedCP = this.viewModel.draggedCP;
+		var _this = player.charSheet;
+		var totalShowCP = _this.clampIntZero(_this.getModifiedValue(13,(_this.schoolLevel >= 1 ? _this.schoolLevel : 0) + _this.clampIntZero(_this.getModifiedValue(8,(_this.get_AGI() + _this.get_WIT()) / 2 | 0))));
+		var totalRowsDn = Math.floor(totalShowCP / 5);
+		if(draggedCP > 0) {
+			var draggedRowsDn = Math.floor(draggedCP / 5);
+			return "<span>" + this.repeatTxt("◘" + "◘" + "◘" + "◘" + "◘",draggedRowsDn,"<br>") + "</span>" + this.repeatTxt("◘",draggedCP - draggedRowsDn * 5) + this.getRemainingMid(draggedCP,"◊",totalShowCP);
+		} else {
+			return this.repeatTxt("◊" + "◊" + "◊" + "◊" + "◊",totalRowsDn,"<br>") + this.repeatTxt("◊",totalShowCP - totalRowsDn * 5);
+		}
+	}
+	,getRemainingMid: function(fromAmount,str,amount) {
+		var ab = amount - Math.floor(amount / 5) * 5;
+		ab = amount - ab;
+		var residue = (ab - fromAmount) % 5;
+		if(residue < 0) {
+			residue = 0;
+		}
+		var s = this.repeatTxt(str,residue);
+		var totalShowCP = amount - fromAmount - residue;
+		if(totalShowCP > 0 && residue > 0) {
+			s += "<br>";
+		}
+		var totalRowsDn = Math.floor(totalShowCP / 5);
+		return s + this.repeatTxt("" + str + str + str + str + str,totalRowsDn,"<br>") + this.repeatTxt("◊",totalShowCP - totalRowsDn * 5);
+	}
+	,repeatTxt: function(str,times,lineBreak) {
+		if(lineBreak == null) {
+			lineBreak = "";
+		}
+		var s = "";
+		var lastIndex = times - 1;
+		var _g1 = 0;
+		var _g = times;
+		while(_g1 < _g) {
+			var i = _g1++;
+			s += str + lineBreak;
+		}
+		return s;
+	}
+	,get_cpTrayStyle: function() {
+		return { transform : this.cpTrayCSSTransform, "font-size" : "" + this.viewModel.trayGridSizeY + "px"};
+	}
 	,setupUIInteraction: function() {
 		this.hammerUI = new troshx_sos_vue_combat_HammerJSCombat(this.$refs.container,this.mapData,null,this.$refs.cursor);
 		this.hammerUI.viewModel = this.viewModel;
@@ -14465,7 +14713,7 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		d.renderCount++;
 	}
 	,Template: function() {
-		return "<div class=\"dollview\" style=\"position:absolute;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div class=\"mouse-cursor\" ref=\"cursor\" :class=\"{observe:viewModel.observeOpponent}\" />\r\n\t<div v-if=\"mapData.renderCount!=0\" style=\"width:100%;height:100%;top:0;left;0;position:absolute;\">\r\n\t\t<div class=\"bg\" v-show=\"gotCurrentOpponent\" style=\"position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain\"></div>\r\n\t\t<zone :index=\"mapData.idIndices['vitals']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\" :class=\"{'enableinput':!player}\">\r\n\t\t\t<div v-if=\"player\">\r\n\t\t\t\t<div>F: <span>{{fatique}}</span></div>\r\n\t\t\t\t<div>Pain: <span>{{pain}}</span></div>\r\n\t\t\t\t<div>BL: <span>{{BL}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<button @click=\"showSelfPregens\" style=\"width:100%; height:100%; position:absolute;top:0;left:0;width:100%;height:100%\">Select your character</button>\r\n\t\t\t</div>\r\n\t\t</zone>\r\n\t\t\r\n\t\t<zone :index=\"mapData.idIndices['incomingManuevers']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\">\r\n\t\t\t<div v-show=\"isDraggingCP\">todo: Drag CP tray</div>\r\n\t\t\t<div class=\"observe-indicator\" v-show=\"viewModel.incomingHeldDown\" v-html=\"observePrompt\"></div>\r\n\t\t\t<div class=\"hover-tag\" v-if=\"gotCurrentOpponent\" v-show=\"viewModel.showFocusedTag\" v-html=\"focusedTextLbl\"></div>\r\n\t\t</zone>\r\n\t\t\t\r\n\t\t<div v-if=\"player\">\r\n\t\t\t<zone :index=\"mapData.idIndices['cpMeter']\" :mapData=\"mapData\">\r\n\t\t\t\t<div v-for=\"i in player.fight.cp\">{{i}}</div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices['cpText']\" :mapData=\"mapData\">\r\n\t\t\t\t<div> {{CP}}cp</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\">-{{viewModel.draggedCP}}</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\"> {{remCP}}</div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"leftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftText']\" :mapData=\"mapData\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\">{{leftItem.name}}</div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"rightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightText']\" :mapData=\"mapData\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\">{{rightItem.name}}</div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t<div v-show=\"gotCurrentOpponent\">\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever1']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">mva1</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever2']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gag</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever3']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">wgw</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever4']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gwgwwaw</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t\t\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnBlock']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">B</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnParry']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">P</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnVoid']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">V</div>\r\n\t\t\t\t</zone>\r\n\t\t\t</div>\r\n\t\t\t\t\r\n\t\t</div>\r\n\t\t\t\t\r\n\t\t<div v-if=\"gotCurrentOpponent\">\r\n\t\t\t\t\r\n\t\t\t<zone v-bind=\"stylePartProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\">\r\n\t\t\t\t<div class=\"thrust-point\" v-if=\"viewModel.isDollPartThrustable(i)\" :style=\"thrustPointStyle\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleSwingProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_SWING_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\"></zone>\r\n\t\t\t\r\n\t\r\n\t\t\t\t\t\r\n\t\t\t<zone v-bind=\"armorPartProps[i]\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\">\r\n\t\t\t\t<div class=\"shieldmark\" v-show=\"dollShieldCoverageBools[i]\" :style=\"shieldIconStyle\"></div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.observeIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandLeft']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyLeftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyRightItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandRight']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyRightTypeTag\"></div>\r\n\t\t\t</zone>\t\t\r\n\t\t\t\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandLeft']\"></zone>\t\t\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyRightItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandRight']\"></zone>\t\r\n\t\r\n\t\t\t<zone :index=\"mapData.idIndices['opponentSwiper']\" :mapData=\"mapData\" class=\"textarea-region\">\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li v-for=\"(li, i) in opponents\" :key=\"i\">{{li.label}}</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</zone>\r\n\t\t</div>\t\r\n\t\t<div v-else>\r\n\t\t\t<div class=\"select-opponent\">\r\n\t\t\t\t<button @click=\"showOpponentPregens\">Select opponent</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\t\t\t\r\n\t\t<div v-if=\"gotCurrentOpponent && player && player.targetLink\">\r\n\t\t\t<zone :index=\"mapData.idIndices['initRange']\" :mapData=\"mapData\" style=\"overflow:visible\">\r\n\t\t\t\t<div class=\"bger\"></div>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\t\t\t\r\n\t\t\r\n\t\t<div v-if=\"gotPregens\">\r\n\t\t\t<pregens :header=\"pregenHeader\" :characters=\"fightChars.pool\" @close=\"closePregens\" @singleCharSelected=\"confirmPregens\" @multiCharSelected=\"confirmPregens\"></pregens>\r\n\t\t</div>\r\n\t\t\r\n\t\t<!--<div v-for=\"(li, i) in armorColorScale\" :key=\"i\" :style=\"{color:li}\">-</div>-->\r\n\t\t\t\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\" v-if=\"mapData.renderCount==0\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"99, 318, 105, 318, 115, 332, 98, 371, 94, 376, 95, 358, 85, 377, 80, 377, 86, 360, 83, 358, 68, 378, 70, 366, 62, 366, 77, 343, 71, 343, 70, 338, 81, 326, 99, 318\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"381, 320, 405, 327, 417, 340, 411, 346, 424, 366, 424, 370, 417, 371, 417, 378, 402, 359, 404, 379, 392, 360, 392, 375, 388, 371, 372, 334, 372, 327, 381, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
+		return "<div class=\"dollview\" style=\"position:absolute;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div class=\"mouse-cursor\" ref=\"cursor\" :class=\"{observe:viewModel.observeOpponent}\" />\r\n\t<div v-if=\"mapData.renderCount!=0\" style=\"width:100%;height:100%;top:0;left;0;position:absolute;\">\r\n\t\t<div class=\"bg\" v-show=\"gotCurrentOpponent\" style=\"position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain\"></div>\r\n\t\t<zone :index=\"mapData.idIndices['vitals']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\" :class=\"{'enableinput':!player}\">\r\n\t\t\t<div v-if=\"player\">\r\n\t\t\t\t<div>F: <span>{{fatique}}</span></div>\r\n\t\t\t\t<div>Pain: <span>{{pain}}</span></div>\r\n\t\t\t\t<div>BL: <span>{{BL}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<button @click=\"showSelfPregens\" style=\"width:100%; height:100%; position:absolute;top:0;left:0;width:100%;height:100%\">Select your character</button>\r\n\t\t\t</div>\r\n\t\t</zone>\r\n\r\n\t\t<zone :index=\"mapData.idIndices['incomingManuevers']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\">\r\n\t\t\t<div class=\"observe-indicator\" v-show=\"viewModel.incomingHeldDown\" v-html=\"observePrompt\"></div>\r\n\t\t\t<div class=\"hover-tag\" v-if=\"gotCurrentOpponent\" v-show=\"viewModel.showFocusedTag\" v-html=\"focusedTextLbl\"></div>\r\n\t\t</zone>\r\n\r\n\t\t<div v-if=\"player\">\r\n\t\t\t<zone :index=\"mapData.idIndices['cpMeter']\" :mapData=\"mapData\">\r\n\t\t\t\t<div v-for=\"i in cpMeterAmount\">\r\n\t\t\t\t\t<component :is=\"i <= player.fight.cp ? 'span' : 'del'\">{{i}}</component>\r\n\t\t\t\t</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['cpText']\" :mapData=\"mapData\">\r\n\t\t\t\t<div> {{CP}}cp</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\">-{{viewModel.draggedCP}}</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\"> {{remCP}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"leftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftText']\" :mapData=\"mapData\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\">{{leftItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"rightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightText']\" :mapData=\"mapData\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\">{{rightItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<div v-show=\"gotCurrentOpponent\">\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever1']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">Disarmed (unarmed)</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever2']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gag</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever3']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">wgw</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever4']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gwgwwaw</div>\r\n\t\t\t\t</zone>\r\n\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnBlock']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">B</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnParry']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">P</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnVoid']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">V</div>\r\n\t\t\t\t</zone>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div class=\"cp-tray\" id=\"cpTray\" v-show=\"isDraggingCP\" v-html=\"dragCPHtml\" :style=\"cpTrayStyle\">\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent\">\r\n\r\n\t\t\t<zone v-bind=\"stylePartProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\">\r\n\t\t\t\t<div class=\"thrust-point\" v-if=\"viewModel.isDollPartThrustable(i)\" :style=\"thrustPointStyle\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleSwingProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_SWING_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\r\n\r\n\t\t\t<zone v-bind=\"armorPartProps[i]\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\">\r\n\t\t\t\t<div class=\"shieldmark\" v-show=\"dollShieldCoverageBools[i]\" :style=\"shieldIconStyle\"></div>\r\n\t\t\t</zone>\r\n\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.observeIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandLeft']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyLeftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyRightItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandRight']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyRightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandLeft']\"></zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyRightItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandRight']\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['opponentSwiper']\" :mapData=\"mapData\" class=\"textarea-region\">\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li v-for=\"(li, i) in opponents\" :key=\"i\">{{li.label}}</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\t\t<div v-else>\r\n\t\t\t<div class=\"select-opponent\">\r\n\t\t\t\t<button @click=\"showOpponentPregens\">Select opponent</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent && player && player.targetLink\">\r\n\t\t\t<zone :index=\"mapData.idIndices['initRange']\" :mapData=\"mapData\" style=\"overflow:visible\">\r\n\t\t\t\t<div class=\"bger\"></div>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\r\n\r\n\t\t<div v-if=\"gotPregens\">\r\n\t\t\t<pregens :header=\"pregenHeader\" :characters=\"fightChars.pool\" @close=\"closePregens\" @singleCharSelected=\"confirmPregens\" @multiCharSelected=\"confirmPregens\"></pregens>\r\n\t\t</div>\r\n\r\n\t\t<!--<div v-for=\"(li, i) in armorColorScale\" :key=\"i\" :style=\"{color:li}\">-</div>-->\r\n\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\" v-if=\"mapData.renderCount==0\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"99, 318, 105, 318, 115, 332, 98, 371, 94, 376, 95, 358, 85, 377, 80, 377, 86, 360, 83, 358, 68, 378, 70, 366, 62, 366, 77, 343, 71, 343, 70, 338, 81, 326, 99, 318\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"381, 320, 405, 327, 417, 340, 411, 346, 424, 366, 424, 370, 417, 371, 417, 378, 402, 359, 404, 379, 392, 360, 392, 375, 388, 371, 372, 334, 372, 327, 381, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_combat_components_DollView;
@@ -14474,11 +14722,234 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		this.components = this.Components();
 		this.mounted = clsP.Mounted;
 		this.template = this.Template();
-		this.computed = { pregenHeader : clsP.get_pregenHeader, boutModel : clsP.get_boutModel, remainingDisplayCP : clsP.get_remainingDisplayCP, fatique : clsP.get_fatique, CP : clsP.get_CP, remCP : clsP.get_remCP, BL : clsP.get_BL, pain : clsP.get_pain, rightItem : clsP.get_rightItem, leftItem : clsP.get_leftItem, leftTypeTag : clsP.get_leftTypeTag, rightTypeTag : clsP.get_rightTypeTag, enemyRightItem : clsP.get_enemyRightItem, enemyLeftItem : clsP.get_enemyLeftItem, enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, enemyRightTypeTag : clsP.get_enemyRightTypeTag, styleObservePartProps : clsP.get_styleObservePartProps, stylePartProps : clsP.get_stylePartProps, armorPartProps : clsP.get_armorPartProps, styleSwingProps : clsP.get_styleSwingProps, focusedTextLbl : clsP.get_focusedTextLbl, observePrompt : clsP.get_observePrompt, partObserveLbl : clsP.get_partObserveLbl, player : clsP.get_player, opponents : clsP.get_opponents, dollScale : clsP.get_dollScale, gotPregens : clsP.get_gotPregens, thrustPointStyle : clsP.get_thrustPointStyle, clampedOpponentIndex : clsP.get_clampedOpponentIndex, currentOpponent : clsP.get_currentOpponent, gotCurrentOpponent : clsP.get_gotCurrentOpponent, currentDollSheet : clsP.get_currentDollSheet, armorColorScale : clsP.get_armorColorScale, carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, carriedDollShield : clsP.get_carriedDollShield, shieldIconStyle : clsP.get_shieldIconStyle, shieldLowProfiles : clsP.get_shieldLowProfiles, shieldHighProfiles : clsP.get_shieldHighProfiles, dollShieldCoverage : clsP.get_dollShieldCoverage, dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, armorDollColors : clsP.get_armorDollColors, hitLocationArmorValues : clsP.get_hitLocationArmorValues, hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, actingState : clsP.get_actingState, isDraggingCP : clsP.get_isDraggingCP};
-		this.methods = { get_pregenHeader : clsP.get_pregenHeader, closePregens : clsP.closePregens, quickStartDebug : clsP.quickStartDebug, confirmPregens : clsP.confirmPregens, deserializeSheet : clsP.deserializeSheet, showSelfPregens : clsP.showSelfPregens, showOpponentPregens : clsP.showOpponentPregens, get_boutModel : clsP.get_boutModel, get_remainingDisplayCP : clsP.get_remainingDisplayCP, get_fatique : clsP.get_fatique, get_CP : clsP.get_CP, get_remCP : clsP.get_remCP, get_BL : clsP.get_BL, get_pain : clsP.get_pain, get_rightItem : clsP.get_rightItem, get_leftItem : clsP.get_leftItem, getTypeTagForItem : clsP.getTypeTagForItem, get_leftTypeTag : clsP.get_leftTypeTag, get_rightTypeTag : clsP.get_rightTypeTag, get_enemyRightItem : clsP.get_enemyRightItem, get_enemyLeftItem : clsP.get_enemyLeftItem, get_enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, get_enemyRightTypeTag : clsP.get_enemyRightTypeTag, get_styleObservePartProps : clsP.get_styleObservePartProps, get_stylePartProps : clsP.get_stylePartProps, getArmorPartPropsOf : clsP.getArmorPartPropsOf, get_armorPartProps : clsP.get_armorPartProps, get_styleSwingProps : clsP.get_styleSwingProps, get_focusedTextLbl : clsP.get_focusedTextLbl, get_observePrompt : clsP.get_observePrompt, get_partObserveLbl : clsP.get_partObserveLbl, get_player : clsP.get_player, get_opponents : clsP.get_opponents, get_dollScale : clsP.get_dollScale, get_gotPregens : clsP.get_gotPregens, get_thrustPointStyle : clsP.get_thrustPointStyle, get_clampedOpponentIndex : clsP.get_clampedOpponentIndex, get_currentOpponent : clsP.get_currentOpponent, get_gotCurrentOpponent : clsP.get_gotCurrentOpponent, startGame : clsP.startGame, get_currentDollSheet : clsP.get_currentDollSheet, get_armorColorScale : clsP.get_armorColorScale, get_carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, get_carriedDollShield : clsP.get_carriedDollShield, get_shieldIconStyle : clsP.get_shieldIconStyle, get_shieldLowProfiles : clsP.get_shieldLowProfiles, get_shieldHighProfiles : clsP.get_shieldHighProfiles, get_dollShieldCoverage : clsP.get_dollShieldCoverage, get_dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, shieldCoveredAtDollHitLocation : clsP.shieldCoveredAtDollHitLocation, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, get_armorDollColors : clsP.get_armorDollColors, getVisibleArmorAtDollPartIndex : clsP.getVisibleArmorAtDollPartIndex, getHitLocationArmorValues : clsP.getHitLocationArmorValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, get_hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, setupUIInteraction : clsP.setupUIInteraction, get_actingState : clsP.get_actingState, get_isDraggingCP : clsP.get_isDraggingCP, onActingStateChanged : clsP.onActingStateChanged, onOpponentsStateChange : clsP.onOpponentsStateChange, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
+		this.computed = { pregenHeader : clsP.get_pregenHeader, boutModel : clsP.get_boutModel, remainingDisplayCP : clsP.get_remainingDisplayCP, fatique : clsP.get_fatique, CP : clsP.get_CP, remCP : clsP.get_remCP, BL : clsP.get_BL, pain : clsP.get_pain, rightItem : clsP.get_rightItem, leftItem : clsP.get_leftItem, leftTypeTag : clsP.get_leftTypeTag, rightTypeTag : clsP.get_rightTypeTag, enemyRightItem : clsP.get_enemyRightItem, enemyLeftItem : clsP.get_enemyLeftItem, enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, enemyRightTypeTag : clsP.get_enemyRightTypeTag, styleObservePartProps : clsP.get_styleObservePartProps, stylePartProps : clsP.get_stylePartProps, armorPartProps : clsP.get_armorPartProps, styleSwingProps : clsP.get_styleSwingProps, focusedTextLbl : clsP.get_focusedTextLbl, observePrompt : clsP.get_observePrompt, partObserveLbl : clsP.get_partObserveLbl, player : clsP.get_player, opponents : clsP.get_opponents, dollScale : clsP.get_dollScale, gotPregens : clsP.get_gotPregens, thrustPointStyle : clsP.get_thrustPointStyle, clampedOpponentIndex : clsP.get_clampedOpponentIndex, currentOpponent : clsP.get_currentOpponent, gotCurrentOpponent : clsP.get_gotCurrentOpponent, currentDollSheet : clsP.get_currentDollSheet, armorColorScale : clsP.get_armorColorScale, carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, carriedDollShield : clsP.get_carriedDollShield, shieldIconStyle : clsP.get_shieldIconStyle, shieldLowProfiles : clsP.get_shieldLowProfiles, shieldHighProfiles : clsP.get_shieldHighProfiles, dollShieldCoverage : clsP.get_dollShieldCoverage, dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, armorDollColors : clsP.get_armorDollColors, hitLocationArmorValues : clsP.get_hitLocationArmorValues, hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, cpMeterAmount : clsP.get_cpMeterAmount, dragCPHtml : clsP.get_dragCPHtml, cpTrayStyle : clsP.get_cpTrayStyle, actingState : clsP.get_actingState, isDraggingCP : clsP.get_isDraggingCP};
+		this.methods = { get_pregenHeader : clsP.get_pregenHeader, closePregens : clsP.closePregens, quickStartDebug : clsP.quickStartDebug, confirmPregens : clsP.confirmPregens, deserializeSheet : clsP.deserializeSheet, showSelfPregens : clsP.showSelfPregens, showOpponentPregens : clsP.showOpponentPregens, get_boutModel : clsP.get_boutModel, get_remainingDisplayCP : clsP.get_remainingDisplayCP, get_fatique : clsP.get_fatique, get_CP : clsP.get_CP, get_remCP : clsP.get_remCP, get_BL : clsP.get_BL, get_pain : clsP.get_pain, get_rightItem : clsP.get_rightItem, get_leftItem : clsP.get_leftItem, getTypeTagForItem : clsP.getTypeTagForItem, get_leftTypeTag : clsP.get_leftTypeTag, get_rightTypeTag : clsP.get_rightTypeTag, get_enemyRightItem : clsP.get_enemyRightItem, get_enemyLeftItem : clsP.get_enemyLeftItem, get_enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, get_enemyRightTypeTag : clsP.get_enemyRightTypeTag, get_styleObservePartProps : clsP.get_styleObservePartProps, get_stylePartProps : clsP.get_stylePartProps, getArmorPartPropsOf : clsP.getArmorPartPropsOf, get_armorPartProps : clsP.get_armorPartProps, get_styleSwingProps : clsP.get_styleSwingProps, get_focusedTextLbl : clsP.get_focusedTextLbl, get_observePrompt : clsP.get_observePrompt, get_partObserveLbl : clsP.get_partObserveLbl, get_player : clsP.get_player, get_opponents : clsP.get_opponents, get_dollScale : clsP.get_dollScale, get_gotPregens : clsP.get_gotPregens, get_thrustPointStyle : clsP.get_thrustPointStyle, get_clampedOpponentIndex : clsP.get_clampedOpponentIndex, get_currentOpponent : clsP.get_currentOpponent, get_gotCurrentOpponent : clsP.get_gotCurrentOpponent, startGame : clsP.startGame, get_currentDollSheet : clsP.get_currentDollSheet, get_armorColorScale : clsP.get_armorColorScale, get_carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, get_carriedDollShield : clsP.get_carriedDollShield, get_shieldIconStyle : clsP.get_shieldIconStyle, get_shieldLowProfiles : clsP.get_shieldLowProfiles, get_shieldHighProfiles : clsP.get_shieldHighProfiles, get_dollShieldCoverage : clsP.get_dollShieldCoverage, get_dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, shieldCoveredAtDollHitLocation : clsP.shieldCoveredAtDollHitLocation, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, get_armorDollColors : clsP.get_armorDollColors, getVisibleArmorAtDollPartIndex : clsP.getVisibleArmorAtDollPartIndex, getHitLocationArmorValues : clsP.getHitLocationArmorValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, get_hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, get_cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, get_cpMeterAmount : clsP.get_cpMeterAmount, get_dragCPHtml : clsP.get_dragCPHtml, getRemainingMid : clsP.getRemainingMid, repeatTxt : clsP.repeatTxt, get_cpTrayStyle : clsP.get_cpTrayStyle, setupUIInteraction : clsP.setupUIInteraction, get_actingState : clsP.get_actingState, get_isDraggingCP : clsP.get_isDraggingCP, onActingStateChanged : clsP.onActingStateChanged, onOpponentsStateChange : clsP.onOpponentsStateChange, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
 		this.watch = { actingState : clsP.onActingStateChanged, gotCurrentOpponent : clsP.onOpponentsStateChange};
 	}
 	,__class__: troshx_sos_vue_combat_components_DollView
+});
+var troshx_sos_vue_combat_components_ImageMapTester = function() {
+	haxevx_vuex_core_VComponent.call(this);
+};
+$hxClasses["troshx.sos.vue.combat.components.ImageMapTester"] = troshx_sos_vue_combat_components_ImageMapTester;
+troshx_sos_vue_combat_components_ImageMapTester.__name__ = ["troshx","sos","vue","combat","components","ImageMapTester"];
+troshx_sos_vue_combat_components_ImageMapTester.__super__ = haxevx_vuex_core_VComponent;
+troshx_sos_vue_combat_components_ImageMapTester.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
+	Data: function() {
+		return troshx_sos_vue_combat_components_DollView.getBlankImageMapData();
+	}
+	,Components: function() {
+		return { zone : new troshx_sos_vue_combat_components_LayoutItemView()};
+	}
+	,setupUIInteraction: function() {
+		new troshx_sos_vue_combat_HammerJSCombat(this.$refs.container,this.$data);
+	}
+	,Mounted: function() {
+		var _gthis = this;
+		var img = this.$refs.image;
+		if(img.width > 0) {
+			this.handleImageMap(img);
+		} else {
+			img.onload = function() {
+				_gthis.handleImageMap(img);
+			};
+		}
+	}
+	,handleImageMap: function(img) {
+		var map = this.$refs.map;
+		var c = map.firstChild;
+		this.refWidth = img.width;
+		this.refHeight = img.height;
+		var arr = [];
+		while(c != null) {
+			if(c.nodeName.toLowerCase() == "area") {
+				var elem = c;
+				this.positionList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
+				this.scaleList.push(hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new());
+				this.classList.push(elem.getAttribute("alt"));
+				this.titleList.push(elem.getAttribute("title"));
+				arr.push(troshx_util_layout_LayoutItem.fromHTMLImageMapArea(img.width,img.height,elem.getAttribute("shape"),elem.getAttribute("coords")));
+			}
+			c = c.nextSibling;
+		}
+		this.$data.layoutItemList = arr;
+		troshx_sos_vue_combat_LayoutConstraints.applyDollView(arr,this.titleList,this.classList,this.refWidth,this.refHeight);
+		window.addEventListener("resize",$bind(this,this.onResize));
+		this.onResize();
+		this.setupUIInteraction();
+	}
+	,onResize: function() {
+		var container = this.$refs.container;
+		var screenWidth = parseFloat(container.clientWidth);
+		var screenHeight = parseFloat(container.clientHeight);
+		this.scaleX = screenWidth / this.refWidth;
+		this.scaleY = screenHeight / this.refHeight;
+		this.refreshLayout();
+	}
+	,refreshLayout: function() {
+		var _g1 = 0;
+		var _g = this.layoutItemList.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.layoutItemList[i].solve(this.positionList[i],this.scaleList[i],this.scaleX,this.scaleY);
+		}
+	}
+	,Template: function() {
+		return "<div class=\"dollview\" style=\"position:fixed;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div style=\"width:100%;height:100%;top:0;left;0;position:absolute;background-repeat:no-repeat;background-image:url(images/dollscreen.png); background-position:50% 50%; background-size:contain\">\r\n\t\t<zone v-for=\"(li, i) in layoutItemList\" :title=\"titleList[i]\" :class=\"classList[i]\" :key=\"i\" :x=\"positionList[i].x*refWidth*scaleX\" :y=\"positionList[i].y*refHeight*scaleY\" :width=\"scaleList[i].x*refWidth*scaleX\" :height=\"scaleList[i].y*refHeight*scaleY\" :item=\"li\" :debug=\"true\" />\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<!--<area shape=\"circle\" coords=\"155, 155, 32\" title=\"circle_test\" />-->\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"98, 321, 106, 322, 111, 333, 97, 367, 94, 338, 79, 330, 98, 321\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"393, 328, 399, 346, 395, 359, 384, 357, 370, 329, 386, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t\t\r\n\t\t\t<area shape=\"rect\" coords=\"84, 43, 275, 78\" alt=\"phase\" title=\"targets_strip\" />\r\n\t\t\t<area shape=\"rect\" coords=\"288, 45, 320, 77\" alt=\"phase\" title=\"focus_target\" />\r\n\t\t\t<area shape=\"rect\" coords=\"332, 659, 364, 691\" alt=\"phase\" title=\"smallbottom4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"118, 660, 150, 692\" alt=\"phase\" title=\"smallbottom2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 661, 53, 693\" alt=\"phase\" title=\"smallbottom1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"6, 552, 356, 649\" alt=\"phase\" title=\"textlog\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 229, 485, 291\" alt=\"phase\" title=\"sidebutton2\" />\r\n\t\t\t<area shape=\"circle\" coords=\"37, 511, 23\" alt=\"phase\" title=\"speedometer\" />\r\n\t\t\t<area shape=\"rect\" coords=\"432, 339, 475, 382\" alt=\"phase\" title=\"firerate\" />\r\n\t\t\t<area shape=\"rect\" coords=\"11, 243, 43, 275\" alt=\"phase\" title=\"focus_area\" />\r\n\t\t\t<area shape=\"rect\" coords=\"422, 432, 486, 494\" alt=\"phase\" title=\"sidebutton3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"422, 539, 486, 601\" title=\"sidebutton4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"414, 658, 472, 725\" alt=\"phase\" title=\"bottombutton5\" />\r\n\t\t\t<area shape=\"rect\" coords=\"318, 659, 376, 726\" alt=\"phase\" title=\"bottombutton4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"211, 659, 269, 726\" alt=\"phase\" title=\"bottombutton3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"105, 659, 163, 726\" alt=\"phase\" title=\"bottombutton2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"11, 659, 69, 726\" alt=\"phase\" title=\"bottombutton1\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
+	}
+	,_Init: function() {
+		var cls = troshx_sos_vue_combat_components_ImageMapTester;
+		var clsP = cls.prototype;
+		this.data = clsP.Data;
+		this.components = this.Components();
+		this.mounted = clsP.Mounted;
+		this.template = this.Template();
+		this.methods = { setupUIInteraction : clsP.setupUIInteraction, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
+	}
+	,__class__: troshx_sos_vue_combat_components_ImageMapTester
+});
+var troshx_sos_vue_combat_components_LayoutItemView = function() {
+	haxevx_vuex_core_VComponent.call(this);
+};
+$hxClasses["troshx.sos.vue.combat.components.LayoutItemView"] = troshx_sos_vue_combat_components_LayoutItemView;
+troshx_sos_vue_combat_components_LayoutItemView.__name__ = ["troshx","sos","vue","combat","components","LayoutItemView"];
+troshx_sos_vue_combat_components_LayoutItemView.drawEllipse = function(context,centerX,centerY,width,height) {
+	context.beginPath();
+	context.moveTo(centerX,centerY - height * .5);
+	context.bezierCurveTo(centerX + width * .5,centerY - height * .5,centerX + width * .5,centerY + height * .5,centerX,centerY + height / 2);
+	context.bezierCurveTo(centerX - width * .5,centerY + height * .5,centerX - width * .5,centerY - height * .5,centerX,centerY - height / 2);
+	context.closePath();
+	context.fill();
+	context.stroke();
+};
+troshx_sos_vue_combat_components_LayoutItemView.__super__ = haxevx_vuex_core_VComponent;
+troshx_sos_vue_combat_components_LayoutItemView.prototype = $extend(haxevx_vuex_core_VComponent.prototype,{
+	get_computedStyle: function() {
+		var obj = { left : this.x + "px", top : this.y + "px", width : this.width + "px", height : this.height + "px", boxSizing : "border-box"};
+		if(troshx_sos_vue_GlobalCanvas2D.CONTEXT != null) {
+			return obj;
+		}
+		if(!this.gotSVG) {
+			if(this.showShape || this.debug) {
+				obj.outline = this.strokeColor + " solid " + this.strokeWidth + "px";
+				obj.backgroundColor = this.fillColor;
+				if(this.item.shape == 1) {
+					obj.borderRadius = "50%";
+					obj.backgroundColor = this.fillColor;
+					if(!this.debug) {
+						obj.outline = "none";
+					}
+				}
+			}
+		}
+		return obj;
+	}
+	,get_gotSVG: function() {
+		if(troshx_sos_vue_GlobalCanvas2D.CONTEXT != null) {
+			return false;
+		}
+		return this.item.shape == 2;
+	}
+	,get_pStyle: function() {
+		return { strokeWidth : this.strokeWidth + "px", stroke : this.strokeColor, fill : this.fillColor};
+	}
+	,get_polyPoints: function() {
+		return this.getPolyString(this.item.uvs);
+	}
+	,getPolyString: function(poly) {
+		var xScale = this.width;
+		var yScale = this.height;
+		var pts = [];
+		var _g1 = 0;
+		var _g = poly.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			pts.push(poly[i].x * xScale);
+			pts.push(poly[i].y * yScale);
+		}
+		return pts.join(" ");
+	}
+	,Updated: function() {
+		if(this.showShape && troshx_sos_vue_GlobalCanvas2D.CONTEXT != null) {
+			this.renderToCanvas();
+		}
+	}
+	,renderToCanvas: function() {
+		var canvas = troshx_sos_vue_GlobalCanvas2D.CANVAS;
+		var ctx = troshx_sos_vue_GlobalCanvas2D.CONTEXT;
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		var shape = this.item.shape;
+		ctx.fillStyle = this.fillColor;
+		ctx.strokeStyle = this.strokeColor;
+		ctx.lineWidth = this.strokeWidth;
+		var x = this.x;
+		var y = this.y;
+		var xScale = this.width;
+		var yScale = this.height;
+		switch(shape) {
+		case 0:
+			ctx.fillRect(x,y,xScale,yScale);
+			ctx.strokeRect(x,y,xScale,yScale);
+			break;
+		case 1:
+			var centerX = x * this.width * 0.5;
+			var centerY = y * this.height * 0.5;
+			var width = this.width;
+			var height = this.height;
+			ctx.beginPath();
+			ctx.moveTo(centerX,centerY - height * .5);
+			ctx.bezierCurveTo(centerX + width * .5,centerY - height * .5,centerX + width * .5,centerY + height * .5,centerX,centerY + height / 2);
+			ctx.bezierCurveTo(centerX - width * .5,centerY + height * .5,centerX - width * .5,centerY - height * .5,centerX,centerY - height / 2);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+			break;
+		case 2:
+			var poly = this.item.uvs;
+			ctx.beginPath();
+			ctx.moveTo(x + poly[0].x * xScale,y + poly[0].y * yScale);
+			var _g1 = 1;
+			var _g = poly.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				ctx.lineTo(x + poly[i].x * xScale,y + poly[i].y * yScale);
+			}
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+			break;
+		}
+	}
+	,get_polyDecompPoints: function() {
+		if(this.item.hitDecomposition != null) {
+			return this.item.hitDecomposition.map($bind(this,this.getPolyString));
+		} else {
+			return null;
+		}
+	}
+	,get_titleClasses: function() {
+		var splits = this.title.split("-");
+		var _g1 = 1;
+		var _g = splits.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			splits[i] = "-" + splits[i];
+		}
+		return splits;
+	}
+	,Template: function() {
+		return "<div class=\"layout-item\" :class=\"[{debug}, titleClasses]\" :data-vis=\"showShape\" :data-title=\"title\" style=\"position:absolute;z-index:1;\" :style=\"computedStyle\">\r\n\t\t\t<svg v-if=\"gotSVG\" v-show=\"debug || showShape\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.2\" baseProfile=\"tiny\" :width=\"width\" :height=\"height\" style=\"position:absolute\">\r\n\t\t\t\t<g style=\"transform-origin:0 0;\">\r\n\t\t\t\t\t<polygon :style=\"pStyle\" :points=\"polyPoints\"></polygon>\r\n\t\t\t\t</g>\r\n\t\t\t\t<g v-if=\"debug\" style=\"transform-origin:0 0;position:absolute\" v-for=\"(p, i) in polyDecompPoints\">\r\n\t\t\t\t\t<polygon style=\"stroke-width:0.5, stroke:#ff0000; fill:transparent\" :points=\"p\" :key=\"i\"></polygon>\r\n\t\t\t\t</g>\r\n\t\t\t</svg>\r\n\t\t\t<slot />\r\n\t\t</div>";
+	}
+	,_Init: function() {
+		var cls = troshx_sos_vue_combat_components_LayoutItemView;
+		var clsP = cls.prototype;
+		this.updated = clsP.Updated;
+		this.template = this.Template();
+		this.computed = { computedStyle : clsP.get_computedStyle, gotSVG : clsP.get_gotSVG, pStyle : clsP.get_pStyle, polyPoints : clsP.get_polyPoints, polyDecompPoints : clsP.get_polyDecompPoints, titleClasses : clsP.get_titleClasses};
+		this.methods = { get_computedStyle : clsP.get_computedStyle, get_gotSVG : clsP.get_gotSVG, get_pStyle : clsP.get_pStyle, get_polyPoints : clsP.get_polyPoints, getPolyString : clsP.getPolyString, renderToCanvas : clsP.renderToCanvas, get_polyDecompPoints : clsP.get_polyDecompPoints, get_titleClasses : clsP.get_titleClasses};
+		this.props = { item : { type : Object}, debug : { "default" : false, type : Boolean}, fillColor : { "default" : "rgba(0,255,0,0.4)", type : String}, strokeColor : { "default" : "#00F", type : String}, showShape : { "default" : false, type : Boolean}, strokeWidth : { "default" : 1, type : Number}, title : { type : String}, y : { type : Number}, height : { type : Number}, width : { type : Number}, x : { type : Number}};
+	}
+	,__class__: troshx_sos_vue_combat_components_LayoutItemView
 });
 var troshx_sos_vue_combat_components_ZoneItemView = function() {
 	haxevx_vuex_core_VComponent.call(this);
@@ -15889,10 +16360,13 @@ troshx_sos_sheets_CharSheet.GENDER_MALE = 0;
 troshx_sos_sheets_CharSheet.GENDER_FEMALE = 1;
 troshx_sos_sheets_CharSheet.VERSION = 2;
 troshx_sos_sheets_CharSheet.LIQUIDATE_ASSET_BASE = 6;
+troshx_sos_vue_combat_CombatViewModel.TRAY_TOTAL_COLS = 5;
 troshx_sos_vue_combat_CombatViewModel.ACTING_DOLL_DECLARE = 0;
 troshx_sos_vue_combat_CombatViewModel.ACTING_DOLL_DRAG_CP = 1;
 troshx_sos_vue_combat_CombatViewModel.ACTING_NONE = 2;
 troshx_sos_vue_combat_HammerJSCombat.HIT_OFFSET_OBSERVE_Y = -55;
+troshx_sos_vue_combat_HammerJSCombat.MAX_GRID_SIZE = 64;
+troshx_sos_vue_combat_HammerJSCombat.MIN_GRID_SIZE = 36;
 troshx_sos_vue_combat_UIInteraction.DOWN = 1;
 troshx_sos_vue_combat_UIInteraction.MOVE = 2;
 troshx_sos_vue_combat_UIInteraction.TAP = 4;
@@ -15927,6 +16401,8 @@ troshx_sos_vue_combat_components_DollView.ICON_CHEV_LEFT = "&#xf053;";
 troshx_sos_vue_combat_components_DollView.ICON_ARROW_LEFT = "&#xf060;";
 troshx_sos_vue_combat_components_DollView.ICON_FINGER_UP = "&#xf0a6;";
 troshx_sos_vue_combat_components_DollView.ICON_SHIELD = "&#xf132;";
+troshx_sos_vue_combat_components_DollView.HTML_CHAR_DRAGGED = "◘";
+troshx_sos_vue_combat_components_DollView.HTML_CHAR_DICE = "◊";
 troshx_sos_vue_tests_layout_LayoutItemTest.TEST_POS = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 troshx_sos_vue_tests_layout_LayoutItemTest.TEST_SCALE = hxGeomAlgo__$HxPoint_HxPoint_$Impl_$._new();
 troshx_util_DiceRoller.NUM_ONES = 0;

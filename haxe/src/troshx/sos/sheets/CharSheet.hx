@@ -206,6 +206,7 @@ class CharSheet implements IBuildListed
 	public var schoolCP(get, never):Int;
 	public var baseCP(get, never):Int;
 	public var CP(get, never):Int;
+	public var fullCP(get, never):Int;
 	public var meleeCP(get, never):Int;
 	
 	public var fatique:Int = 0;
@@ -668,10 +669,24 @@ class CharSheet implements IBuildListed
 		return schoolCP + ADR;
 	}
 	
+	/**
+	 * 
+	 * @return Total available CP in actual combat conditions (condidering fatique/encumbrance,etc.)
+	 */
 	inline function get_CP():Int {
 		var row = encumbranceLvlRow;
 		return row.cpMult * clampIntZero( (getModifiedValue(Modifier.CP, baseCP)) * (prone ? 0.5 : 1) + row.cp + fatiqueCPPenalty );
 	}
+	
+	/**
+	 * 
+	 * @return Total innate availalbe CP in ideal conditions only including character misc modifiers
+	 */
+	inline function get_fullCP():Int {
+		return clampIntZero( (getModifiedValue(Modifier.CP, baseCP)) );
+	}
+
+
 	
 	inline function get_meleeCP():Int 
 	{
