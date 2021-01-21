@@ -68,6 +68,42 @@ class DollView extends VComponent<DollViewData, NoneT>
 		this.showPregens = 0;
 	}
 	
+	function quickStartDebug() {
+		
+		var boutModel = this.boutModel;
+		if (boutModel.bout == null) {
+			boutModel.bout = new Bout();
+		}
+		
+		var valData:CharSave;
+		var node;
+		valData = FightCharacters.get()[4];
+		
+		node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
+		var theIndex = boutModel.bout.combatants.length;
+		boutModel.bout.pushNewFightNode(node);
+		viewModel.currentPlayerIndex = theIndex;
+		node.fight.cp = node.charSheet.CP;
+		
+		node.charSheet.inventory.refreshHalfArmorLabels();
+		node.charSheet.inventory.cleanupShieldLabels();
+		node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+		
+
+		valData = FightCharacters.get()[5];
+		node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
+		boutModel.bout.pushNewFightNode(node);
+		
+		
+		node.charSheet.inventory.refreshHalfArmorLabels();
+		node.charSheet.inventory.cleanupShieldLabels();
+		node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+		
+		
+		
+		this.showPregens = 0;
+	}
+	
 	function confirmPregens(val:Dynamic):Void {
 		var boutModel = this.boutModel;
 		if (boutModel.bout == null) {
@@ -382,6 +418,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 				handleImageMap(img);
 			};
 		}
+		
+		if (Browser.window.location.href.substr(0,7) == "file://" || Browser.window.location.host == "localhost") {
+			Browser.window.setTimeout(function() {
+				quickStartDebug();
+			}, 100);
+		}
+		
 	}
 	
 	function startGame():Void {

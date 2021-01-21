@@ -114,6 +114,7 @@ class Inventory
 		}
 		return null;
 	}
+	
 	public function findMasterHandItem():Item {
 		for (i in 0...weapons.length) {
 			if (( weapons[i].held & HELD_MASTER) != 0) {

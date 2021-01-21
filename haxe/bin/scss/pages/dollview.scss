@@ -83,8 +83,32 @@
 		}
 	}
 	
+	.def-manuever-btn {
+		border:1px solid #666666;
+		.lbl {
+			width:100%;
+			position:absolute;
+			top:50%;
+			transform:translateY(-50%);
+			font-weight:bold;
+			text-align:center;
+			font-size:16px;
+		}
+	}
+	
+	.adv-manuever-btn {
+		padding:4px;
+		border:1px solid #666666;
+		.lbl {
+			width:100%;
+			position:absolute;
+			top:50%;
+			font-size:11px;
+			transform:translateY(-50%);
+		}
+	}
+	
 	.enemy-handbox {
-
 		background-color:rgb(228, 229, 231);
 		box-sizing:border-box;
 		border:1px solid #666666;
@@ -95,6 +119,7 @@
 			width:100%;
 			position:absolute;
 			top:50%;
+			
 			transform:translateY(-50%);
 		}
 		
@@ -181,6 +206,7 @@
 			
 		}
 	}
+	
 	
 	.handLeftText {
 		.lbl {

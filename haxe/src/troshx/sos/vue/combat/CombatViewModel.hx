@@ -6,6 +6,7 @@ import troshx.sos.core.BodyChar;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Item;
+import troshx.sos.core.Manuever;
 import troshx.sos.core.TargetZone;
 import troshx.sos.core.Wound;
 import troshx.sos.sheets.CharSheet;
@@ -47,6 +48,18 @@ class CombatViewModel
 	public inline function setObserveIndex(val:Int):Void { // layout index
 		observeIndex = val;
 	}
+	
+	
+	public function getAdvancedManuevers(targetZone:Int, offhand:Bool=false) {
+		var curPlayer = getCurrentPlayer();
+		
+		var weaponAssign:WeaponAssign;
+		weaponAssign = offhand ? curPlayer.charSheet.inventory.getOffhandWeaponAssign() : curPlayer.charSheet.inventory.getMasterWeaponAssign();
+		
+		
+	}
+	
+	
 	
 	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item):String {
 		var i = focusedIndex;

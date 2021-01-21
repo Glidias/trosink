@@ -43,6 +43,32 @@
 			<zone :index="mapData.idIndices['handRightText']" :mapData="mapData" v-if="rightItem">
 				<div class="lbl">{{rightItem.name}}</div>
 			</zone>
+				
+			<div v-show="gotCurrentOpponent">
+				<zone :index="mapData.idIndices['advManuever1']" :mapData="mapData" class="adv-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">mva1</div>
+				</zone>
+				<zone :index="mapData.idIndices['advManuever2']" :mapData="mapData" class="adv-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">gag</div>
+				</zone>
+				<zone :index="mapData.idIndices['advManuever3']" :mapData="mapData" class="adv-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">wgw</div>
+				</zone>
+				<zone :index="mapData.idIndices['advManuever4']" :mapData="mapData" class="adv-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">gwgwwaw</div>
+				</zone>
+					
+				<zone :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">B</div>
+				</zone>
+				<zone :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">P</div>
+				</zone>
+				<zone :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+					<div class="lbl">V</div>
+				</zone>
+			</div>
+				
 		</div>
 				
 		<div v-if="gotCurrentOpponent">
