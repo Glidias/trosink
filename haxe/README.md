@@ -22,5 +22,5 @@ View/test under `bin/indext.html` locally.
 
 ### Important Notes:
 	
-- You need Haxe compiler to compile main Hx class.
+- You need Haxe compiler to compile main Hx class to produce `bin/TrosHAXE.js`
 - Also, you need a SCSS compiler  (or `sass` available on command line together HaxeDevelop to save SCSS files ) to export out to CSS files in same folder for viewing at `bin/scss/pages/dollview.scss`. Ensure you compile SCSS to ensure you have the latest css stylesheet!
