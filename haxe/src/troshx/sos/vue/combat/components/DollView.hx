@@ -193,6 +193,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var pl = viewModel.getCurrentPlayer();
 		return pl.charSheet.inventory.findOffHandItem();
 	}
+	@:computed function get_rightItemHighlighted():Bool {
+		return this.rightItem == viewModel.playerManueverSpec.activeItem;
+	}
+	@:computed function get_leftItemHighlighted():Bool {
+		
+		return this.leftItem == viewModel.playerManueverSpec.activeItem;
+	}
 	
 	function getTypeTagForItem(item:Item):String {
 		var weapon:Weapon = LibUtil.as(item, Weapon);
@@ -305,6 +312,24 @@ class DollView extends VComponent<DollViewData, NoneT>
 			fillColor: "rgba(0,255,255,0.3)",
 			strokeColor: "rgba(0,255,255,0.3)",
 			strokeWidth: 8*(d.scaleX < d.scaleY ? d.scaleX : d.scaleY)
+		}
+	}
+	
+	@:computed function get_styleDefBtnProps():ShapeStyleProps {
+		var d = mapData;
+		return {
+			fillColor: "rgba(0,255,255,0.3)",
+			strokeColor: "rgba(0,255,255,0.3)",
+			strokeWidth: 4,
+		}
+	}
+	
+
+	@:computed function get_stylePlHandBtnProps():ShapeStyleProps {
+		return {
+			fillColor: "rgba(161,244,210,1)",
+			// strokeColor: "rgba(0,255,255,0.3)",
+			strokeWidth: 0
 		}
 	}
 	

@@ -31,14 +31,14 @@
 				<div v-show="viewModel.draggedCP"> {{remCP}}</div>
 			</zone>
 
-			<zone :index="mapData.idIndices['handLeftAlt']" :mapData="mapData" class="textarea-region" v-if="leftItem">
+			<zone :index="mapData.idIndices['handLeftAlt']" :mapData="mapData" class="textarea-region" v-if="leftItem" :showShape="leftItemHighlighted">
 				<div class="lbl" v-html="leftTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handLeftText']" :mapData="mapData" v-if="leftItem">
 				<div class="lbl">{{leftItem.name}}</div>
 			</zone>
 
-			<zone :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" v-if="rightItem">
+			<zone v-bind="stylePlHandBtnProps"  :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" v-if="rightItem" :showShape="rightItemHighlighted">
 				<div class="lbl" v-html="rightTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handRightText']" :mapData="mapData" v-if="rightItem">
