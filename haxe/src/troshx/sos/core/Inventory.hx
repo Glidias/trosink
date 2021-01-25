@@ -115,6 +115,25 @@ class Inventory
 		return null;
 	}
 	
+	public function findOffHandAssign():ReadyAssign {
+		for (i in 0...weapons.length) {
+			if (weapons[i].held == HELD_OFF) {
+				return weapons[i];
+			}
+		}
+		for (i in 0...shields.length) {
+			if (shields[i].held == HELD_OFF) {
+				return shields[i];
+			}
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			if (equipedNonMeleeItems[i].held == HELD_OFF) {
+				return equipedNonMeleeItems[i];
+			}
+		}
+		return null;
+	}
+	
 	public function findMasterHandItem():Item {
 		for (i in 0...weapons.length) {
 			if (( weapons[i].held & HELD_MASTER) != 0) {
@@ -129,6 +148,25 @@ class Inventory
 		for (i in 0...equipedNonMeleeItems.length) {
 			if (( equipedNonMeleeItems[i].held & HELD_MASTER) != 0) {
 				return equipedNonMeleeItems[i].item;
+			}
+		}
+		return null;
+	}
+	
+	public function findMasterHandAssign():ReadyAssign {
+		for (i in 0...weapons.length) {
+			if (( weapons[i].held & HELD_MASTER) != 0) {
+				return weapons[i];
+			}
+		}
+		for (i in 0...shields.length) {
+			if (( shields[i].held & HELD_MASTER) != 0) {
+				return shields[i];
+			}
+		}
+		for (i in 0...equipedNonMeleeItems.length) {
+			if (( equipedNonMeleeItems[i].held & HELD_MASTER) != 0) {
+				return equipedNonMeleeItems[i];
 			}
 		}
 		return null;

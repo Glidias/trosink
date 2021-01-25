@@ -9,7 +9,6 @@ import troshx.components.FightState.ManueverDeclare;
 class ManueverSpec 
 {
 	public var typePreference:Int = 0;
-	//public var activeBody:IBodyChar = null;
 	public var activeItem:Dynamic = null;
 	public var usingLeftLimb:Bool = false;
 	public var activeEnemyBody:IBodyChar = null;
@@ -23,11 +22,17 @@ class ManueverSpec
 	public static inline var RIGHT_HAND_ZONE:Int = -3;
 	
 
-	public function reset():Void {
+	public function resetPlayer():Void {
 		typePreference = 0;
 		usingLeftLimb  = false;
 		activeItem = null;
-		//activeEnemy = null;
+		activeEnemyItem = null;
+		activeEnemyZone = -1;
+	}
+	public function resetAll():Void {
+		typePreference = 0;
+		usingLeftLimb  = false;
+		activeItem = null;
 		activeEnemyItem = null;
 		activeEnemyBody = null;
 		activeEnemyZone = -1;
@@ -36,7 +41,6 @@ class ManueverSpec
 		activeEnemyZone = -1;
 		activeEnemyBody = body;
 		activeEnemyItem = null;
-		//activeEnemy = e;
 	}
 	
 	

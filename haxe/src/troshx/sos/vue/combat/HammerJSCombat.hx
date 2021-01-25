@@ -146,7 +146,10 @@ class HammerJSCombat
 						else return;
 					}
 					else viewModel.resetAdvFocusedIndex(); 
-					startDragCP(name, tag,  viewModel.isFocusedEnemyLeftSide(), viewModel.isFocusedEnemyLower());
+					if (viewModel.currentPlayerIndex >= 0) startDragCP(name, tag,  viewModel.isFocusedEnemyLeftSide(), viewModel.isFocusedEnemyLower());
+					else { // description writeup?
+					
+					}
 				}
 			}
 			return;
@@ -176,8 +179,12 @@ class HammerJSCombat
 		} 
 		else if (name == "advManuever1" || name == "advManuever2" || name == "advManuever3" || name == "advManuever4") {
 			if (event == UIInteraction.DOWN) {
-				viewModel.setAdvFocusedIndex(Std.parseInt(name.substr(name.length - 1)) - 1);
-				startDragCP(name, tag, true, name == "advManuever3" || name == "advManuever4");
+				if (viewModel.currentPlayerIndex >= 0) {
+					viewModel.setAdvFocusedIndex(Std.parseInt(name.substr(name.length - 1)) - 1);
+					startDragCP(name, tag, true, name == "advManuever3" || name == "advManuever4");
+				} else { // description writeup?
+					
+				}
 			}
 		} 
 		else {

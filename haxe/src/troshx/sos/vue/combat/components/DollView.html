@@ -31,35 +31,21 @@
 				<div v-show="viewModel.draggedCP"> {{remCP}}</div>
 			</zone>
 
-			<zone :index="mapData.idIndices['handLeftAlt']" :mapData="mapData" class="textarea-region" v-if="leftItem" :showShape="leftItemHighlighted">
+			<zone v-bind="stylePlHandBtnProps"  :index="mapData.idIndices['handLeftAlt']" :mapData="mapData" class="textarea-region" v-if="leftItem" :showShape="leftItemHighlighted">
 				<div class="lbl" v-html="leftTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handLeftText']" :mapData="mapData" v-if="leftItem">
 				<div class="lbl">{{leftItem.name}}</div>
 			</zone>
 
-			<zone v-bind="stylePlHandBtnProps"  :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" v-if="rightItem" :showShape="rightItemHighlighted">
+			<zone v-bind="stylePlHandBtnProps" :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" v-if="rightItem" :showShape="rightItemHighlighted">
 				<div class="lbl" v-html="rightTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handRightText']" :mapData="mapData" v-if="rightItem">
 				<div class="lbl">{{rightItem.name}}</div>
 			</zone>
 
-			<div v-show="gotCurrentOpponent">
-				<zone v-bind="advStyleProps"  :index="mapData.idIndices['advManuever'+(i+1)]" :key="i" :class="{disabled:advDisabledAt(i)}" :mapData="mapData" v-for="(manuever, i) in advManuevers" class="adv-manuever-btn" :showShape="viewModel.advFocusedIndex === i" v-if="!advHiddenAt(i)">
-					<div class="lbl">{{manuever.name}}<span class="cost" v-show="advCosts[i]!=0"> [{{advCosts[i]}}]</span><span class="tn" v-show="advTNs[i]!=7"> &gt;{{advTNs[i]}}</span></div>
-				</zone>
-					
-				<zone :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
-					<div class="lbl">B</div>
-				</zone>
-				<zone :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
-					<div class="lbl">P</div>
-				</zone>
-				<zone :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
-					<div class="lbl">V</div>
-				</zone>
-			</div>
+			
 
 			<div class="cp-tray" id="cpTray" v-show="isDraggingCP" v-html="dragCPHtml" :style="cpTrayStyle">
 
@@ -68,6 +54,21 @@
 
 		<div v-if="gotCurrentOpponent">
 
+			<zone v-bind="advStyleProps"  :index="mapData.idIndices['advManuever'+(i+1)]" :key="i" :class="{disabled:advDisabledAt(i)}" :mapData="mapData" v-for="(manuever, i) in advManuevers" class="adv-manuever-btn" :showShape="viewModel.advFocusedIndex === i" v-if="!advHiddenAt(i) && manuever.name !==''">
+				<div class="lbl">{{manuever.name}}<span class="cost" v-show="advCosts[i]!=0"> [{{advCosts[i]}}]</span><span class="tn" v-show="advTNArr[i]!=7 && advTNArr[i]!=0"> &gt;{{advTNArr[i]}}</span></div>
+			</zone>
+				
+			<zone :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+				<div class="lbl">B</div>
+			</zone>
+			<zone :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+				<div class="lbl">P</div>
+			</zone>
+			<zone :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+				<div class="lbl">V</div>
+			</zone>
+	
+					
 			<zone v-bind="stylePartProps" :index="mapData.idIndices[li]" :mapData="mapData" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li" :showShape="viewModel.focusedIndex==mapData.idIndices[li]">
 				<div class="thrust-point" v-if="viewModel.isDollPartThrustable(i)" :style="thrustPointStyle"></div>
 			</zone>

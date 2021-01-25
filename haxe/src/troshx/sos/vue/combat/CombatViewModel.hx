@@ -251,11 +251,10 @@ class CombatViewModel
 		var offhand = manueverSpec.usingLeftLimb;
 		var focusIndex = this.focusedIndex;
 		
-		
 		if (manueverSpec.activeEnemyBody==null) {
 			return EMPTY_ARR;
 		}
-
+	
 		if (curEnemy != null) {
 			if (playerManueverSpec.activeEnemyZone < 0 && playerManueverSpec.activeEnemyZone != ManueverSpec.NO_ZONE) {
 				if (playerManueverSpec.activeEnemyZone == ManueverSpec.LEFT_HAND_ZONE) {
@@ -272,11 +271,12 @@ class CombatViewModel
 				playerManueverSpec.activeEnemyItem = null;
 			}
 		}
-		
+		/*
 		if (curPlayer == null) {
 			// todo: dummy catalog only without filtering player state
 			return EMPTY_ARR;
 		}
+		*/
 		
 		if (targetZone >= 0) {
 			if (manueverSpec.activeEnemyBody.isThrusting(targetZone)) {
@@ -286,8 +286,10 @@ class CombatViewModel
 			}
 		} else {
 			if (focusIndex == _enemyHandLeftIdx || focusIndex == _enemyHandRightIdx) {
-
-				if (Std.is(manueverSpec.activeItem, Weapon)) {
+				if (manueverSpec.activeItem == null && curPlayer == null) {
+					return Std.is(manueverSpec.activeEnemyItem, Shield) ? advAntiShieldWithWeaponArr : advAntiWeapWithWeaponArr; // todo: makeshift, 3 types..
+				}
+				else if (Std.is(manueverSpec.activeItem, Weapon)) {
 					return Std.is(manueverSpec.activeEnemyItem, Shield) ? advAntiShieldWithWeaponArr : advAntiWeapWithWeaponArr;
 				} else if (Std.is(manueverSpec.activeItem, Shield)) {
 					return advAntiHandWithShieldArr;
@@ -452,7 +454,7 @@ class CombatViewModel
 	public var currentPlayerIndex(default, set):Int = -1;
 	inline function set_currentPlayerIndex(value:Int):Int 
 	{
-		playerManueverSpec.reset();
+		playerManueverSpec.resetPlayer();
 		//playerManueverSpec.activeItem = boutModel.bout.combatants[value].charSheet.inventory.findMasterHandItem();
 		//trace(playerManueverSpec.activeItem);
 		return currentPlayerIndex = value;
