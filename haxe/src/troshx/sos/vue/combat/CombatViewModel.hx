@@ -2,13 +2,16 @@ package troshx.sos.vue.combat;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 import troshx.components.Bout.FightNode;
+import troshx.core.ManueverSpec;
 import troshx.sos.combat.BoutModel;
 import troshx.sos.core.BodyChar;
 import troshx.sos.core.HitLocation;
 import troshx.sos.core.Inventory;
 import troshx.sos.core.Item;
 import troshx.sos.core.Manuever;
+import troshx.sos.core.Shield;
 import troshx.sos.core.TargetZone;
+import troshx.sos.core.Weapon;
 import troshx.sos.core.Wound;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.UIInteraction.UInteract;
@@ -74,16 +77,17 @@ class CombatViewModel
 	
 	var basicHookPunch:Manuever;
 	var basicStraightPunch:Manuever;
-	var advPuglismSwingArr:Array<Manuever>;
-	var advPuglismThrustArr:Array<Manuever>;
+	var advPuglismThrustSwingArr:Array<Manuever>;
+	var advPuglismHandlessArr:Array<Manuever>;
 	
 	var basicMeleeShoot:Manuever;
 	var basicNetToss:Manuever;
 	var advRangedArr:Array<Manuever>;
 	
+	public var playerManueverSpec(default, null):ManueverSpec = new ManueverSpec();
+	
 	// gameplay related manuevers
 	public var mOneTwoPunch(default, null):Manuever;
-	
 	public var mDoNothing(default, null):Manuever;
 	public var mMasterStrike(default, null):Manuever;
 	public var mDoubleAttack(default, null):Manuever;
@@ -112,10 +116,9 @@ class CombatViewModel
 		
 		basicHookPunch = manueverRepo.get('hookPunch');
 		basicStraightPunch = manueverRepo.get('straightPunch');
-		advPuglismSwingArr = ['', 'elbow', 'kick', 'trip'].map(manueverRepo.get);
-		advPuglismThrustArr = ['headbutt', 'knee', 'kick', 'trip'].map(manueverRepo.get);
+		advPuglismHandlessArr = ['headbutt', 'elbow', 'knee', 'trip'].map(manueverRepo.get);
+		advPuglismThrustSwingArr = ['oneTwoPunch', 'elbow', 'kick', 'trip'].map(manueverRepo.get);
 		mOneTwoPunch = manueverRepo.get('oneTwoPunch');
-		
 		
 		basicMeleeShoot = manueverRepo.get('meleeShoot');
 		basicNetToss = manueverRepo.get('netToss');
@@ -144,11 +147,15 @@ class CombatViewModel
 		
 		// later: alt mode swithching
 		// steal initiative
-		
-		
-		
-		
 	}
+	
+	public function activatePlayerItem(offhand:Bool = false):Void {
+		var player = getCurrentPlayer();
+		playerManueverSpec.activeItem = offhand ? player.charSheet.inventory.findOffHandItem() : player.charSheet.inventory.findMasterHandItem();
+	}
+
+	
+	
 
 	//public function filteredBodyParts(swing:B
 	//return visiblity of doll elements
@@ -182,25 +189,93 @@ class CombatViewModel
 	public inline function setFocusedIndex(val:Int):Void { // layout index
 		//focusInvalidateCount++;
 		focusedIndex = val;
+		
+		playerManueverSpec.activeEnemyZone = this.getTargetZoneIndexFromFocIndex(val);
+		// playerManueverSpec.activeEnemyZone = val >=  ? val : -1;
 		showFocusedTag = val >=0;
+	}
+	
+	public function getTargetZoneIndexFromFocIndex(i:Int):Int {
+		if (_swingMap.exists(i)) {
+			return DOLL_SWING_Indices[_swingMap.get(i)];
+		} else if (_partMap.exists(i)) {
+			return DOLL_PART_Indices[_partMap.get(i)];
+		} else if (focusedIndex == _enemyHandLeftIdx) {
+			return ManueverSpec.LEFT_HAND_ZONE;
+		}
+		else if (focusedIndex == _enemyHandRightIdx) {
+			return ManueverSpec.RIGHT_HAND_ZONE;
+		} else {
+			return ManueverSpec.NO_ZONE;
+		}
 	}
 
 	public inline function setObserveIndex(val:Int):Void { // layout index
 		observeIndex = val;
-
-	}
-
-
-	public function getAdvancedManuevers(targetZone:Int, offhand:Bool=false) {
-		var curPlayer = getCurrentPlayer();
-
-		var weaponAssign:WeaponAssign;
-		weaponAssign = offhand ? curPlayer.charSheet.inventory.getOffhandWeaponAssign() : curPlayer.charSheet.inventory.getMasterWeaponAssign();
-
-
 	}
 	
-
+	static var EMPTY_ARR:Array<Manuever> = [];
+	public function getAdvancedManuevers(curPlayer:FightNode<CharSheet>=null, playerLeftItem:Item=null, playerRightItem:Item=null, curEnemy:FightNode<CharSheet>=null, enemyLeftItem:Item=null, enemyRightItem=null):Array<Manuever> {
+		var manueverSpec:ManueverSpec = playerManueverSpec;
+		var targetZone = manueverSpec.activeEnemyZone;
+		var offhand = manueverSpec.usingLeftLimb;
+		var focusIndex = this.focusedIndex;
+		
+		
+		if (manueverSpec.activeEnemyBody==null) {
+			return EMPTY_ARR;
+		}
+		
+		if (curEnemy != null) {
+			if (playerManueverSpec.activeEnemyZone < 0 && playerManueverSpec.activeEnemyZone != ManueverSpec.NO_ZONE) {
+				if (playerManueverSpec.activeEnemyZone == ManueverSpec.LEFT_HAND_ZONE) {
+					if (enemyLeftItem == null) enemyLeftItem = curEnemy.charSheet.inventory.findOffHandItem();
+					playerManueverSpec.activeEnemyItem = null;
+				} else if (playerManueverSpec.activeEnemyZone == ManueverSpec.RIGHT_HAND_ZONE) {
+					if (enemyRightItem == null) enemyRightItem = curEnemy.charSheet.inventory.findMasterHandItem();
+					playerManueverSpec.activeEnemyItem = enemyRightItem;
+				}
+				else {
+					playerManueverSpec.activeEnemyItem = enemyLeftItem;
+				}
+			} else {
+				playerManueverSpec.activeEnemyItem = null;
+			}
+		}
+		
+		if (curPlayer == null) {
+			// todo: dummy catalog only without filtering player state
+			return EMPTY_ARR;
+		}
+		
+		if (targetZone >= 0) {
+			if (manueverSpec.activeEnemyBody.isThrusting(targetZone)) {
+				return advThrustArr;
+			} else {
+				return advSwingArr;
+			}
+		} else {
+			if (focusIndex == _enemyHandLeftIdx || focusIndex == _enemyHandRightIdx) {
+				var theItem;
+				if (manueverSpec.usingLeftLimb) {
+					if (playerLeftItem == null) playerLeftItem = curPlayer.charSheet.inventory.findOffHandItem();
+					theItem = playerLeftItem;
+				} else {
+					if (playerRightItem == null) playerRightItem = curPlayer.charSheet.inventory.findMasterHandItem();
+					theItem = playerRightItem;
+				}
+				if (Std.is(theItem, Weapon)) {
+					return advAntiHandWithWeaponArr;
+				} else if (Std.is(theItem, Shield)) {
+					return advAntiHandWithShieldArr;
+				}
+				return advAntiHandUnarmedArr; 
+				//advAntiHandUnarmedArr
+				// advAntiHandWithShieldArr
+			} 
+		}
+		return EMPTY_ARR;
+	}
 
 
 	public function isFocusedEnemyLeftSide() {
@@ -351,8 +426,21 @@ class CombatViewModel
 		actingState = val;
 	}
 
-	public var currentPlayerIndex:Int = -1;
-	public var focusOpponentIndex:Int = 0;
+	public var currentPlayerIndex(default, set):Int = -1;
+	inline function set_currentPlayerIndex(value:Int):Int 
+	{
+		playerManueverSpec.reset();
+		//playerManueverSpec.activeItem = boutModel.bout.combatants[value].charSheet.inventory.findMasterHandItem();
+		//trace(playerManueverSpec.activeItem);
+		return currentPlayerIndex = value;
+	}
+	
+	public var focusOpponentIndex(default, set):Int = 0;
+	inline function set_focusOpponentIndex(value:Int):Int 
+	{
+		playerManueverSpec.setNewEnemy(boutModel.bout.combatants[value].charSheet.body);
+		return focusOpponentIndex = value;
+	}
 
 	public inline function getCurrentPlayer():FightNode<CharSheet> {
 		return currentPlayerIndex >= 0 ? boutModel.bout.combatants[currentPlayerIndex] : null;
@@ -408,6 +496,13 @@ class CombatViewModel
 	public function onSwingAvailabilityChange():Void {
 		handleDisabledMask(swingAvailabilityMask, DOLL_SWING_Slugs);
 	}
+	
+	public function onAdvAvailabilityChange(mask:Int):Void {
+		advInteract1.disabled = (mask & (1|16)) != 0;
+		advInteract2.disabled = (mask & (2|32)) != 0;
+		advInteract3.disabled = (mask & (4|64)) != 0;
+		advInteract4.disabled = (mask & (8|128)) != 0;
+	}
 
 	public function partIndexAvailable(index:Int):Bool {
 		return (thrustAvailabilityMask & (index << 1)) != 0;
@@ -430,6 +525,10 @@ class CombatViewModel
 	var _partMap:IntMap<Int>;
 	var _enemyHandLeftIdx:Int;
 	var _enemyHandRightIdx:Int;
+	var advInteract1:UInteract;
+	var advInteract2:UInteract;
+	var advInteract3:UInteract;
+	var advInteract4:UInteract;
 
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
 		_interactionMaps = [];
@@ -439,6 +538,12 @@ class CombatViewModel
 		_interactionStates[ACTING_DOLL_DRAG_CP] = [];
 		_dollImageMapData = imageMapData;
 		_interactionStates[ACTING_NONE] = [];
+		
+		(advInteract1=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever1'))).disabled = false;
+		(advInteract2=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever2'))).disabled = false;
+		(advInteract3=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever3'))).disabled = false;
+		(advInteract4=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever4'))).disabled = false;
+		
 
 		var body = BodyChar.getInstance();
 		_body = body;
@@ -556,5 +661,6 @@ class CombatViewModel
 		onSwingAvailabilityChange();
 	}
 
+	
 
 }

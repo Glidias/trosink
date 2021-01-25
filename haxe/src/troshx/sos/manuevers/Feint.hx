@@ -2,7 +2,6 @@ package troshx.sos.manuevers;
 import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
 import troshx.core.ManueverSpec;
-import troshx.sos.core.DamageType;
 import troshx.sos.core.Manuever;
 import troshx.sos.core.MeleeSpecial;
 import troshx.sos.core.Weapon;

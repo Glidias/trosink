@@ -332,6 +332,7 @@ class Manuever implements IManuever implements IUid
 		req &= (REQ_WEAPON|REQ_SHIELD);
 		
 		if ( (reqMilitaryArms & req) != req ) {
+			trace(name + ', ' + req + ', '+activeItem);
 			return -1;
 		}
 		

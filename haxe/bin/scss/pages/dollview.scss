@@ -14,7 +14,7 @@
 	
 }
 
-.dollview {
+.dollview { 
 	overflow:hidden;
 	button, a {
 		pointer-events:auto;
@@ -92,6 +92,9 @@
 	.def-manuever-btn {
 		border:1px solid #666666;
 		overflow:hidden;
+		&.disabled {
+			opacity:.25;
+		}
 		.lbl {
 			width:100%;
 			position:absolute;
@@ -107,6 +110,9 @@
 		padding:4px;
 		overflow:hidden;
 		border:1px solid #666666;
+		&.disabled {
+			opacity:.25;
+		}
 		.lbl {
 			width:100%;
 			position:absolute;

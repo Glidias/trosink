@@ -73,7 +73,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		
 		var valData:CharSave;
 		var node;
-		valData = FightCharacters.get()[4];
+		valData = FightCharacters.get()[7];
 		
 		node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultPlayerSideIndex());
 		var theIndex = boutModel.bout.combatants.length;
@@ -84,12 +84,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 		node.charSheet.inventory.refreshHalfArmorLabels();
 		node.charSheet.inventory.cleanupShieldLabels();
 		node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+		viewModel.activatePlayerItem();
 		
 
-		valData = FightCharacters.get()[5];
+		valData = FightCharacters.get()[7];
 		node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
 		boutModel.bout.pushNewFightNode(node);
-		
+		viewModel.focusOpponentIndex = viewModel.getDefaultEnemySideIndex();
 		
 		node.charSheet.inventory.refreshHalfArmorLabels();
 		node.charSheet.inventory.cleanupShieldLabels();
@@ -115,11 +116,13 @@ class DollView extends VComponent<DollViewData, NoneT>
 			boutModel.bout.pushNewFightNode(node);
 			viewModel.currentPlayerIndex = theIndex;
 			node.fight.cp = node.charSheet.CP;
+			viewModel.activatePlayerItem();
 			
 		} else if (showPregens == PREGEN_SELECT_OPPONENT) {
 			var valData:CharSave = val;
 			node = new FightNode<CharSheet>(valData.label, deserializeSheet(valData.savedData), viewModel.getDefaultEnemySideIndex());
 			boutModel.bout.pushNewFightNode(node);
+			viewModel.focusOpponentIndex = viewModel.getDefaultEnemySideIndex();
 		}
 		if (node != null) {
 			node.charSheet.inventory.refreshHalfArmorLabels();
@@ -207,6 +210,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	
 	// ENEMY
 	
+	// warning: assumption made for masterhand item handedness
 	@:computed function get_enemyRightItem():Item {
 		var pl = this.currentOpponent;
 		return pl.charSheet.inventory.findMasterHandItem();
@@ -336,7 +340,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return "";
 	}
 	
-	@:computed inline function get_player():FightNode<CharSheet>
+	@:computed function get_player():FightNode<CharSheet>
 	{
 		return viewModel.getCurrentPlayer();
 	}
@@ -378,7 +382,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return focusIndex < opponents.length ? focusIndex : opponents.length -1;
 	}
 	
-	@:computed inline function get_currentOpponent():FightNode<CharSheet> 
+	@:computed function get_currentOpponent():FightNode<CharSheet> 
 	{
 		var allOpponents = this.opponents; // fallback temp show from all opponents list if no currentPlayer yet
 		
@@ -403,6 +407,52 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
+	@:computed function get_advManuevers():Array<Manuever> {
+		var gotPlayer:Bool = this.player != null;
+		var gotEnemy:Bool = this.currentOpponent != null;
+		return this.viewModel.getAdvancedManuevers(this.player, gotPlayer ? this.leftItem : null, gotPlayer ? this.rightItem : null, this.currentOpponent, gotEnemy ? this.enemyLeftItem : null, gotEnemy ? this.enemyRightItem : null);
+	}
+	
+
+	
+	@:computed function get_advTNs():Array<Int> {
+		var arr = this.advManuevers;
+		var val = [];
+		for (i in 0...arr.length) {
+			val[i] = arr[i].getTN(this.viewModel.playerManueverSpec);
+		}
+		return val;
+	}
+	
+	@:computed function get_advCosts():Array<Int> {
+		var arr = this.advManuevers;
+		var val = [];
+		for (i in 0...arr.length) {
+			val[i] = arr[i].getCost(this.boutModel.bout, this.player, null);
+		}
+		return val;
+	}
+	
+	function advHiddenAt(i:Int):Bool {
+		return (this.advNotAvailMask & (1 << i)) != 0;
+	}
+	
+	function advDisabledAt(i:Int):Bool {
+		return (this.advNotAvailMask & (1 << (i+4))) != 0;
+	}
+	@:computed function get_advNotAvailMask():Int {
+		var arr = this.advManuevers;
+		var arrTNs = this.advTNs;
+		var val = 0;
+		for (i in 0...arr.length) {
+			val |= arrTNs[i] < 0 || !arr[i].getAvailability(this.boutModel.bout, this.player, this.viewModel.playerManueverSpec) ? (1 << i) : 0;
+		}
+		return val;
+	}
+	
+	@:watch("advNotAvailMask") function onNotAvailAdvMaskChange(newValue:Int, oldValue:Int):Void {
+		this.viewModel.onAdvAvailabilityChange(newValue);
+	}
 		
 	override public function Mounted():Void {
 		var img:Image = _vRefs.image;
@@ -445,7 +495,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.currentDollSheet.inventory.findHeldShieldAssign();
 	}
 	
-	@:computed inline function get_carriedDollShield():Shield {
+	@:computed function get_carriedDollShield():Shield {
 		var assign = this.carriedDollShieldAssign;
 		return assign != null ? assign.shield : null;
 	}
