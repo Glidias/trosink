@@ -16,6 +16,9 @@
 
 .dollview { 
 	overflow:hidden;
+	button {
+		border-radius:0;
+	}
 	button, a {
 		pointer-events:auto;
 		touch-action:auto;

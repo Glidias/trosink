@@ -23,7 +23,7 @@ class Feint extends Manuever
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
 		var weapon:Weapon = spec.activeItem;
 		var fluidThrusts:Bool = (weapon.meleeFlags & MeleeSpecial.FLUID_THRUSTS) != 0;
-		if (spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && !fluidThrusts) {
+		if (!spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && fluidThrusts) {
 			return false;
 		}
 		return true;

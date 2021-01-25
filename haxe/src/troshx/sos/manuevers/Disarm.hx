@@ -16,7 +16,7 @@ class Disarm extends Manuever
 
 	public function new() 
 	{
-		super("disarm", "Disarm (Weapon)");
+		super("disarm", "Disarm");
 		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._costs(1)._attackTypes(Manuever.ATTACK_TYPE_SWING)._targetZoneMode(Manuever.TARGET_ZONE_WEAPON)._superior();
 		
 	}
@@ -49,7 +49,7 @@ class DisarmUnarmedAtk extends Manuever
 
 	public function new() 
 	{
-		super("disarmUnarmedAtk", "Disarmed (Unarmed, Attack)");
+		super("disarmUnarmedAtk", "Disarm (Unarmed)");
 		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_UNARMED)._targetZoneMode(Manuever.TARGET_ZONE_WEAPON)._costs(1)._reach(Weapon.REACH_H)._tn(7)._superiorInit(function(m){m._tn(6); });
 		
 	}
@@ -73,7 +73,7 @@ class DisarmUnarmedDef extends Manuever
 
 	public function new() 
 	{
-		super("disarmUnarmedDef", "Disarmed (Unarmed, Defend)");
+		super("disarmUnarmedDef", "Disarm (Unarmed)");
 		_types(Manuever.TYPE_DEFENSIVE)._requisite(Manuever.REQ_UNARMED)._tags(Manuever.TAG_PARRY)._costs(1)._reach(Weapon.REACH_H)._tn(8)._superiorInit(function(m){m._tn(7); });
 	}
 }

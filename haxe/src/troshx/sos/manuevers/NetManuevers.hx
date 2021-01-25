@@ -19,7 +19,8 @@ class NetFeint extends Manuever
 	public function new() 
 	{
 		super("netFeint", "Net Feint");
-		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON | Manuever.REQ_STUFF, NetItems.STUFF)._costs(1, Manuever.DEFER_COST)._ranged(); 
+		// | Manuever.REQ_STUFF
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON, NetItems.STUFF)._costs(1, Manuever.DEFER_COST)._ranged(); 
 	}
 	
 	

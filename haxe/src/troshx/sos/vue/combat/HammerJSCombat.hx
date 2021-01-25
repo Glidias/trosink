@@ -120,8 +120,8 @@ class HammerJSCombat
 				defaultAct = DEFAULT_ACT_HOVER;
 				requiredActs = 0;
 				
-				viewModel.setDraggedCP(0);
 				viewModel.resetAdvFocusedIndex(); // todo: might be kept
+				viewModel.setDraggedCP(0);
 				//trace("Drag move canceled");
 			}
 			else {
@@ -186,7 +186,29 @@ class HammerJSCombat
 					
 				}
 			}
-		} 
+		}
+		else if (name == "btnVoid" || name == "btnParry" || name == "btnBlock") {
+			if ( (event & UIInteraction.DOWN) != 0 ) {
+				if (index != viewModel.focusedIndex) viewModel.setFocusedIndex(index);
+				else {
+					viewModel.resetAdvFocusedIndex();
+					startDragCP(name, tag, name=="btnParry", true);
+				}
+			} else if ( (event & UIInteraction.MASK_CANCELED_OR_RELEASE) != 0 ) {
+				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
+				defaultAct = DEFAULT_ACT_HOVER;
+				requiredActs = 0;
+				viewModel.setDraggedCP(0);
+				viewModel.resetAdvFocusedIndex(); // todo: might be kept
+			}
+		}
+		else if (name == "handLeftAlt" || name == "handRightAlt") {
+			if ( (event & UIInteraction.TAP) != 0 ) {
+				if (viewModel.getCurrentPlayer() == null) {
+					viewModel.cycleAttackManueverMode(name == "handLeftAlt");
+				}
+			}
+		}
 		else {
 			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}

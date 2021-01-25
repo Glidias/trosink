@@ -319,7 +319,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	
 
-	
+
 	
 	@:computed function get_styleSwingProps():ShapeStyleProps {
 		var d = mapData;
@@ -469,6 +469,26 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return gotPlayer ? this.advTNs : this.advSimpTNs;
 	}
 	
+	@:computed function get_advCostArr():Array<Int> {
+		var gotPlayer:Bool = this.player != null; 
+		return gotPlayer ? this.advCosts : this.advSimpCosts;
+	}
+	
+	@:computed function get_browseAttackModeLabel():String {
+		return this.viewModel.getBrowseAttackModeLabel(false);
+	}
+	
+	@:computed function get_browseAttackModeLabel2():String {
+		return this.viewModel.getBrowseAttackModeLabel(true);
+	}
+	
+	@:computed function get_isBrowseHighlightLeft():Bool {
+		return this.viewModel.isBrowseHighlightLeft();
+	}
+	@:computed function get_isBrowseHighlightRight():Bool {
+		return this.viewModel.isBrowseHighlightRight();
+	}
+	
 	@:computed function get_advTNs():Array<Int> {
 		var arr = this.advManuevers;
 		var val = [];
@@ -497,6 +517,15 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return val;
 	}
 	
+	@:computed function get_advSimpCosts():Array<Int> {
+		var arr = this.advManuevers;
+		var val = [];
+		for (i in 0...arr.length) {
+			val[i] = arr[i].cost;
+		}
+		return val;
+	}
+	
 	function advHiddenAt(i:Int):Bool {
 		return (this.advNotAvailMask & (1 << i)) != 0;
 	}
@@ -509,10 +538,12 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var arrTNs = this.advTNs;
 		var gotPlayer = this.player != null;
 		var val = 0;
-		for (i in 0...arr.length) {
-			val |= arrTNs[i] < 0 || !arr[i].getAvailability(this.boutModel.bout, this.player, this.viewModel.playerManueverSpec) ? (1 << i) : 0;
+		if (gotPlayer) {
+			for (i in 0...arr.length) {
+				val |= arrTNs[i] < 0 || !arr[i].getAvailability(this.boutModel.bout, this.player, this.viewModel.playerManueverSpec) ? (1 << i) : 0;
+			}
 		}
-		return gotPlayer ? val : 0;
+		return val;
 	}
 	
 	@:watch("advNotAvailMask") function onNotAvailAdvMaskChange(newValue:Int, oldValue:Int):Void {
@@ -798,6 +829,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.viewModel.actingState;
 	}
 
+	@:computed function get_isDefBtnBlockAllowed():Bool {
+		return this.viewModel.isDefBtnBlockAllowed();
+	}
+	
+	@:computed function get_isDefBtnParryAllowed():Bool {
+		return this.viewModel.isDefBtnParryAllowed();
+	}
+	
 	@:computed function get_isDraggingCP():Bool {
 		return this.viewModel.actingState == CombatViewModel.ACTING_DOLL_DRAG_CP;
 	}

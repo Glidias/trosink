@@ -14,7 +14,7 @@
 		</zone>
 
 		<zone :index="mapData.idIndices['incomingManuevers']" :mapData="mapData" style="padding:5px" class="textarea-region">
-			<div class="observe-indicator" v-show="viewModel.incomingHeldDown" v-html="observePrompt"></div>
+			<div class="observe-indicator" v-if="gotCurrentOpponent" v-show="viewModel.incomingHeldDown || (!viewModel.showFocusedTag)" v-html="observePrompt"></div>
 			<div class="hover-tag" v-if="gotCurrentOpponent" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
 		</zone>
 
@@ -55,16 +55,16 @@
 		<div v-if="gotCurrentOpponent">
 
 			<zone v-bind="advStyleProps"  :index="mapData.idIndices['advManuever'+(i+1)]" :key="i" :class="{disabled:advDisabledAt(i)}" :mapData="mapData" v-for="(manuever, i) in advManuevers" class="adv-manuever-btn" :showShape="viewModel.advFocusedIndex === i" v-if="!advHiddenAt(i) && manuever.name !==''">
-				<div class="lbl">{{manuever.name}}<span class="cost" v-show="advCosts[i]!=0"> [{{advCosts[i]}}]</span><span class="tn" v-show="advTNArr[i]!=7 && advTNArr[i]!=0"> &gt;{{advTNArr[i]}}</span></div>
+				<div class="lbl">{{manuever.name}}<span class="cost" v-show="advCostArr[i]!=0"> [{{advCostArr[i]}}]</span><span class="tn" v-show="advTNArr[i]!=7 && advTNArr[i]!=0"> &gt;{{advTNArr[i]}}</span></div>
 			</zone>
 				
-			<zone :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="!player || isDefBtnBlockAllowed" :showShape="viewModel.focusedIndex==mapData.idIndices['btnBlock']">
 				<div class="lbl">B</div>
 			</zone>
-			<zone :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="!player || isDefBtnParryAllowed" :showShape="viewModel.focusedIndex==mapData.idIndices['btnParry']">
 				<div class="lbl">P</div>
 			</zone>
-			<zone :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="false">
+			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="viewModel.focusedIndex==mapData.idIndices['btnVoid']">
 				<div class="lbl">V</div>
 			</zone>
 	
@@ -98,6 +98,21 @@
 					<li v-for="(li, i) in opponents" :key="i">{{li.label}}</li>
 				</ul>
 			</zone>
+					
+			<div v-if="!player">
+				<zone v-bind="stylePlHandBtnProps" :index="mapData.idIndices['handLeftAlt']" :mapData="mapData" class="textarea-region" :showShape="isBrowseHighlightLeft">
+					<div class="lbl"></div>
+				</zone>
+				<zone :index="mapData.idIndices['handLeftText']" :mapData="mapData">
+					<div class="lbl">{{browseAttackModeLabel2}}</div>
+				</zone>
+				<zone v-bind="stylePlHandBtnProps" :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" :showShape="isBrowseHighlightRight">
+					<div class="lbl"></div>
+				</zone>
+				<zone :index="mapData.idIndices['handRightText']" :mapData="mapData">
+					<div class="lbl">{{browseAttackModeLabel}}</div>
+				</zone>
+			</div>
 		</div>
 		<div v-else>
 			<div class="select-opponent">

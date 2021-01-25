@@ -1,6 +1,11 @@
 package troshx.sos.manuevers;
+import troshx.components.Bout;
 import troshx.core.ManueverSpec;
 import troshx.sos.core.Manuever;
+import troshx.sos.core.MeleeSpecial;
+import troshx.sos.core.Shield;
+import troshx.sos.core.Weapon;
+import troshx.sos.sheets.CharSheet;
 
 /**
  * ...
@@ -9,6 +14,7 @@ import troshx.sos.core.Manuever;
 class ShieldFeint extends Manuever
 {
 
+
 	public function new() 
 	{
 		super("shieldFeint", "Shield Feint");
@@ -16,7 +22,33 @@ class ShieldFeint extends Manuever
 	}
 	
 	override public function getTN(spec:ManueverSpec):Int {
-		return super.getTN(spec); // if >=0, return bashTN instead?
+		//return super.getTN(spec); // if >=0, return bashTN instead?
+		return 0;
+	}
+	
+	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
+		var shield:Shield = node.charSheet.inventory.findHeldShield();
+		if (shield == null) return false;
+		///*
+		var weapon:Weapon = node.charSheet.inventory.getMasterWeapon();
+		if (weapon == null) node.charSheet.inventory.getOffhandWeapon();
+		var fluidThrusts:Bool = (weapon.meleeFlags & MeleeSpecial.FLUID_THRUSTS) != 0;
+		if (!spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && fluidThrusts) {
+			return false;
+		}
+		return true;
+		//*/
+	
+		/*
+		var weapon:Weapon = spec.activeItem;
+
+		var fluidThrusts:Bool = (weapon.meleeFlags & MeleeSpecial.FLUID_THRUSTS) != 0;
+		if (!spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && fluidThrusts) {
+			return false;
+		}
+		
+		return true;
+		*/
 	}
 	
 }

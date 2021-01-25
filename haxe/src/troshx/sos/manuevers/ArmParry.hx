@@ -25,8 +25,9 @@ class ArmParry extends Manuever
 		var tn:Int = super.getTN(spec);
 		if (tn < 0) return tn;
 		var usingLeftLimb:Bool = spec.usingLeftLimb;
-		if ( (spec.replyTo.targetZone == Humanoid.SWING_UPPER_ARM || spec.replyTo.targetZone == Humanoid.SWING_LOWER_ARM || spec.replyTo.targetZone == Humanoid.THRUST_LOWER_ARM || spec.replyTo.targetZone == Humanoid.THRUST_UPPER_ARM) 
-			&& spec.replyTo.targetZonePreferLeft == usingLeftLimb
+		if ( spec.replyTo != null &&  // always getTN refresh needed upon resolved if manuever is floated
+			((spec.replyTo.targetZone == Humanoid.SWING_UPPER_ARM || spec.replyTo.targetZone == Humanoid.SWING_LOWER_ARM || spec.replyTo.targetZone == Humanoid.THRUST_LOWER_ARM || spec.replyTo.targetZone == Humanoid.THRUST_UPPER_ARM) 
+			&& spec.replyTo.targetZonePreferLeft == usingLeftLimb)
 		) {
 			tn++;
 		}

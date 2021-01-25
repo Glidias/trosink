@@ -436,6 +436,7 @@ class Manuever implements IManuever implements IUid
 			// Shield/other alts
 			//Swipe Up Shield for sub menu  and tap on Shield Feint as an option. Will revert back to weapon being selected.
 			// alt-feints
+			new ShieldBash(),
 			new ShieldFeint(),
 			new NetFeint(),
 			

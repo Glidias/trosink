@@ -3466,7 +3466,27 @@ var troshx_core_ManueverSpec = function() {
 $hxClasses["troshx.core.ManueverSpec"] = troshx_core_ManueverSpec;
 troshx_core_ManueverSpec.__name__ = ["troshx","core","ManueverSpec"];
 troshx_core_ManueverSpec.prototype = {
-	__class__: troshx_core_ManueverSpec
+	resetPlayer: function() {
+		this.typePreference = 0;
+		this.usingLeftLimb = false;
+		this.activeItem = null;
+		this.activeEnemyItem = null;
+		this.activeEnemyZone = -1;
+	}
+	,resetAll: function() {
+		this.typePreference = 0;
+		this.usingLeftLimb = false;
+		this.activeItem = null;
+		this.activeEnemyItem = null;
+		this.activeEnemyBody = null;
+		this.activeEnemyZone = -1;
+	}
+	,setNewEnemy: function(body) {
+		this.activeEnemyZone = -1;
+		this.activeEnemyBody = body;
+		this.activeEnemyItem = null;
+	}
+	,__class__: troshx_core_ManueverSpec
 };
 var troshx_core_ManueverStack = function() {
 	this.stack = [];
@@ -7657,10 +7677,16 @@ troshx_sos_core_BodyChar.prototype = {
 		}
 		return masks;
 	}
-	,getDescLabelTargetZone: function(zoneIndex) {
+	,getDescLabelTargetZone: function(zoneIndex,thrustLabel,swingLabel) {
+		if(swingLabel == null) {
+			swingLabel = "Swing to";
+		}
+		if(thrustLabel == null) {
+			thrustLabel = "Thrust to";
+		}
 		var isThrusting = zoneIndex >= this.thrustStartIndex;
 		var t = this.targetZones[zoneIndex];
-		return (t.description != "" ? t.description + " to" : isThrusting ? "Thrust to" : "Swing to") + " " + t.name;
+		return (t.description != "" ? t.description + " to" : isThrusting ? thrustLabel : swingLabel) + " " + t.name;
 	}
 	,getDescLabelsTargetZoneMask: function(mask) {
 		var arr = [];
@@ -8777,6 +8803,33 @@ troshx_sos_core_Inventory.prototype = {
 		}
 		return null;
 	}
+	,findOffHandAssign: function() {
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.weapons[i].held == 2) {
+				return this.weapons[i];
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.shields.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			if(this.shields[i1].held == 2) {
+				return this.shields[i1];
+			}
+		}
+		var _g12 = 0;
+		var _g3 = this.equipedNonMeleeItems.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			if(this.equipedNonMeleeItems[i2].held == 2) {
+				return this.equipedNonMeleeItems[i2];
+			}
+		}
+		return null;
+	}
 	,findMasterHandItem: function() {
 		var _g1 = 0;
 		var _g = this.weapons.length;
@@ -8800,6 +8853,33 @@ troshx_sos_core_Inventory.prototype = {
 			var i2 = _g12++;
 			if((this.equipedNonMeleeItems[i2].held & 1) != 0) {
 				return this.equipedNonMeleeItems[i2].item;
+			}
+		}
+		return null;
+	}
+	,findMasterHandAssign: function() {
+		var _g1 = 0;
+		var _g = this.weapons.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if((this.weapons[i].held & 1) != 0) {
+				return this.weapons[i];
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.shields.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			if((this.shields[i1].held & 1) != 0) {
+				return this.shields[i1];
+			}
+		}
+		var _g12 = 0;
+		var _g3 = this.equipedNonMeleeItems.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			if((this.equipedNonMeleeItems[i2].held & 1) != 0) {
+				return this.equipedNonMeleeItems[i2];
 			}
 		}
 		return null;
@@ -9765,7 +9845,7 @@ troshx_sos_core_Manuever.getArray = function() {
 	}
 };
 troshx_sos_core_Manuever.getNewArray = function() {
-	return [new troshx_sos_core_Manuever("swing","Swing")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_manuevers_DrawCut(),new troshx_sos_manuevers_CleavingBlow(),new troshx_sos_core_Manuever("thrust","Thrust")._types(2)._requisite(1)._attackTypes(2),new troshx_sos_manuevers_PushCut(),new troshx_sos_manuevers_JointThrust(),new troshx_sos_manuevers_Hook(),new troshx_sos_manuevers_Feint(),new troshx_sos_manuevers_Disarm(),new troshx_sos_manuevers_Beat(),new troshx_sos_manuevers_Break(),new troshx_sos_manuevers_Hew(),new troshx_sos_manuevers_ShieldBeat(),new troshx_sos_manuevers_DisarmUnarmedAtk(),new troshx_sos_core_Manuever("parry","Parry")._types(1)._requisite(1)._tags(64),new troshx_sos_manuevers_Riposte(),new troshx_sos_manuevers_ArmParry(),new troshx_sos_manuevers_DisarmUnarmedDef(),new troshx_sos_core_Manuever("void","Void")._types(1)._tags(128)._tn(8)._bs(2),new troshx_sos_manuevers_HastyVoid(),new troshx_sos_manuevers_MobileVoid(),new troshx_sos_manuevers_Flee(),new troshx_sos_core_Manuever("block","Block")._types(1)._requisite(2)._tags(256),new troshx_sos_manuevers_ShieldBind(),new troshx_sos_manuevers_TotalBlock(),new troshx_sos_manuevers_ShieldFeint(),new troshx_sos_manuevers_NetFeint(),new troshx_sos_core_Manuever("buttStrike","Butt Strike")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_core_Manuever("pommelStrike","Pommel Strike")._types(2)._requisite(1)._attackTypes(2)._tn(6)._superior(),new troshx_sos_core_Manuever("halfSword","Half-Sword")._types(8)._requisite(1)._tags(1536)._costs(1),new troshx_sos_core_Manuever("murderStrike","Murder Strike")._types(8)._requisite(1)._tags(1536)._costs(2),new troshx_sos_manuevers_StealInitiative(),new troshx_sos_manuevers_StraightPunch(),new troshx_sos_manuevers_HookPunch(),new troshx_sos_manuevers_Elbow(),new troshx_sos_manuevers_HeadButt(),new troshx_sos_manuevers_Kick(),new troshx_sos_manuevers_Knee(),new troshx_sos_manuevers_Trip(),new troshx_sos_manuevers_OneTwoPunch(),new troshx_sos_manuevers_MeleeShoot(),new troshx_sos_manuevers_WeaponThrow(),new troshx_sos_manuevers_BlindToss(),new troshx_sos_manuevers_NetToss(),new troshx_sos_core_Manuever("doNothing","Do Nothing")._types(0)._costs(0,-1)._superiorInit(function(m) {
+	return [new troshx_sos_core_Manuever("","")._tn(-1),new troshx_sos_core_Manuever("swing","Swing")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_manuevers_DrawCut(),new troshx_sos_manuevers_CleavingBlow(),new troshx_sos_core_Manuever("thrust","Thrust")._types(2)._requisite(1)._attackTypes(2),new troshx_sos_manuevers_PushCut(),new troshx_sos_manuevers_JointThrust(),new troshx_sos_manuevers_Hook(),new troshx_sos_manuevers_Feint(),new troshx_sos_manuevers_Disarm(),new troshx_sos_manuevers_Beat(),new troshx_sos_manuevers_Break(),new troshx_sos_manuevers_Hew(),new troshx_sos_manuevers_ShieldBeat(),new troshx_sos_manuevers_DisarmUnarmedAtk(),new troshx_sos_core_Manuever("parry","Parry")._types(1)._requisite(1)._tags(64),new troshx_sos_manuevers_Riposte(),new troshx_sos_manuevers_ArmParry(),new troshx_sos_manuevers_DisarmUnarmedDef(),new troshx_sos_core_Manuever("void","Void")._types(1)._tags(128)._tn(8)._bs(2),new troshx_sos_manuevers_HastyVoid(),new troshx_sos_manuevers_MobileVoid(),new troshx_sos_manuevers_Flee(),new troshx_sos_core_Manuever("block","Block")._types(1)._requisite(2)._tags(256),new troshx_sos_manuevers_ShieldBind(),new troshx_sos_manuevers_TotalBlock(),new troshx_sos_manuevers_ShieldBash(),new troshx_sos_manuevers_ShieldFeint(),new troshx_sos_manuevers_NetFeint(),new troshx_sos_core_Manuever("buttStrike","Butt Strike")._types(2)._requisite(1)._attackTypes(1),new troshx_sos_core_Manuever("pommelStrike","Pommel Strike")._types(2)._requisite(1)._attackTypes(2)._tn(6)._superior(),new troshx_sos_core_Manuever("halfSword","Half-Sword")._types(8)._requisite(1)._tags(1536)._costs(1),new troshx_sos_core_Manuever("murderStrike","Murder Strike")._types(8)._requisite(1)._tags(1536)._costs(2),new troshx_sos_manuevers_StealInitiative(),new troshx_sos_manuevers_StraightPunch(),new troshx_sos_manuevers_HookPunch(),new troshx_sos_manuevers_Elbow(),new troshx_sos_manuevers_HeadButt(),new troshx_sos_manuevers_Kick(),new troshx_sos_manuevers_Knee(),new troshx_sos_manuevers_Trip(),new troshx_sos_manuevers_OneTwoPunch(),new troshx_sos_manuevers_MeleeShoot(),new troshx_sos_manuevers_WeaponThrow(),new troshx_sos_manuevers_BlindToss(),new troshx_sos_manuevers_NetToss(),new troshx_sos_core_Manuever("doNothing","Do Nothing")._types(0)._costs(0,-1)._superiorInit(function(m) {
 		m.name = "Focus";
 	}),new troshx_sos_core_Manuever("masterStrike","Masterstrike")._types(0)._costs(2)._superior(),new troshx_sos_core_Manuever("doubleAttack","Double Attack")._types(0)._costs(1),new troshx_sos_core_Manuever("doubleShot","Double Shot")._types(0)._costs(2),new troshx_sos_core_Manuever("quickDefense","Quick Defense")._types(0)._costs(2),new troshx_sos_core_Manuever("quickDraw","Quick Draw")._types(0)._costs(1,-1)._tags(1024),new troshx_sos_core_Manuever("allyDefense","Ally Defense")._types(0)._costs(2)._tags(1025),new troshx_sos_core_Manuever("threadNeedle","Thread the Needle")._types(0)._tags(3072),new troshx_sos_core_Manuever("rapidRise","Rapid Rise")._types(0)._tags(3072)._costs(3,-1),new troshx_sos_core_Manuever("guardedAttack","Guarded Attack")._types(0)];
 };
@@ -10985,7 +11065,7 @@ troshx_sos_manuevers_ArmParry.prototype = $extend(troshx_sos_core_Manuever.proto
 			return tn;
 		}
 		var usingLeftLimb = spec.usingLeftLimb;
-		if((spec.replyTo.targetZone == 4 || spec.replyTo.targetZone == 5 || spec.replyTo.targetZone == 14 || spec.replyTo.targetZone == 13) && spec.replyTo.targetZonePreferLeft == usingLeftLimb) {
+		if(spec.replyTo != null && ((spec.replyTo.targetZone == 4 || spec.replyTo.targetZone == 5 || spec.replyTo.targetZone == 14 || spec.replyTo.targetZone == 13) && spec.replyTo.targetZonePreferLeft == usingLeftLimb)) {
 			++tn;
 		}
 		return tn;
@@ -11068,7 +11148,7 @@ troshx_sos_manuevers_CleavingBlow.prototype = $extend(troshx_sos_core_Manuever.p
 	,__class__: troshx_sos_manuevers_CleavingBlow
 });
 var troshx_sos_manuevers_Disarm = function() {
-	troshx_sos_core_Manuever.call(this,"disarm","Disarm (Weapon)");
+	troshx_sos_core_Manuever.call(this,"disarm","Disarm");
 	this._types(2)._requisite(1)._costs(1)._attackTypes(1)._targetZoneMode(1)._superior();
 };
 $hxClasses["troshx.sos.manuevers.Disarm"] = troshx_sos_manuevers_Disarm;
@@ -11078,7 +11158,7 @@ troshx_sos_manuevers_Disarm.prototype = $extend(troshx_sos_core_Manuever.prototy
 	__class__: troshx_sos_manuevers_Disarm
 });
 var troshx_sos_manuevers_DisarmUnarmedAtk = function() {
-	troshx_sos_core_Manuever.call(this,"disarmUnarmedAtk","Disarmed (Unarmed, Attack)");
+	troshx_sos_core_Manuever.call(this,"disarmUnarmedAtk","Disarm (Unarmed)");
 	this._types(2)._requisite(4)._targetZoneMode(1)._costs(1)._reach(2)._tn(7)._superiorInit(function(m) {
 		m._tn(6);
 	});
@@ -11090,7 +11170,7 @@ troshx_sos_manuevers_DisarmUnarmedAtk.prototype = $extend(troshx_sos_core_Manuev
 	__class__: troshx_sos_manuevers_DisarmUnarmedAtk
 });
 var troshx_sos_manuevers_DisarmUnarmedDef = function() {
-	troshx_sos_core_Manuever.call(this,"disarmUnarmedDef","Disarmed (Unarmed, Defend)");
+	troshx_sos_core_Manuever.call(this,"disarmUnarmedDef","Disarm (Unarmed)");
 	this._types(1)._requisite(4)._tags(64)._costs(1)._reach(2)._tn(8)._superiorInit(function(m) {
 		m._tn(7);
 	});
@@ -11102,7 +11182,7 @@ troshx_sos_manuevers_DisarmUnarmedDef.prototype = $extend(troshx_sos_core_Manuev
 	__class__: troshx_sos_manuevers_DisarmUnarmedDef
 });
 var troshx_sos_manuevers_DrawCut = function() {
-	troshx_sos_core_Manuever.call(this,"drawCut","Draw Cut");
+	troshx_sos_core_Manuever.call(this,"drawCut","Deep Draw Cut");
 	this._types(2)._requisite(1)._attackTypes(1);
 };
 $hxClasses["troshx.sos.manuevers.DrawCut"] = troshx_sos_manuevers_DrawCut;
@@ -11111,7 +11191,15 @@ troshx_sos_manuevers_DrawCut.__super__ = troshx_sos_core_Manuever;
 troshx_sos_manuevers_DrawCut.prototype = $extend(troshx_sos_core_Manuever.prototype,{
 	getAvailability: function(bout,node,spec) {
 		var weapon = spec.activeItem;
-		return weapon.damageTypeS == 0;
+		if(weapon.damageTypeS == 0) {
+			if(weapon.meleeSpecial != null) {
+				return weapon.meleeSpecial.draw > 0;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 	,__class__: troshx_sos_manuevers_DrawCut
 });
@@ -11126,7 +11214,7 @@ troshx_sos_manuevers_Feint.prototype = $extend(troshx_sos_core_Manuever.prototyp
 	getAvailability: function(bout,node,spec) {
 		var weapon = spec.activeItem;
 		var fluidThrusts = (weapon.meleeFlags & 16) != 0;
-		if(spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && !fluidThrusts) {
+		if(!spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && fluidThrusts) {
 			return false;
 		}
 		return true;
@@ -11238,7 +11326,7 @@ $hxClasses["troshx.sos.manuevers.NetItems"] = troshx_sos_manuevers_NetItems;
 troshx_sos_manuevers_NetItems.__name__ = ["troshx","sos","manuevers","NetItems"];
 var troshx_sos_manuevers_NetFeint = function() {
 	troshx_sos_core_Manuever.call(this,"netFeint","Net Feint");
-	this._types(2)._requisite(9,troshx_sos_manuevers_NetItems.STUFF)._costs(1,-2)._ranged();
+	this._types(2)._requisite(1,troshx_sos_manuevers_NetItems.STUFF)._costs(1,-2)._ranged();
 };
 $hxClasses["troshx.sos.manuevers.NetFeint"] = troshx_sos_manuevers_NetFeint;
 troshx_sos_manuevers_NetFeint.__name__ = ["troshx","sos","manuevers","NetFeint"];
@@ -11410,6 +11498,23 @@ troshx_sos_manuevers_Riposte.prototype = $extend(troshx_sos_core_Manuever.protot
 	}
 	,__class__: troshx_sos_manuevers_Riposte
 });
+var troshx_sos_manuevers_ShieldBash = function() {
+	troshx_sos_core_Manuever.call(this,"shieldBash","Shield Bash");
+};
+$hxClasses["troshx.sos.manuevers.ShieldBash"] = troshx_sos_manuevers_ShieldBash;
+troshx_sos_manuevers_ShieldBash.__name__ = ["troshx","sos","manuevers","ShieldBash"];
+troshx_sos_manuevers_ShieldBash.__super__ = troshx_sos_core_Manuever;
+troshx_sos_manuevers_ShieldBash.prototype = $extend(troshx_sos_core_Manuever.prototype,{
+	getTN: function(spec) {
+		var obj = spec.activeItem;
+		var shield = js_Boot.__instanceof(obj,troshx_sos_core_Shield) ? obj : null;
+		if(shield == null) {
+			return -1;
+		}
+		return shield.bashTN;
+	}
+	,__class__: troshx_sos_manuevers_ShieldBash
+});
 var troshx_sos_manuevers_ShieldBind = function() {
 	troshx_sos_core_Manuever.call(this,"shieldBind","Shield Bind");
 	this._types(1)._requisite(2)._tags(768)._costs(1)._superior();
@@ -11441,7 +11546,22 @@ troshx_sos_manuevers_ShieldFeint.__name__ = ["troshx","sos","manuevers","ShieldF
 troshx_sos_manuevers_ShieldFeint.__super__ = troshx_sos_core_Manuever;
 troshx_sos_manuevers_ShieldFeint.prototype = $extend(troshx_sos_core_Manuever.prototype,{
 	getTN: function(spec) {
-		return troshx_sos_core_Manuever.prototype.getTN.call(this,spec);
+		return 0;
+	}
+	,getAvailability: function(bout,node,spec) {
+		var shield = node.charSheet.inventory.findHeldShield();
+		if(shield == null) {
+			return false;
+		}
+		var weapon = node.charSheet.inventory.getMasterWeapon();
+		if(weapon == null) {
+			node.charSheet.inventory.getOffhandWeapon();
+		}
+		var fluidThrusts = (weapon.meleeFlags & 16) != 0;
+		if(!spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) && fluidThrusts) {
+			return false;
+		}
+		return true;
 	}
 	,__class__: troshx_sos_manuevers_ShieldFeint
 });
@@ -12868,11 +12988,13 @@ var troshx_sos_vue_combat_CombatViewModel = function(boutModel) {
 	this.DOLL_SWING_IsLefts = 0;
 	this.DOLL_SWING_Indices = [];
 	this.DOLL_SWING_Slugs = [];
+	this.DOLL_GENERAL_FOCUS_DESC = new haxe_ds_IntMap();
 	this.DOLL_PART_IsLefts = 0;
 	this.DOLL_PART_HitIndices = [];
 	this.DOLL_PART_Indices = [];
 	this.DOLL_PART_Slugs = [];
 	this.draggedCP = 0;
+	this.advFocusedIndex = -1;
 	this.focusedIndex = -1;
 	this.observeIndex = -1;
 	this.showFocusedTag = false;
@@ -12911,6 +13033,10 @@ var troshx_sos_vue_combat_CombatViewModel = function(boutModel) {
 		_g.h["THIGH"] = true;
 	}
 	this.MAP_LOWER_BODY_PARTS = _g;
+	this.playerManueverSpec = new troshx_core_ManueverSpec();
+	this.browseManueverIndex = 0;
+	this.browseAttackManueverList2 = [1,2,0];
+	this.browseAttackManueverList = [1,3,0,7];
 	this.trayPosFlipY = false;
 	this.trayPosFlip = false;
 	this.trayGridShelfX = 8;
@@ -12932,48 +13058,56 @@ var troshx_sos_vue_combat_CombatViewModel = function(boutModel) {
 		return _e1[p1];
 	});
 	var _e2 = this.manueverRepo;
-	this.advAntiHandWithWeaponArr = ["disarm","beat","break","hew"].map(function(p2) {
+	this.advShieldAttackArr = ["shieldBash","","","shieldFeint"].map(function(p2) {
 		return _e2[p2];
 	});
 	var _e3 = this.manueverRepo;
-	this.advAntiHandUnarmedArr = ["disarmUnarmedAtk"].map(function(p3) {
+	this.advAntiWeapWithWeaponArr = ["disarm","beat","break",""].map(function(p3) {
 		return _e3[p3];
 	});
 	var _e4 = this.manueverRepo;
-	this.advAntiHandWithShieldArr = ["shieldBeat"].map(function(p4) {
+	this.advAntiShieldWithWeaponArr = ["hew","beat","hook",""].map(function(p4) {
 		return _e4[p4];
 	});
-	this.basicHookPunch = this.manueverRepo["hookPunch"];
-	this.basicStraightPunch = this.manueverRepo["straightPunch"];
 	var _e5 = this.manueverRepo;
-	this.advPuglismSwingArr = ["","elbow","kick","trip"].map(function(p5) {
+	this.advAntiHandUnarmedArr = ["disarmUnarmedAtk"].map(function(p5) {
 		return _e5[p5];
 	});
 	var _e6 = this.manueverRepo;
-	this.advPuglismThrustArr = ["headbutt","knee","kick","trip"].map(function(p6) {
+	this.advAntiHandWithShieldArr = ["shieldBeat"].map(function(p6) {
 		return _e6[p6];
+	});
+	this.basicHookPunch = this.manueverRepo["hookPunch"];
+	this.basicStraightPunch = this.manueverRepo["straightPunch"];
+	var _e7 = this.manueverRepo;
+	this.advPuglismHandlessArr = ["headbutt","elbow","knee","trip"].map(function(p7) {
+		return _e7[p7];
+	});
+	var _e8 = this.manueverRepo;
+	this.advPuglismThrustSwingArr = ["oneTwoPunch","elbow","kick","trip"].map(function(p8) {
+		return _e8[p8];
 	});
 	this.mOneTwoPunch = this.manueverRepo["oneTwoPunch"];
 	this.basicMeleeShoot = this.manueverRepo["meleeShoot"];
 	this.basicNetToss = this.manueverRepo["netToss"];
-	var _e7 = this.manueverRepo;
-	this.advRangedArr = ["","","blindToss","weaponThrow"].map(function(p7) {
-		return _e7[p7];
+	var _e9 = this.manueverRepo;
+	this.advRangedArr = ["","","blindToss","weaponThrow"].map(function(p9) {
+		return _e9[p9];
 	});
 	this.basicVoid = this.manueverRepo["void"];
 	this.basicParry = this.manueverRepo["parry"];
 	this.basicBlock = this.manueverRepo["block"];
-	var _e8 = this.manueverRepo;
-	this.advVoidArr = ["hastyVoid","mobileVoid","","flee"].map(function(p8) {
-		return _e8[p8];
-	});
-	var _e9 = this.manueverRepo;
-	this.advParryArr = ["disarmUnarmedDef","armParry","riposte",""].map(function(p9) {
-		return _e9[p9];
-	});
 	var _e10 = this.manueverRepo;
-	this.advBlockArr = ["","shieldBind","","totalBlock"].map(function(p10) {
+	this.advVoidArr = ["hastyVoid","mobileVoid","","flee"].map(function(p10) {
 		return _e10[p10];
+	});
+	var _e11 = this.manueverRepo;
+	this.advParryArr = ["disarmUnarmedDef","armParry","riposte",""].map(function(p11) {
+		return _e11[p11];
+	});
+	var _e12 = this.manueverRepo;
+	this.advBlockArr = ["","shieldBind","","totalBlock"].map(function(p12) {
+		return _e12[p12];
 	});
 	this.mStealInitiative = this.manueverRepo["stealInitiative"];
 	this.mDoNothing = this.manueverRepo["doNothing"];
@@ -13008,6 +13142,56 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 		}
 		return amt;
 	}
+	,cycleAttackManueverMode: function(leftLimb) {
+		if(leftLimb == null) {
+			leftLimb = false;
+		}
+		if(this.playerManueverSpec.usingLeftLimb != leftLimb) {
+			this.playerManueverSpec.usingLeftLimb = leftLimb;
+			this.browseManueverIndex = 0;
+		}
+		var tarArr = leftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList;
+		this.browseManueverIndex++;
+		if(this.browseManueverIndex >= tarArr.length) {
+			this.browseManueverIndex = 0;
+		}
+	}
+	,getBrowseAttackMode: function() {
+		return (this.playerManueverSpec.usingLeftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList)[this.browseManueverIndex];
+	}
+	,getBrowseAttackModeLabel: function(alsoLeft) {
+		var tarArr = this.playerManueverSpec.usingLeftLimb && alsoLeft ? this.browseAttackManueverList2 : this.browseAttackManueverList;
+		var val = tarArr[this.browseManueverIndex];
+		switch(val) {
+		case 1:case 3:
+			return "Weapon";
+		case 2:
+			return "Shield";
+		case 0:case 7:
+			return "Unarmed";
+		}
+		return "unfound";
+	}
+	,isBrowseHighlightLeft: function() {
+		var tarArr = this.playerManueverSpec.usingLeftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList;
+		if(!(this.playerManueverSpec.usingLeftLimb && tarArr[this.browseManueverIndex] == 1)) {
+			return (tarArr[this.browseManueverIndex] & 2) != 0;
+		} else {
+			return true;
+		}
+	}
+	,isBrowseHighlightRight: function() {
+		var tarArr = this.playerManueverSpec.usingLeftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList;
+		return (tarArr[this.browseManueverIndex] & 1) != 0;
+	}
+	,activatePlayerItem: function(offhand) {
+		if(offhand == null) {
+			offhand = false;
+		}
+		var player = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
+		var tmp = offhand ? player.charSheet.inventory.findOffHandItem() : player.charSheet.inventory.findMasterHandItem();
+		this.playerManueverSpec.activeItem = tmp;
+	}
 	,setIncomingHeldDown: function(val) {
 		this.incomingHeldDown = val;
 	}
@@ -13016,19 +13200,161 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 		this.observeOpponent = val;
 		return gotChange;
 	}
+	,isDefBtnBlockAllowed: function() {
+		var pl = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
+		if(pl == null) {
+			return false;
+		}
+		return pl.charSheet.inventory.findHeldShieldAssign() != null;
+	}
+	,isDefBtnParryAllowed: function() {
+		var pl = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
+		var offhandPrefer = this.playerManueverSpec.usingLeftLimb;
+		if(pl == null) {
+			return false;
+		}
+		var w = offhandPrefer ? pl.charSheet.inventory.getOffhandWeapon() : pl.charSheet.inventory.getMasterWeapon();
+		if(w != null) {
+			return w.dtn >= 1;
+		}
+		return false;
+	}
 	,setFocusedIndex: function(val) {
 		this.focusedIndex = val;
+		this.playerManueverSpec.activeEnemyZone = this.getTargetZoneIndexFromFocIndex(val);
 		this.showFocusedTag = val >= 0;
+	}
+	,setAdvFocusedIndex: function(val) {
+		this.advFocusedIndex = val;
+	}
+	,resetAdvFocusedIndex: function() {
+		this.advFocusedIndex = -1;
+	}
+	,getFocusManueverAtkType: function() {
+		var i = this.focusedIndex;
+		if(this._swingMap.h.hasOwnProperty(i)) {
+			return 1;
+		} else if(this._partMap.h.hasOwnProperty(i)) {
+			return 2;
+		} else if(this.focusedIndex == this._enemyHandLeftIdx) {
+			return -2;
+		} else if(this.focusedIndex == this._enemyHandRightIdx) {
+			return -3;
+		} else {
+			return -1;
+		}
+	}
+	,getTargetZoneIndexFromFocIndex: function(i) {
+		if(this._swingMap.h.hasOwnProperty(i)) {
+			return this.DOLL_SWING_Indices[this._swingMap.h[i]];
+		} else if(this._partMap.h.hasOwnProperty(i)) {
+			return this.DOLL_PART_Indices[this._partMap.h[i]];
+		} else if(this.focusedIndex == this._enemyHandLeftIdx) {
+			return -2;
+		} else if(this.focusedIndex == this._enemyHandRightIdx) {
+			return -3;
+		} else {
+			return -1;
+		}
 	}
 	,setObserveIndex: function(val) {
 		this.observeIndex = val;
 	}
-	,getAdvancedManuevers: function(targetZone,offhand) {
-		if(offhand == null) {
-			offhand = false;
+	,getAdvancedManuevers: function(curPlayer,playerLeftItem,playerRightItem,curEnemy,enemyLeftItem,enemyRightItem) {
+		var manueverSpec = this.playerManueverSpec;
+		var targetZone = manueverSpec.activeEnemyZone;
+		var offhand = manueverSpec.usingLeftLimb;
+		var focusIndex = this.focusedIndex;
+		if(manueverSpec.activeEnemyBody == null) {
+			return troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR;
 		}
-		var curPlayer = this.currentPlayerIndex >= 0 ? this.boutModel.bout.combatants[this.currentPlayerIndex] : null;
-		var weaponAssign = offhand ? curPlayer.charSheet.inventory.getOffhandWeaponAssign() : curPlayer.charSheet.inventory.getMasterWeaponAssign();
+		if(curEnemy != null) {
+			if(this.playerManueverSpec.activeEnemyZone < 0 && this.playerManueverSpec.activeEnemyZone != -1) {
+				if(this.playerManueverSpec.activeEnemyZone == -2) {
+					if(enemyLeftItem == null) {
+						enemyLeftItem = curEnemy.charSheet.inventory.findOffHandItem();
+					}
+					this.playerManueverSpec.activeEnemyItem = enemyLeftItem;
+				} else if(this.playerManueverSpec.activeEnemyZone == -3) {
+					if(enemyRightItem == null) {
+						enemyRightItem = curEnemy.charSheet.inventory.findMasterHandItem();
+					}
+					this.playerManueverSpec.activeEnemyItem = enemyRightItem;
+				} else {
+					this.playerManueverSpec.activeEnemyItem = null;
+				}
+			} else {
+				this.playerManueverSpec.activeEnemyItem = null;
+			}
+		}
+		if(targetZone >= 0) {
+			if(curPlayer == null) {
+				var mode = (this.playerManueverSpec.usingLeftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList)[this.browseManueverIndex];
+				if(mode == 1 || mode == 3) {
+					if(manueverSpec.activeEnemyBody.isThrusting(targetZone)) {
+						return this.advThrustArr;
+					} else {
+						return this.advSwingArr;
+					}
+				} else if(mode == 7 || mode == 0) {
+					if(mode == 7) {
+						return this.advPuglismThrustSwingArr;
+					} else {
+						return this.advPuglismHandlessArr;
+					}
+				} else if(mode == 2) {
+					return this.advShieldAttackArr;
+				}
+			}
+			if(manueverSpec.activeEnemyBody.isThrusting(targetZone)) {
+				return this.advThrustArr;
+			} else {
+				return this.advSwingArr;
+			}
+		} else if(focusIndex == this._enemyHandLeftIdx || focusIndex == this._enemyHandRightIdx) {
+			if(curPlayer == null) {
+				var mode1 = (this.playerManueverSpec.usingLeftLimb ? this.browseAttackManueverList2 : this.browseAttackManueverList)[this.browseManueverIndex];
+				if(mode1 == 1 || mode1 == 3) {
+					if(js_Boot.__instanceof(manueverSpec.activeEnemyItem,troshx_sos_core_Shield)) {
+						return this.advAntiShieldWithWeaponArr;
+					} else {
+						return this.advAntiWeapWithWeaponArr;
+					}
+				} else if(mode1 == 7 || mode1 == 0) {
+					if(js_Boot.__instanceof(manueverSpec.activeEnemyItem,troshx_sos_core_Shield)) {
+						return troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR;
+					} else {
+						return this.advAntiHandUnarmedArr;
+					}
+				} else if(mode1 == 2) {
+					if(js_Boot.__instanceof(manueverSpec.activeEnemyItem,troshx_sos_core_Shield)) {
+						return troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR;
+					} else {
+						return this.advAntiHandWithShieldArr;
+					}
+				}
+			} else if(js_Boot.__instanceof(manueverSpec.activeItem,troshx_sos_core_Weapon)) {
+				if(js_Boot.__instanceof(manueverSpec.activeEnemyItem,troshx_sos_core_Shield)) {
+					return this.advAntiShieldWithWeaponArr;
+				} else {
+					return this.advAntiWeapWithWeaponArr;
+				}
+			} else if(js_Boot.__instanceof(manueverSpec.activeItem,troshx_sos_core_Shield)) {
+				return this.advAntiHandWithShieldArr;
+			}
+			return this.advAntiHandUnarmedArr;
+		} else if(focusIndex == this.btnBlockInteract.index || focusIndex == this.btnParryInteract.index || focusIndex == this.btnVoidInteract.index) {
+			if(focusIndex == this.btnBlockInteract.index) {
+				return this.advBlockArr;
+			} else if(focusIndex == this.btnParryInteract.index) {
+				return this.advParryArr;
+			} else if(focusIndex == this.btnVoidInteract.index) {
+				return this.advVoidArr;
+			} else {
+				return troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR;
+			}
+		}
+		return troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR;
 	}
 	,isFocusedEnemyLeftSide: function() {
 		var i = this.focusedIndex;
@@ -13091,6 +13417,8 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 			} else {
 				return "enemy's right-hand item";
 			}
+		} else if(this.DOLL_GENERAL_FOCUS_DESC.h.hasOwnProperty(i)) {
+			return this.DOLL_GENERAL_FOCUS_DESC.h[i];
 		} else {
 			return "todo/missing";
 		}
@@ -13142,6 +13470,16 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 	}
 	,isLeftPartAtDollIndex: function(i) {
 		return (this.DOLL_PART_IsLefts & 1 << i) != 0;
+	}
+	,getGeneralFocusDescAt: function(index) {
+		return this.DOLL_GENERAL_FOCUS_DESC.h[index];
+	}
+	,isDefensiveFocusIndex: function(index) {
+		if(!(index == this.btnBlockInteract.index || index == this.btnParryInteract.index)) {
+			return index == this.btnVoidInteract.index;
+		} else {
+			return true;
+		}
 	}
 	,getDollPartThrustDescAt: function(index) {
 		index = this.DOLL_PART_Indices[index];
@@ -13195,6 +13533,14 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 	}
 	,setActingState: function(val) {
 		this.actingState = val;
+	}
+	,set_currentPlayerIndex: function(value) {
+		this.playerManueverSpec.resetPlayer();
+		return this.currentPlayerIndex = value;
+	}
+	,set_focusOpponentIndex: function(value) {
+		this.playerManueverSpec.setNewEnemy(this.boutModel.bout.combatants[value].charSheet.body);
+		return this.focusOpponentIndex = value;
 	}
 	,getCurrentPlayer: function() {
 		if(this.currentPlayerIndex >= 0) {
@@ -13259,6 +13605,12 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 	,onSwingAvailabilityChange: function() {
 		this.handleDisabledMask(this.swingAvailabilityMask,this.DOLL_SWING_Slugs);
 	}
+	,onAdvAvailabilityChange: function(mask) {
+		this.advInteract1.disabled = (mask & 17) != 0;
+		this.advInteract2.disabled = (mask & 34) != 0;
+		this.advInteract3.disabled = (mask & 68) != 0;
+		this.advInteract4.disabled = (mask & 136) != 0;
+	}
 	,partIndexAvailable: function(index) {
 		return (this.thrustAvailabilityMask & index << 1) != 0;
 	}
@@ -13268,6 +13620,8 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 	,getInteractionListByState: function(state) {
 		return this._interactionStates[state];
 	}
+	,validateDefDisabled: function() {
+	}
 	,setupDollInteraction: function(fullInteractList,imageMapData) {
 		this._interactionMaps = [];
 		this._interactionStates = [];
@@ -13276,6 +13630,16 @@ troshx_sos_vue_combat_CombatViewModel.prototype = {
 		this._interactionStates[1] = [];
 		this._dollImageMapData = imageMapData;
 		this._interactionStates[2] = [];
+		(this.advInteract1 = this._interactionMaps[0].h[this._dollImageMapData.idIndices["advManuever1"]]).disabled = false;
+		(this.advInteract2 = this._interactionMaps[0].h[this._dollImageMapData.idIndices["advManuever2"]]).disabled = false;
+		(this.advInteract3 = this._interactionMaps[0].h[this._dollImageMapData.idIndices["advManuever3"]]).disabled = false;
+		(this.advInteract4 = this._interactionMaps[0].h[this._dollImageMapData.idIndices["advManuever4"]]).disabled = false;
+		this.btnBlockInteract = this._interactionMaps[0].h[this._dollImageMapData.idIndices["btnBlock"]];
+		this.btnVoidInteract = this._interactionMaps[0].h[this._dollImageMapData.idIndices["btnVoid"]];
+		this.btnParryInteract = this._interactionMaps[0].h[this._dollImageMapData.idIndices["btnParry"]];
+		this.DOLL_GENERAL_FOCUS_DESC.h[this.btnBlockInteract.index] = this.basicBlock.name;
+		this.DOLL_GENERAL_FOCUS_DESC.h[this.btnVoidInteract.index] = this.basicVoid.name;
+		this.DOLL_GENERAL_FOCUS_DESC.h[this.btnParryInteract.index] = this.basicParry.name;
 		var body = troshx_sos_core_BodyChar.getInstance();
 		this._body = body;
 		var needToLowercase;
@@ -13457,6 +13821,8 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 			console.log("Receiving event from:" + index + " ::" + event + " >" + this.currentGesture.type + " :" + this.currentGesture.eventType);
 			return;
 		}
+		var tag = this.imageMapData.classList[index];
+		var name = this.imageMapData.titleList[index];
 		if(this.viewModel.actingState == 1) {
 			if(event == 2) {
 				this.viewModel.draggedCP = this.viewModel.getDraggedCPAmountFromPos(this.currentGesture.center.x,this.currentGesture.center.y);
@@ -13465,38 +13831,41 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 				this.defaultAct = this.DEFAULT_ACT_HOVER;
 				this.requiredActs = 0;
 				this.viewModel.draggedCP = 0;
+				this.viewModel.advFocusedIndex = -1;
 			} else if(event == 16384) {
 				this.viewModel.setActingState(0);
 				this.defaultAct = this.DEFAULT_ACT_HOVER;
 				this.requiredActs = 0;
+				this.viewModel.advFocusedIndex = -1;
 				this.viewModel.draggedCP = 0;
 			} else {
 				return;
 			}
 			return;
 		}
-		var tag = this.imageMapData.classList[index];
-		var name = this.imageMapData.titleList[index];
 		if(tag == "swing" || tag == "part" || name == "enemyHandLeft" || name == "enemyHandRight") {
 			if((event & 266240) != 0 || index != this.viewModel.focusedIndex) {
 				if(!this.viewModel.observeOpponent) {
 					var _this = this.viewModel;
 					_this.focusedIndex = index;
+					_this.playerManueverSpec.activeEnemyZone = _this.getTargetZoneIndexFromFocIndex(index);
 					_this.showFocusedTag = index >= 0;
 				} else {
 					this.viewModel.observeIndex = index;
 				}
 			} else if(event == 1 && index == this.viewModel.focusedIndex) {
-				this.viewModel.draggedCP = 0;
-				this.viewModel.showFocusedTag = true;
-				this.viewModel.trayPosX = this.currentGesture.center.x;
-				this.viewModel.trayPosY = this.currentGesture.center.y;
-				this.calibrateDragCPTraySize();
-				this.viewModel.trayPosFlip = this.viewModel.isFocusedEnemyLeftSide();
-				this.viewModel.trayPosFlipY = this.viewModel.isFocusedEnemyLower();
-				this.viewModel.setActingState(1);
-				this.requiredActs = 49154;
-				this.defaultAct = null;
+				if(name == "enemyHandLeft" || name == "enemyHandRight") {
+					if(!this.viewModel.advInteract1.disabled) {
+						this.viewModel.advFocusedIndex = 0;
+					} else {
+						return;
+					}
+				} else {
+					this.viewModel.advFocusedIndex = -1;
+				}
+				if(this.viewModel.currentPlayerIndex >= 0) {
+					this.startDragCP(name,tag,this.viewModel.isFocusedEnemyLeftSide(),this.viewModel.isFocusedEnemyLower());
+				}
 			}
 			return;
 		}
@@ -13520,8 +13889,54 @@ troshx_sos_vue_combat_HammerJSCombat.prototype = {
 				}
 			}
 		} else if(name != "vitals") {
-			console.log("unhadnled:" + name + " ::" + event + " : " + this.currentGesture.type);
+			if(name == "advManuever1" || name == "advManuever2" || name == "advManuever3" || name == "advManuever4") {
+				if(event == 1) {
+					if(this.viewModel.currentPlayerIndex >= 0) {
+						this.viewModel.advFocusedIndex = Std.parseInt(HxOverrides.substr(name,name.length - 1,null)) - 1;
+						this.startDragCP(name,tag,true,name == "advManuever3" || name == "advManuever4");
+					}
+				}
+			} else if(name == "btnVoid" || name == "btnParry" || name == "btnBlock") {
+				if((event & 1) != 0) {
+					if(index != this.viewModel.focusedIndex) {
+						var _this1 = this.viewModel;
+						_this1.focusedIndex = index;
+						_this1.playerManueverSpec.activeEnemyZone = _this1.getTargetZoneIndexFromFocIndex(index);
+						_this1.showFocusedTag = index >= 0;
+					} else {
+						this.viewModel.advFocusedIndex = -1;
+						this.startDragCP(name,tag,name == "btnParry",true);
+					}
+				} else if((event & 49152) != 0) {
+					this.viewModel.setActingState(0);
+					this.defaultAct = this.DEFAULT_ACT_HOVER;
+					this.requiredActs = 0;
+					this.viewModel.draggedCP = 0;
+					this.viewModel.advFocusedIndex = -1;
+				}
+			} else if(name == "handLeftAlt" || name == "handRightAlt") {
+				if((event & 4) != 0) {
+					var _this2 = this.viewModel;
+					if((_this2.currentPlayerIndex >= 0 ? _this2.boutModel.bout.combatants[_this2.currentPlayerIndex] : null) == null) {
+						this.viewModel.cycleAttackManueverMode(name == "handLeftAlt");
+					}
+				}
+			} else {
+				console.log("unhadnled:" + name + " ::" + event + " : " + this.currentGesture.type);
+			}
 		}
+	}
+	,startDragCP: function(name,tag,flip,flipY) {
+		this.viewModel.draggedCP = 0;
+		this.viewModel.showFocusedTag = true;
+		this.viewModel.trayPosX = this.currentGesture.center.x;
+		this.viewModel.trayPosY = this.currentGesture.center.y;
+		this.calibrateDragCPTraySize();
+		this.viewModel.trayPosFlip = flip;
+		this.viewModel.trayPosFlipY = flipY;
+		this.viewModel.setActingState(1);
+		this.requiredActs = 49154;
+		this.defaultAct = null;
 	}
 	,calibrateDragCPTraySize: function() {
 		var _gthis = this;
@@ -13804,11 +14219,11 @@ troshx_sos_vue_combat_UIInteraction.setupDollViewInteracts = function(layoutItem
 		}
 		switch(name) {
 		case "advManuever1":case "advManuever2":case "advManuever3":case "advManuever4":
-			arr.push(new troshx_sos_vue_combat_UInteract(i,1));
+			arr.push(new troshx_sos_vue_combat_UInteract(i,49155));
 			break;
 		case "btnBlock":case "btnParry":case "btnVoid":
 			item.hitPadding = 5;
-			arr.push(new troshx_sos_vue_combat_UInteract(i,49153));
+			arr.push(new troshx_sos_vue_combat_UInteract(i,49155));
 			break;
 		case "cpMeter":
 			break;
@@ -14113,27 +14528,33 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		}
 		var valData;
 		var node;
-		valData = troshx_sos_pregens_FightCharacters.get()[4];
+		valData = troshx_sos_pregens_FightCharacters.get()[7];
 		var valData1 = valData.label;
 		var node1 = this.deserializeSheet(valData.savedData);
 		var _this = this.viewModel;
 		node = new troshx_components_FightNode(valData1,node1,0);
 		var theIndex = boutModel.bout.combatants.length;
 		boutModel.bout.pushNewFightNode(node);
-		this.viewModel.currentPlayerIndex = theIndex;
-		var _this1 = node.charSheet;
-		var row = _this1.get_encumbranceLvlRow();
-		var tmp = row.cpMult * _this1.clampIntZero(_this1.getModifiedValue(13,(_this1.schoolLevel >= 1 ? _this1.schoolLevel : 0) + _this1.clampIntZero(_this1.getModifiedValue(8,(_this1.get_AGI() + _this1.get_WIT()) / 2 | 0))) * (_this1.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this1.get_fatiqueLevel()].cp);
+		var _this1 = this.viewModel;
+		_this1.playerManueverSpec.resetPlayer();
+		_this1.currentPlayerIndex = theIndex;
+		var _this2 = node.charSheet;
+		var row = _this2.get_encumbranceLvlRow();
+		var tmp = row.cpMult * _this2.clampIntZero(_this2.getModifiedValue(13,(_this2.schoolLevel >= 1 ? _this2.schoolLevel : 0) + _this2.clampIntZero(_this2.getModifiedValue(8,(_this2.get_AGI() + _this2.get_WIT()) / 2 | 0))) * (_this2.prone ? 0.5 : 1) + row.cp + troshx_sos_sheets_FatiqueTable.getTable()[_this2.get_fatiqueLevel()].cp);
 		node.fight.cp = tmp;
 		node.charSheet.inventory.refreshHalfArmorLabels();
 		node.charSheet.inventory.cleanupShieldLabels();
 		node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
-		valData = troshx_sos_pregens_FightCharacters.get()[5];
+		this.viewModel.activatePlayerItem();
+		valData = troshx_sos_pregens_FightCharacters.get()[7];
 		var valData2 = valData.label;
 		var node2 = this.deserializeSheet(valData.savedData);
-		var _this2 = this.viewModel;
+		var _this3 = this.viewModel;
 		node = new troshx_components_FightNode(valData2,node2,1);
 		boutModel.bout.pushNewFightNode(node);
+		var _this4 = this.viewModel;
+		_this4.playerManueverSpec.setNewEnemy(_this4.boutModel.bout.combatants[theIndex].charSheet.body);
+		_this4.focusOpponentIndex = theIndex;
 		node.charSheet.inventory.refreshHalfArmorLabels();
 		node.charSheet.inventory.cleanupShieldLabels();
 		node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
@@ -14152,6 +14573,7 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 			node = new troshx_components_FightNode(valData.label,this.deserializeSheet(valData.savedData),0);
 			var theIndex = boutModel.bout.combatants.length;
 			boutModel.bout.pushNewFightNode(node);
+			viewModel.playerManueverSpec.resetPlayer();
 			viewModel.currentPlayerIndex = theIndex;
 			var _this = node.charSheet;
 			var row = _this.get_encumbranceLvlRow();
@@ -14159,13 +14581,19 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 			node.fight.cp = tmp;
 		} else if(showPregens == 4) {
 			var valData1 = val;
+			var theIndex1 = boutModel.bout.combatants.length;
 			node = new troshx_components_FightNode(valData1.label,this.deserializeSheet(valData1.savedData),1);
 			boutModel.bout.pushNewFightNode(node);
+			viewModel.playerManueverSpec.setNewEnemy(viewModel.boutModel.bout.combatants[theIndex1].charSheet.body);
+			viewModel.focusOpponentIndex = theIndex1;
 		}
 		if(node != null) {
 			node.charSheet.inventory.refreshHalfArmorLabels();
 			node.charSheet.inventory.cleanupShieldLabels();
 			node.charSheet.inventory.weildMeleeEquip(node.charSheet.profsMelee);
+			if(showPregens == 1) {
+				viewModel.activatePlayerItem();
+			}
 		}
 		this.showPregens = 0;
 	}
@@ -14220,6 +14648,39 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		var pl = _this.currentPlayerIndex >= 0 ? _this.boutModel.bout.combatants[_this.currentPlayerIndex] : null;
 		return pl.charSheet.inventory.findOffHandItem();
 	}
+	,get_rightItemAssign: function() {
+		var _this = this.viewModel;
+		var pl = _this.currentPlayerIndex >= 0 ? _this.boutModel.bout.combatants[_this.currentPlayerIndex] : null;
+		return pl.charSheet.inventory.findMasterHandAssign();
+	}
+	,get_leftItemAssign: function() {
+		var _this = this.viewModel;
+		var pl = _this.currentPlayerIndex >= 0 ? _this.boutModel.bout.combatants[_this.currentPlayerIndex] : null;
+		return pl.charSheet.inventory.findOffHandAssign();
+	}
+	,get_rightItemHighlighted: function() {
+		var usingLeftLimb = this.viewModel.playerManueverSpec.usingLeftLimb;
+		var activeItem = this.viewModel.playerManueverSpec.activeItem;
+		var rightItem = this.rightItem;
+		if(usingLeftLimb) {
+			return false;
+		} else {
+			return rightItem == activeItem;
+		}
+	}
+	,get_leftItemHighlighted: function() {
+		var usingLeftLimb = this.viewModel.playerManueverSpec.usingLeftLimb;
+		var activeItem = this.viewModel.playerManueverSpec.activeItem;
+		var leftItem = this.leftItem;
+		var rightItemAssign = this.rightItemAssign;
+		if(usingLeftLimb) {
+			return leftItem == activeItem;
+		} else if(rightItemAssign != null) {
+			return rightItemAssign.held == 3;
+		} else {
+			return false;
+		}
+	}
 	,getTypeTagForItem: function(item) {
 		var weapon = js_Boot.__instanceof(item,troshx_sos_core_Weapon) ? item : null;
 		var shield = js_Boot.__instanceof(item,troshx_sos_core_Shield) ? item : null;
@@ -14258,6 +14719,16 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		var d = this.mapData;
 		return { fillColor : "transparent", strokeColor : "rgba(0,0,0,1)", strokeWidth : 4 * (d.scaleX < d.scaleY ? d.scaleX : d.scaleY)};
 	}
+	,get_focusManueverAtkType: function() {
+		return this.viewModel.getFocusManueverAtkType();
+	}
+	,get_advStyleProps: function() {
+		if(this.focusManueverAtkType != 1) {
+			return this.stylePartProps;
+		} else {
+			return this.styleSwingProps;
+		}
+	}
 	,get_stylePartProps: function() {
 		var d = this.mapData;
 		return { fillColor : "rgba(0,200,255,0.3)", strokeColor : "rgba(0,200,255,0.3)", strokeWidth : 4 * (d.scaleX < d.scaleY ? d.scaleX : d.scaleY)};
@@ -14288,6 +14759,13 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 	,get_styleSwingProps: function() {
 		var d = this.mapData;
 		return { fillColor : "rgba(0,255,255,0.3)", strokeColor : "rgba(0,255,255,0.3)", strokeWidth : 8 * (d.scaleX < d.scaleY ? d.scaleX : d.scaleY)};
+	}
+	,get_styleDefBtnProps: function() {
+		var d = this.mapData;
+		return { fillColor : "rgba(0,255,255,0.3)", strokeColor : "rgba(0,255,255,0.3)", strokeWidth : 4};
+	}
+	,get_stylePlHandBtnProps: function() {
+		return { fillColor : "rgba(161,244,210,1)", strokeWidth : 0};
 	}
 	,get_focusedTextLbl: function() {
 		var viewModel = this.viewModel;
@@ -14401,6 +14879,108 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 	,Components: function() {
 		return { zone : new troshx_sos_vue_combat_components_ZoneItemView(), pregens : new troshx_sos_vue_pregen_PregenSelectView()};
 	}
+	,get_advManuevers: function() {
+		var gotPlayer = this.player != null;
+		var gotEnemy = this.currentOpponent != null;
+		return this.viewModel.getAdvancedManuevers(this.player,gotPlayer ? this.leftItem : null,gotPlayer ? this.rightItem : null,this.currentOpponent,gotEnemy ? this.enemyLeftItem : null,gotEnemy ? this.enemyRightItem : null);
+	}
+	,get_advTNArr: function() {
+		var gotPlayer = this.player != null;
+		if(gotPlayer) {
+			return this.advTNs;
+		} else {
+			return this.advSimpTNs;
+		}
+	}
+	,get_advCostArr: function() {
+		var gotPlayer = this.player != null;
+		if(gotPlayer) {
+			return this.advCosts;
+		} else {
+			return this.advSimpCosts;
+		}
+	}
+	,get_browseAttackModeLabel: function() {
+		return this.viewModel.getBrowseAttackModeLabel(false);
+	}
+	,get_browseAttackModeLabel2: function() {
+		return this.viewModel.getBrowseAttackModeLabel(true);
+	}
+	,get_isBrowseHighlightLeft: function() {
+		return this.viewModel.isBrowseHighlightLeft();
+	}
+	,get_isBrowseHighlightRight: function() {
+		return this.viewModel.isBrowseHighlightRight();
+	}
+	,get_advTNs: function() {
+		var arr = this.advManuevers;
+		var val = [];
+		var pSpec = this.viewModel.playerManueverSpec;
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			val[i] = arr[i].getTN(pSpec);
+		}
+		return val;
+	}
+	,get_advSimpTNs: function() {
+		var arr = this.advManuevers;
+		var val = [];
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			val[i] = arr[i].tn;
+		}
+		return val;
+	}
+	,get_advCosts: function() {
+		var arr = this.advManuevers;
+		var val = [];
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			val[i] = arr[i].getCost(this.boutModel.bout,this.player,null);
+		}
+		return val;
+	}
+	,get_advSimpCosts: function() {
+		var arr = this.advManuevers;
+		var val = [];
+		var _g1 = 0;
+		var _g = arr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			val[i] = arr[i].cost;
+		}
+		return val;
+	}
+	,advHiddenAt: function(i) {
+		return (this.advNotAvailMask & 1 << i) != 0;
+	}
+	,advDisabledAt: function(i) {
+		return (this.advNotAvailMask & 1 << i + 4) != 0;
+	}
+	,get_advNotAvailMask: function() {
+		var arr = this.advManuevers;
+		var arrTNs = this.advTNs;
+		var gotPlayer = this.player != null;
+		var val = 0;
+		if(gotPlayer) {
+			var _g1 = 0;
+			var _g = arr.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				val |= arrTNs[i] < 0 || !arr[i].getAvailability(this.boutModel.bout,this.player,this.viewModel.playerManueverSpec) ? 1 << i : 0;
+			}
+		}
+		return val;
+	}
+	,onNotAvailAdvMaskChange: function(newValue,oldValue) {
+		this.viewModel.onAdvAvailabilityChange(newValue);
+	}
 	,Mounted: function() {
 		var _gthis = this;
 		var img = this.$refs.image;
@@ -14413,7 +14993,6 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		}
 		if(HxOverrides.substr(window.location.href,0,7) == "file://" || window.location.host == "localhost") {
 			window.setTimeout(function() {
-				_gthis.quickStartDebug();
 			},100);
 		}
 	}
@@ -14644,6 +15223,12 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 	,get_actingState: function() {
 		return this.viewModel.actingState;
 	}
+	,get_isDefBtnBlockAllowed: function() {
+		return this.viewModel.isDefBtnBlockAllowed();
+	}
+	,get_isDefBtnParryAllowed: function() {
+		return this.viewModel.isDefBtnParryAllowed();
+	}
 	,get_isDraggingCP: function() {
 		return this.viewModel.actingState == 1;
 	}
@@ -14713,7 +15298,7 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		d.renderCount++;
 	}
 	,Template: function() {
-		return "<div class=\"dollview\" style=\"position:absolute;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div class=\"mouse-cursor\" ref=\"cursor\" :class=\"{observe:viewModel.observeOpponent}\" />\r\n\t<div v-if=\"mapData.renderCount!=0\" style=\"width:100%;height:100%;top:0;left;0;position:absolute;\">\r\n\t\t<div class=\"bg\" v-show=\"gotCurrentOpponent\" style=\"position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain\"></div>\r\n\t\t<zone :index=\"mapData.idIndices['vitals']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\" :class=\"{'enableinput':!player}\">\r\n\t\t\t<div v-if=\"player\">\r\n\t\t\t\t<div>F: <span>{{fatique}}</span></div>\r\n\t\t\t\t<div>Pain: <span>{{pain}}</span></div>\r\n\t\t\t\t<div>BL: <span>{{BL}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<button @click=\"showSelfPregens\" style=\"width:100%; height:100%; position:absolute;top:0;left:0;width:100%;height:100%\">Select your character</button>\r\n\t\t\t</div>\r\n\t\t</zone>\r\n\r\n\t\t<zone :index=\"mapData.idIndices['incomingManuevers']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\">\r\n\t\t\t<div class=\"observe-indicator\" v-show=\"viewModel.incomingHeldDown\" v-html=\"observePrompt\"></div>\r\n\t\t\t<div class=\"hover-tag\" v-if=\"gotCurrentOpponent\" v-show=\"viewModel.showFocusedTag\" v-html=\"focusedTextLbl\"></div>\r\n\t\t</zone>\r\n\r\n\t\t<div v-if=\"player\">\r\n\t\t\t<zone :index=\"mapData.idIndices['cpMeter']\" :mapData=\"mapData\">\r\n\t\t\t\t<div v-for=\"i in cpMeterAmount\">\r\n\t\t\t\t\t<component :is=\"i <= player.fight.cp ? 'span' : 'del'\">{{i}}</component>\r\n\t\t\t\t</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['cpText']\" :mapData=\"mapData\">\r\n\t\t\t\t<div> {{CP}}cp</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\">-{{viewModel.draggedCP}}</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\"> {{remCP}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"leftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftText']\" :mapData=\"mapData\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\">{{leftItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"rightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightText']\" :mapData=\"mapData\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\">{{rightItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<div v-show=\"gotCurrentOpponent\">\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever1']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">Disarmed (unarmed)</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever2']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gag</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever3']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">wgw</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['advManuever4']\" :mapData=\"mapData\" class=\"adv-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">gwgwwaw</div>\r\n\t\t\t\t</zone>\r\n\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnBlock']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">B</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnParry']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">P</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['btnVoid']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"false\">\r\n\t\t\t\t\t<div class=\"lbl\">V</div>\r\n\t\t\t\t</zone>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div class=\"cp-tray\" id=\"cpTray\" v-show=\"isDraggingCP\" v-html=\"dragCPHtml\" :style=\"cpTrayStyle\">\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent\">\r\n\r\n\t\t\t<zone v-bind=\"stylePartProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\">\r\n\t\t\t\t<div class=\"thrust-point\" v-if=\"viewModel.isDollPartThrustable(i)\" :style=\"thrustPointStyle\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleSwingProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_SWING_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\r\n\r\n\t\t\t<zone v-bind=\"armorPartProps[i]\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\">\r\n\t\t\t\t<div class=\"shieldmark\" v-show=\"dollShieldCoverageBools[i]\" :style=\"shieldIconStyle\"></div>\r\n\t\t\t</zone>\r\n\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.observeIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandLeft']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyLeftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyRightItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandRight']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyRightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandLeft']\"></zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyRightItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandRight']\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['opponentSwiper']\" :mapData=\"mapData\" class=\"textarea-region\">\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li v-for=\"(li, i) in opponents\" :key=\"i\">{{li.label}}</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\t\t<div v-else>\r\n\t\t\t<div class=\"select-opponent\">\r\n\t\t\t\t<button @click=\"showOpponentPregens\">Select opponent</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent && player && player.targetLink\">\r\n\t\t\t<zone :index=\"mapData.idIndices['initRange']\" :mapData=\"mapData\" style=\"overflow:visible\">\r\n\t\t\t\t<div class=\"bger\"></div>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\r\n\r\n\t\t<div v-if=\"gotPregens\">\r\n\t\t\t<pregens :header=\"pregenHeader\" :characters=\"fightChars.pool\" @close=\"closePregens\" @singleCharSelected=\"confirmPregens\" @multiCharSelected=\"confirmPregens\"></pregens>\r\n\t\t</div>\r\n\r\n\t\t<!--<div v-for=\"(li, i) in armorColorScale\" :key=\"i\" :style=\"{color:li}\">-</div>-->\r\n\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\" v-if=\"mapData.renderCount==0\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"99, 318, 105, 318, 115, 332, 98, 371, 94, 376, 95, 358, 85, 377, 80, 377, 86, 360, 83, 358, 68, 378, 70, 366, 62, 366, 77, 343, 71, 343, 70, 338, 81, 326, 99, 318\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"381, 320, 405, 327, 417, 340, 411, 346, 424, 366, 424, 370, 417, 371, 417, 378, 402, 359, 404, 379, 392, 360, 392, 375, 388, 371, 372, 334, 372, 327, 381, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
+		return "<div class=\"dollview\" style=\"position:absolute;top:0;left:0;width:100%;height:100%\"  ref=\"container\">\r\n\t<div class=\"mouse-cursor\" ref=\"cursor\" :class=\"{observe:viewModel.observeOpponent}\" />\r\n\t<div v-if=\"mapData.renderCount!=0\" style=\"width:100%;height:100%;top:0;left;0;position:absolute;\">\r\n\t\t<div class=\"bg\" v-show=\"gotCurrentOpponent\" style=\"position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain\"></div>\r\n\t\t<zone :index=\"mapData.idIndices['vitals']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\" :class=\"{'enableinput':!player}\">\r\n\t\t\t<div v-if=\"player\">\r\n\t\t\t\t<div>F: <span>{{fatique}}</span></div>\r\n\t\t\t\t<div>Pain: <span>{{pain}}</span></div>\r\n\t\t\t\t<div>BL: <span>{{BL}}</span></div>\r\n\t\t\t</div>\r\n\t\t\t<div v-else>\r\n\t\t\t\t<button @click=\"showSelfPregens\" style=\"width:100%; height:100%; position:absolute;top:0;left:0;width:100%;height:100%\">Select your character</button>\r\n\t\t\t</div>\r\n\t\t</zone>\r\n\r\n\t\t<zone :index=\"mapData.idIndices['incomingManuevers']\" :mapData=\"mapData\" style=\"padding:5px\" class=\"textarea-region\">\r\n\t\t\t<div class=\"observe-indicator\" v-if=\"gotCurrentOpponent\" v-show=\"viewModel.incomingHeldDown || (!viewModel.showFocusedTag)\" v-html=\"observePrompt\"></div>\r\n\t\t\t<div class=\"hover-tag\" v-if=\"gotCurrentOpponent\" v-show=\"viewModel.showFocusedTag\" v-html=\"focusedTextLbl\"></div>\r\n\t\t</zone>\r\n\r\n\t\t<div v-if=\"player\">\r\n\t\t\t<zone :index=\"mapData.idIndices['cpMeter']\" :mapData=\"mapData\">\r\n\t\t\t\t<div v-for=\"i in cpMeterAmount\">\r\n\t\t\t\t\t<component :is=\"i <= player.fight.cp ? 'span' : 'del'\">{{i}}</component>\r\n\t\t\t\t</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['cpText']\" :mapData=\"mapData\">\r\n\t\t\t\t<div> {{CP}}cp</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\">-{{viewModel.draggedCP}}</div>\r\n\t\t\t\t<div v-show=\"viewModel.draggedCP\"> {{remCP}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone v-bind=\"stylePlHandBtnProps\"  :index=\"mapData.idIndices['handLeftAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"leftItem\" :showShape=\"leftItemHighlighted\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"leftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handLeftText']\" :mapData=\"mapData\" v-if=\"leftItem\">\r\n\t\t\t\t<div class=\"lbl\">{{leftItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone v-bind=\"stylePlHandBtnProps\" :index=\"mapData.idIndices['handRightAlt']\" :mapData=\"mapData\" class=\"textarea-region\" v-if=\"rightItem\" :showShape=\"rightItemHighlighted\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"rightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['handRightText']\" :mapData=\"mapData\" v-if=\"rightItem\">\r\n\t\t\t\t<div class=\"lbl\">{{rightItem.name}}</div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t\r\n\r\n\t\t\t<div class=\"cp-tray\" id=\"cpTray\" v-show=\"isDraggingCP\" v-html=\"dragCPHtml\" :style=\"cpTrayStyle\">\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent\">\r\n\r\n\t\t\t<zone v-bind=\"advStyleProps\"  :index=\"mapData.idIndices['advManuever'+(i+1)]\" :key=\"i\" :class=\"{disabled:advDisabledAt(i)}\" :mapData=\"mapData\" v-for=\"(manuever, i) in advManuevers\" class=\"adv-manuever-btn\" :showShape=\"viewModel.advFocusedIndex === i\" v-if=\"!advHiddenAt(i) && manuever.name !==''\">\r\n\t\t\t\t<div class=\"lbl\">{{manuever.name}}<span class=\"cost\" v-show=\"advCostArr[i]!=0\"> [{{advCostArr[i]}}]</span><span class=\"tn\" v-show=\"advTNArr[i]!=7 && advTNArr[i]!=0\"> &gt;{{advTNArr[i]}}</span></div>\r\n\t\t\t</zone>\r\n\t\t\t\t\r\n\t\t\t<zone v-bind=\"styleDefBtnProps\" :index=\"mapData.idIndices['btnBlock']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"!player || isDefBtnBlockAllowed\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['btnBlock']\">\r\n\t\t\t\t<div class=\"lbl\">B</div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleDefBtnProps\" :index=\"mapData.idIndices['btnParry']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"!player || isDefBtnParryAllowed\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['btnParry']\">\r\n\t\t\t\t<div class=\"lbl\">P</div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleDefBtnProps\" :index=\"mapData.idIndices['btnVoid']\" :mapData=\"mapData\" class=\"def-manuever-btn\" v-show=\"true\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['btnVoid']\">\r\n\t\t\t\t<div class=\"lbl\">V</div>\r\n\t\t\t</zone>\r\n\t\r\n\t\t\t\t\t\r\n\t\t\t<zone v-bind=\"stylePartProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\">\r\n\t\t\t\t<div class=\"thrust-point\" v-if=\"viewModel.isDollPartThrustable(i)\" :style=\"thrustPointStyle\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone v-bind=\"styleSwingProps\" :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-for=\"(li, i) in viewModel.DOLL_SWING_Slugs\" :key=\"li\" :showShape=\"viewModel.focusedIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\r\n\r\n\t\t\t<zone v-bind=\"armorPartProps[i]\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\">\r\n\t\t\t\t<div class=\"shieldmark\" v-show=\"dollShieldCoverageBools[i]\" :style=\"shieldIconStyle\"></div>\r\n\t\t\t</zone>\r\n\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices[li]\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" v-for=\"(li, i) in viewModel.DOLL_PART_Slugs\" :key=\"li\" :showShape=\"viewModel.observeIndex==mapData.idIndices[li]\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandLeft']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyLeftTypeTag\"></div>\r\n\t\t\t</zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"stylePartProps\" class=\"enemy-handbox\" v-if=\"enemyRightItem\" :showShape=\"viewModel.focusedIndex==mapData.idIndices['enemyHandRight']\">\r\n\t\t\t\t<div class=\"lbl\" v-html=\"enemyRightTypeTag\"></div>\r\n\t\t\t</zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandLeft']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyLeftItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandLeft']\"></zone>\r\n\t\t\t<zone :index=\"mapData.idIndices['enemyHandRight']\" :mapData=\"mapData\" v-bind=\"styleObservePartProps\" class=\"enemy-handbox dummy\" v-if=\"enemyRightItem\" :showShape=\"viewModel.observeIndex==mapData.idIndices['enemyHandRight']\"></zone>\r\n\r\n\t\t\t<zone :index=\"mapData.idIndices['opponentSwiper']\" :mapData=\"mapData\" class=\"textarea-region\">\r\n\t\t\t\t<ul>\r\n\t\t\t\t\t<li v-for=\"(li, i) in opponents\" :key=\"i\">{{li.label}}</li>\r\n\t\t\t\t</ul>\r\n\t\t\t</zone>\r\n\t\t\t\t\t\r\n\t\t\t<div v-if=\"!player\">\r\n\t\t\t\t<zone v-bind=\"stylePlHandBtnProps\" :index=\"mapData.idIndices['handLeftAlt']\" :mapData=\"mapData\" class=\"textarea-region\" :showShape=\"isBrowseHighlightLeft\">\r\n\t\t\t\t\t<div class=\"lbl\"></div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['handLeftText']\" :mapData=\"mapData\">\r\n\t\t\t\t\t<div class=\"lbl\">{{browseAttackModeLabel2}}</div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone v-bind=\"stylePlHandBtnProps\" :index=\"mapData.idIndices['handRightAlt']\" :mapData=\"mapData\" class=\"textarea-region\" :showShape=\"isBrowseHighlightRight\">\r\n\t\t\t\t\t<div class=\"lbl\"></div>\r\n\t\t\t\t</zone>\r\n\t\t\t\t<zone :index=\"mapData.idIndices['handRightText']\" :mapData=\"mapData\">\r\n\t\t\t\t\t<div class=\"lbl\">{{browseAttackModeLabel}}</div>\r\n\t\t\t\t</zone>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div v-else>\r\n\t\t\t<div class=\"select-opponent\">\r\n\t\t\t\t<button @click=\"showOpponentPregens\">Select opponent</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div v-if=\"gotCurrentOpponent && player && player.targetLink\">\r\n\t\t\t<zone :index=\"mapData.idIndices['initRange']\" :mapData=\"mapData\" style=\"overflow:visible\">\r\n\t\t\t\t<div class=\"bger\"></div>\r\n\t\t\t</zone>\r\n\t\t</div>\r\n\r\n\r\n\t\t<div v-if=\"gotPregens\">\r\n\t\t\t<pregens :header=\"pregenHeader\" :characters=\"fightChars.pool\" @close=\"closePregens\" @singleCharSelected=\"confirmPregens\" @multiCharSelected=\"confirmPregens\"></pregens>\r\n\t\t</div>\r\n\r\n\t\t<!--<div v-for=\"(li, i) in armorColorScale\" :key=\"i\" :style=\"{color:li}\">-</div>-->\r\n\r\n\t</div>\r\n\t<div class=\"image-map-holder\" style=\"position:relative; display:none\" v-if=\"mapData.renderCount==0\">\r\n\t\t<img src=\"images/dollscreen.png\" style=\"transform-origin:0 0; pointer-events:none; opacity:0.12\" usemap=\"#map\" ref=\"image\" />\r\n\t\t<map name=\"map\" ref=\"map\">\r\n\t\t\t<area shape=\"rect\" coords=\"401, 334, 435, 391\" title=\"enemyHandLeft\" />\r\n\t\t\t<area shape=\"rect\" coords=\"59, 336, 92, 393\" title=\"enemyHandRight\" />\r\n\t\t\t<area shape=\"poly\" coords=\"316, 519, 314, 580, 305, 622, 317, 659, 374, 585\" alt=\"swing\" title=\"SWING_LOWER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 567, 170, 525, 172, 576, 179, 619, 160, 663\" alt=\"swing\" title=\"SWING_LOWER_LEG-r\" />\r\n\t\t\t<area shape=\"rect\" coords=\"224, 478, 261, 585\" title=\"enemyStatus\" />\r\n\t\t\t<area shape=\"poly\" coords=\"238, 76, 254, 78, 262, 85, 267, 115, 262, 115, 255, 96, 244, 95, 234, 97, 223, 115, 217, 115, 223, 85, 238, 76\" alt=\"part\" title=\"UPPER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"309, 400, 310, 483, 313, 506, 378, 574, 366, 421\" alt=\"swing\" title=\"SWING_UPPER_LEG-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"124, 432, 172, 409, 175, 499, 115, 557\" alt=\"swing\" title=\"SWING_UPPER_LEG-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 332, 351, 364, 364, 413, 306, 390\" alt=\"swing\" title=\"SWING_GROIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"142, 358, 181, 334, 171, 392, 124, 418\" alt=\"swing\" title=\"SWING_GROIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"302, 254, 331, 307, 361, 333, 349, 349, 307, 318, 300, 315\" alt=\"swing\" title=\"SWING_TORSO-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"137, 319, 172, 278, 183, 259, 185, 322, 141, 351\" alt=\"swing\" title=\"SWING_TORSO-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 263, 399, 235, 411, 300, 387, 311\" alt=\"swing\" title=\"SWING_LOWER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"319, 168, 352, 254, 399, 224, 366, 168\" alt=\"swing\" title=\"SWING_UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"271, 77, 272, 127, 306, 83\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"166, 82, 213, 132, 210, 77\" alt=\"swing\" title=\"SWING_DOWNWARD_HEAD-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"313, 83, 269, 144, 285, 158, 366, 162\" alt=\"swing\" title=\"SWING_NECK-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"219, 78, 242, 46, 264, 79, 267, 91, 220, 93\" alt=\"swing\" title=\"SWING_UPWARD_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"89, 226, 133, 258, 101, 309, 67, 310\" alt=\"swing\" title=\"SWING_LOWER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"87, 213, 139, 250, 159, 186, 170, 164, 115, 162\" alt=\"swing\" title=\"SWING_UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"153, 85, 219, 144, 200, 159, 120, 157\" alt=\"swing\" title=\"SWING_NECK-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"224, 124, 228, 144, 247, 149, 258, 142, 269, 123, 263, 123, 250, 134, 237, 134, 228, 124\" alt=\"part\" title=\"LOWER_HEAD\" />\r\n\t\t\t<area shape=\"poly\" coords=\"322, 192, 339, 250, 315, 256, 308, 243, 306, 223, 322, 192\" alt=\"part\" title=\"UPPER_ARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"99, 318, 105, 318, 115, 332, 98, 371, 94, 376, 95, 358, 85, 377, 80, 377, 86, 360, 83, 358, 68, 378, 70, 366, 62, 366, 77, 343, 71, 343, 70, 338, 81, 326, 99, 318\" alt=\"part\" title=\"HAND-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"381, 320, 405, 327, 417, 340, 411, 346, 424, 366, 424, 370, 417, 371, 417, 378, 402, 359, 404, 379, 392, 360, 392, 375, 388, 371, 372, 334, 372, 327, 381, 320\" alt=\"part\" title=\"HAND-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"356, 283, 381, 313, 368, 324, 347, 311, 327, 279, 349, 270\" alt=\"part\" title=\"FOREARM-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"334, 253, 345, 263, 325, 273, 318, 260\" alt=\"part\" title=\"ELBOW-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"138, 267, 155, 281, 116, 327, 105, 317\" alt=\"part\" title=\"FOREARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"284, 620, 294, 619, 299, 650, 312, 666, 309, 671, 284, 672, 279, 637\" alt=\"part\" title=\"FOOT-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"188, 619, 202, 619, 207, 633, 205, 668, 199, 673, 169, 669, 183, 647, 188, 630\" alt=\"part\" title=\"FOOT-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"250, 383, 267, 368, 297, 367, 302, 390, 298, 457, 298, 480, 286, 481, 271, 486, 261, 421\" alt=\"part\" title=\"THIGH-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"301, 517, 306, 520, 308, 534, 306, 580, 297, 622, 284, 621, 275, 563, 274, 519, 291, 524, 301, 517\" alt=\"part\" title=\"SHIN-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"180, 516, 195, 523, 210, 518, 211, 558, 202, 614, 186, 614, 182, 600, 177, 571, 180, 516\" alt=\"part\" title=\"SHIN-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"274, 496, 289, 492, 301, 494, 302, 508, 292, 520, 273, 511\" alt=\"part\" title=\"KNEE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"193, 488, 213, 497, 211, 509, 199, 516, 183, 508, 185, 492, 193, 488\" alt=\"part\" title=\"KNEE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"189, 367, 220, 367, 237, 381, 213, 491, 205, 484, 191, 484, 186, 480, 183, 385, 189, 367\" alt=\"part\" title=\"THIGH-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"243, 343, 258, 367, 248, 379, 239, 380, 228, 366, 243, 343\" alt=\"part\" title=\"GROIN\" />\r\n\t\t\t<area shape=\"poly\" coords=\"287, 326, 293, 332, 295, 363, 262, 363, 253, 350, 253, 342, 269, 331, 287, 326\" alt=\"part\" title=\"HIP-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"197, 324, 220, 331, 235, 341, 223, 363, 188, 363, 197, 324\" alt=\"part\" title=\"HIP-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"195, 259, 218, 266, 208, 295, 213, 325, 197, 319, 195, 259\" alt=\"part\" title=\"SIDE-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"288, 259, 292, 259, 293, 266, 289, 315, 286, 320, 271, 324, 278, 294, 269, 266, 288, 259\" alt=\"part\" title=\"SIDE-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"237, 256, 257, 261, 271, 287, 268, 317, 261, 328, 246, 337, 224, 329, 212, 302, 217, 273, 237, 256\" alt=\"part\" title=\"BELLY\" />\r\n\t\t\t<area shape=\"poly\" coords=\"240, 99, 254, 102, 258, 108, 259, 123, 250, 133, 238, 132, 231, 129, 225, 118, 231, 104, 240, 99\" alt=\"part\" title=\"FACE\" />\r\n\t\t\t<area shape=\"poly\" coords=\"259, 144, 262, 157, 270, 165, 245, 179, 209, 163, 225, 158, 230, 146, 244, 154, 258, 150\" alt=\"part\" title=\"NECK\" />\r\n\t\t\t<area shape=\"poly\" coords=\"286, 169, 307, 171, 317, 186, 305, 217\" alt=\"part\" title=\"SHOULDER-l\" />\r\n\t\t\t<area shape=\"poly\" coords=\"200, 174, 180, 217, 166, 186, 176, 171, 191, 168\" alt=\"part\" title=\"SHOULDER-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"164, 196, 180, 224, 169, 257, 151, 245, 164, 196\" alt=\"part\" title=\"UPPER_ARM-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"151, 253, 166, 263, 158, 276, 140, 261, 149, 249\" alt=\"part\" title=\"ELBOW-r\" />\r\n\t\t\t<area shape=\"poly\" coords=\"276, 170, 299, 223, 294, 252, 264, 260, 242, 250, 221, 260, 190, 250, 188, 220, 210, 171, 246, 186, 276, 170\" alt=\"part\" title=\"CHEST\" />\r\n\t\t\t<area shape=\"rect\" coords=\"1, 177, 13, 723\" title=\"cpMeter\" />\r\n\t\t\t<area shape=\"rect\" coords=\"331, 3, 487, 106\" title=\"incomingManuevers\" />\r\n\t\t\t<area shape=\"rect\" coords=\"71, 3, 320, 34\" title=\"opponentSwiper\" />\r\n\t\t\t<area shape=\"rect\" coords=\"8, 3, 65, 31\" title=\"roundCount\" />\r\n\t\t\t<area shape=\"rect\" coords=\"7, 37, 74, 163\" title=\"vitals\" />\r\n\t\t\t<area shape=\"rect\" coords=\"21, 175, 72, 229\" title=\"cpText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"421, 143, 487, 203\" title=\"advManuever1\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 239, 486, 298\" title=\"advManuever2\" />\r\n\t\t\t<area shape=\"rect\" coords=\"424, 425, 489, 481\" title=\"advManuever3\" />\r\n\t\t\t<area shape=\"rect\" coords=\"423, 517, 487, 576\" title=\"advManuever4\" />\r\n\t\t\t<area shape=\"rect\" coords=\"50, 509, 102, 560\" title=\"btnBlock\" />\r\n\t\t\t<area shape=\"rect\" coords=\"391, 610, 443, 661\" title=\"btnParry\" />\r\n\t\t\t<area shape=\"rect\" coords=\"49, 612, 101, 663\" title=\"btnVoid\" />\r\n\t\t\t<area shape=\"rect\" coords=\"39, 688, 118, 721\" title=\"handLeftText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"351, 688, 470, 721\" title=\"handRightText\" />\r\n\t\t\t<area shape=\"rect\" coords=\"271, 684, 347, 721\" title=\"handRightAlt\" />\r\n\t\t\t<area shape=\"rect\" coords=\"123, 684, 199, 721\" title=\"handLeftAlt\" />\r\n\t\t\t<area shape=\"poly\" coords=\"239, 605, 219, 619, 210, 727, 266, 727, 258, 617\" title=\"initRange\" />\r\n\t\t</map>\r\n\t</div>\r\n</div>";
 	}
 	,_Init: function() {
 		var cls = troshx_sos_vue_combat_components_DollView;
@@ -14722,9 +15307,9 @@ troshx_sos_vue_combat_components_DollView.prototype = $extend(haxevx_vuex_core_V
 		this.components = this.Components();
 		this.mounted = clsP.Mounted;
 		this.template = this.Template();
-		this.computed = { pregenHeader : clsP.get_pregenHeader, boutModel : clsP.get_boutModel, remainingDisplayCP : clsP.get_remainingDisplayCP, fatique : clsP.get_fatique, CP : clsP.get_CP, remCP : clsP.get_remCP, BL : clsP.get_BL, pain : clsP.get_pain, rightItem : clsP.get_rightItem, leftItem : clsP.get_leftItem, leftTypeTag : clsP.get_leftTypeTag, rightTypeTag : clsP.get_rightTypeTag, enemyRightItem : clsP.get_enemyRightItem, enemyLeftItem : clsP.get_enemyLeftItem, enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, enemyRightTypeTag : clsP.get_enemyRightTypeTag, styleObservePartProps : clsP.get_styleObservePartProps, stylePartProps : clsP.get_stylePartProps, armorPartProps : clsP.get_armorPartProps, styleSwingProps : clsP.get_styleSwingProps, focusedTextLbl : clsP.get_focusedTextLbl, observePrompt : clsP.get_observePrompt, partObserveLbl : clsP.get_partObserveLbl, player : clsP.get_player, opponents : clsP.get_opponents, dollScale : clsP.get_dollScale, gotPregens : clsP.get_gotPregens, thrustPointStyle : clsP.get_thrustPointStyle, clampedOpponentIndex : clsP.get_clampedOpponentIndex, currentOpponent : clsP.get_currentOpponent, gotCurrentOpponent : clsP.get_gotCurrentOpponent, currentDollSheet : clsP.get_currentDollSheet, armorColorScale : clsP.get_armorColorScale, carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, carriedDollShield : clsP.get_carriedDollShield, shieldIconStyle : clsP.get_shieldIconStyle, shieldLowProfiles : clsP.get_shieldLowProfiles, shieldHighProfiles : clsP.get_shieldHighProfiles, dollShieldCoverage : clsP.get_dollShieldCoverage, dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, armorDollColors : clsP.get_armorDollColors, hitLocationArmorValues : clsP.get_hitLocationArmorValues, hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, cpMeterAmount : clsP.get_cpMeterAmount, dragCPHtml : clsP.get_dragCPHtml, cpTrayStyle : clsP.get_cpTrayStyle, actingState : clsP.get_actingState, isDraggingCP : clsP.get_isDraggingCP};
-		this.methods = { get_pregenHeader : clsP.get_pregenHeader, closePregens : clsP.closePregens, quickStartDebug : clsP.quickStartDebug, confirmPregens : clsP.confirmPregens, deserializeSheet : clsP.deserializeSheet, showSelfPregens : clsP.showSelfPregens, showOpponentPregens : clsP.showOpponentPregens, get_boutModel : clsP.get_boutModel, get_remainingDisplayCP : clsP.get_remainingDisplayCP, get_fatique : clsP.get_fatique, get_CP : clsP.get_CP, get_remCP : clsP.get_remCP, get_BL : clsP.get_BL, get_pain : clsP.get_pain, get_rightItem : clsP.get_rightItem, get_leftItem : clsP.get_leftItem, getTypeTagForItem : clsP.getTypeTagForItem, get_leftTypeTag : clsP.get_leftTypeTag, get_rightTypeTag : clsP.get_rightTypeTag, get_enemyRightItem : clsP.get_enemyRightItem, get_enemyLeftItem : clsP.get_enemyLeftItem, get_enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, get_enemyRightTypeTag : clsP.get_enemyRightTypeTag, get_styleObservePartProps : clsP.get_styleObservePartProps, get_stylePartProps : clsP.get_stylePartProps, getArmorPartPropsOf : clsP.getArmorPartPropsOf, get_armorPartProps : clsP.get_armorPartProps, get_styleSwingProps : clsP.get_styleSwingProps, get_focusedTextLbl : clsP.get_focusedTextLbl, get_observePrompt : clsP.get_observePrompt, get_partObserveLbl : clsP.get_partObserveLbl, get_player : clsP.get_player, get_opponents : clsP.get_opponents, get_dollScale : clsP.get_dollScale, get_gotPregens : clsP.get_gotPregens, get_thrustPointStyle : clsP.get_thrustPointStyle, get_clampedOpponentIndex : clsP.get_clampedOpponentIndex, get_currentOpponent : clsP.get_currentOpponent, get_gotCurrentOpponent : clsP.get_gotCurrentOpponent, startGame : clsP.startGame, get_currentDollSheet : clsP.get_currentDollSheet, get_armorColorScale : clsP.get_armorColorScale, get_carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, get_carriedDollShield : clsP.get_carriedDollShield, get_shieldIconStyle : clsP.get_shieldIconStyle, get_shieldLowProfiles : clsP.get_shieldLowProfiles, get_shieldHighProfiles : clsP.get_shieldHighProfiles, get_dollShieldCoverage : clsP.get_dollShieldCoverage, get_dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, shieldCoveredAtDollHitLocation : clsP.shieldCoveredAtDollHitLocation, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, get_armorDollColors : clsP.get_armorDollColors, getVisibleArmorAtDollPartIndex : clsP.getVisibleArmorAtDollPartIndex, getHitLocationArmorValues : clsP.getHitLocationArmorValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, get_hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, get_cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, get_cpMeterAmount : clsP.get_cpMeterAmount, get_dragCPHtml : clsP.get_dragCPHtml, getRemainingMid : clsP.getRemainingMid, repeatTxt : clsP.repeatTxt, get_cpTrayStyle : clsP.get_cpTrayStyle, setupUIInteraction : clsP.setupUIInteraction, get_actingState : clsP.get_actingState, get_isDraggingCP : clsP.get_isDraggingCP, onActingStateChanged : clsP.onActingStateChanged, onOpponentsStateChange : clsP.onOpponentsStateChange, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
-		this.watch = { actingState : clsP.onActingStateChanged, gotCurrentOpponent : clsP.onOpponentsStateChange};
+		this.computed = { pregenHeader : clsP.get_pregenHeader, boutModel : clsP.get_boutModel, remainingDisplayCP : clsP.get_remainingDisplayCP, fatique : clsP.get_fatique, CP : clsP.get_CP, remCP : clsP.get_remCP, BL : clsP.get_BL, pain : clsP.get_pain, rightItem : clsP.get_rightItem, leftItem : clsP.get_leftItem, rightItemAssign : clsP.get_rightItemAssign, leftItemAssign : clsP.get_leftItemAssign, rightItemHighlighted : clsP.get_rightItemHighlighted, leftItemHighlighted : clsP.get_leftItemHighlighted, leftTypeTag : clsP.get_leftTypeTag, rightTypeTag : clsP.get_rightTypeTag, enemyRightItem : clsP.get_enemyRightItem, enemyLeftItem : clsP.get_enemyLeftItem, enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, enemyRightTypeTag : clsP.get_enemyRightTypeTag, styleObservePartProps : clsP.get_styleObservePartProps, focusManueverAtkType : clsP.get_focusManueverAtkType, advStyleProps : clsP.get_advStyleProps, stylePartProps : clsP.get_stylePartProps, armorPartProps : clsP.get_armorPartProps, styleSwingProps : clsP.get_styleSwingProps, styleDefBtnProps : clsP.get_styleDefBtnProps, stylePlHandBtnProps : clsP.get_stylePlHandBtnProps, focusedTextLbl : clsP.get_focusedTextLbl, observePrompt : clsP.get_observePrompt, partObserveLbl : clsP.get_partObserveLbl, player : clsP.get_player, opponents : clsP.get_opponents, dollScale : clsP.get_dollScale, gotPregens : clsP.get_gotPregens, thrustPointStyle : clsP.get_thrustPointStyle, clampedOpponentIndex : clsP.get_clampedOpponentIndex, currentOpponent : clsP.get_currentOpponent, gotCurrentOpponent : clsP.get_gotCurrentOpponent, advManuevers : clsP.get_advManuevers, advTNArr : clsP.get_advTNArr, advCostArr : clsP.get_advCostArr, browseAttackModeLabel : clsP.get_browseAttackModeLabel, browseAttackModeLabel2 : clsP.get_browseAttackModeLabel2, isBrowseHighlightLeft : clsP.get_isBrowseHighlightLeft, isBrowseHighlightRight : clsP.get_isBrowseHighlightRight, advTNs : clsP.get_advTNs, advSimpTNs : clsP.get_advSimpTNs, advCosts : clsP.get_advCosts, advSimpCosts : clsP.get_advSimpCosts, advNotAvailMask : clsP.get_advNotAvailMask, currentDollSheet : clsP.get_currentDollSheet, armorColorScale : clsP.get_armorColorScale, carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, carriedDollShield : clsP.get_carriedDollShield, shieldIconStyle : clsP.get_shieldIconStyle, shieldLowProfiles : clsP.get_shieldLowProfiles, shieldHighProfiles : clsP.get_shieldHighProfiles, dollShieldCoverage : clsP.get_dollShieldCoverage, dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, coverageHitLocations : clsP.get_coverageHitLocations, hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, armorDollColors : clsP.get_armorDollColors, hitLocationArmorValues : clsP.get_hitLocationArmorValues, hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, cpMeterAmount : clsP.get_cpMeterAmount, dragCPHtml : clsP.get_dragCPHtml, cpTrayStyle : clsP.get_cpTrayStyle, actingState : clsP.get_actingState, isDefBtnBlockAllowed : clsP.get_isDefBtnBlockAllowed, isDefBtnParryAllowed : clsP.get_isDefBtnParryAllowed, isDraggingCP : clsP.get_isDraggingCP};
+		this.methods = { get_pregenHeader : clsP.get_pregenHeader, closePregens : clsP.closePregens, quickStartDebug : clsP.quickStartDebug, confirmPregens : clsP.confirmPregens, deserializeSheet : clsP.deserializeSheet, showSelfPregens : clsP.showSelfPregens, showOpponentPregens : clsP.showOpponentPregens, get_boutModel : clsP.get_boutModel, get_remainingDisplayCP : clsP.get_remainingDisplayCP, get_fatique : clsP.get_fatique, get_CP : clsP.get_CP, get_remCP : clsP.get_remCP, get_BL : clsP.get_BL, get_pain : clsP.get_pain, get_rightItem : clsP.get_rightItem, get_leftItem : clsP.get_leftItem, get_rightItemAssign : clsP.get_rightItemAssign, get_leftItemAssign : clsP.get_leftItemAssign, get_rightItemHighlighted : clsP.get_rightItemHighlighted, get_leftItemHighlighted : clsP.get_leftItemHighlighted, getTypeTagForItem : clsP.getTypeTagForItem, get_leftTypeTag : clsP.get_leftTypeTag, get_rightTypeTag : clsP.get_rightTypeTag, get_enemyRightItem : clsP.get_enemyRightItem, get_enemyLeftItem : clsP.get_enemyLeftItem, get_enemyLeftTypeTag : clsP.get_enemyLeftTypeTag, get_enemyRightTypeTag : clsP.get_enemyRightTypeTag, get_styleObservePartProps : clsP.get_styleObservePartProps, get_focusManueverAtkType : clsP.get_focusManueverAtkType, get_advStyleProps : clsP.get_advStyleProps, get_stylePartProps : clsP.get_stylePartProps, getArmorPartPropsOf : clsP.getArmorPartPropsOf, get_armorPartProps : clsP.get_armorPartProps, get_styleSwingProps : clsP.get_styleSwingProps, get_styleDefBtnProps : clsP.get_styleDefBtnProps, get_stylePlHandBtnProps : clsP.get_stylePlHandBtnProps, get_focusedTextLbl : clsP.get_focusedTextLbl, get_observePrompt : clsP.get_observePrompt, get_partObserveLbl : clsP.get_partObserveLbl, get_player : clsP.get_player, get_opponents : clsP.get_opponents, get_dollScale : clsP.get_dollScale, get_gotPregens : clsP.get_gotPregens, get_thrustPointStyle : clsP.get_thrustPointStyle, get_clampedOpponentIndex : clsP.get_clampedOpponentIndex, get_currentOpponent : clsP.get_currentOpponent, get_gotCurrentOpponent : clsP.get_gotCurrentOpponent, get_advManuevers : clsP.get_advManuevers, get_advTNArr : clsP.get_advTNArr, get_advCostArr : clsP.get_advCostArr, get_browseAttackModeLabel : clsP.get_browseAttackModeLabel, get_browseAttackModeLabel2 : clsP.get_browseAttackModeLabel2, get_isBrowseHighlightLeft : clsP.get_isBrowseHighlightLeft, get_isBrowseHighlightRight : clsP.get_isBrowseHighlightRight, get_advTNs : clsP.get_advTNs, get_advSimpTNs : clsP.get_advSimpTNs, get_advCosts : clsP.get_advCosts, get_advSimpCosts : clsP.get_advSimpCosts, advHiddenAt : clsP.advHiddenAt, advDisabledAt : clsP.advDisabledAt, get_advNotAvailMask : clsP.get_advNotAvailMask, onNotAvailAdvMaskChange : clsP.onNotAvailAdvMaskChange, startGame : clsP.startGame, get_currentDollSheet : clsP.get_currentDollSheet, get_armorColorScale : clsP.get_armorColorScale, get_carriedDollShieldAssign : clsP.get_carriedDollShieldAssign, get_carriedDollShield : clsP.get_carriedDollShield, get_shieldIconStyle : clsP.get_shieldIconStyle, get_shieldLowProfiles : clsP.get_shieldLowProfiles, get_shieldHighProfiles : clsP.get_shieldHighProfiles, get_dollShieldCoverage : clsP.get_dollShieldCoverage, get_dollShieldCoverageBools : clsP.get_dollShieldCoverageBools, shieldCoveredAtDollHitLocation : clsP.shieldCoveredAtDollHitLocation, get_coverageHitLocations : clsP.get_coverageHitLocations, get_hitLocationZeroAVValues : clsP.get_hitLocationZeroAVValues, get_hitLocationZeroAVValues2 : clsP.get_hitLocationZeroAVValues2, get_armorDollColors : clsP.get_armorDollColors, getVisibleArmorAtDollPartIndex : clsP.getVisibleArmorAtDollPartIndex, getHitLocationArmorValues : clsP.getHitLocationArmorValues, get_hitLocationArmorValues : clsP.get_hitLocationArmorValues, get_hitLocationArmorValues2 : clsP.get_hitLocationArmorValues2, get_cpTrayCSSTransform : clsP.get_cpTrayCSSTransform, get_cpMeterAmount : clsP.get_cpMeterAmount, get_dragCPHtml : clsP.get_dragCPHtml, getRemainingMid : clsP.getRemainingMid, repeatTxt : clsP.repeatTxt, get_cpTrayStyle : clsP.get_cpTrayStyle, setupUIInteraction : clsP.setupUIInteraction, get_actingState : clsP.get_actingState, get_isDefBtnBlockAllowed : clsP.get_isDefBtnBlockAllowed, get_isDefBtnParryAllowed : clsP.get_isDefBtnParryAllowed, get_isDraggingCP : clsP.get_isDraggingCP, onActingStateChanged : clsP.onActingStateChanged, onOpponentsStateChange : clsP.onOpponentsStateChange, handleImageMap : clsP.handleImageMap, onResize : clsP.onResize, refreshLayout : clsP.refreshLayout};
+		this.watch = { advNotAvailMask : clsP.onNotAvailAdvMaskChange, actingState : clsP.onActingStateChanged, gotCurrentOpponent : clsP.onOpponentsStateChange};
 	}
 	,__class__: troshx_sos_vue_combat_components_DollView
 });
@@ -15986,6 +16571,9 @@ troshx_components_FightLink.SIDE_NONE = 0;
 troshx_core_BoutMessage.TYPE_NONE = 0;
 troshx_core_BoutMessage.TYPE_PLAYERS_TURN = 1;
 troshx_core_BoutMessage.TYPE_RESOLVE_MANUEVER = 2;
+troshx_core_ManueverSpec.NO_ZONE = -1;
+troshx_core_ManueverSpec.LEFT_HAND_ZONE = -2;
+troshx_core_ManueverSpec.RIGHT_HAND_ZONE = -3;
 troshx_sos_core_BoonBane.__GOOD_EYES__BAD_EYES = 1;
 troshx_sos_core_BoonBane.__GOOD_EARS_BAD_EARS = 2;
 troshx_sos_core_BoonBane.__GOOD_EARS_BAD_NOSE = 4;
@@ -16361,6 +16949,12 @@ troshx_sos_sheets_CharSheet.GENDER_FEMALE = 1;
 troshx_sos_sheets_CharSheet.VERSION = 2;
 troshx_sos_sheets_CharSheet.LIQUIDATE_ASSET_BASE = 6;
 troshx_sos_vue_combat_CombatViewModel.TRAY_TOTAL_COLS = 5;
+troshx_sos_vue_combat_CombatViewModel.B_ATTACK_1H = 1;
+troshx_sos_vue_combat_CombatViewModel.B_ATTACK_SHIELD = 2;
+troshx_sos_vue_combat_CombatViewModel.B_ATTACK_2H = 3;
+troshx_sos_vue_combat_CombatViewModel.B_ATTACK_UNARMED = 0;
+troshx_sos_vue_combat_CombatViewModel.B_ATTACK_UNARMED_2 = 7;
+troshx_sos_vue_combat_CombatViewModel.EMPTY_ARR = [];
 troshx_sos_vue_combat_CombatViewModel.ACTING_DOLL_DECLARE = 0;
 troshx_sos_vue_combat_CombatViewModel.ACTING_DOLL_DRAG_CP = 1;
 troshx_sos_vue_combat_CombatViewModel.ACTING_NONE = 2;
