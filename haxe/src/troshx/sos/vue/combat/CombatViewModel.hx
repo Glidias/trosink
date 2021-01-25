@@ -17,13 +17,13 @@ import troshx.util.LibUtil;
 
 /**
  * Client-side Combat view model that works alongside other views
- * 
+ *
  * @author Glidias
  */
-class CombatViewModel 
+class CombatViewModel
 {
 	//public var focusInvalidateCount(default, null):Int = 0;
-	
+
 	public var trayPosX:Float = 0;
 	public var trayPosY:Float = 0;
 	public var trayGridSizeX:Float = 10;
@@ -31,14 +31,14 @@ class CombatViewModel
 	public var trayGridShelfSize:Float = 10;
 	public var trayGridShelfX:Float = 8;
 	public static inline var TRAY_TOTAL_COLS:Int = 5;
-	
+
 	public var trayPosFlip:Bool = false;
 	public var trayPosFlipY:Bool = false;
 	public function getDraggedCPAmountFromPos(mx:Int, my:Int):Int {
 		var player = this.getCurrentPlayer();
 		var maxAvailableCP = player.fight.cp;
 		// any activation costs to be sbtracted
-		
+
 		var dx = trayPosFlip ? -1 : 1;
 		var dy = trayPosFlipY ? -1 : 1;
 		var x = trayPosX + trayGridShelfX * dx;
@@ -52,8 +52,107 @@ class CombatViewModel
 		if (amt > maxAvailableCP) amt = maxAvailableCP;
 		return amt;
 	}
-	
+
 	var manueverRepo:AbsStringMap<Manuever>;
+
+	// atk and def manuevers, basic and adv
+	var basicSwing:Manuever;
+	var basicThrust:Manuever;
+	var advSwingArr:Array<Manuever>;
+	var advThrustArr:Array<Manuever>;
+	
+	var basicVoid:Manuever;
+	var basicBlock:Manuever;
+	var basicParry:Manuever;
+	var advParryArr:Array<Manuever>;
+	var advVoidArr:Array<Manuever>;
+	var advBlockArr:Array<Manuever>;
+	
+	var advAntiHandWithWeaponArr:Array<Manuever>;
+	var advAntiHandWithShieldArr:Array<Manuever>;
+	var advAntiHandUnarmedArr:Array<Manuever>;
+	
+	var basicHookPunch:Manuever;
+	var basicStraightPunch:Manuever;
+	var advPuglismSwingArr:Array<Manuever>;
+	var advPuglismThrustArr:Array<Manuever>;
+	
+	var basicMeleeShoot:Manuever;
+	var basicNetToss:Manuever;
+	var advRangedArr:Array<Manuever>;
+	
+	// gameplay related manuevers
+	public var mOneTwoPunch(default, null):Manuever;
+	
+	public var mDoNothing(default, null):Manuever;
+	public var mMasterStrike(default, null):Manuever;
+	public var mDoubleAttack(default, null):Manuever;
+	public var mDoubleShot(default, null):Manuever;
+	public var mStealInitiative(default, null):Manuever;
+	public var mThreadNeedle(default, null):Manuever;
+	public var mAllyDefense(default, null):Manuever;
+	public var mQuickDefense(default, null):Manuever;
+	public var mQuickDraw(default, null):Manuever;
+	public var mRapidRise(default, null):Manuever;
+	public var mGuardedAttack(default, null):Manuever;
+	
+	public function new(boutModel:BoutModel=null)
+	{
+		this.boutModel = boutModel != null ? boutModel : new BoutModel();
+		manueverRepo = Manuever.getMap();
+		
+		basicSwing = manueverRepo.get('swing');
+		basicThrust = manueverRepo.get('thrust');
+		advSwingArr = ['drawCut', 'cleavingBlow', 'hook', 'feint'].map(manueverRepo.get);
+		advThrustArr = ['pushCut', 'jointThrust', 'hook', 'feint'].map(manueverRepo.get);
+	
+		advAntiHandWithWeaponArr = ['disarm', 'beat', 'break', 'hew'].map(manueverRepo.get);
+		advAntiHandUnarmedArr = ['disarmUnarmedAtk'].map(manueverRepo.get);
+		advAntiHandWithShieldArr = ['shieldBeat'].map(manueverRepo.get);
+		
+		basicHookPunch = manueverRepo.get('hookPunch');
+		basicStraightPunch = manueverRepo.get('straightPunch');
+		advPuglismSwingArr = ['', 'elbow', 'kick', 'trip'].map(manueverRepo.get);
+		advPuglismThrustArr = ['headbutt', 'knee', 'kick', 'trip'].map(manueverRepo.get);
+		mOneTwoPunch = manueverRepo.get('oneTwoPunch');
+		
+		
+		basicMeleeShoot = manueverRepo.get('meleeShoot');
+		basicNetToss = manueverRepo.get('netToss');
+		advRangedArr = ['', '', 'blindToss', 'weaponThrow'].map(manueverRepo.get);
+		
+		basicVoid = manueverRepo.get('void');
+		basicParry = manueverRepo.get('parry');
+		basicBlock = manueverRepo.get('block');
+		advVoidArr =  ['hastyVoid', 'mobileVoid', '', 'flee'].map(manueverRepo.get);
+		advParryArr =  ['disarmUnarmedDef', 'armParry', 'riposte', ''].map(manueverRepo.get);
+		advBlockArr =  ['', 'shieldBind', '', 'totalBlock'].map(manueverRepo.get);
+		
+		mStealInitiative = manueverRepo.get('stealInitiative');
+		
+		mDoNothing = manueverRepo.get('doNothing');
+		mMasterStrike = manueverRepo.get('masterStrike');
+		mDoubleAttack = manueverRepo.get('doubleAttack');
+		mDoubleShot = manueverRepo.get('mDoubleShot');
+		
+		mQuickDefense = manueverRepo.get('quickDefense');
+		mQuickDraw = manueverRepo.get('quickDraw');
+		mAllyDefense = manueverRepo.get('allyDefense');
+		mThreadNeedle = manueverRepo.get('threadNeedle');
+		mRapidRise = manueverRepo.get('rapidRise');
+		mGuardedAttack = manueverRepo.get('guardedAttack');
+		
+		// later: alt mode swithching
+		// steal initiative
+		
+		
+		
+		
+	}
+
+	//public function filteredBodyParts(swing:B
+	//return visiblity of doll elements
+	//set disabled states of doll elements
 	
 	var MAP_LOWER_BODY_PARTS:StringMap<Bool> = [
 		'SWING_LOWER_LEG'=> true,
@@ -63,14 +162,14 @@ class CombatViewModel
 		'SHIN'=> true,
 		'THIGH'=> true
 	];
-	
+
 	public var isTouchDragMode:Bool = false;
 	public var incomingHeldDown(default, null):Bool = false;
 	public function setIncomingHeldDown(val:Bool):Void
 	{
 		incomingHeldDown = val;
 	}
-	
+
 	public var observeOpponent(default, null):Bool = false;
 	public function setObserveOpponent(val:Bool):Bool {
 		var gotChange:Bool = observeOpponent != val;
@@ -85,11 +184,25 @@ class CombatViewModel
 		focusedIndex = val;
 		showFocusedTag = val >=0;
 	}
-	
+
 	public inline function setObserveIndex(val:Int):Void { // layout index
 		observeIndex = val;
+
+	}
+
+
+	public function getAdvancedManuevers(targetZone:Int, offhand:Bool=false) {
+		var curPlayer = getCurrentPlayer();
+
+		var weaponAssign:WeaponAssign;
+		weaponAssign = offhand ? curPlayer.charSheet.inventory.getOffhandWeaponAssign() : curPlayer.charSheet.inventory.getMasterWeaponAssign();
+
+
 	}
 	
+
+
+
 	public function isFocusedEnemyLeftSide() {
 		var i = focusedIndex;
 		var str = null;
@@ -100,7 +213,7 @@ class CombatViewModel
 		}
 		return i == _enemyHandLeftIdx || (str != null && str.substr(str.length - 2) == "-l");
 	}
-	
+
 	public function isFocusedEnemyLower() {
 		var i = focusedIndex;
 		var str = null;
@@ -115,11 +228,11 @@ class CombatViewModel
 		return str != null && MAP_LOWER_BODY_PARTS.exists(str);
 	}
 
-	
+
 	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item):String {
 		var i = focusedIndex;
 		if (i < 0) return "";
-		
+
 		if (_swingMap.exists(i)) {
 			return getDollSwingDescAt(_swingMap.get(i));
 		} else if (_partMap.exists(i)) {
@@ -128,18 +241,18 @@ class CombatViewModel
 			if (i != _enemyHandRightIdx) {
 				return enemyLeftItem != null ? enemyLeftItem.name : "enemy's left-hand item";
 			} else {
-				return enemyRightItem != null ? enemyRightItem.name : "enemy's right-hand item"; 
+				return enemyRightItem != null ? enemyRightItem.name : "enemy's right-hand item";
 			}
 		} else {
 			return "todo/missing";
 		}
 	}
-	
+
 	public inline function focusIndexEnemyHandSide(i:Int):Int {
 		return (i == _enemyHandLeftIdx ? Inventory.WEAR_LEFT : i == _enemyHandRightIdx ? Inventory.WEAR_RIGHT : 0);
 	}
-	
-	
+
+
 
 	public function getHitLocationAtFocusIndex(i:Int):HitLocation {
 		return getDollPartHitLocationAt(_partMap.get(i));
@@ -147,24 +260,24 @@ class CombatViewModel
 	public function getDollIndexAtFocusIndex(i:Int):Int {
 		return _partMap.get(i);
 	}
-	
+
 	public function getBodyPartLabel(i:Int=-1):String {
 		if (i < 0) i = focusedIndex;
 		if (i < 0) return "";
 		if (_partMap.exists(i)) {
 			var loc = getDollPartHitLocationAt(_partMap.get(i));
 			return loc.name;
-			
+
 		} else {
 			return null;
 		}
 	}
-	
+
 	public var draggedCP(default, null):Int = 0;
 	public inline function setDraggedCP(val:Int):Void {
 		draggedCP = val;
 	}
-	
+
 	public function getRemainingDisplayCP():Int {
 		var dcp = draggedCP;
 		var pl = this.getCurrentPlayer();
@@ -172,7 +285,7 @@ class CombatViewModel
 		var cp = pl.fight.cp - dcp;
 		return cp >= 0 ? cp : 0;
 	}
-	
+
 	public var DOLL_PART_Slugs:Array<String> = [];
 	public var DOLL_PART_Indices:Array<Int> = [];
 	public var DOLL_PART_HitIndices:Array<Int> = [];
@@ -196,7 +309,7 @@ class CombatViewModel
 	public inline function isDollPartThrustable(index:Int):Bool {
 		return  DOLL_PART_Indices[index] >= 0;
 	}
-	
+
 	public function getDollPartArmorValues(result:Array<Int> = null):Array<Int> {
 		if (result == null) result = [];
 		return result;
@@ -209,7 +322,7 @@ class CombatViewModel
 		if (result == null) result = [];
 		return result;
 	}
-	
+
 	public var DOLL_SWING_Slugs:Array<String> = [];
 	public var DOLL_SWING_Indices:Array<Int> = [];
 	public var DOLL_SWING_IsLefts:Int = 0;
@@ -219,20 +332,20 @@ class CombatViewModel
 	public function getDollSwingZoneAt(index:Int):TargetZone {
 		return _body.targetZones[DOLL_SWING_Indices[index]];
 	}
-	
+
 	public var boutModel(default, null):BoutModel; // server side synced data
 	public inline function getDefaultPlayerSideIndex():Int {
 		return 0;
 	}
-	
+
 	public inline function getDefaultEnemySideIndex():Int {
 		return 1;
 	}
-	
+
 	public static inline var ACTING_DOLL_DECLARE:Int = 0;
 	public static inline var ACTING_DOLL_DRAG_CP:Int = 1;
 	public static inline var ACTING_NONE:Int = 2;
-	
+
 	public var actingState(default, null):Int = -1;
 	public function setActingState(val:Int):Void {
 		actingState = val;
@@ -240,11 +353,11 @@ class CombatViewModel
 
 	public var currentPlayerIndex:Int = -1;
 	public var focusOpponentIndex:Int = 0;
-	
+
 	public inline function getCurrentPlayer():FightNode<CharSheet> {
 		return currentPlayerIndex >= 0 ? boutModel.bout.combatants[currentPlayerIndex] : null;
 	}
-	
+
 	public inline function getCurrentOpponents():Array<FightNode<CharSheet>> {
 		var playerSideIndex = getDefaultPlayerSideIndex();
 		if (boutModel.bout == null) return null;
@@ -253,7 +366,7 @@ class CombatViewModel
 			return obj.sideIndex != playerSideIndex;
 		});
 	}
-	
+
 	public inline function getCurrentActiveOpponents():Array<FightNode<CharSheet>> {
 		var pl = this.getCurrentPlayer();
 		if (boutModel.bout == null) return null;
@@ -263,7 +376,7 @@ class CombatViewModel
 		}
 		return null;
 	}
-	
+
 	public inline function getCurrentAllies():Array<FightNode<CharSheet>> {
 		var playerSideIndex = getDefaultPlayerSideIndex();
 		if (boutModel.bout == null) return null;
@@ -271,7 +384,7 @@ class CombatViewModel
 			return obj.sideIndex != playerSideIndex;
 		});
 	}
-	
+
 	var defaultSwingAvailMask(default, null):Int = 0;
 	var defaultThrustAvailMask(default, null):Int = 0;
 	public var swingAvailabilityMask(default, null):Int = 0;
@@ -295,7 +408,7 @@ class CombatViewModel
 	public function onSwingAvailabilityChange():Void {
 		handleDisabledMask(swingAvailabilityMask, DOLL_SWING_Slugs);
 	}
-	
+
 	public function partIndexAvailable(index:Int):Bool {
 		return (thrustAvailabilityMask & (index << 1)) != 0;
 	}
@@ -303,13 +416,13 @@ class CombatViewModel
 	public function swingArcAvailableBetween(slugs:Array<String>):Bool {
 		return swingAvailabilityMask & (_dollImageMapData.idIndices.get(slugs[0]) | _dollImageMapData.idIndices.get(slugs[1]) ) != 0;
 	}
-	
+
 	// Post initialize
 	var _interactionStates:Array<Array<UInteract>>;
 	public function getInteractionListByState(state:Int):Array<UInteract> {
 		return _interactionStates[state];
 	}
-	
+
 	var _interactionMaps:Array<IntMap<UInteract>>;
 	var _dollImageMapData:ImageMapData;
 	var _body:BodyChar;
@@ -317,7 +430,7 @@ class CombatViewModel
 	var _partMap:IntMap<Int>;
 	var _enemyHandLeftIdx:Int;
 	var _enemyHandRightIdx:Int;
-	
+
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
 		_interactionMaps = [];
 		_interactionStates = [];
@@ -326,26 +439,26 @@ class CombatViewModel
 		_interactionStates[ACTING_DOLL_DRAG_CP] = [];
 		_dollImageMapData = imageMapData;
 		_interactionStates[ACTING_NONE] = [];
-		
+
 		var body = BodyChar.getInstance();
 		_body = body;
-		
+
 		var needToLowercase:Bool;
-	
+
 		_swingMap = new IntMap<Int>();
 		_partMap = new IntMap<Int>();
-	
+
 		for (i in 0...imageMapData.layoutItemList.length) {
 			var tag = imageMapData.classList[i];
 			var name = imageMapData.titleList[i];
 			if (tag == "part") {
 				_partMap.set(i, DOLL_PART_Slugs.length);
 				DOLL_PART_Slugs.push(imageMapData.titleList[i]);
-				
+
 			} else if (tag == "swing") {
 				_swingMap.set(i, DOLL_SWING_Slugs.length);
 				DOLL_SWING_Slugs.push(imageMapData.titleList[i]);
-				
+
 			} else if (name == "enemyHandLeft") {
 				_enemyHandLeftIdx = i;
 			} else if (name == "enemyHandRight") {
@@ -354,10 +467,10 @@ class CombatViewModel
 
 		}
 		var targetZones = body.targetZones;
-		
+
 		var toUnderscoreCapital:EReg = new EReg(" ([A-Z])", "g");
 		var toSlugifyCapital:EReg = new EReg("_([a-z])", "g");
-		
+
 		var mapTempSwings:AbsStringMap<Int> = new AbsStringMap<Int>();
 		var mapTempThrusts:AbsStringMap<Int> = new AbsStringMap<Int>();
 		var key:String;
@@ -378,20 +491,20 @@ class CombatViewModel
 				mapTempThrusts.set("FACE", i);
 			} else if (key == "LOWER_LEG") {
 				mapTempThrusts.set("SHIN", i);
-			} 
+			}
 			//trace(key);
 		}
-		
+
 		needToLowercase = DOLL_PART_Slugs[0].charAt(0).toLowerCase() != DOLL_PART_Slugs[0].charAt(0);
 		var keySplit:Array<String>;
-		
+
 		var maskAccum:Int;
-		
+
 		maskAccum = 0;
 		for (i in 0...DOLL_PART_Slugs.length) {
 			keySplit = DOLL_PART_Slugs[i].split("-");
 			key = keySplit[0];
-			
+
 			DOLL_PART_IsLefts |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "l" ? (1 << i) : 0;
 			if (mapTempThrusts.exists(key)) {
 				DOLL_PART_Indices[i] = mapTempThrusts.get(key);
@@ -401,7 +514,7 @@ class CombatViewModel
 				DOLL_PART_Indices[i] = -1;
 				//trace ("did not find target zone thrust index by key:"+key);
 			}
-			
+
 			key = toSlugifyCapital.map(key.toLowerCase(), function(e):String { return e.matched(1).toUpperCase(); } );
 			key = key.charAt(0).toLowerCase() + key.substr(1);
 			if (Reflect.hasField(body.hitLocationHash, key)) {
@@ -411,14 +524,14 @@ class CombatViewModel
 			}
 		}
 		thrustAvailabilityMask = maskAccum;
-	
+
 		maskAccum = 0;
 		for (i in 0...DOLL_SWING_Slugs.length) {
 			//DOLL_PART_Slugs[i].replace(
 			keySplit = DOLL_SWING_Slugs[i].split("-");
-			
+
 			DOLL_SWING_IsLefts |= keySplit.length >= 2 && keySplit[keySplit.length - 1] == "l" ? (1 << i) : 0;
-			
+
 			key = keySplit[0];
 			if (key == "SWING_UPWARD_HEAD") {	// hardcodes exception case , ah well
 				DOLL_SWING_Indices[i] = 1;
@@ -435,31 +548,13 @@ class CombatViewModel
 			maskAccum |= (1 << i);
 		}
 		swingAvailabilityMask = maskAccum;
-		
-		
+
+
 		defaultSwingAvailMask = swingAvailabilityMask;
 		defaultThrustAvailMask = thrustAvailabilityMask;
 		onThrustAvailabilityChange();
 		onSwingAvailabilityChange();
 	}
-	
-	
-	
-	//public function filteredBodyParts(swing:B
-	
-	// return visiblity of doll elements
-	// set disabled states of doll elements
-	
-	public function new(boutModel:BoutModel=null) 
-	{
-		this.boutModel = boutModel != null ? boutModel : new BoutModel();
-		this.manueverRepo = Manuever.getMap();
-	}
-	
-	
-		
-	
-	
-	
-	
+
+
 }

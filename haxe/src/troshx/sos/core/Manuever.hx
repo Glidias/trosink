@@ -12,6 +12,7 @@ import troshx.sos.manuevers.*;
 import troshx.sos.manuevers.Beat.ShieldBeat;
 import troshx.sos.manuevers.Disarm.DisarmUnarmedAtk;
 import troshx.sos.manuevers.Disarm.DisarmUnarmedDef;
+import troshx.sos.manuevers.PugilisiticAttack.StraightPunch;
 import troshx.sos.sheets.CharSheet;
 import troshx.util.AbsStringMap;
 import troshx.util.LibUtil;
@@ -447,12 +448,16 @@ class Manuever implements IManuever implements IUid
 			new StealInitiative(),
 			
 			// Puglism (trip / kick / knee   ,  Straight punch/ Hook punch/ One-two punch[2] ,  Head butt,  Elbow)
+			new StraightPunch(),
+			new HookPunch(),
+			
 			new Elbow(),
 			new HeadButt(),
-			new HookPunch(),
+	
 			new Kick(),
 			new Knee(),
 			new Trip(),
+			
 			new OneTwoPunch(),
 			
 			// Ranged (melee shoot/ weapon throw / blind toss)
