@@ -116,10 +116,10 @@ class UIInteraction
 				case "initRange": 
 					arr.push(new UInteract(i, DOWN) );
 				case "advManuever1", "advManuever2", "advManuever3", "advManuever4": 
-					arr.push(new UInteract(i, DOWN) );
+					arr.push(new UInteract(i, DOWN|RELEASE|CANCELED|MOVE) );
 				case "btnBlock", "btnVoid", "btnParry": 
 					item.hitPadding = 5;
-					arr.push(new UInteract(i, DOWN | RELEASE | CANCELED) );
+					arr.push(new UInteract(i, MOVE|DOWN | RELEASE | CANCELED) );
 				case "incomingManuevers":
 					arr.push(new UInteract(i, MOVE|ROLL_OUT|HOVER|MASK_CANCELED_OR_RELEASE|DOWN)); //| PAN_UP|PAN_DOWN
 				case "opponentSwiper":

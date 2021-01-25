@@ -291,7 +291,8 @@ class Manuever implements IManuever implements IUid
 	}
 	
 	/**
-	 * This function should typically be used if requisites isn't zero to get a relavant conventional manuever TN based on held equipment (if available)
+	 * This function should typically be used if requisites isn't zero to get a relavant conventional manuever TN based on held equipment (if available).
+	 * TODO: targetZoneMode check
 	 * @param	spec
 	 * @return	A default TN based on manuever requisites and manuever spec. If negative number -1, denotes impossible manuever due to lack of requisites.
 	 */
@@ -389,6 +390,7 @@ class Manuever implements IManuever implements IUid
 	// hardcode this or excel???
 	public static function getNewArray():Array<Manuever> {
 		return [
+			new Manuever("", "")._tn( -1), // null blank manuever
 		
 			// Swings and thrusts
 			new Manuever("swing", "Swing")._types(TYPE_OFFENSIVE)._requisite(REQ_WEAPON)._attackTypes(ATTACK_TYPE_SWING), // greater Swings +1 and +2?

@@ -97,6 +97,9 @@ class HammerJSCombat
 			trace("Receiving event from:" + index + " ::" + event + " >" + currentGesture.type + " :" + currentGesture.eventType);
 			return;
 		}
+		var tag = imageMapData.classList[index];
+		var name = imageMapData.titleList[index];
+		
 		
 		if (viewModel.actingState == CombatViewModel.ACTING_DOLL_DRAG_CP) {
 			if (event == UIInteraction.MOVE) {
@@ -109,6 +112,8 @@ class HammerJSCombat
 				defaultAct = DEFAULT_ACT_HOVER;
 				requiredActs = 0;
 				viewModel.setDraggedCP(0);
+				viewModel.resetAdvFocusedIndex(); // todo: might be kept
+				
 				//trace("Drag move release");
 			} else if (event == UIInteraction.CANCELED) {
 				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
@@ -116,6 +121,7 @@ class HammerJSCombat
 				requiredActs = 0;
 				
 				viewModel.setDraggedCP(0);
+				viewModel.resetAdvFocusedIndex(); // todo: might be kept
 				//trace("Drag move canceled");
 			}
 			else {
@@ -125,30 +131,22 @@ class HammerJSCombat
 			return;
 		}
 		
-		var tag = imageMapData.classList[index];
-		var name = imageMapData.titleList[index];
+		
 		if (tag == "swing" || tag == "part" || name == "enemyHandLeft" || name == "enemyHandRight") {
 			if ( (event & UIInteraction.MASK_HOVER)!=0 || index != viewModel.focusedIndex) {
-				if (!viewModel.observeOpponent) viewModel.setFocusedIndex(index);
+				if (!viewModel.observeOpponent) {
+					viewModel.setFocusedIndex(index);
+					
+				}
 				else viewModel.setObserveIndex(index);
 			} else {
 				if (event == UIInteraction.DOWN && index == viewModel.focusedIndex) {
-					viewModel.setDraggedCP(0);
-					viewModel.showFocusedTag = true;
-					viewModel.trayPosX = currentGesture.center.x;
-					viewModel.trayPosY = currentGesture.center.y;
-					calibrateDragCPTraySize();
-					//viewModel.trayGridSizeX = 32;
-					//viewModel.trayGridSizeY = 32;
-					//viewModel.trayPosFlip = viewModel.getHitLocationAtFocusIndex(
-					
-					
-					viewModel.trayPosFlip = viewModel.isFocusedEnemyLeftSide();
-					viewModel.trayPosFlipY = viewModel.isFocusedEnemyLower();
-					viewModel.setActingState(CombatViewModel.ACTING_DOLL_DRAG_CP);
-					
-					requiredActs = UIInteraction.MOVE | UIInteraction.CANCELED | UIInteraction.RELEASE;
-					defaultAct = null;
+					if (name == "enemyHandLeft" || name == "enemyHandRight") {
+						if (!viewModel.advInteract1.disabled) viewModel.setAdvFocusedIndex(0);
+						else return;
+					}
+					else viewModel.resetAdvFocusedIndex(); 
+					startDragCP(name, tag,  viewModel.isFocusedEnemyLeftSide(), viewModel.isFocusedEnemyLower());
 				}
 			}
 			return;
@@ -175,9 +173,30 @@ class HammerJSCombat
 		} 
 		else if (name == "vitals") {
 			
-		} else {
+		} 
+		else if (name == "advManuever1" || name == "advManuever2" || name == "advManuever3" || name == "advManuever4") {
+			if (event == UIInteraction.DOWN) {
+				viewModel.setAdvFocusedIndex(Std.parseInt(name.substr(name.length - 1)) - 1);
+				startDragCP(name, tag, true, name == "advManuever3" || name == "advManuever4");
+			}
+		} 
+		else {
 			trace("unhadnled:" + name + " ::"+event + " : "+currentGesture.type);
 		}
+	}
+	
+	function startDragCP(name:String, tag:String, flip:Bool, flipY:Bool):Void {
+		viewModel.setDraggedCP(0);
+		viewModel.showFocusedTag = true;
+		viewModel.trayPosX = currentGesture.center.x;
+		viewModel.trayPosY = currentGesture.center.y;
+		calibrateDragCPTraySize();
+		viewModel.trayPosFlip = flip;
+		viewModel.trayPosFlipY = flipY;
+		viewModel.setActingState(CombatViewModel.ACTING_DOLL_DRAG_CP);
+		
+		requiredActs = UIInteraction.MOVE | UIInteraction.CANCELED | UIInteraction.RELEASE;
+		defaultAct = null;
 	}
 	
 	static inline var MAX_GRID_SIZE:Float = 64;

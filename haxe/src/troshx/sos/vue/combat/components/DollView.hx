@@ -251,6 +251,15 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
+	@:computed function get_focusManueverAtkType():Int {
+		return viewModel.getFocusManueverAtkType();
+	}
+	
+	@:computed function get_advStyleProps():ShapeStyleProps {
+		return this.focusManueverAtkType != Manuever.ATTACK_TYPE_SWING ? stylePartProps : styleSwingProps;
+	}
+	
+	
 	@:computed function get_stylePartProps():ShapeStyleProps {
 		var d = mapData;
 		return {
@@ -288,6 +297,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	}
 	
 
+	
 	
 	@:computed function get_styleSwingProps():ShapeStyleProps {
 		var d = mapData;

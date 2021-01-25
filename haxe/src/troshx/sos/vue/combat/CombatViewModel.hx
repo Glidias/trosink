@@ -71,9 +71,11 @@ class CombatViewModel
 	var advVoidArr:Array<Manuever>;
 	var advBlockArr:Array<Manuever>;
 	
-	var advAntiHandWithWeaponArr:Array<Manuever>;
+	var advAntiWeapWithWeaponArr:Array<Manuever>;
+	var advAntiShieldWithWeaponArr:Array<Manuever>;
 	var advAntiHandWithShieldArr:Array<Manuever>;
 	var advAntiHandUnarmedArr:Array<Manuever>;
+	
 	
 	var basicHookPunch:Manuever;
 	var basicStraightPunch:Manuever;
@@ -110,7 +112,8 @@ class CombatViewModel
 		advSwingArr = ['drawCut', 'cleavingBlow', 'hook', 'feint'].map(manueverRepo.get);
 		advThrustArr = ['pushCut', 'jointThrust', 'hook', 'feint'].map(manueverRepo.get);
 	
-		advAntiHandWithWeaponArr = ['disarm', 'beat', 'break', 'hew'].map(manueverRepo.get);
+		advAntiWeapWithWeaponArr = ['disarm', 'beat', 'break', ''].map(manueverRepo.get);
+		advAntiShieldWithWeaponArr = ['hew', 'beat', 'hook', ''].map(manueverRepo.get);
 		advAntiHandUnarmedArr = ['disarmUnarmedAtk'].map(manueverRepo.get);
 		advAntiHandWithShieldArr = ['shieldBeat'].map(manueverRepo.get);
 		
@@ -186,6 +189,8 @@ class CombatViewModel
 	public var showFocusedTag:Bool = false;
 	public var observeIndex(default, null):Int = -1;
 	public var focusedIndex(default, null):Int = -1;
+	public var advFocusedIndex(default, null):Int = -1;
+	
 	public inline function setFocusedIndex(val:Int):Void { // layout index
 		//focusInvalidateCount++;
 		focusedIndex = val;
@@ -193,6 +198,31 @@ class CombatViewModel
 		playerManueverSpec.activeEnemyZone = this.getTargetZoneIndexFromFocIndex(val);
 		// playerManueverSpec.activeEnemyZone = val >=  ? val : -1;
 		showFocusedTag = val >=0;
+	}
+	
+	public inline function setAdvFocusedIndex(val:Int):Void {
+		advFocusedIndex = val;
+	}
+	
+	public inline function resetAdvFocusedIndex():Void {
+		advFocusedIndex = -1;
+	}
+	
+
+	public function getFocusManueverAtkType():Int {
+		var i = focusedIndex;
+		if (_swingMap.exists(i)) {
+			return Manuever.ATTACK_TYPE_SWING;
+		} else if (_partMap.exists(i)) {
+			return Manuever.ATTACK_TYPE_THRUST;
+		} else if (focusedIndex == _enemyHandLeftIdx) {
+			return ManueverSpec.LEFT_HAND_ZONE;
+		}
+		else if (focusedIndex == _enemyHandRightIdx) {
+			return ManueverSpec.RIGHT_HAND_ZONE;
+		} else {
+			return ManueverSpec.NO_ZONE;
+		}
 	}
 	
 	public function getTargetZoneIndexFromFocIndex(i:Int):Int {
@@ -225,18 +255,18 @@ class CombatViewModel
 		if (manueverSpec.activeEnemyBody==null) {
 			return EMPTY_ARR;
 		}
-		
+
 		if (curEnemy != null) {
 			if (playerManueverSpec.activeEnemyZone < 0 && playerManueverSpec.activeEnemyZone != ManueverSpec.NO_ZONE) {
 				if (playerManueverSpec.activeEnemyZone == ManueverSpec.LEFT_HAND_ZONE) {
 					if (enemyLeftItem == null) enemyLeftItem = curEnemy.charSheet.inventory.findOffHandItem();
-					playerManueverSpec.activeEnemyItem = null;
+					playerManueverSpec.activeEnemyItem = enemyLeftItem;
 				} else if (playerManueverSpec.activeEnemyZone == ManueverSpec.RIGHT_HAND_ZONE) {
 					if (enemyRightItem == null) enemyRightItem = curEnemy.charSheet.inventory.findMasterHandItem();
 					playerManueverSpec.activeEnemyItem = enemyRightItem;
 				}
 				else {
-					playerManueverSpec.activeEnemyItem = enemyLeftItem;
+					playerManueverSpec.activeEnemyItem = null;
 				}
 			} else {
 				playerManueverSpec.activeEnemyItem = null;
@@ -256,17 +286,10 @@ class CombatViewModel
 			}
 		} else {
 			if (focusIndex == _enemyHandLeftIdx || focusIndex == _enemyHandRightIdx) {
-				var theItem;
-				if (manueverSpec.usingLeftLimb) {
-					if (playerLeftItem == null) playerLeftItem = curPlayer.charSheet.inventory.findOffHandItem();
-					theItem = playerLeftItem;
-				} else {
-					if (playerRightItem == null) playerRightItem = curPlayer.charSheet.inventory.findMasterHandItem();
-					theItem = playerRightItem;
-				}
-				if (Std.is(theItem, Weapon)) {
-					return advAntiHandWithWeaponArr;
-				} else if (Std.is(theItem, Shield)) {
+
+				if (Std.is(manueverSpec.activeItem, Weapon)) {
+					return Std.is(manueverSpec.activeEnemyItem, Shield) ? advAntiShieldWithWeaponArr : advAntiWeapWithWeaponArr;
+				} else if (Std.is(manueverSpec.activeItem, Shield)) {
 					return advAntiHandWithShieldArr;
 				}
 				return advAntiHandUnarmedArr; 
@@ -525,10 +548,10 @@ class CombatViewModel
 	var _partMap:IntMap<Int>;
 	var _enemyHandLeftIdx:Int;
 	var _enemyHandRightIdx:Int;
-	var advInteract1:UInteract;
-	var advInteract2:UInteract;
-	var advInteract3:UInteract;
-	var advInteract4:UInteract;
+	public var advInteract1(default, null):UInteract;
+	public var advInteract2(default, null):UInteract;
+	public var advInteract3(default, null):UInteract;
+	public var advInteract4(default, null):UInteract;
 
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
 		_interactionMaps = [];
