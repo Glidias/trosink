@@ -163,6 +163,9 @@ class Manuever implements IManuever implements IUid
 	public static inline var TAG_INSTANT:Int = (1 << 10);
 	public static inline var TAG_MOVEMENT:Int = (1 << 11);
 	
+	public function getSecondary():Manuever {
+		return null;
+	}
 	
 	@:col public function _tags(val:Int):Manuever {
 		tags = val;

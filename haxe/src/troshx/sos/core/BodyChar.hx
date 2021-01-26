@@ -153,10 +153,11 @@ class BodyChar implements IBodyChar
 		return masks;
 	}
 
-	public function getDescLabelTargetZone(zoneIndex:Int, thrustLabel:String="Thrust to", swingLabel:String = "Swing to"):String {
+	public function getDescLabelTargetZone(zoneIndex:Int, thrustLabel:String="Thrust to", swingLabel:String = "Swing to", descOverwites:Array<String>=null):String {
 		var isThrusting:Bool  = zoneIndex >= thrustStartIndex;
 		var t = targetZones[zoneIndex];
-		return (t.description != "" ? t.description + " to" : (isThrusting ? thrustLabel : swingLabel) ) + " " +t.name;
+		var defaultDesc = (isThrusting ? thrustLabel : swingLabel);
+		return (t.description != ""  ? descOverwites != null && zoneIndex < descOverwites.length && descOverwites[zoneIndex] != null ? descOverwites[zoneIndex] : t.description + " to" : defaultDesc ) + " " +t.name;
 	}
 	
 	

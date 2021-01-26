@@ -61,6 +61,7 @@ class CombatViewModel
 	// atk and def manuevers, basic and adv
 	var basicSwing:Manuever;
 	var basicThrust:Manuever;
+	var basicShieldBash:Manuever;
 	var advSwingArr:Array<Manuever>;
 	var advThrustArr:Array<Manuever>;
 	var advShieldAttackArr:Array<Manuever>;
@@ -85,6 +86,7 @@ class CombatViewModel
 	
 	var basicMeleeShoot:Manuever;
 	var basicNetToss:Manuever;
+	var basicThrow:Manuever;
 	var advRangedArr:Array<Manuever>;
 	
 	static inline var B_ATTACK_1H:Int = 1;
@@ -92,41 +94,106 @@ class CombatViewModel
 	static inline var B_ATTACK_2H:Int = 3;
 	static inline var B_ATTACK_UNARMED:Int = 0;
 	static inline var B_ATTACK_UNARMED_2:Int = 3|4;
-	var browseAttackManueverList(default, null):Array<Int> = [B_ATTACK_1H, B_ATTACK_2H, B_ATTACK_UNARMED, B_ATTACK_UNARMED_2]; 
-	var browseAttackManueverList2(default, null):Array<Int> = [B_ATTACK_1H, B_ATTACK_SHIELD, B_ATTACK_UNARMED];
+	//var browseAttackManueverList(default, null):Array<Int> = [B_ATTACK_1H, B_ATTACK_2H, B_ATTACK_UNARMED, B_ATTACK_UNARMED_2]; 
+	//var browseAttackManueverList2(default, null):Array<Int> = [B_ATTACK_1H, B_ATTACK_SHIELD, B_ATTACK_UNARMED];
+	
+	var browseAttackManueverList3(default, null):Array<Int> = [B_ATTACK_1H, B_ATTACK_2H, B_ATTACK_1H, B_ATTACK_SHIELD, B_ATTACK_UNARMED, B_ATTACK_UNARMED_2];
+	var browseAttackManueverList3i(default, null):Array<Bool> = [false, false, true, true, false, false];
+	
 	var browseManueverIndex:Int = 0;
-	public function cycleAttackManueverMode(leftLimb:Bool=false):Void {
+	public function cycleAttackManueverMode(leftLimb:Bool = false):Void {
+		/*
 		if (playerManueverSpec.usingLeftLimb != leftLimb) {
 			playerManueverSpec.usingLeftLimb = leftLimb;
 			browseManueverIndex = 0;
 		}
-		var tarArr = leftLimb ? browseAttackManueverList2 : browseAttackManueverList;
+		var tarArr =getTarArr();
 		browseManueverIndex++;
 		if (browseManueverIndex >= tarArr.length) {
 			browseManueverIndex = 0;
 		}
+		*/
+		var tarArr =getTarArr();
+		if (leftLimb) {
+			browseManueverIndex--;
+			if (browseManueverIndex < 0) {
+				browseManueverIndex = tarArr.length - 1;
+			}
+		} else {
+			browseManueverIndex++;
+			if (browseManueverIndex >= tarArr.length) {
+				browseManueverIndex = 0;
+			}
+		}
+	}
+	public inline function getTarArr():Array<Int> {
+		return browseAttackManueverList3;
+		//return (playerManueverSpec.usingLeftLimb ? browseAttackManueverList2 : browseAttackManueverList);
 	}
 	public inline function getBrowseAttackMode():Int {
-		return (playerManueverSpec.usingLeftLimb ? browseAttackManueverList2 : browseAttackManueverList)[browseManueverIndex];
+		return getTarArr()[browseManueverIndex];
 	}
 	public function getBrowseAttackModeLabel(alsoLeft:Bool):String {
-		var tarArr = playerManueverSpec.usingLeftLimb && alsoLeft ? browseAttackManueverList2 : browseAttackManueverList;
+		var tarArr = getTarArr(); // playerManueverSpec.usingLeftLimb && alsoLeft ? browseAttackManueverList2 : browseAttackManueverList;
 		var val = tarArr[browseManueverIndex];
 		switch (val) {
 			case B_ATTACK_1H, B_ATTACK_2H: return "Weapon";
 			case B_ATTACK_UNARMED, B_ATTACK_UNARMED_2: return "Unarmed";
-			case B_ATTACK_SHIELD: return "Shield";
+			case B_ATTACK_SHIELD: return alsoLeft ? "Shield" : "Weapon";
 		}
 		return "unfound";
 	}
 	public function isBrowseHighlightLeft():Bool {
-		var tarArr = playerManueverSpec.usingLeftLimb ? browseAttackManueverList2 : browseAttackManueverList;
+		var tarArr = getTarArr();
 		return (playerManueverSpec.usingLeftLimb && tarArr[browseManueverIndex] ==B_ATTACK_1H) || (tarArr[browseManueverIndex] & 2) != 0;
 	}
 	public function isBrowseHighlightRight():Bool {
-		var tarArr = playerManueverSpec.usingLeftLimb ? browseAttackManueverList2 : browseAttackManueverList;
+		var tarArr =  getTarArr();
 		return (tarArr[browseManueverIndex] & 1) != 0;
 	}
+	
+	static var TARGETING_LABELS_MELEE:Array<String> = ["Thrust at", "Swing at"];
+	static var TARGETING_LABELS_SHOOT:Array<String> = ["Shoot at", null];
+	static var TARGETING_LABELS_THROW:Array<String> = ["Throw at", null];
+	static var TARGETING_LABELS_SHIELD:Array<String> = ["Shield bash at", null];
+	static var TARGETING_LABELS_UNARMED:Array<String> = ["Straight punch at", "Hook punch to", "Downward hook to", "Upward hook to"];
+	
+	
+	public function getBasicTargetingLabels():Array<String> {
+		var activeItem = playerManueverSpec.activeItem;
+		var gotPlayer = this.getCurrentPlayer() != null;
+		var b = getBrowseAttackMode();
+		
+		if (gotPlayer) {
+			var weap:Weapon = LibUtil.as(activeItem, Weapon);
+			var shield:Shield = LibUtil.as(activeItem, Shield);
+			if (weap != null) {
+				if (!weap.isRangedWeap()) {
+					return TARGETING_LABELS_MELEE;
+				} else {
+					if (!weap.isThrowing()) {
+						return TARGETING_LABELS_SHOOT;
+					} else {
+						return TARGETING_LABELS_THROW;
+					}
+				}
+			}  
+			else if (shield != null) {
+				return TARGETING_LABELS_SHIELD;
+			}
+			else {
+				return TARGETING_LABELS_UNARMED;
+			}
+		} else {
+			switch (b) {
+				case B_ATTACK_1H, B_ATTACK_2H: return TARGETING_LABELS_MELEE;
+				case B_ATTACK_SHIELD: return TARGETING_LABELS_SHIELD;
+				case B_ATTACK_UNARMED, B_ATTACK_UNARMED_2: return TARGETING_LABELS_UNARMED;
+			}
+		}
+		return TARGETING_LABELS_MELEE;
+	}
+	
 	
 	public var playerManueverSpec(default, null):ManueverSpec = new ManueverSpec();
 	
@@ -153,9 +220,11 @@ class CombatViewModel
 		
 		basicSwing = manueverRepo.get('swing');
 		basicThrust = manueverRepo.get('thrust');
+		basicShieldBash = manueverRepo.get("shieldBash");
+		
 		advSwingArr = ['drawCut', 'cleavingBlow', 'hook', 'feint'].map(manueverRepo.get);
 		advThrustArr = ['pushCut', 'jointThrust', 'hook', 'feint'].map(manueverRepo.get);
-		advShieldAttackArr = ['shieldBash', '', '', 'shieldFeint'].map(manueverRepo.get);
+		advShieldAttackArr = ['', '', '', 'shieldFeint'].map(manueverRepo.get);
 		
 		advAntiWeapWithWeaponArr = ['disarm', 'beat', 'break', ''].map(manueverRepo.get);
 		advAntiShieldWithWeaponArr = ['hew', 'beat', 'hook', ''].map(manueverRepo.get);
@@ -171,6 +240,7 @@ class CombatViewModel
 		
 		basicMeleeShoot = manueverRepo.get('meleeShoot');
 		basicNetToss = manueverRepo.get('netToss');
+		basicThrow = manueverRepo.get('throw');
 		advRangedArr = ['', '', 'blindToss', 'weaponThrow'].map(manueverRepo.get);
 		
 		basicVoid = manueverRepo.get('void');
@@ -411,14 +481,14 @@ class CombatViewModel
 	}
 
 
-	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item):String {
+	public function getFocusedLabel(enemyLeftItem:Item, enemyRightItem:Item, lblDescs:Array<String>=null):String {
 		var i = focusedIndex;
 		if (i < 0) return "";
-
+		
 		if (_swingMap.exists(i)) {
-			return getDollSwingDescAt(_swingMap.get(i));
+			return lblDescs!= null ? _body.getDescLabelTargetZone(DOLL_SWING_Indices[_swingMap.get(i)], lblDescs[0], lblDescs[1], lblDescs.length >= 3 ? lblDescs.slice(2) : null) : getDollSwingDescAt(_swingMap.get(i));
 		} else if (_partMap.exists(i)) {
-			return getDollPartThrustDescAt(_partMap.get(i));
+			return lblDescs!=null ? _body.getDescLabelTargetZone(DOLL_PART_Indices[_partMap.get(i)], lblDescs[0], lblDescs[1]) : getDollPartThrustDescAt(_partMap.get(i));
 		} else if (i == _enemyHandLeftIdx || i == _enemyHandRightIdx) {
 			if (i != _enemyHandRightIdx) {
 				return enemyLeftItem != null ? enemyLeftItem.name : "enemy's left-hand item";
@@ -653,9 +723,13 @@ class CombatViewModel
 	public var btnVoidInteract(default, null):UInteract;
 	public var btnParryInteract(default, null):UInteract;
 	
-	public function validateDefDisabled():Void {
-		
-	}
+	/*
+	 * TODO:
+	 * Attack type and target zone filtering
+	Default Manuever description + TN based off weapon or lack thereof ([Straight Punch, Hook Punch], [Swing, Thrust], [Shield Bash]*, [Shoot, Throw]*)
+	*Limit to thrusts viewing under these basic modes
+	Secondary manuever tn previewing
+	*/
 
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
 		_interactionMaps = [];
@@ -671,12 +745,7 @@ class CombatViewModel
 		(advInteract3=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever3'))).disabled = false;
 		(advInteract4 = _interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever4'))).disabled = false;
 		
-		(btnBlockInteract=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnBlock')));
-		(btnVoidInteract=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnVoid')));
-		(btnParryInteract = _interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnParry')));
-		DOLL_GENERAL_FOCUS_DESC.set(btnBlockInteract.index, basicBlock.name);
-		DOLL_GENERAL_FOCUS_DESC.set(btnVoidInteract.index, basicVoid.name);
-		DOLL_GENERAL_FOCUS_DESC.set(btnParryInteract.index, basicParry.name);
+		
 		
 
 		var body = BodyChar.getInstance();
@@ -793,6 +862,13 @@ class CombatViewModel
 		defaultThrustAvailMask = thrustAvailabilityMask;
 		onThrustAvailabilityChange();
 		onSwingAvailabilityChange();
+		
+		(btnBlockInteract = _interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnBlock'))).disabled = true;
+		(btnVoidInteract=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnVoid'))); //.disabled = true
+		(btnParryInteract = _interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('btnParry'))).disabled = true;
+		DOLL_GENERAL_FOCUS_DESC.set(btnBlockInteract.index, basicBlock.name);
+		DOLL_GENERAL_FOCUS_DESC.set(btnVoidInteract.index, basicVoid.name);
+		DOLL_GENERAL_FOCUS_DESC.set(btnParryInteract.index, basicParry.name);
 	}
 
 	

@@ -348,11 +348,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
+	@:computed function get_basicTargetingLabels():Array<String> {
+		return viewModel.getBasicTargetingLabels();
+	}
 	@:computed function get_focusedTextLbl():String 
 	{
 		var viewModel = this.viewModel;
 		//var d1 = this.viewModel.focusInvalidateCount; // this.cachedEnemyLeft
-		var lbl = !viewModel.observeOpponent ? viewModel.getFocusedLabel(this.enemyLeftItem, this.enemyRightItem) : this.partObserveLbl;
+		var lbl = !viewModel.observeOpponent ? viewModel.getFocusedLabel(this.enemyLeftItem, this.enemyRightItem, this.basicTargetingLabels) : this.partObserveLbl;
 		//if (lbl == null) lbl = viewModel.getBodyPartLabel(viewModel.focusedIndex);
 		return lbl;
 	}
@@ -829,9 +832,35 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return this.viewModel.actingState;
 	}
 
+	@:computed function get_isDefBtnBlockVisible():Bool {
+		var a = this.isDefBtnBlockAllowed;
+		var b = this.player == null;
+		var c = this.currentOpponent != null;
+		return c && (a || b);
+	}
 	@:computed function get_isDefBtnBlockAllowed():Bool {
 		return this.viewModel.isDefBtnBlockAllowed();
 	}
+	@:watch function on_isDefBtnBlockVisible(val:Bool, oldVal:Bool):Void {
+		this.viewModel.btnBlockInteract.disabled = !val;
+	}
+	
+	@:computed function get_isDefBtnParryVisible():Bool {
+		var a = this.isDefBtnParryAllowed;
+		var b = this.player == null;
+		var c = this.currentOpponent != null;
+		return c && (a || b);
+	}
+	@:watch function on_isDefBtnParryVisible(val:Bool, oldVal:Bool):Void {
+		this.viewModel.btnParryInteract.disabled = !val;
+	}
+	/*
+	@:watch function on_isDefBtnVoidAllowed(val:Bool, oldVal:Bool):Bool {
+		return this.viewModel.btnVoidInteract = val;
+	}
+	*/
+	
+	
 	
 	@:computed function get_isDefBtnParryAllowed():Bool {
 		return this.viewModel.isDefBtnParryAllowed();

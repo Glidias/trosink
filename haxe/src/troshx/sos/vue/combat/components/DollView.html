@@ -58,10 +58,10 @@
 				<div class="lbl">{{manuever.name}}<span class="cost" v-show="advCostArr[i]!=0"> [{{advCostArr[i]}}]</span><span class="tn" v-show="advTNArr[i]!=7 && advTNArr[i]!=0"> &gt;{{advTNArr[i]}}</span></div>
 			</zone>
 				
-			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="!player || isDefBtnBlockAllowed" :showShape="viewModel.focusedIndex==mapData.idIndices['btnBlock']">
+			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnBlock']" :mapData="mapData" class="def-manuever-btn" v-show="isDefBtnBlockVisible" :showShape="viewModel.focusedIndex==mapData.idIndices['btnBlock']">
 				<div class="lbl">B</div>
 			</zone>
-			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="!player || isDefBtnParryAllowed" :showShape="viewModel.focusedIndex==mapData.idIndices['btnParry']">
+			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnParry']" :mapData="mapData" class="def-manuever-btn" v-show="isDefBtnParryVisible" :showShape="viewModel.focusedIndex==mapData.idIndices['btnParry']">
 				<div class="lbl">P</div>
 			</zone>
 			<zone v-bind="styleDefBtnProps" :index="mapData.idIndices['btnVoid']" :mapData="mapData" class="def-manuever-btn" v-show="true" :showShape="viewModel.focusedIndex==mapData.idIndices['btnVoid']">
