@@ -34,7 +34,7 @@ class ShieldFeint extends Manuever
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
-		var shield:Shield = LibUtil.as(spec.activeItem, Shield); //  node.charSheet.inventory.findHeldShield();
+		var shield:Shield =  node.charSheet.inventory.findHeldShield();
 		if (shield == null) return false;
 		///*
 		var weapon:Weapon = node.charSheet.inventory.getMasterWeapon();

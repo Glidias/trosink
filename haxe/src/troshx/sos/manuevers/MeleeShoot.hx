@@ -15,7 +15,7 @@ class MeleeShoot extends Manuever
 	public function new() 
 	{
 		super("meleeShoot", "Melee Shoot");
-		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_THRUST)._ranged();
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_SHOOTING)._ranged();
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {

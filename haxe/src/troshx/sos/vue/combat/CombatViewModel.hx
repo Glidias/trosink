@@ -125,6 +125,7 @@ class CombatViewModel
 				browseManueverIndex = 0;
 			}
 		}
+		playerManueverSpec.usingLeftLimb = browseAttackManueverList3i[browseManueverIndex];
 	}
 	public inline function getTarArr():Array<Int> {
 		return browseAttackManueverList3;
@@ -725,10 +726,9 @@ class CombatViewModel
 	
 	/*
 	 * TODO:
-	 * Attack type and target zone filtering
-	Default Manuever description + TN based off weapon or lack thereof ([Straight Punch, Hook Punch], [Swing, Thrust], [Shield Bash]*, [Shoot, Throw]*)
-	*Limit to thrusts viewing under these basic modes
-	Secondary manuever tn previewing
+	Player item hand item selections
+	Actual Game: with Manuever Description TN based off weapon or lack thereof ([Straight Punch, Hook Punch], [Swing, Thrust], [Shield Bash]*, [Shoot, Throw]*)
+	Actual Game: Limit to thrusts viewing under these basic modes
 	*/
 
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {

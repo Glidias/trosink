@@ -2,7 +2,6 @@ package troshx.sos.manuevers;
 import troshx.components.Bout;
 import troshx.components.Bout.FightNode;
 import troshx.core.ManueverSpec;
-import troshx.sos.core.DamageType;
 import troshx.sos.core.Manuever;
 import troshx.sos.core.MeleeSpecial;
 import troshx.sos.core.Weapon;
@@ -18,7 +17,7 @@ class Hook extends Manuever
 	public function new() 
 	{
 		super("hook", "Hook");
-		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_BOTH)._targetZoneMode(Manuever.TARGET_ZONE_SHIELD | Manuever.TARGET_ZONE_OPPONENT)._costs(1)._superior();
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_BOTH)._targetZoneMode(Manuever.TARGET_ZONE_SHIELD|Manuever.TARGET_ZONE_OPPONENT)._costs(1)._superior();
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
