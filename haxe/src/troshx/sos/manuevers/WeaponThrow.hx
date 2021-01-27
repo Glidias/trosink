@@ -16,7 +16,7 @@ class WeaponThrow extends Manuever
 	public function new() 
 	{
 		super("weaponThrow", "Weapon Throw");
-		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_THRUST)._costs(1)._ranged();
+		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_THROWING)._costs(1)._ranged();
 	}
 	
 }

@@ -39,7 +39,6 @@ import troshx.sos.vue.pregen.PregenSelectView;
 import troshx.sos.chargen.CharGenData;
 
 
-
 /**
  * Main doll view component
  * @author Glidias
@@ -51,7 +50,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	{
 		super();
 	}
-	
+
 	// PREGENS
 	
 	static inline var PREGEN_SELECT_OPPONENT:Int = 4;
@@ -187,6 +186,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 	// todo : might be different depending on handedness
 	@:computed function get_rightItem():Item {
 		var pl = viewModel.getCurrentPlayer();
+		var weaponAssign = pl.charSheet.inventory.getMasterWeaponAssign();
+		if (weaponAssign != null) {
+			return Inventory.weaponFromAssign(weaponAssign);
+		}
 		return pl.charSheet.inventory.findMasterHandItem();
 	}
 	@:computed function get_leftItem():Item {
@@ -205,7 +208,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var usingLeftLimb = viewModel.playerManueverSpec.usingLeftLimb;
 		var activeItem = viewModel.playerManueverSpec.activeItem;
 		var rightItem = this.rightItem;
-		return usingLeftLimb ? false : rightItem ==  activeItem;
+		return usingLeftLimb ? false : rightItem == activeItem;
 	}
 	@:computed function get_leftItemHighlighted():Bool {
 		var usingLeftLimb = viewModel.playerManueverSpec.usingLeftLimb;
@@ -318,6 +321,9 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return arr;
 	}
 	
+	@:computed function get_isUsingNet():Bool {
+		return this.viewModel.isUsingNet();
+	}
 
 
 	
@@ -506,6 +512,15 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return val;
 	}
 	
+	@:computed function get_basicManuever():Manuever {
+		return this.viewModel.getBasicManuever();
+	}
+	
+	@:computed function get_basicManueverTN():Int {
+		var m = this.basicManuever;
+		var gotPlayer:Bool = this.player != null;
+		return m != null ? gotPlayer ? m.getTN(this.viewModel.playerManueverSpec) : m.tn : 0;
+	}
 	
 	@:computed function get_advSimpTNs():Array<Int> {
 		var arr = this.advManuevers;
@@ -672,7 +687,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 		return arr;
 	}
-	
+
 	function shieldCoveredAtDollHitLocation(i:Int):Bool {
 		var viewModel = this.viewModel;
 		var hitLocation = viewModel.getDollPartHitLocationAt(i);
@@ -693,6 +708,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 	// for standard non-dominant (enemy's left) side  (ie. right side of doll)
 	@:computed function get_hitLocationZeroAVValues2():Dynamic<AV3> {
 		return this.currentDollSheet.body.getNewEmptyAvsWithVis();
+	}
+	
+	function bitMaskHitAtIndex(i:Int, mask:Int):Bool {
+		return (i & mask) != 0;
 	}
 	
 	/*
@@ -879,7 +898,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 	@:computed function get_isDefBtnBlockAllowed():Bool {
 		return this.viewModel.isDefBtnBlockAllowed();
 	}
-	@:watch function on_isDefBtnBlockVisible(val:Bool, oldVal:Bool):Void {
+	@:watch function changed_isDefBtnBlockVisible(val:Bool, oldVal:Bool):Void {
 		this.viewModel.btnBlockInteract.disabled = !val;
 	}
 	
@@ -889,19 +908,48 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var c = this.currentOpponent != null;
 		return c && (a || b);
 	}
-	@:watch function on_isDefBtnParryVisible(val:Bool, oldVal:Bool):Void {
+	@:watch function changed_isDefBtnParryVisible(val:Bool, oldVal:Bool):Void {
 		this.viewModel.btnParryInteract.disabled = !val;
 	}
 	/*
-	@:watch function on_isDefBtnVoidAllowed(val:Bool, oldVal:Bool):Bool {
+	@:watch function changed_isDefBtnVoidAllowed(val:Bool, oldVal:Bool):Bool {
 		return this.viewModel.btnVoidInteract = val;
 	}
 	*/
 	
 	
-	
 	@:computed function get_isDefBtnParryAllowed():Bool {
 		return this.viewModel.isDefBtnParryAllowed();
+	}
+	
+		
+	@:computed function get_thrustAvailabilityMask():Int {
+		return viewModel.thrustAvailabilityMask;
+	}
+	@:computed function get_swingAvailabilityMask():Int {
+		return viewModel.swingAvailabilityMask;
+	}
+	
+	@:watch function changed_swingAvailabilityMask(newVal:Int, oldVal:Int):Void {
+		viewModel.onSwingAvailabilityChange();
+	}
+	@:watch function changed_thrustAvailabilityMask(newVal:Int, oldVal:Int):Void {
+		viewModel.onThrustAvailabilityChange();
+	}
+	
+	@:computed function get_activePlayerItem():Dynamic {
+		return viewModel.playerManueverSpec.activeItem;
+	}
+	
+	@:watch function changed_activePlayerItem(newVal:Dynamic, oldVal:Dynamic):Void {
+		viewModel.updateSwingThrustAvails();
+	}
+	
+	// default doll images
+	static var DOLL_BG_NO_SWINGS:Dynamic = {'background-image': 'url(images/dollscreen_clear3.png)'};
+	static var DOLL_BG_SWINGS:Dynamic = {'background-image': 'url(images/dollscreen_clear2.png)'};
+	@:computed function get_bgDollStyle():Dynamic {
+		return this.swingAvailabilityMask != 0 ? DOLL_BG_SWINGS : DOLL_BG_NO_SWINGS;
 	}
 	
 	@:computed function get_isDraggingCP():Bool {

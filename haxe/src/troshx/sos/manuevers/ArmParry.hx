@@ -5,8 +5,10 @@ import troshx.core.ManueverSpec;
 import troshx.sos.core.BodyChar.Humanoid;
 import troshx.sos.core.DamageType;
 import troshx.sos.core.Manuever;
+import troshx.sos.core.Shield;
 import troshx.sos.core.Weapon;
 import troshx.sos.sheets.CharSheet;
+import troshx.util.LibUtil;
 
 /**
  * ...
@@ -35,8 +37,8 @@ class ArmParry extends Manuever
 	}
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
-		var weapon:Weapon = spec.activeItem;
-		return weapon.atnS > 0;
+		var shield:Shield = LibUtil.as(spec.activeItem, Shield);
+		return shield == null;
 	}
 	
 }

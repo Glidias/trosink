@@ -20,6 +20,7 @@ class FightCharacters
 		
 			new CharSave("Street Thug", VHTMacros.getHTMLStringFromFile("src/troshx/sos/pregens/characters/street-thug", "txt"), "0.5/10 S CP:9" ),
 			new CharSave("Street Thug Boss", VHTMacros.getHTMLStringFromFile("src/troshx/sos/pregens/characters/street-thug-boss", "txt"), "0.5/10 S CP:12*"),
+			new CharSave("Japanese Street Thug Boss", VHTMacros.getHTMLStringFromFile("src/troshx/sos/pregens/characters/japanese-street-thug-boss", "txt"), "0.5/10 S CP:12*"),
 			new CharSave("Street Berserker", VHTMacros.getHTMLStringFromFile("src/troshx/sos/pregens/characters/street-berserker", "txt"), "0.5/10 S CP:15*" ),
 			
 			

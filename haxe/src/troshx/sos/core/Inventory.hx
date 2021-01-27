@@ -208,6 +208,10 @@ class Inventory
 		return null;
 	}
 	
+	public static inline function weaponFromAssign(w:WeaponAssign):Weapon {
+		return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
+	}
+	
 	public function getReach():Int {
 		return getReachBetween(getMasterWeapon(), getOffhandWeapon());
 	}
@@ -622,11 +626,7 @@ class Inventory
 				masterItem = null;
 			}
 		}
-		if (secItem != null) {
-			if (!isWeaponary(secItem)) {
-				secItem = null;
-			}
-		}
+		
 		
 		var weaponPicks:Array<SortedWeapon> = null;
 		var w:SortedWeapon;
@@ -765,12 +765,11 @@ class Inventory
 		var w;
 		var s;
 		var t;
-		
 		for (i in 0...weapons.length) {
 			w = weapons[i];
 			if (!w.weapon.strapped ) {  // For now, assumed no limit to amount of strapped weapons (assumed magic...)
 				w.held &= ~held;
-				if (w.weapon.twoHanded && w.held != HELD_BOTH) {
+				if (held != 0 && w.weapon.twoHanded && w.held == HELD_BOTH) {
 					w.held = 0;
 				}
 			}
@@ -781,7 +780,7 @@ class Inventory
 			s.held &= ~held;
 			if (!s.shield.strapped || isForShield) {  // only 1 strapped shield is allowed with isForShield
 				s.held &= ~held;
-				if (s.shield.twoHanded && s.held != HELD_BOTH) {
+				if (held != 0 && s.shield.twoHanded && s.held == HELD_BOTH) {
 					s.held = 0;
 				}
 			}
@@ -790,10 +789,10 @@ class Inventory
 		
 		for (i in 0...equipedNonMeleeItems.length) {
 			t = equipedNonMeleeItems[i];
-			
+		
 			if (!t.item.strapped) {  // For now, assumed no limit to amount of strapped items (assumed magic..)
 				t.held &= ~held;
-				if (t.item.twoHanded && t.held != HELD_BOTH) {
+				if (held != 0 && t.item.twoHanded && t.held == HELD_BOTH) {
 					t.held = 0;
 				}
 			}

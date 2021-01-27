@@ -64,6 +64,8 @@ class Manuever implements IManuever implements IUid
 	public static inline var ATTACK_TYPE_THRUST:Int = 2;
 	public static inline var ATTACK_TYPE_BOTH:Int = (ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST);
 	public static inline var ATTACK_TYPE_SHOOTING:Int = 4;
+	public static inline var ATTACK_TYPE_THROWING:Int = 8;
+	public static inline var IS_RANGED_ATTACK_TYPE:Int = (ATTACK_TYPE_SHOOTING | ATTACK_TYPE_THROWING);
 	//public static inline var ATTACK_TYPE_SHOOTING:Int = 8;
 	
 	@:col public function _attackTypes(val:Int):Manuever {
@@ -99,7 +101,7 @@ class Manuever implements IManuever implements IUid
 			var tzMouse:Int = spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) ? ATTACK_TYPE_THRUST : ATTACK_TYPE_SWING;
 			
 			var atks:Int = attackTypes;
-			if ((atks & ATTACK_TYPE_SHOOTING) != 0) {
+			if ((atks & (IS_RANGED_ATTACK_TYPE)) != 0) {
 				atks |= ATTACK_TYPE_THRUST;
 			}
 			return (tzMouse & atks) != 0;

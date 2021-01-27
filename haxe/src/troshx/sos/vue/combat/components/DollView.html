@@ -1,7 +1,7 @@
 <div class="dollview" style="position:absolute;top:0;left:0;width:100%;height:100%"  ref="container">
 	<div class="mouse-cursor" ref="cursor" :class="{observe:viewModel.observeOpponent}" />
 	<div v-if="mapData.renderCount!=0" style="width:100%;height:100%;top:0;left;0;position:absolute;">
-		<div class="bg" v-show="gotCurrentOpponent" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-image:url(images/dollscreen_clear2.png); background-position:50% 50%; background-size:contain"></div>
+		<div class="bg" v-show="gotCurrentOpponent" :style="bgDollStyle" style="position:absolute;top:0;left:0;width:100%;height:100%;background-repeat:no-repeat; background-position:50% 50%; background-size:contain"></div>
 		<zone :index="mapData.idIndices['vitals']" :mapData="mapData" style="padding:5px" class="textarea-region" :class="{'enableinput':!player}">
 			<div v-if="player">
 				<div>F: <span>{{fatique}}</span></div>
@@ -15,7 +15,7 @@
 
 		<zone :index="mapData.idIndices['incomingManuevers']" :mapData="mapData" style="padding:5px" class="textarea-region">
 			<div class="observe-indicator" v-if="gotCurrentOpponent" v-show="viewModel.incomingHeldDown || (!viewModel.showFocusedTag)" v-html="observePrompt"></div>
-			<div class="hover-tag" v-if="gotCurrentOpponent" v-show="viewModel.showFocusedTag" v-html="focusedTextLbl"></div>
+			<div class="hover-tag" v-if="gotCurrentOpponent" v-show="viewModel.showFocusedTag"><span v-html="focusedTextLbl"></span><span v-if="basicManueverTN > 0 && basicManueverTN != 7"> &gt;{{basicManueverTN}}</span></div>
 		</zone>
 
 		<div v-if="player">
@@ -45,8 +45,6 @@
 				<div class="lbl">{{rightItem.name}}</div>
 			</zone>
 
-			
-
 			<div class="cp-tray" id="cpTray" v-show="isDraggingCP" v-html="dragCPHtml" :style="cpTrayStyle">
 
 			</div>
@@ -68,12 +66,14 @@
 				<div class="lbl">V</div>
 			</zone>
 	
-					
-			<zone v-bind="stylePartProps" :index="mapData.idIndices[li]" :mapData="mapData" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li" :showShape="viewModel.focusedIndex==mapData.idIndices[li]">
-				<div class="thrust-point" v-if="viewModel.isDollPartThrustable(i)" :style="thrustPointStyle"></div>
-			</zone>
-			<zone v-bind="styleSwingProps" :index="mapData.idIndices[li]" :mapData="mapData" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li" :showShape="viewModel.focusedIndex==mapData.idIndices[li]"></zone>
+			<div v-show="viewModel.thrustAvailabilityMask != 0">
+				<zone v-bind="stylePartProps" :index="mapData.idIndices[li]" :mapData="mapData" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li" :showShape="viewModel.focusedIndex==mapData.idIndices[li]">
+					<div class="thrust-point" v-if="viewModel.isDollPartThrustable(i)" :style="thrustPointStyle"></div>
+				</zone>
+			</div>
 
+				
+			<zone v-bind="styleSwingProps" :index="mapData.idIndices[li]" :mapData="mapData" v-for="(li, i) in viewModel.DOLL_SWING_Slugs" :key="li" :showShape="viewModel.focusedIndex==mapData.idIndices[li]"></zone>
 
 
 			<zone v-bind="armorPartProps[i]" v-for="(li, i) in viewModel.DOLL_PART_Slugs" :key="li">
@@ -136,6 +136,8 @@
 	</div>
 	<div class="image-map-holder" style="position:relative; display:none" v-if="mapData.renderCount==0">
 		<img src="images/dollscreen.png" style="transform-origin:0 0; pointer-events:none; opacity:0.12" usemap="#map" ref="image" />
+		<img src="images/dollscreen_clear.png" style="display:none;"  />
+		<img src="images/dollscreen_clear2.png" style="display:none;"  />
 		<map name="map" ref="map">
 			<area shape="rect" coords="401, 334, 435, 391" title="enemyHandLeft" />
 			<area shape="rect" coords="59, 336, 92, 393" title="enemyHandRight" />

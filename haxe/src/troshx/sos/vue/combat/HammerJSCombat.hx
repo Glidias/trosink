@@ -206,7 +206,14 @@ class HammerJSCombat
 		}
 		else if (name == "handLeftAlt" || name == "handRightAlt") {
 			if ( (event & UIInteraction.TAP) != 0 ) {
-				if (viewModel.getCurrentPlayer() == null) {
+				if (viewModel.getCurrentPlayer() != null) {
+					if (name != "handLeftAlt") {
+						viewModel.togglePlayerMasterhandSlot();
+					} else {
+						viewModel.togglePlayerOffhandSlot();
+					}
+				}
+				else {
 					viewModel.cycleAttackManueverMode(name == "handLeftAlt");
 				}
 			}
@@ -243,7 +250,7 @@ class HammerJSCombat
 		viewModel.trayGridShelfSize = Math.floor(0.65 * valY);
 		viewModel.trayGridSizeX = viewModel.trayGridSizeY;
 		if (this.cpTrayDom == null) this.cpTrayDom = Browser.document.getElementById('cpTray');
-		Browser.window.setTimeout(function() {
+			Browser.window.setTimeout(function() {
 			viewModel.trayGridSizeX = cpTrayDom.clientWidth / CombatViewModel.TRAY_TOTAL_COLS;
 			trace(viewModel.trayGridSizeX + ' , ' + viewModel.trayGridSizeX);
 		});
@@ -270,8 +277,6 @@ class HammerJSCombat
 			this.viewModel.isTouchDragMode = isTouchMode;
 			
 		}
-		
-		
 	}
 	
 	

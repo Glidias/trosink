@@ -13,6 +13,7 @@ import troshx.sos.core.Shield;
 import troshx.sos.core.TargetZone;
 import troshx.sos.core.Weapon;
 import troshx.sos.core.Wound;
+import troshx.sos.manuevers.NetManuevers.NetItems;
 import troshx.sos.sheets.CharSheet;
 import troshx.sos.vue.combat.UIInteraction.UInteract;
 import troshx.util.AbsStringMap;
@@ -86,7 +87,7 @@ class CombatViewModel
 	
 	var basicMeleeShoot:Manuever;
 	var basicNetToss:Manuever;
-	var basicThrow:Manuever;
+	var basicWeaponThrow:Manuever;
 	var advRangedArr:Array<Manuever>;
 	
 	static inline var B_ATTACK_1H:Int = 1;
@@ -156,11 +157,11 @@ class CombatViewModel
 	static var TARGETING_LABELS_MELEE:Array<String> = ["Thrust at", "Swing at"];
 	static var TARGETING_LABELS_SHOOT:Array<String> = ["Shoot at", null];
 	static var TARGETING_LABELS_THROW:Array<String> = ["Throw at", null];
+	static var TARGETING_LABELS_THROW_NET:Array<String> = ["Throw net at", null];
 	static var TARGETING_LABELS_SHIELD:Array<String> = ["Shield bash at", null];
 	static var TARGETING_LABELS_UNARMED:Array<String> = ["Straight punch at", "Hook punch to", "Downward hook to", "Upward hook to"];
 	
-	
-	public function getBasicTargetingLabels():Array<String> {
+	public function getBasicTargetingLabels(?usingNet:Bool):Array<String> {
 		var activeItem = playerManueverSpec.activeItem;
 		var gotPlayer = this.getCurrentPlayer() != null;
 		var b = getBrowseAttackMode();
@@ -175,7 +176,8 @@ class CombatViewModel
 					if (!weap.isThrowing()) {
 						return TARGETING_LABELS_SHOOT;
 					} else {
-						return TARGETING_LABELS_THROW;
+						if (usingNet == null) usingNet = isUsingNet();
+						return usingNet ? TARGETING_LABELS_THROW_NET : TARGETING_LABELS_THROW;
 					}
 				}
 			}  
@@ -194,6 +196,163 @@ class CombatViewModel
 		}
 		return TARGETING_LABELS_MELEE;
 	}
+	
+	public function getBasicManuever(?usingNet:Bool):Manuever {
+		var spec = playerManueverSpec;
+		var activeItem = spec.activeItem;
+		var gotPlayer = this.getCurrentPlayer() != null;
+		var b = getBrowseAttackMode();
+		var enemyBody =  spec.activeEnemyBody;
+		var enemyZone = spec.activeEnemyZone;
+		
+		var f = focusedIndex;
+		if (_swingMap.exists(f) || _partMap.exists(f) || f == _enemyHandLeftIdx || f == _enemyHandRightIdx) {
+			if (gotPlayer) {
+				var weap:Weapon = LibUtil.as(activeItem, Weapon);
+				var shield:Shield = LibUtil.as(activeItem, Shield);
+				if (weap != null) {
+					if (!weap.isRangedWeap()) {
+						return enemyBody.isThrusting(spec.activeEnemyZone) ? basicThrust : basicSwing;
+					} else {
+						if (!weap.isThrowing()) {
+							return basicMeleeShoot;
+						} else {
+							if (usingNet == null) usingNet = isUsingNet();
+							return usingNet ? basicNetToss : basicWeaponThrow;
+						}
+					}
+				}  
+				else if (shield != null) {
+					return basicShieldBash;
+				}
+				else {
+					return enemyBody.isThrusting(enemyZone) ? basicStraightPunch : basicHookPunch;
+				}
+			} else {
+				switch (b) {
+					case B_ATTACK_1H, B_ATTACK_2H: return enemyBody.isThrusting(enemyZone) ? basicThrust : basicSwing;
+					case B_ATTACK_SHIELD: return basicShieldBash;
+					case B_ATTACK_UNARMED, B_ATTACK_UNARMED_2: return enemyBody.isThrusting(enemyZone) ? basicStraightPunch : basicHookPunch;
+				}
+			}
+		} else {
+			if (f == btnVoidInteract.index) {
+				return basicVoid;
+			} else if (f == btnParryInteract.index) {
+				return basicParry;
+			} else if (f == btnBlockInteract.index ){
+				return basicBlock;
+			}
+			return null;
+		}
+		return null;
+	}
+	
+	
+	public function updateSwingThrustAvails():Void {
+		var activeItem = playerManueverSpec.activeItem;
+		var gotPlayer = this.getCurrentPlayer() != null;
+
+		if (gotPlayer) {
+			var weap:Weapon = LibUtil.as(activeItem, Weapon);
+			var shield:Shield = LibUtil.as(activeItem, Shield);
+			if (weap != null) {
+				if (!weap.isRangedWeap()) {
+					thrustAvailabilityMask = defaultThrustAvailMask;
+					swingAvailabilityMask = defaultSwingAvailMask;
+				} else {
+					if (!weap.isThrowing()) {
+						thrustAvailabilityMask = defaultThrustAvailMask;
+						swingAvailabilityMask = 0;
+					} else {
+						thrustAvailabilityMask = defaultThrustAvailMask;
+						swingAvailabilityMask = 0;
+					}
+				}
+			}  
+			else if (shield != null) {
+				thrustAvailabilityMask = defaultThrustAvailMask;
+				swingAvailabilityMask = 0;
+			}
+			else {
+				thrustAvailabilityMask = defaultThrustAvailMask;
+				swingAvailabilityMask = defaultSwingAvailMask;
+			}
+		} else {
+			thrustAvailabilityMask = defaultThrustAvailMask;
+			swingAvailabilityMask = defaultSwingAvailMask;
+		}
+	}
+	
+	public function onThrustAvailabilityChange():Void {
+		handleDisabledMask(thrustAvailabilityMask, DOLL_PART_Slugs);
+		var i = focusedIndex;
+		if (_partMap.exists(i)) {
+			//if (thrustAvailabilityMask == 0) focusedIndex = 0;
+			//map.get(_dollImageMapData.idIndices.get(slugs[i]))
+			if ((thrustAvailabilityMask & (1 << _partMap.get(i)) == 0)) {
+				focusedIndex = -1;
+			}
+		}
+	}
+	public function onSwingAvailabilityChange():Void {
+		handleDisabledMask(swingAvailabilityMask, DOLL_SWING_Slugs);
+		var i = focusedIndex;
+		if (_swingMap.exists(i)) {
+			//if (swingAvailabilityMask == 0) focusedIndex = 0;
+			if ((swingAvailabilityMask & (1 << _swingMap.get(i)) == 0)) {
+				focusedIndex = -1;
+			}
+		}
+	}
+	
+	public function togglePlayerMasterhandSlot():Void {
+		var pl = getCurrentPlayer();
+		
+		var weaponAssign:WeaponAssign = pl.charSheet.inventory.getMasterWeaponAssign();
+		var weapon:Weapon = Inventory.weaponFromAssign(weaponAssign);
+		playerManueverSpec.usingLeftLimb = false;
+		if (weaponAssign != null) {
+			if (weapon == playerManueverSpec.activeItem) {
+				if (weaponAssign.held == Inventory.HELD_BOTH && (!weapon.twoHanded || Weapon.isTwoHandedOff(weapon)) && weapon.variant !=null ) {
+					weapon = weapon.variant;
+					weaponAssign.holding1H = true;
+					playerManueverSpec.activeItem = null;
+				} else {
+					playerManueverSpec.activeItem = null;
+				}
+			} else {
+				if (weaponAssign.holding1H) { // restore back to holding2H
+					weapon = weaponAssign.weapon;
+					weaponAssign.held = Inventory.HELD_MASTER;
+					weaponAssign.holding1H = false;
+				}
+				playerManueverSpec.activeItem = weapon;
+			}
+			return;
+		}
+
+		// for simplficiation in combat, all items assumed to not need two-handed carries
+		var item:Item = pl.charSheet.inventory.findMasterHandItem();
+		 if (item ==  playerManueverSpec.activeItem) {
+			playerManueverSpec.activeItem = null;
+		} else {
+			playerManueverSpec.activeItem = item;
+		}
+	}
+	public function togglePlayerOffhandSlot():Void {
+		var pl = getCurrentPlayer();
+	
+		var item:Item = pl.charSheet.inventory.findOffHandItem();
+		 if (item ==  playerManueverSpec.activeItem) {
+			playerManueverSpec.activeItem = null;
+			playerManueverSpec.usingLeftLimb = false;
+		} else {
+			playerManueverSpec.activeItem = item;
+			playerManueverSpec.usingLeftLimb = true;
+		}
+	}
+	
 	
 	
 	public var playerManueverSpec(default, null):ManueverSpec = new ManueverSpec();
@@ -222,6 +381,8 @@ class CombatViewModel
 		basicSwing = manueverRepo.get('swing');
 		basicThrust = manueverRepo.get('thrust');
 		basicShieldBash = manueverRepo.get("shieldBash");
+		basicMeleeShoot = manueverRepo.get("meleeShoot");
+		basicWeaponThrow = manueverRepo.get("weaponThrow");
 		
 		advSwingArr = ['drawCut', 'cleavingBlow', 'hook', 'feint'].map(manueverRepo.get);
 		advThrustArr = ['pushCut', 'jointThrust', 'hook', 'feint'].map(manueverRepo.get);
@@ -240,8 +401,8 @@ class CombatViewModel
 		mOneTwoPunch = manueverRepo.get('oneTwoPunch');
 		
 		basicMeleeShoot = manueverRepo.get('meleeShoot');
+		basicWeaponThrow = manueverRepo.get("weaponThrow"); // if optional training weapon
 		basicNetToss = manueverRepo.get('netToss');
-		basicThrow = manueverRepo.get('throw');
 		advRangedArr = ['', '', 'blindToss', 'weaponThrow'].map(manueverRepo.get);
 		
 		basicVoid = manueverRepo.get('void');
@@ -273,8 +434,6 @@ class CombatViewModel
 		var player = getCurrentPlayer();
 		playerManueverSpec.activeItem = offhand ? player.charSheet.inventory.findOffHandItem() : player.charSheet.inventory.findMasterHandItem();
 	}
-
-	
 	
 
 	//public function filteredBodyParts(swing:B
@@ -356,6 +515,15 @@ class CombatViewModel
 		} else {
 			return ManueverSpec.NO_ZONE;
 		}
+	}
+	
+	public function isUsingNet():Bool {
+		var weap:Weapon = LibUtil.as(playerManueverSpec.activeItem, Weapon);
+		if (weap != null) {
+			var throwing = weap.isThrowing();
+			return throwing && NetItems.STUFF.indexOf(weap.name) >= 0;
+		}
+		return false;
 	}
 	
 	public function getTargetZoneIndexFromFocIndex(i:Int):Int {
@@ -679,12 +847,6 @@ class CombatViewModel
 			map.get(_dollImageMapData.idIndices.get(slugs[i])).disabled = disabled;
 		}
 	}
-	public function onThrustAvailabilityChange():Void {
-		handleDisabledMask(thrustAvailabilityMask, DOLL_PART_Slugs);
-	}
-	public function onSwingAvailabilityChange():Void {
-		handleDisabledMask(swingAvailabilityMask, DOLL_SWING_Slugs);
-	}
 	
 	public function onAdvAvailabilityChange(mask:Int):Void {
 		advInteract1.disabled = (mask & (1|16)) != 0;
@@ -727,8 +889,7 @@ class CombatViewModel
 	/*
 	 * TODO:
 	Player item hand item selections
-	Actual Game: with Manuever Description TN based off weapon or lack thereof ([Straight Punch, Hook Punch], [Swing, Thrust], [Shield Bash]*, [Shoot, Throw]*)
-	Actual Game: Limit to thrusts viewing under these basic modes
+	Low priority: Blind Toss items
 	*/
 
 	public function setupDollInteraction(fullInteractList:Array<UInteract>, imageMapData:ImageMapData):Void {
@@ -745,9 +906,6 @@ class CombatViewModel
 		(advInteract3=_interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever3'))).disabled = false;
 		(advInteract4 = _interactionMaps[ACTING_DOLL_DECLARE].get(_dollImageMapData.idIndices.get('advManuever4'))).disabled = false;
 		
-		
-		
-
 		var body = BodyChar.getInstance();
 		_body = body;
 
