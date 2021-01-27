@@ -191,8 +191,10 @@ class HammerJSCombat
 			if ( (event & UIInteraction.DOWN) != 0 ) {
 				if (index != viewModel.focusedIndex) viewModel.setFocusedIndex(index);
 				else {
-					viewModel.resetAdvFocusedIndex();
-					startDragCP(name, tag, name=="btnParry", true);
+					if (viewModel.currentPlayerIndex >= 0) {
+						viewModel.resetAdvFocusedIndex();
+						startDragCP(name, tag, name == "btnParry", true);
+					}
 				}
 			} else if ( (event & UIInteraction.MASK_CANCELED_OR_RELEASE) != 0 ) {
 				viewModel.setActingState(CombatViewModel.ACTING_DOLL_DECLARE);
