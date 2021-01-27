@@ -892,8 +892,7 @@ class CombatViewModel
 	public var btnParryInteract(default, null):UInteract;
 	
 	/*
-	 * TODO:
-	Player item hand item selections
+	 * todo:
 	Low priority: Blind Toss items
 	*/
 
