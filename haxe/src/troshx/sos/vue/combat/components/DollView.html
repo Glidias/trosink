@@ -35,14 +35,14 @@
 				<div class="lbl" v-html="leftTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handLeftText']" :mapData="mapData" v-if="leftItem">
-				<div class="lbl">{{leftItem.name}}</div>
+				<div class="lbl">{{leftItem.name}}<span v-show="leftItemAssign.holding1H">*</span></div>
 			</zone>
 
 			<zone v-bind="stylePlHandBtnProps" :index="mapData.idIndices['handRightAlt']" :mapData="mapData" class="textarea-region" v-if="rightItem" :showShape="rightItemHighlighted">
 				<div class="lbl" v-html="rightTypeTag"></div>
 			</zone>
 			<zone :index="mapData.idIndices['handRightText']" :mapData="mapData" v-if="rightItem">
-				<div class="lbl">{{rightItem.name}}</div>
+				<div class="lbl">{{rightItem.name}}<span v-show="rightItemAssign.holding1H">*</span></div>
 			</zone>
 
 			<div class="cp-tray" id="cpTray" v-show="isDraggingCP" v-html="dragCPHtml" :style="cpTrayStyle">

@@ -466,10 +466,16 @@ class DollView extends VComponent<DollViewData, NoneT>
 		}
 	}
 	
+	@:computed function get_canOneTwoPunch():Bool {
+		var a = boutModel.bout;
+		var b = this.player;
+		return b != null ? this.viewModel.mOneTwoPunch.getAvailability(a , b, viewModel.playerManueverSpec) : false;
+	}
+	
 	@:computed function get_advManuevers():Array<Manuever> {
 		var gotPlayer:Bool = this.player != null;
 		var gotEnemy:Bool = this.currentOpponent != null;
-		return this.viewModel.getAdvancedManuevers(this.player, gotPlayer ? this.leftItem : null, gotPlayer ? this.rightItem : null, this.currentOpponent, gotEnemy ? this.enemyLeftItem : null, gotEnemy ? this.enemyRightItem : null);
+		return this.viewModel.getAdvancedManuevers(this.player, gotPlayer ? this.leftItem : null, gotPlayer ? this.rightItem : null, this.currentOpponent, gotEnemy ? this.enemyLeftItem : null, gotEnemy ? this.enemyRightItem : null, this.canOneTwoPunch && this.viewModel.lastToggleMasterSlot);
 	}
 	
 

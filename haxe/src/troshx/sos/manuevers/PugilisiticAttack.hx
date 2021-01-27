@@ -244,8 +244,15 @@ class OneTwoPunch extends PugilisiticAttack {
 	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
 		// todo: left handed might be using a differnet master hand item?
-		var otherHandItem = spec.usingLeftLimb ? node.charSheet.inventory.findMasterHandItem() : node.charSheet.inventory.findOffHandItem();
-		return otherHandItem == null;
+		//var otherHandItem = spec.usingLeftLimb ? node.charSheet.inventory.findMasterHandItem() : node.charSheet.inventory.findOffHandItem();
+		// For now, shield prevents using one two punch. ANy item may be fair game considered for punching while holding.
+		//return otherHandItem == null;
+		var holdingShield = node.charSheet.inventory.findHeldShieldAssign() != null;
+		var masterHandItem = node.charSheet.inventory.findMasterHandItem();
+		if (holdingShield) return false;
+		if (masterHandItem != null && masterHandItem.twoHanded ) return false;
+		return true;
+		
 	}
 }
  /*

@@ -308,25 +308,24 @@ class CombatViewModel
 	
 	public function togglePlayerMasterhandSlot():Void {
 		var pl = getCurrentPlayer();
+		lastToggleMasterSlot = true;
 		
 		var weaponAssign:WeaponAssign = pl.charSheet.inventory.getMasterWeaponAssign();
 		var weapon:Weapon = Inventory.weaponFromAssign(weaponAssign);
 		playerManueverSpec.usingLeftLimb = false;
 		if (weaponAssign != null) {
-			if (weapon == playerManueverSpec.activeItem) {
+			if (playerManueverSpec.activeItem != null && weapon == playerManueverSpec.activeItem) {
 				if (weaponAssign.held == Inventory.HELD_BOTH && (!weapon.twoHanded || Weapon.isTwoHandedOff(weapon)) && weapon.variant !=null ) {
 					weapon = weapon.variant;
 					weaponAssign.holding1H = true;
-					playerManueverSpec.activeItem = null;
+					weaponAssign.held = Inventory.HELD_MASTER;
+					playerManueverSpec.activeItem = weapon;
 				} else {
 					playerManueverSpec.activeItem = null;
+					pl.charSheet.inventory.holdBackWeaponNormalise(weaponAssign);
 				}
 			} else {
-				if (weaponAssign.holding1H) { // restore back to holding2H
-					weapon = weaponAssign.weapon;
-					weaponAssign.held = Inventory.HELD_MASTER;
-					weaponAssign.holding1H = false;
-				}
+				pl.charSheet.inventory.holdBackWeaponNormalise(weaponAssign);
 				playerManueverSpec.activeItem = weapon;
 			}
 			return;
@@ -334,7 +333,7 @@ class CombatViewModel
 
 		// for simplficiation in combat, all items assumed to not need two-handed carries
 		var item:Item = pl.charSheet.inventory.findMasterHandItem();
-		 if (item ==  playerManueverSpec.activeItem) {
+		 if (playerManueverSpec.activeItem != null && item ==  playerManueverSpec.activeItem) {
 			playerManueverSpec.activeItem = null;
 		} else {
 			playerManueverSpec.activeItem = item;
@@ -342,6 +341,7 @@ class CombatViewModel
 	}
 	public function togglePlayerOffhandSlot():Void {
 		var pl = getCurrentPlayer();
+		lastToggleMasterSlot = false;
 	
 		var item:Item = pl.charSheet.inventory.findOffHandItem();
 		 if (item ==  playerManueverSpec.activeItem) {
@@ -546,7 +546,7 @@ class CombatViewModel
 	}
 	
 	static var EMPTY_ARR:Array<Manuever> = [];
-	public function getAdvancedManuevers(curPlayer:FightNode<CharSheet>=null, playerLeftItem:Item=null, playerRightItem:Item=null, curEnemy:FightNode<CharSheet>=null, enemyLeftItem:Item=null, enemyRightItem=null):Array<Manuever> {
+	public function getAdvancedManuevers(curPlayer:FightNode<CharSheet>=null, playerLeftItem:Item=null, playerRightItem:Item=null, curEnemy:FightNode<CharSheet>=null, enemyLeftItem:Item=null, enemyRightItem=null, preferOneTwoPunch:Bool=false):Array<Manuever> {
 		var manueverSpec:ManueverSpec = playerManueverSpec;
 		var targetZone = manueverSpec.activeEnemyZone;
 		var offhand = manueverSpec.usingLeftLimb;
@@ -589,6 +589,8 @@ class CombatViewModel
 				} else if (mode == CombatViewModel.B_ATTACK_SHIELD) {
 					return advShieldAttackArr;
 				}
+			}  else if (manueverSpec.activeItem == null) {
+				return preferOneTwoPunch ? advPuglismThrustSwingArr : advPuglismHandlessArr;
 			}
 			
 			if (manueverSpec.activeEnemyBody.isThrusting(targetZone)) {
@@ -787,6 +789,7 @@ class CombatViewModel
 	inline function set_currentPlayerIndex(value:Int):Int 
 	{
 		playerManueverSpec.resetPlayer();
+		lastToggleMasterSlot = true;
 		//playerManueverSpec.activeItem = boutModel.bout.combatants[value].charSheet.inventory.findMasterHandItem();
 		//trace(playerManueverSpec.activeItem);
 		return currentPlayerIndex = value;
@@ -876,6 +879,8 @@ class CombatViewModel
 	var _partMap:IntMap<Int>;
 	var _enemyHandLeftIdx:Int;
 	var _enemyHandRightIdx:Int;
+	
+	public var lastToggleMasterSlot(default, null):Bool = true;
 	
 	public var advInteract1(default, null):UInteract;
 	public var advInteract2(default, null):UInteract;

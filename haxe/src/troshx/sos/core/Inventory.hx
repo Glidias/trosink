@@ -193,7 +193,7 @@ class Inventory
 		for (i in 0...weapons.length) {
 			if (weapons[i].held == HELD_OFF) {
 				var w = weapons[i];
-				return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
+				return weaponFromAssign(w); // (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
 			}
 		}
 		return null;
@@ -202,14 +202,30 @@ class Inventory
 		for (i in 0...weapons.length) {
 			if (( weapons[i].held & HELD_MASTER) != 0) {
 				var w = weapons[i];
-				return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
+				return weaponFromAssign(w); // (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
 			}
 		}
 		return null;
 	}
 	
+	/**
+	 * Holds back weapon as per normal if needed be
+	 * @param	masterWeaponAssign
+	 * @return
+	 */
+	public function holdBackWeaponNormalise(masterWeaponAssign:WeaponAssign=null):Bool {
+		if (masterWeaponAssign == null) masterWeaponAssign = getMasterWeaponAssign();
+		if (masterWeaponAssign == null) return false;
+		if (masterWeaponAssign.holding1H && masterWeaponAssign.weapon.twoHanded && this.findOffHandAssign()==null) {
+			masterWeaponAssign.holding1H = false;
+			masterWeaponAssign.held = HELD_BOTH;
+			return true;
+		}
+		return false;
+	}
+	
 	public static inline function weaponFromAssign(w:WeaponAssign):Weapon {
-		return (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
+		return w.holding1H && w.weapon.variant != null ? w.weapon.variant : w.weapon; // (!w.holding1H || w.weapon.variant == null) ? w.weapon : w.weapon.variant;
 	}
 	
 	public function getReach():Int {
