@@ -142,7 +142,7 @@ class HammerJSCombat
 			} else {
 				if (event == UIInteraction.DOWN && index == viewModel.focusedIndex) {
 					if (name == "enemyHandLeft" || name == "enemyHandRight") {
-						if (!viewModel.advInteract1.disabled) viewModel.setAdvFocusedIndex(0);
+						if (!viewModel.advInteract1.disabled && viewModel.currentPlayerIndex >= 0) viewModel.setAdvFocusedIndex(0);
 						else return;
 					}
 					else viewModel.resetAdvFocusedIndex(); 

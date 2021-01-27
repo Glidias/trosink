@@ -476,6 +476,10 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var gotPlayer:Bool = this.player != null; 
 		return gotPlayer ? this.advCosts : this.advSimpCosts;
 	}
+	@:computed function get_advCosLblArr():Array<String> {
+		var gotPlayer:Bool = this.player != null; 
+		return gotPlayer ? this.advCostStrs : this.advSimpCostStr;
+	}
 	
 	@:computed function get_browseAttackModeLabel():String {
 		return this.viewModel.getBrowseAttackModeLabel(false);
@@ -502,6 +506,7 @@ class DollView extends VComponent<DollViewData, NoneT>
 		return val;
 	}
 	
+	
 	@:computed function get_advSimpTNs():Array<Int> {
 		var arr = this.advManuevers;
 		var val = [];
@@ -514,8 +519,28 @@ class DollView extends VComponent<DollViewData, NoneT>
 	@:computed function get_advCosts():Array<Int> {
 		var arr = this.advManuevers;
 		var val = [];
+		var player = this.player;
+		var bout = this.boutModel.bout;
 		for (i in 0...arr.length) {
-			val[i] = arr[i].getCost(this.boutModel.bout, this.player, null);
+			val[i] = arr[i].getCost(bout, player, null);
+		}
+		return val;
+	}
+	
+	@:computed function get_advCostStrs():Array<String> {
+		var arr = this.advManuevers;
+		var arrCosts = this.advCosts;
+		var val:Array<String> = [];
+		var player = this.player;
+		var bout = this.boutModel.bout;
+		var spec = this.viewModel.playerManueverSpec;
+		for (i in 0...arr.length) {
+			var m = arr[i];
+			var sec = m.getSecondary();
+			if (sec!= null && !sec.getAvailability(bout, player, spec)) { // warning:: this dirty check isn't optimized/cached
+				sec = null;
+			}
+			val[i] = (m.isDeferedCost() ? '\\' : "") + arrCosts[i] + (sec != null ? ','+sec.getCost(bout, player, null)  : "");
 		}
 		return val;
 	}
@@ -525,6 +550,16 @@ class DollView extends VComponent<DollViewData, NoneT>
 		var val = [];
 		for (i in 0...arr.length) {
 			val[i] = arr[i].cost;
+		}
+		return val;
+	}
+	
+	@:computed function get_advSimpCostStr():Array<String> {
+		var arr = this.advManuevers;
+		var val = [];
+		for (i in 0...arr.length) {
+			var m = arr[i];
+			val[i] = (m.isDeferedCost() ? '\\' : "") + m.cost;
 		}
 		return val;
 	}
@@ -539,11 +574,14 @@ class DollView extends VComponent<DollViewData, NoneT>
 	@:computed function get_advNotAvailMask():Int {
 		var arr = this.advManuevers;
 		var arrTNs = this.advTNs;
-		var gotPlayer = this.player != null;
+		var player = this.player;
+		var bout = this.boutModel.bout;
+		var gotPlayer = player != null;
 		var val = 0;
+		var spec = this.viewModel.playerManueverSpec;
 		if (gotPlayer) {
 			for (i in 0...arr.length) {
-				val |= arrTNs[i] < 0 || !arr[i].getAvailability(this.boutModel.bout, this.player, this.viewModel.playerManueverSpec) ? (1 << i) : 0;
+				val |= arrTNs[i] < 0 || !arr[i].getAvailability(bout, player, spec) || !arr[i].validForTargetZone(spec) ? (1 << i) : 0;
 			}
 		}
 		return val;

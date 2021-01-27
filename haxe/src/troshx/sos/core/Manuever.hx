@@ -63,8 +63,8 @@ class Manuever implements IManuever implements IUid
 	public static inline var ATTACK_TYPE_SWING:Int = 1;
 	public static inline var ATTACK_TYPE_THRUST:Int = 2;
 	public static inline var ATTACK_TYPE_BOTH:Int = (ATTACK_TYPE_SWING | ATTACK_TYPE_THRUST);
-	public static inline var ATTACK_TYPE_BUTT:Int = 4;
-	public static inline var ATTACK_TYPE_SHOOTING:Int = 8;
+	public static inline var ATTACK_TYPE_SHOOTING:Int = 4;
+	//public static inline var ATTACK_TYPE_SHOOTING:Int = 8;
 	
 	@:col public function _attackTypes(val:Int):Manuever {
 		attackTypes = val;
@@ -85,12 +85,34 @@ class Manuever implements IManuever implements IUid
 	public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
 		return true;
 	}
+	public function validForTargetZone(spec:ManueverSpec):Bool {
+		
+		if (targetZoneMode != TARGET_ZONE_AUTO) {
+			if (targetZoneMode == TARGET_ZONE_WEAPON) {
+				return Std.is(spec.activeEnemyItem, Weapon);
+			} else if (targetZoneMode == TARGET_ZONE_SHIELD) {
+				return Std.is(spec.activeEnemyItem, Shield);
+			} 
+		} 
+		if (targetZoneMode == TARGET_ZONE_AUTO || (targetZoneMode & TARGET_ZONE_OPPONENT)!=0) {
+			if (attackTypes == 0 || spec.activeEnemyZone < 0) return true;
+			var tzMouse:Int = spec.activeEnemyBody.isThrusting(spec.activeEnemyZone) ? ATTACK_TYPE_THRUST : ATTACK_TYPE_SWING;
+			
+			var atks:Int = attackTypes;
+			if ((atks & ATTACK_TYPE_SHOOTING) != 0) {
+				atks |= ATTACK_TYPE_THRUST;
+			}
+			return (tzMouse & atks) != 0;
+			//return (attackTypes &
+		}
+		return true;
+	}
 	
 	
 	public static inline var TARGET_ZONE_AUTO:Int = 0;  // determined from attack type
 	public static inline var TARGET_ZONE_WEAPON:Int = 1;
 	public static inline var TARGET_ZONE_SHIELD:Int = 2;
-	public static inline var TARGET_ZONE_OPPONENT:Int = -1;
+	public static inline var TARGET_ZONE_OPPONENT:Int = 4;
 	
 	public static inline function specificTargetZoneModeMask(val:Int):Int {
 		return -val;
@@ -201,6 +223,9 @@ class Manuever implements IManuever implements IUid
 	public var costVaries:Bool = false;
 	public static inline var NO_INVEST:Int = -1;
 	public static inline var DEFER_COST:Int = -2;
+	public  inline function isDeferedCost():Bool {
+		return costFuncInputs == DEFER_COST;
+	}
 	@:col public function _costs(cost:Int, costFuncInputs:Int=0, costVaries:Bool=false):Manuever {
 		this.cost = cost;
 		this.costFuncInputs = costFuncInputs;

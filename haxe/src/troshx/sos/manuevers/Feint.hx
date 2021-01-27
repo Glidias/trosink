@@ -20,6 +20,11 @@ class Feint extends Manuever
 		_types(Manuever.TYPE_OFFENSIVE)._requisite(Manuever.REQ_WEAPON)._attackTypes(Manuever.ATTACK_TYPE_BOTH)._costs(2, Manuever.DEFER_COST)._superior();
 	}
 	
+	var _shieldFeint:ShieldFeint;
+	override public function getSecondary():Manuever {
+		return _shieldFeint!=null ? _shieldFeint : (_shieldFeint = new ShieldFeint());
+	}
+	
 	override public function getAvailability(bout:Bout<CharSheet>, node:FightNode<CharSheet>, spec:ManueverSpec):Bool {
 		var weapon:Weapon = spec.activeItem;
 		var fluidThrusts:Bool = (weapon.meleeFlags & MeleeSpecial.FLUID_THRUSTS) != 0;
